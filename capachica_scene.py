@@ -77,7 +77,9 @@ def make_mat(name, rgb, roughness=0.8, metallic=0.0, emission_rgb=None, emission
     bsdf.inputs['Roughness'].default_value   = roughness
     bsdf.inputs['Metallic'].default_value    = metallic
     if emission_rgb:
-        bsdf.inputs['Emission'].default_value        = (*emission_rgb, 1.0)
+        # Blender 4.x renombró 'Emission' → 'Emission Color'
+        emit_key = 'Emission Color' if 'Emission Color' in bsdf.inputs else 'Emission'
+        bsdf.inputs[emit_key].default_value        = (*emission_rgb, 1.0)
         bsdf.inputs['Emission Strength'].default_value = emission_strength
     links.new(bsdf.outputs['BSDF'], out.inputs['Surface'])
     return mat
