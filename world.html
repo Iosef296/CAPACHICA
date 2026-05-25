@@ -9,38 +9,36 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:#040c08;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif;color:#e2f5f0;}
-
 #map{position:fixed;inset:0;width:100vw;height:100vh;}
 
-/* ── Overlays de animación ── */
-#stars-canvas{
-  position:fixed;inset:0;pointer-events:none;z-index:2;
-  opacity:0.75;
-}
-#water-shimmer{
+/* ── Overlays de efecto ── */
+#stars-canvas{position:fixed;inset:0;pointer-events:none;z-index:2;}
+/* Brillo de agua pulsante */
+#water-glow{
   position:fixed;inset:0;pointer-events:none;z-index:3;
-  background:radial-gradient(ellipse 70% 50% at 55% 58%,
-    rgba(13,148,136,0.10) 0%,
-    rgba(5,42,32,0.05) 50%,
-    transparent 72%);
-  animation:shimmerPulse 3.5s ease-in-out infinite;
+  background:radial-gradient(ellipse 65% 45% at 55% 60%,
+    rgba(13,148,136,0.12) 0%, rgba(5,42,32,0.06) 50%, transparent 70%);
+  animation:waterGlow 4s ease-in-out infinite;
 }
-@keyframes shimmerPulse{
-  0%,100%{opacity:0.5;transform:scale(1);}
-  50%{opacity:1;transform:scale(1.04);}
+@keyframes waterGlow{0%,100%{opacity:0.5;transform:scale(1);}50%{opacity:1;transform:scale(1.06);}}
+/* Scan-lines: efecto mapa de juego */
+#scanlines{
+  position:fixed;inset:0;pointer-events:none;z-index:4;
+  background:repeating-linear-gradient(
+    0deg, transparent, transparent 3px, rgba(0,0,0,0.10) 3px, rgba(0,0,0,0.10) 4px);
 }
 /* Viñeta oscura en bordes */
 #vignette{
-  position:fixed;inset:0;pointer-events:none;z-index:4;
-  background:radial-gradient(ellipse 90% 90% at 50% 50%,
-    transparent 55%, rgba(4,12,8,0.6) 100%);
+  position:fixed;inset:0;pointer-events:none;z-index:5;
+  background:radial-gradient(ellipse 88% 88% at 50% 50%,
+    transparent 52%, rgba(4,12,8,0.65) 100%);
 }
 
 /* ── Loading ── */
 #loading{
-  position:fixed;inset:0;background:#040c08;display:flex;
-  flex-direction:column;align-items:center;justify-content:center;
-  z-index:100;transition:opacity 0.8s;
+  position:fixed;inset:0;background:#040c08;z-index:100;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity 0.8s;
 }
 #loading-logo{
   width:80px;height:80px;border-radius:50%;background:#0d9488;
@@ -48,134 +46,90 @@ body{background:#040c08;overflow:hidden;font-family:'Plus Jakarta Sans',sans-ser
   font-size:36px;font-weight:900;color:#fff;margin-bottom:24px;
   animation:pulse 1.5s ease-in-out infinite;
 }
-@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.08);opacity:0.85}}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);opacity:.85;}}
 #loading-bar-bg{width:240px;height:4px;background:#1a3a2a;border-radius:2px;overflow:hidden;}
-#loading-bar{height:100%;width:0%;background:#0d9488;transition:width 0.4s;border-radius:2px;}
-#loading-text{margin-top:16px;font-size:14px;color:#5eead4;opacity:0.8;}
+#loading-bar{height:100%;width:0%;background:#0d9488;transition:width .4s;border-radius:2px;}
+#loading-text{margin-top:16px;font-size:14px;color:#5eead4;opacity:.8;}
 
-/* ── Back button ── */
+/* ── Back ── */
 #btn-back{
   position:fixed;top:20px;left:20px;z-index:20;
-  background:rgba(7,21,16,0.85);border:1px solid #0d9488;
+  background:rgba(7,21,16,.85);border:1px solid #0d9488;
   color:#5eead4;padding:8px 16px;border-radius:8px;font-size:13px;
-  cursor:pointer;backdrop-filter:blur(8px);transition:background 0.2s;
-  text-decoration:none;display:inline-block;
+  cursor:pointer;backdrop-filter:blur(8px);text-decoration:none;
+  transition:background .2s;display:inline-block;
 }
-#btn-back:hover{background:rgba(13,148,136,0.3);}
+#btn-back:hover{background:rgba(13,148,136,.3);}
 
 /* ── Time label ── */
 #time-label{
   position:fixed;top:24px;left:50%;transform:translateX(-50%);
-  font-size:13px;color:rgba(94,234,212,0.75);pointer-events:none;
-  background:rgba(4,12,8,0.6);padding:4px 14px;border-radius:20px;z-index:20;
+  font-size:13px;color:rgba(94,234,212,.8);pointer-events:none;z-index:20;
+  background:rgba(4,12,8,.65);padding:4px 14px;border-radius:20px;
 }
 
 /* ── Hint ── */
 #hint{
   position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
-  background:rgba(7,21,16,0.78);border:1px solid rgba(94,234,212,0.18);
+  background:rgba(7,21,16,.78);border:1px solid rgba(94,234,212,.18);
   border-radius:10px;padding:9px 20px;font-size:12px;color:#94a3b8;
   pointer-events:none;transition:opacity 1.5s;text-align:center;
   white-space:nowrap;z-index:20;
 }
-#hint kbd{
-  background:rgba(13,148,136,0.25);border-radius:4px;padding:1px 6px;
-  font-family:monospace;font-size:11px;color:#5eead4;
-}
+#hint kbd{background:rgba(13,148,136,.25);border-radius:4px;padding:1px 6px;font-family:monospace;font-size:11px;color:#5eead4;}
 
 /* ── POI Markers ── */
 .poi-marker{cursor:pointer;position:relative;width:54px;height:54px;display:flex;align-items:center;justify-content:center;z-index:10;}
-.poi-ring{
-  width:28px;height:28px;border:3px solid #fbbf24;border-radius:50%;
-  animation:poiPulse 2.2s ease-in-out infinite;
-  box-shadow:0 0 18px rgba(251,191,36,0.65),0 0 5px rgba(251,191,36,1);
-}
-.poi-ring-outer{
-  position:absolute;width:44px;height:44px;border:1px solid rgba(251,191,36,0.25);
-  border-radius:50%;animation:poiOuter 2.2s ease-in-out infinite;
-}
-.poi-dot{
-  position:absolute;width:9px;height:9px;background:#fbbf24;border-radius:50%;
-  top:50%;left:50%;transform:translate(-50%,-50%);
-  box-shadow:0 0 10px #fbbf24,0 0 4px #fff;
-}
+.poi-ring-outer{position:absolute;width:44px;height:44px;border:1px solid rgba(251,191,36,.22);border-radius:50%;animation:poiOuter 2.4s ease-in-out infinite;}
+.poi-ring{width:26px;height:26px;border:3px solid #fbbf24;border-radius:50%;animation:poiPulse 2.2s ease-in-out infinite;box-shadow:0 0 18px rgba(251,191,36,.6),0 0 5px rgba(251,191,36,1);}
+.poi-dot{position:absolute;width:9px;height:9px;background:#fbbf24;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:0 0 10px #fbbf24,0 0 4px #fff;}
 .poi-label{
   position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);
   white-space:nowrap;font-size:11px;color:#5eead4;font-weight:600;
-  background:rgba(4,12,8,0.92);padding:2px 10px;border-radius:10px;
-  border:1px solid rgba(13,148,136,0.5);pointer-events:none;
-  font-family:'Plus Jakarta Sans',sans-serif;
-  box-shadow:0 0 8px rgba(13,148,136,0.3);
+  background:rgba(4,12,8,.92);padding:2px 10px;border-radius:10px;
+  border:1px solid rgba(13,148,136,.5);pointer-events:none;
+  box-shadow:0 0 10px rgba(13,148,136,.3);font-family:'Plus Jakarta Sans',sans-serif;
 }
-@keyframes poiPulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.22);opacity:0.65;}}
-@keyframes poiOuter{0%,100%{transform:scale(1);opacity:0.5;}50%{transform:scale(1.15);opacity:0.15;}}
+@keyframes poiPulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.24);opacity:.6;}}
+@keyframes poiOuter{0%,100%{transform:scale(1);opacity:.45;}50%{transform:scale(1.18);opacity:.12;}}
 
 /* ── POI Panel ── */
 #poi-panel{
   position:fixed;bottom:80px;left:50%;
   transform:translateX(-50%) translateY(30px);
   width:min(390px,94vw);
-  background:rgba(4,12,8,0.97);
-  border:1px solid #0d9488;border-radius:18px;
-  backdrop-filter:blur(18px);
-  opacity:0;transition:opacity 0.35s,transform 0.35s;
+  background:rgba(4,12,8,.97);border:1px solid #0d9488;border-radius:18px;
+  backdrop-filter:blur(18px);opacity:0;transition:opacity .35s,transform .35s;
   z-index:30;overflow:hidden;pointer-events:none;
-  box-shadow:0 8px 40px rgba(0,0,0,0.8),0 0 0 1px rgba(94,234,212,0.1),0 0 30px rgba(13,148,136,0.15);
+  box-shadow:0 8px 40px rgba(0,0,0,.8),0 0 0 1px rgba(94,234,212,.1),0 0 30px rgba(13,148,136,.15);
 }
 #poi-panel.visible{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
 #poi-header{padding:15px 16px 10px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
 #poi-header-text{flex:1;min-width:0;}
 #poi-panel h3{font-size:15px;color:#5eead4;font-weight:700;margin:0 0 3px;}
-#poi-dist{font-size:11px;color:#0d9488;font-weight:600;letter-spacing:0.02em;}
-#poi-close{
-  flex-shrink:0;width:26px;height:26px;border-radius:50%;
-  background:rgba(13,148,136,0.15);border:1px solid rgba(13,148,136,0.4);
-  color:#5eead4;font-size:12px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:background 0.2s;padding:0;
-}
-#poi-close:hover{background:rgba(13,148,136,0.35);}
+#poi-dist{font-size:11px;color:#0d9488;font-weight:600;}
+#poi-close{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:rgba(13,148,136,.15);border:1px solid rgba(13,148,136,.4);color:#5eead4;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;padding:0;}
+#poi-close:hover{background:rgba(13,148,136,.35);}
 #poi-desc{font-size:12px;color:#94a3b8;line-height:1.6;padding:0 16px 10px;margin:0;}
-#poi-map-wrap{
-  width:100%;height:185px;overflow:hidden;position:relative;
-  border-top:1px solid rgba(13,148,136,0.25);
-  border-bottom:1px solid rgba(13,148,136,0.25);
-  background:#061410;
-}
-#poi-map-placeholder{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:8px;
-  font-size:12px;color:#5eead4;pointer-events:none;z-index:0;
-}
+#poi-map-wrap{width:100%;height:185px;overflow:hidden;position:relative;border-top:1px solid rgba(13,148,136,.25);border-bottom:1px solid rgba(13,148,136,.25);background:#061410;}
+#poi-map-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:12px;color:#5eead4;pointer-events:none;z-index:0;}
 #poi-map-placeholder span{font-size:28px;}
 #poi-map{width:100%;height:100%;border:none;position:relative;z-index:1;display:block;}
 #poi-actions{display:flex;gap:8px;padding:12px 14px 14px;}
-.poi-btn{
-  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
-  padding:9px 4px;border-radius:9px;font-size:12px;font-weight:600;
-  text-decoration:none;cursor:pointer;border:none;
-  transition:background 0.2s,transform 0.12s;font-family:inherit;
-}
-.poi-btn:active{transform:scale(0.96);}
+.poi-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 4px;border-radius:9px;font-size:12px;font-weight:600;text-decoration:none;cursor:pointer;border:none;transition:background .2s,transform .12s;font-family:inherit;}
+.poi-btn:active{transform:scale(.96);}
 #poi-btn-route{background:#0d9488;color:#fff;}
 #poi-btn-route:hover{background:#0f766e;}
-#poi-btn-view{background:rgba(13,148,136,0.14);color:#5eead4;border:1px solid rgba(13,148,136,0.38);}
-#poi-btn-view:hover{background:rgba(13,148,136,0.28);}
+#poi-btn-view{background:rgba(13,148,136,.14);color:#5eead4;border:1px solid rgba(13,148,136,.38);}
+#poi-btn-view:hover{background:rgba(13,148,136,.28);}
 
-/* ── MapLibre dark overrides ── */
-.maplibregl-ctrl-group{
-  background:rgba(4,12,8,0.9)!important;
-  border:1px solid rgba(13,148,136,0.5)!important;
-  border-radius:10px!important;overflow:hidden;
-  box-shadow:0 4px 16px rgba(0,0,0,0.6)!important;
-}
-.maplibregl-ctrl-group button{background-color:transparent!important;border-color:rgba(13,148,136,0.3)!important;}
-.maplibregl-ctrl-group button:hover{background:rgba(13,148,136,0.2)!important;}
-.maplibregl-ctrl-group button+button{border-top:1px solid rgba(13,148,136,0.25)!important;}
-.maplibregl-ctrl-compass .maplibregl-ctrl-icon,
-.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon,
-.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon{filter:invert(0.8) sepia(1) saturate(3) hue-rotate(140deg);}
-.maplibregl-ctrl-attrib{background:rgba(4,12,8,0.72)!important;color:#5eead4!important;font-size:10px!important;border-radius:6px!important;}
+/* ── MapLibre overrides (dark) ── */
+.maplibregl-ctrl-group{background:rgba(4,12,8,.9)!important;border:1px solid rgba(13,148,136,.5)!important;border-radius:10px!important;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.6)!important;}
+.maplibregl-ctrl-group button{background-color:transparent!important;border-color:rgba(13,148,136,.3)!important;}
+.maplibregl-ctrl-group button:hover{background:rgba(13,148,136,.2)!important;}
+.maplibregl-ctrl-group button+button{border-top:1px solid rgba(13,148,136,.25)!important;}
+.maplibregl-ctrl-compass .maplibregl-ctrl-icon,.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon,.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon{filter:invert(.8) sepia(1) saturate(3) hue-rotate(140deg);}
+.maplibregl-ctrl-attrib{background:rgba(4,12,8,.72)!important;color:#5eead4!important;font-size:10px!important;border-radius:6px!important;}
 .maplibregl-ctrl-attrib a{color:#0d9488!important;}
 .maplibregl-ctrl-attrib-button{filter:invert(1)!important;}
 </style>
@@ -185,12 +139,12 @@ body{background:#040c08;overflow:hidden;font-family:'Plus Jakarta Sans',sans-ser
 <div id="loading">
   <div id="loading-logo">C</div>
   <div id="loading-bar-bg"><div id="loading-bar"></div></div>
-  <div id="loading-text">Iniciando mundo...</div>
+  <div id="loading-text">Cargando mundo...</div>
 </div>
 
-<!-- Overlays animados -->
 <canvas id="stars-canvas"></canvas>
-<div id="water-shimmer"></div>
+<div id="water-glow"></div>
+<div id="scanlines"></div>
 <div id="vignette"></div>
 
 <a id="btn-back" href="index.html">← Volver</a>
@@ -200,7 +154,7 @@ body{background:#040c08;overflow:hidden;font-family:'Plus Jakarta Sans',sans-ser
   <kbd>Arrastrar</kbd> mover &nbsp;·&nbsp;
   <kbd>Clic derecho</kbd> rotar &nbsp;·&nbsp;
   <kbd>Scroll</kbd> zoom &nbsp;·&nbsp;
-  <kbd>📍</kbd> marcadores
+  <kbd>📍</kbd> explorar destinos
 </div>
 
 <div id="poi-panel">
@@ -213,20 +167,12 @@ body{background:#040c08;overflow:hidden;font-family:'Plus Jakarta Sans',sans-ser
   </div>
   <p id="poi-desc"></p>
   <div id="poi-map-wrap">
-    <div id="poi-map-placeholder">
-      <span>🗺️</span>
-      Cargando mapa...
-    </div>
-    <iframe id="poi-map" allowfullscreen loading="lazy"
-      referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <div id="poi-map-placeholder"><span>🗺️</span>Cargando mapa...</div>
+    <iframe id="poi-map" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
   </div>
   <div id="poi-actions">
-    <a id="poi-btn-route" class="poi-btn" href="#" target="_blank" rel="noopener noreferrer">
-      🧭 Cómo llegar
-    </a>
-    <a id="poi-btn-view" class="poi-btn" href="#" target="_blank" rel="noopener noreferrer">
-      🗺️ Ver en Maps
-    </a>
+    <a id="poi-btn-route" class="poi-btn" href="#" target="_blank" rel="noopener noreferrer">🧭 Cómo llegar</a>
+    <a id="poi-btn-view"  class="poi-btn" href="#" target="_blank" rel="noopener noreferrer">🗺️ Ver en Maps</a>
   </div>
 </div>
 
@@ -236,88 +182,255 @@ body{background:#040c08;overflow:hidden;font-family:'Plus Jakarta Sans',sans-ser
 (function(){
 'use strict';
 
-var loadBar  = document.getElementById('loading-bar');
-var loadWrap = document.getElementById('loading');
-var loadText = document.getElementById('loading-text');
+// ─── Progress ────────────────────────────────────────────────────────────────
+var loadBar=document.getElementById('loading-bar');
+var loadWrap=document.getElementById('loading');
+var loadText=document.getElementById('loading-text');
 function setP(p,msg){loadBar.style.width=p+'%';if(msg)loadText.textContent=msg;}
 
-setP(10,'Iniciando mundo...');
+setP(8,'Preparando mundo...');
 
 // ─── POIs ─────────────────────────────────────────────────────────────────────
 var POIS=[
-  {name:'Playa Llachón',      desc:'La playa más hermosa de la península. Aguas turquesa, totora y vistas al Titicaca sin igual.',                       coords:[-15.5850,-69.7744],zoom:15},
-  {name:'Mirador del Amaru',  desc:'Panorámica 360° sobre el lago, las islas y la cordillera boliviana. Mejor al amanecer.',                             coords:[-15.6005,-69.8148],zoom:15},
-  {name:'Comunidad Capachica',desc:'El corazón de la península. Plaza principal, mercado artesanal y calidez aimara-quechua.',                           coords:[-15.6183,-69.8239],zoom:15},
-  {name:'Isla Ticonata',      desc:'Isla sagrada a 2h en bote. Lodge comunitario con hospedaje en familias aimaras.',                                    coords:[-15.5067,-69.7983],zoom:14},
-  {name:'Mirador Atardeceres',desc:'Los atardeceres de Capachica son únicos en el mundo. El lago se tiñe de naranja y dorado.',                          coords:[-15.6347,-69.8502],zoom:15},
+  {name:'Playa Llachón',       desc:'La playa más hermosa de la península. Aguas turquesa, totora y vistas al Titicaca sin igual.',           coords:[-15.5850,-69.7744],zoom:15},
+  {name:'Mirador del Amaru',   desc:'Panorámica 360° sobre el lago, las islas y la cordillera boliviana. Mejor al amanecer.',                 coords:[-15.6005,-69.8148],zoom:15},
+  {name:'Comunidad Capachica', desc:'El corazón de la península. Plaza principal, mercado artesanal y calidez aimara-quechua.',               coords:[-15.6183,-69.8239],zoom:15},
+  {name:'Isla Ticonata',       desc:'Isla sagrada a 2h en bote. Lodge comunitario con hospedaje en familias aimaras.',                        coords:[-15.5067,-69.7983],zoom:14},
+  {name:'Mirador Atardeceres', desc:'Los atardeceres de Capachica son únicos en el mundo. El lago se tiñe de naranja y dorado.',              coords:[-15.6347,-69.8502],zoom:15},
 ];
 
-setP(22,'Cargando satélite...');
+// ─── Paleta dark-teal ─────────────────────────────────────────────────────────
+var PALETTE={
+  bg:       '#040c08',
+  water:    '#052a20',
+  waterDeep:'#031a14',
+  waterEdge:'#0a4030',
+  land:     '#0d1f15',
+  grass:    '#1a3d1f',
+  forest:   '#163618',
+  urban:    '#0d2218',
+  road:     '#0f4a38',
+  roadMajor:'#0d9488',
+  border:   '#0d5e4e',
+  label:    '#5eead4',
+  halo:     '#040c08',
+};
 
-// ─── Map — satélite con filtro dark teal ──────────────────────────────────────
-var map=new maplibregl.Map({
-  container:'map',
-  style:{
+// ─── Remapear un layer al estilo dark-teal ────────────────────────────────────
+function remapLayer(layer){
+  var id=(layer.id||'').toLowerCase();
+  var p=layer.paint||{};
+
+  // Background
+  if(layer.type==='background'){
+    return Object.assign({},layer,{paint:{'background-color':PALETTE.bg}});
+  }
+
+  var np=Object.assign({},p);
+
+  // Detección por id y source-layer
+  var sl=(layer['source-layer']||'').toLowerCase();
+  var isWater    = sl==='water'||id.includes('water')||id.includes('lake')||id.includes('ocean');
+  var isWaterway = sl==='waterway'||id.includes('waterway')||id.includes('river');
+  var isLand     = sl==='landcover'||sl==='landuse'||id.includes('land')||id.includes('ground');
+  var isGrass    = id.includes('grass')||id.includes('park')||id.includes('farmland')||id.includes('meadow')||id.includes('scrub');
+  var isForest   = id.includes('forest')||id.includes('wood')||id.includes('tree');
+  var isUrban    = id.includes('residential')||id.includes('urban')||id.includes('building');
+  var isRoad     = sl==='transportation'||sl==='road'||id.includes('road')||id.includes('path')||id.includes('transit');
+  var isBorder   = sl==='boundary'||id.includes('border')||id.includes('boundary');
+  var isLabel    = layer.type==='symbol';
+
+  if(isWater){
+    if('fill-color'      in p) np['fill-color']='#052a20';
+    if('fill-opacity'    in p) np['fill-opacity']=0.95;
+    if('fill-outline-color' in p) np['fill-outline-color']=PALETTE.waterEdge;
+    if('line-color'      in p) np['line-color']=PALETTE.waterEdge;
+  } else if(isWaterway){
+    if('line-color' in p) np['line-color']='#0a4030';
+    if('line-opacity' in p) np['line-opacity']=0.8;
+  } else if(isForest){
+    if('fill-color' in p) np['fill-color']=PALETTE.forest;
+  } else if(isGrass){
+    if('fill-color' in p) np['fill-color']=PALETTE.grass;
+  } else if(isUrban){
+    if('fill-color'           in p) np['fill-color']=PALETTE.urban;
+    if('fill-extrusion-color' in p) np['fill-extrusion-color']=PALETTE.urban;
+    if('fill-outline-color'   in p) np['fill-outline-color']='#0d3a28';
+  } else if(isLand){
+    if('fill-color' in p) np['fill-color']=PALETTE.land;
+  }
+
+  if(isRoad){
+    if('line-color' in p){
+      // Vías principales: teal suave; el resto: muy oscuras
+      var isMajor=id.includes('major')||id.includes('primary')||id.includes('trunk')||id.includes('motorway');
+      np['line-color']=isMajor?'rgba(13,148,136,0.45)':'rgba(15,74,56,0.55)';
+    }
+    if('fill-color' in p) np['fill-color']='rgba(15,74,56,0.4)';
+  }
+
+  if(isBorder){
+    if('line-color'   in p) np['line-color']=PALETTE.border;
+    if('line-opacity' in p) np['line-opacity']=0.35;
+    if('line-dasharray' in p) np['line-dasharray']=[3,3];
+  }
+
+  if(isLabel){
+    np['text-color']    =PALETTE.label;
+    np['text-halo-color']=PALETTE.halo;
+    np['text-halo-width']=1.5;
+    if('icon-color' in p) np['icon-color']=PALETTE.label;
+    // Ocultar iconos no relevantes
+    layer.layout=layer.layout||{};
+    if(layer.layout['icon-image']){layer.layout['icon-image']='';}
+  }
+
+  return Object.assign({},layer,{paint:np});
+}
+
+// ─── Modificar el estilo completo ─────────────────────────────────────────────
+function applyDarkTeal(style){
+  // Fuente de terreno
+  style.sources['terrain-dem']={
+    type:'raster-dem',
+    tiles:['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
+    tileSize:256,maxzoom:15,encoding:'terrarium',
+  };
+  // Remapar todos los layers
+  style.layers=style.layers.map(remapLayer);
+  return style;
+}
+
+// ─── Inicializar mapa ─────────────────────────────────────────────────────────
+function initMap(style){
+  setP(55,'Iniciando mapa...');
+  var map=new maplibregl.Map({
+    container:'map',
+    style:style,
+    center:[-69.8239,-15.6183],
+    zoom:10.5,pitch:52,bearing:-15,
+    maxPitch:85,antialias:true,
+  });
+
+  map.addControl(new maplibregl.NavigationControl({visualizePitch:true}),'top-right');
+
+  map.on('load',function(){
+    setP(72,'Aplicando terreno...');
+    try{map.setTerrain({source:'terrain-dem',exaggeration:2.1});}catch(e){console.warn(e);}
+
+    setP(82,'Añadiendo cielo...');
+    try{
+      map.addLayer({id:'sky',type:'sky',paint:{
+        'sky-type':'atmosphere',
+        'sky-atmosphere-sun':[0,80],
+        'sky-atmosphere-sun-intensity':5,
+        'sky-atmosphere-color':'rgba(4,18,12,1)',
+      }});
+    }catch(e){console.warn(e);}
+
+    setP(91,'Colocando destinos...');
+    addPoiMarkers(map);
+
+    setP(100,'¡Listo!');
+
+    // Fly-in de entrada
+    setTimeout(function(){
+      map.flyTo({center:[-69.8239,-15.6183],zoom:13.2,pitch:62,bearing:-20,duration:4200,essential:true,
+        easing:function(t){return 1-Math.pow(1-t,3);}});
+    },300);
+
+    setTimeout(function(){
+      loadWrap.style.opacity='0';
+      setTimeout(function(){loadWrap.style.display='none';},850);
+    },500);
+
+    // Animación del agua (real shape del Titicaca)
+    startWaterAnimation(map);
+    // Ciclo día/noche
+    startDayNight(map);
+  });
+
+  map.on('error',function(e){console.warn('Map:',e&&e.error&&e.error.message);});
+  map.on('click',closePoiPanel);
+
+  setupHint(map);
+}
+
+// ─── Fallback: satélite dark-teal si falla vector ─────────────────────────────
+function initMapFallback(){
+  setP(40,'Cargando vista satélite...');
+  var style={
     version:8,
     sources:{
-      satellite:{
-        type:'raster',
+      sat:{type:'raster',
         tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
-        tileSize:256,maxzoom:19,
-        attribution:'© Esri, DigitalGlobe'
-      },
-      terrain:{
-        type:'raster-dem',
+        tileSize:256,maxzoom:19,attribution:'© Esri'},
+      'terrain-dem':{type:'raster-dem',
         tiles:['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
-        tileSize:256,maxzoom:15,encoding:'terrarium',
-        attribution:'© Mapzen, USGS'
-      }
+        tileSize:256,maxzoom:15,encoding:'terrarium'},
     },
-    layers:[{
-      id:'satellite',type:'raster',source:'satellite',
-      paint:{
-        // ← Aquí está la magia: convierte el satélite al tono oscuro teal
-        'raster-hue-rotate':   162,   // verde → teal
-        'raster-saturation':   0.55,  // más saturado
-        'raster-brightness-max':0.38, // más oscuro
-        'raster-contrast':     0.28,  // más contraste
-        'raster-opacity':      1.0
-      }
-    }]
-  },
-  center:[-69.8239,-15.6183],
-  zoom:10.5,pitch:52,bearing:-15,
-  maxPitch:85,antialias:true,
-});
+    layers:[{id:'sat',type:'raster',source:'sat',
+      paint:{'raster-hue-rotate':162,'raster-saturation':0.55,'raster-brightness-max':0.38,'raster-contrast':0.28}}]
+  };
+  initMap(style);
+}
 
-map.addControl(new maplibregl.NavigationControl({visualizePitch:true}),'top-right');
+// ─── Carga el estilo vectorial de OpenFreeMap ─────────────────────────────────
+setP(15,'Cargando estilo vectorial...');
+var STYLE_URL='https://tiles.openfreemap.org/styles/liberty';
 
-setP(45,'Generando relieve 3D...');
+fetch(STYLE_URL)
+  .then(function(r){
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.json();
+  })
+  .then(function(style){
+    setP(40,'Remapeando colores...');
+    style=applyDarkTeal(style);
+    initMap(style);
+  })
+  .catch(function(err){
+    console.warn('Vector style failed, using satellite fallback:',err);
+    initMapFallback();
+  });
 
-// ─── On load ──────────────────────────────────────────────────────────────────
-map.on('load',function(){
-  setP(65,'Aplicando terreno...');
+// ─── Animación de agua: cambia el fill-color del Titicaca en tiempo real ──────
+function startWaterAnimation(map){
+  var t0=Date.now();
+  var waterLayers=[];
+  // Recopilar layers de agua
+  (map.getStyle().layers||[]).forEach(function(l){
+    var id=(l.id||'').toLowerCase();
+    var sl=(l['source-layer']||'').toLowerCase();
+    if((sl==='water'||id.includes('water'))&&(l.type==='fill'||l.type==='fill-extrusion')){
+      waterLayers.push(l.id);
+    }
+  });
 
-  try{ map.setTerrain({source:'terrain',exaggeration:2.1}); }
-  catch(e){ console.warn('Terrain:',e); }
-
-  setP(78,'Añadiendo cielo...');
-
-  try{
-    map.addLayer({
-      id:'sky',type:'sky',
-      paint:{
-        'sky-type':'atmosphere',
-        'sky-atmosphere-sun':[0.0,80.0],
-        'sky-atmosphere-sun-intensity':8,
-        'sky-atmosphere-color':'rgba(6,25,18,1)',
-      }
+  function tick(){
+    requestAnimationFrame(tick);
+    var t=(Date.now()-t0)/1000;
+    // Oscilación suave entre tonos deep/light, como el shader del lago
+    var wave=Math.sin(t*0.7)*0.5+0.5;
+    var wave2=Math.sin(t*1.1+1)*0.5+0.5;
+    var r=Math.round(3+wave*4);
+    var g=Math.round(28+wave*18+wave2*6);
+    var b=Math.round(20+wave*16+wave2*4);
+    var col='rgb('+r+','+g+','+b+')';
+    waterLayers.forEach(function(id){
+      try{map.setPaintProperty(id,'fill-color',col);}catch(e){}
     });
-  }catch(e){ console.warn('Sky:',e); }
+    // Destellos en el borde del agua
+    var edgeAlpha=(0.35+Math.sin(t*1.8)*0.2).toFixed(2);
+    waterLayers.forEach(function(id){
+      try{map.setPaintProperty(id,'fill-outline-color','rgba(13,148,136,'+edgeAlpha+')');}catch(e){}
+    });
+  }
+  tick();
+}
 
-  setP(90,'Colocando marcadores...');
-
-  // POI markers
+// ─── POI Markers ──────────────────────────────────────────────────────────────
+function addPoiMarkers(map){
   POIS.forEach(function(poi,i){
     var el=document.createElement('div');
     el.className='poi-marker';
@@ -326,117 +439,78 @@ map.on('load',function(){
       '<div class="poi-ring"       style="animation-delay:'+(i*0.3)+'s"></div>'+
       '<div class="poi-dot"></div>'+
       '<div class="poi-label">'+poi.name+'</div>';
-
     new maplibregl.Marker({element:el,anchor:'center'})
       .setLngLat([poi.coords[1],poi.coords[0]])
       .addTo(map);
-
     el.addEventListener('click',function(e){
       e.stopPropagation();
       openPoiPanel(i);
-      map.flyTo({
-        center:[poi.coords[1],poi.coords[0]],
-        zoom:poi.zoom,pitch:65,
-        bearing:map.getBearing()+12,
-        duration:1400,essential:true,
-        easing:function(t){return t<0.5?2*t*t:-1+(4-2*t)*t;}
-      });
+      map.flyTo({center:[poi.coords[1],poi.coords[0]],zoom:poi.zoom,
+        pitch:65,bearing:map.getBearing()+12,duration:1400,essential:true,
+        easing:function(t){return t<0.5?2*t*t:-1+(4-2*t)*t;}});
     });
   });
-
-  setP(100,'¡Listo!');
-
-  // Fly-in de bienvenida
-  setTimeout(function(){
-    map.flyTo({
-      center:[-69.8239,-15.6183],zoom:13.2,
-      pitch:62,bearing:-20,duration:4200,essential:true,
-      easing:function(t){return 1-Math.pow(1-t,3);}
-    });
-  },300);
-
-  // Ocultar pantalla de carga
-  setTimeout(function(){
-    loadWrap.style.opacity='0';
-    setTimeout(function(){loadWrap.style.display='none';},850);
-  },500);
-});
-
-map.on('error',function(e){ console.warn('Map:',e&&e.error&&e.error.message); });
-
-// ─── Day/Night cycle ──────────────────────────────────────────────────────────
-var timeLabel=document.getElementById('time-label');
-var DAY=180; // segundos de ciclo
-var startT=Date.now();
-var TIMES=[
-  {th:0.00,label:'🌙 Noche',     hue:195, sat:0.30, brt:0.20, exag:2.4},
-  {th:0.22,label:'🌅 Amanecer',  hue:170, sat:0.45, brt:0.30, exag:2.2},
-  {th:0.38,label:'☀️ Mediodía',  hue:162, sat:0.55, brt:0.38, exag:2.1},
-  {th:0.62,label:'🌇 Atardecer', hue:148, sat:0.50, brt:0.32, exag:2.2},
-  {th:0.78,label:'🌙 Noche',     hue:195, sat:0.30, brt:0.20, exag:2.4},
-];
-
-function lerp(a,b,t){return a+(b-a)*t;}
-function dayNight(){
-  var ph=((Date.now()-startT)/1000%DAY)/DAY;
-  var t0,t1;
-  for(var k=0;k<TIMES.length-1;k++){
-    if(ph>=TIMES[k].th&&ph<TIMES[k+1].th){t0=TIMES[k];t1=TIMES[k+1];break;}
-  }
-  if(!t0)return;
-  var f=(ph-t0.th)/(t1.th-t0.th);
-  var hue=lerp(t0.hue,t1.hue,f);
-  var sat=lerp(t0.sat,t1.sat,f);
-  var brt=lerp(t0.brt,t1.brt,f);
-  // aplicar al layer del satélite
-  if(map.getLayer&&map.getLayer('satellite')){
-    map.setPaintProperty('satellite','raster-hue-rotate',hue);
-    map.setPaintProperty('satellite','raster-saturation',sat);
-    map.setPaintProperty('satellite','raster-brightness-max',brt);
-  }
-  timeLabel.textContent=t0.label;
 }
-setInterval(dayNight,1500);
 
-// ─── Stars canvas overlay ──────────────────────────────────────────────────────
+// ─── Ciclo día/noche ─────────────────────────────────────────────────────────
+function startDayNight(map){
+  var timeLabel=document.getElementById('time-label');
+  var startT=Date.now();
+  var DAY=180000; // 3 min = ciclo completo
+  var phases=[
+    {th:0.00,label:'🌙 Noche',     hue:195,sat:0.25,brt:0.18},
+    {th:0.22,label:'🌅 Amanecer',  hue:175,sat:0.40,brt:0.28},
+    {th:0.38,label:'☀️ Mediodía',  hue:162,sat:0.55,brt:0.38},
+    {th:0.62,label:'🌇 Atardecer', hue:148,sat:0.48,brt:0.30},
+    {th:0.78,label:'🌙 Noche',     hue:195,sat:0.25,brt:0.18},
+  ];
+  function lerp(a,b,t){return a+(b-a)*t;}
+  setInterval(function(){
+    var ph=((Date.now()-startT)%DAY)/DAY;
+    var a,b;
+    for(var k=0;k<phases.length-1;k++){
+      if(ph>=phases[k].th&&ph<phases[k+1].th){a=phases[k];b=phases[k+1];break;}
+    }
+    if(!a)return;
+    var f=(ph-a.th)/(b.th-a.th);
+    // Ciclo día/noche solo para fallback satélite; en vectorial el agua ya anima
+    if(map.getLayer&&map.getLayer('sat')){
+      try{
+        map.setPaintProperty('sat','raster-hue-rotate',lerp(a.hue,b.hue,f));
+        map.setPaintProperty('sat','raster-saturation',lerp(a.sat,b.sat,f));
+        map.setPaintProperty('sat','raster-brightness-max',lerp(a.brt,b.brt,f));
+      }catch(e){}
+    }
+    timeLabel.textContent=a.label;
+    // Oscuridad nocturna general
+    var nightness=ph<0.22||ph>0.78?1:ph<0.38?1-(ph-0.22)/0.16:ph>0.62?(ph-0.62)/0.16:0;
+    document.getElementById('water-glow').style.opacity=(0.3+nightness*0.5).toFixed(2);
+  },1200);
+}
+
+// ─── Stars canvas ─────────────────────────────────────────────────────────────
 (function(){
   var cvs=document.getElementById('stars-canvas');
   var ctx=cvs.getContext('2d');
-  var stars=[];
-  var W,H;
-
-  function resize(){
-    W=cvs.width=window.innerWidth;
-    H=cvs.height=window.innerHeight;
-  }
+  var W,H,stars=[];
+  function resize(){W=cvs.width=window.innerWidth;H=cvs.height=window.innerHeight;}
   window.addEventListener('resize',resize);resize();
-
-  // Generar estrellas aleatorias
-  for(var i=0;i<220;i++){
-    stars.push({
-      x:Math.random(),y:Math.random()*0.55, // solo mitad superior (cielo)
-      r:Math.random()*1.2+0.2,
-      a:Math.random(),
-      speed:0.4+Math.random()*1.2,
-      phase:Math.random()*Math.PI*2
-    });
+  for(var i=0;i<260;i++){
+    stars.push({x:Math.random(),y:Math.random()*0.5,r:.2+Math.random()*1.1,
+      a:.3+Math.random()*.7,spd:.4+Math.random()*1.2,ph:Math.random()*Math.PI*2});
   }
-
-  var t0=Date.now();
-  function drawStars(){
-    requestAnimationFrame(drawStars);
+  var startT=Date.now();
+  var DAY=180000;
+  function draw(){
+    requestAnimationFrame(draw);
     ctx.clearRect(0,0,W,H);
-    var t=(Date.now()-t0)/1000;
-    // Determinar si es de noche (opacidad de estrellas según hora)
-    var ph=((Date.now()-startT)/1000%DAY)/DAY;
-    var nightness=ph<0.22|ph>0.78?1:
-      ph<0.38?1-(ph-0.22)/0.16:
-      ph>0.62?(ph-0.62)/0.16:0;
-    if(nightness<0.05)return;
-
+    var t=(Date.now()-startT)/1000;
+    var ph=((Date.now()-startT)%DAY)/DAY;
+    var night=ph<0.22||ph>0.78?1:ph<0.38?1-(ph-0.22)/0.16:ph>0.62?(ph-0.62)/0.16:0;
+    if(night<0.04)return;
     stars.forEach(function(s){
-      var flicker=0.5+0.5*Math.sin(t*s.speed+s.phase);
-      ctx.globalAlpha=s.a*0.8*flicker*nightness;
+      var flicker=.5+.5*Math.sin(t*s.spd+s.ph);
+      ctx.globalAlpha=s.a*.85*flicker*night;
       ctx.fillStyle='#e2f5f0';
       ctx.beginPath();
       ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);
@@ -444,7 +518,7 @@ setInterval(dayNight,1500);
     });
     ctx.globalAlpha=1;
   }
-  drawStars();
+  draw();
 })();
 
 // ─── POI Panel ────────────────────────────────────────────────────────────────
@@ -471,14 +545,14 @@ function openPoiPanel(i){
   poiPanel.classList.add('visible');
 }
 function closePoiPanel(){activePoi=-1;poiPanel.classList.remove('visible');}
-
 document.getElementById('poi-close').addEventListener('click',closePoiPanel);
-map.on('click',closePoiPanel);
 
-// Hint fade
-var hintEl=document.getElementById('hint'),hintDone=false;
-function fadeHint(){if(hintDone)return;hintDone=true;setTimeout(function(){hintEl.style.opacity='0';},2500);}
-map.on('dragstart',fadeHint);map.on('zoomstart',fadeHint);
+// ─── Hint ─────────────────────────────────────────────────────────────────────
+function setupHint(map){
+  var hintEl=document.getElementById('hint'),done=false;
+  function fade(){if(done)return;done=true;setTimeout(function(){hintEl.style.opacity='0';},2500);}
+  map.on('dragstart',fade);map.on('zoomstart',fade);
+}
 
 })();
 </script>
