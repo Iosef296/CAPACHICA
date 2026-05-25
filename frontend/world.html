@@ -279,39 +279,33 @@ setP(50,'Generando relieve 3D...');
 
 // ─── On load ──────────────────────────────────────────────────────────────────
 map.on('load',function(){
-  setP(70,'Aplicando terreno...');
+  setP(72,'Aplicando terreno 3D...');
 
-  // 3D terrain
-  map.setTerrain({source:'terrain',exaggeration:2.0});
+  // 3D terrain — envuelto en try/catch, es opcional
+  try{
+    map.setTerrain({source:'terrain',exaggeration:2.0});
+  }catch(e){ console.warn('Terrain no disponible:',e); }
 
-  // Fog / atmosphere
-  map.setFog({
-    'color':'rgba(180,220,230,0.3)',
-    'high-color':'rgba(60,120,200,0.25)',
-    'horizon-blend':0.08,
-    'space-color':'rgba(4,12,8,1)',
-    'star-intensity':0.6
-  });
+  setP(82,'Añadiendo atmósfera...');
 
-  // Sky layer
-  map.addLayer({
-    id:'sky',type:'sky',
-    paint:{
-      'sky-type':'atmosphere',
-      'sky-atmosphere-sun':[0.0,80.0],
-      'sky-atmosphere-sun-intensity':12,
-      'sky-atmosphere-color':'rgba(140,195,230,1)',
-      'sky-atmosphere-halo-color':'rgba(255,170,90,0.5)',
-    }
-  });
+  // Sky layer — simplificado para máxima compatibilidad
+  try{
+    map.addLayer({
+      id:'sky',type:'sky',
+      paint:{
+        'sky-type':'atmosphere',
+        'sky-atmosphere-sun':[0.0,80.0],
+        'sky-atmosphere-sun-intensity':15,
+      }
+    });
+  }catch(e){ console.warn('Sky layer no disponible:',e); }
 
-  setP(88,'Añadiendo marcadores...');
+  setP(90,'Añadiendo marcadores...');
 
   // POI markers
   POIS.forEach(function(poi,i){
     var el=document.createElement('div');
     el.className='poi-marker';
-    el.style.animationDelay=(i*0.25)+'s';
     el.innerHTML=
       '<div class="poi-ring" style="animation-delay:'+(i*0.3)+'s"></div>'+
       '<div class="poi-dot"></div>'+
@@ -351,17 +345,18 @@ map.on('load',function(){
     });
   },300);
 
-  // Hide loading screen
+  // Ocultar pantalla de carga
   setTimeout(function(){
     loadWrap.style.opacity='0';
     setTimeout(function(){loadWrap.style.display='none';},850);
-  },600);
+  },500);
 });
 
-// Error fallback
+// Error fallback — solo loguea, no bloquea
 map.on('error',function(e){
-  console.warn('MapLibre error:',e);
-  setP(100,'Error al cargar. Reintenta.');
+  // Ignorar errores de tiles de terreno (son opcionales)
+  if(e&&e.error&&e.error.message&&e.error.message.indexOf('terrain')>=0) return;
+  console.warn('MapLibre:',e);
 });
 
 // ─── POI Panel ────────────────────────────────────────────────────────────────
