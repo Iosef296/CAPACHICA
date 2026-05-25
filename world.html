@@ -67,17 +67,69 @@ canvas#world{display:block;width:100vw;height:100vh;}
   font-family:monospace;font-size:11px;color:#5eead4;
 }
 
-/* ── POI card ── */
-#poi-card{
-  position:fixed;bottom:86px;left:50%;transform:translateX(-50%) translateY(20px);
-  background:rgba(7,21,16,0.93);border:1px solid #0d9488;border-radius:14px;
-  padding:18px 22px;width:300px;backdrop-filter:blur(12px);pointer-events:none;
+/* ── POI Panel con Google Maps ── */
+#poi-panel{
+  position:fixed;bottom:80px;left:50%;
+  transform:translateX(-50%) translateY(30px);
+  width:min(390px,94vw);
+  background:rgba(6,18,13,0.97);
+  border:1px solid #0d9488;border-radius:18px;
+  backdrop-filter:blur(18px);
   opacity:0;transition:opacity 0.35s,transform 0.35s;
+  z-index:30;overflow:hidden;pointer-events:none;
+  box-shadow:0 8px 40px rgba(0,0,0,0.7),0 0 0 1px rgba(94,234,212,0.08);
 }
-#poi-card.visible{opacity:1;transform:translateX(-50%) translateY(0);}
-#poi-card h3{font-size:15px;color:#5eead4;margin-bottom:6px;}
-#poi-card p {font-size:12px;color:#94a3b8;line-height:1.55;}
-#poi-card .poi-dist{font-size:11px;color:#0d9488;margin-top:8px;}
+#poi-panel.visible{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+#poi-header{
+  padding:15px 16px 10px;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:10px;
+}
+#poi-header-text{flex:1;min-width:0;}
+#poi-panel h3{font-size:15px;color:#5eead4;font-weight:700;margin:0 0 3px;}
+#poi-dist{font-size:11px;color:#0d9488;font-weight:600;letter-spacing:0.03em;}
+#poi-close{
+  flex-shrink:0;width:26px;height:26px;border-radius:50%;
+  background:rgba(13,148,136,0.15);border:1px solid rgba(13,148,136,0.4);
+  color:#5eead4;font-size:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.2s;padding:0;
+}
+#poi-close:hover{background:rgba(13,148,136,0.35);}
+#poi-desc{font-size:12px;color:#94a3b8;line-height:1.6;padding:0 16px 10px;margin:0;}
+#poi-map-wrap{
+  width:100%;height:185px;overflow:hidden;
+  position:relative;border-top:1px solid rgba(13,148,136,0.25);
+  border-bottom:1px solid rgba(13,148,136,0.25);
+  background:#0a1e16;
+}
+#poi-map-placeholder{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:8px;
+  font-size:12px;color:#5eead4;pointer-events:none;z-index:0;
+}
+#poi-map-placeholder span{font-size:28px;}
+#poi-map{
+  width:100%;height:100%;border:none;
+  position:relative;z-index:1;display:block;
+}
+#poi-actions{
+  display:flex;gap:8px;padding:12px 14px 14px;
+}
+.poi-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px 4px;border-radius:9px;font-size:12px;font-weight:600;
+  text-decoration:none;cursor:pointer;border:none;
+  transition:background 0.2s,transform 0.12s;
+  font-family:inherit;
+}
+.poi-btn:active{transform:scale(0.96);}
+#poi-btn-route{background:#0d9488;color:#fff;}
+#poi-btn-route:hover{background:#0f766e;}
+#poi-btn-view{
+  background:rgba(13,148,136,0.14);color:#5eead4;
+  border:1px solid rgba(13,148,136,0.38);
+}
+#poi-btn-view:hover{background:rgba(13,148,136,0.28);}
 </style>
 </head>
 <body>
@@ -96,10 +148,31 @@ canvas#world{display:block;width:100vw;height:100vh;}
   <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> mover &nbsp;·&nbsp;
   <kbd>Arrastrar</kbd> rotar &nbsp;·&nbsp; <kbd>Scroll</kbd> zoom
 </div>
-<div id="poi-card">
-  <h3 id="poi-name"></h3>
-  <p  id="poi-desc"></p>
-  <div class="poi-dist" id="poi-dist"></div>
+<div id="poi-panel">
+  <div id="poi-header">
+    <div id="poi-header-text">
+      <h3 id="poi-name"></h3>
+      <div id="poi-dist"></div>
+    </div>
+    <button id="poi-close" title="Cerrar">✕</button>
+  </div>
+  <p id="poi-desc"></p>
+  <div id="poi-map-wrap">
+    <div id="poi-map-placeholder">
+      <span>🗺️</span>
+      Cargando mapa...
+    </div>
+    <iframe id="poi-map" allowfullscreen loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+  <div id="poi-actions">
+    <a id="poi-btn-route" class="poi-btn" href="#" target="_blank" rel="noopener noreferrer">
+      🧭 Cómo llegar
+    </a>
+    <a id="poi-btn-view" class="poi-btn" href="#" target="_blank" rel="noopener noreferrer">
+      🗺️ Ver en Maps
+    </a>
+  </div>
 </div>
 
 <canvas id="world"></canvas>
@@ -422,11 +495,41 @@ setP(80,'POIs...');
 
 // ─── POIs ─────────────────────────────────────────────────────────────────────
 var POIS=[
-  {name:'Playa Llachón',      desc:'La playa más hermosa de la península. Aguas turquesa, totora y vistas al Titicaca sin igual.', x:33, z:4,  r:4},
-  {name:'Mirador del Amaru',  desc:'Desde los 4,000m, panorámica 360° sobre el lago, las islas y la cordillera. Mejor al amanecer.', x:-5, z:-18,r:3},
-  {name:'Comunidad Capachica',desc:'El corazón de la península. Plaza principal, mercado artesanal y calidez aimara-quechua.', x:2,  z:10, r:4},
-  {name:'Isla Ticonata',      desc:'Isla sagrada a 2h en bote. Lodge comunitario con hospedaje en familias aimaras.', x:0,  z:-42,r:3},
-  {name:'Atardeceres',        desc:'Los atardeceres de Capachica son únicos en el mundo. El lago se tiñe de naranja y dorado.', x:-28,z:18, r:4},
+  {
+    name:'Playa Llachón',
+    desc:'La playa más hermosa de la península. Aguas turquesa, totora y vistas al Titicaca sin igual.',
+    x:33, z:4, r:4,
+    coords:[-15.5850,-69.7744],
+    zoom:15
+  },
+  {
+    name:'Mirador del Amaru',
+    desc:'Desde los 4,000m, panorámica 360° sobre el lago, las islas y la cordillera boliviana. Mejor al amanecer.',
+    x:-5, z:-18, r:3,
+    coords:[-15.6005,-69.8148],
+    zoom:15
+  },
+  {
+    name:'Comunidad Capachica',
+    desc:'El corazón de la península. Plaza principal, mercado artesanal y calidez aimara-quechua.',
+    x:2, z:10, r:4,
+    coords:[-15.6183,-69.8239],
+    zoom:15
+  },
+  {
+    name:'Isla Ticonata',
+    desc:'Isla sagrada a 2h en bote desde Capachica. Lodge comunitario con hospedaje en familias aimaras.',
+    x:0, z:-42, r:3,
+    coords:[-15.5067,-69.7983],
+    zoom:14
+  },
+  {
+    name:'Mirador Atardeceres',
+    desc:'Los atardeceres de Capachica son únicos en el mundo. El lago Titicaca se tiñe de naranja y dorado.',
+    x:-28, z:18, r:4,
+    coords:[-15.6347,-69.8502],
+    zoom:15
+  },
 ];
 
 var torusGeo=new THREE.TorusGeometry(0.45,0.12,8,22);
@@ -508,22 +611,45 @@ document.addEventListener('keydown',function(e){
 
 setP(95,'UI...');
 
-// ─── POI UI ───────────────────────────────────────────────────────────────────
-var poiCard=document.getElementById('poi-card');
-var poiName=document.getElementById('poi-name');
-var poiDesc=document.getElementById('poi-desc');
-var poiDist=document.getElementById('poi-dist');
-var activePoi=-1;
+// ─── POI UI con Google Maps ───────────────────────────────────────────────────
+var poiPanel   = document.getElementById('poi-panel');
+var poiName    = document.getElementById('poi-name');
+var poiDesc    = document.getElementById('poi-desc');
+var poiDist    = document.getElementById('poi-dist');
+var poiMap     = document.getElementById('poi-map');
+var poiBtnRoute= document.getElementById('poi-btn-route');
+var poiBtnView = document.getElementById('poi-btn-view');
+var activePoi  = -1;
+var closedPois = {}; // POIs cerrados manualmente — no reaparecen hasta alejarse
 
-function showPoi(i){
-  if(i===activePoi)return;
+function showPoi(i, force){
+  if(i<0){
+    poiPanel.classList.remove('visible');
+    activePoi=-1;
+    return;
+  }
+  if(!force && closedPois[i]) return; // Respeta cierre manual
+  if(i===activePoi) return;           // Ya visible, sin cambios
   activePoi=i;
-  if(i<0){poiCard.classList.remove('visible');return;}
-  poiName.textContent=POIS[i].name;
-  poiDesc.textContent=POIS[i].desc;
-  poiCard.classList.add('visible');
+  var p=POIS[i];
+  poiName.textContent = p.name;
+  poiDesc.textContent = p.desc;
+  // Google Maps URLs sin API key
+  var lat=p.coords[0], lng=p.coords[1], z=p.zoom||15;
+  poiMap.src = 'https://maps.google.com/maps?q='+lat+','+lng+'&z='+z+'&output=embed&hl=es';
+  poiBtnRoute.href = 'https://www.google.com/maps/dir/?api=1&destination='+lat+','+lng;
+  poiBtnView.href  = 'https://www.google.com/maps?q='+lat+','+lng+'&z='+z;
+  poiPanel.classList.add('visible');
 }
 
+// Cerrar con botón X
+document.getElementById('poi-close').addEventListener('click',function(){
+  if(activePoi>=0) closedPois[activePoi]=true;
+  activePoi=-1;
+  poiPanel.classList.remove('visible');
+});
+
+// Click directo en marcador 3D → siempre abre (ignora closedPois)
 var ray=new THREE.Raycaster();
 canvas.addEventListener('click',function(e){
   var rect=canvas.getBoundingClientRect();
@@ -532,7 +658,11 @@ canvas.addEventListener('click',function(e){
     y:-((e.clientY-rect.top)/rect.height)*2+1,
   },camera);
   var hits=ray.intersectObjects(poiMeshes);
-  showPoi(hits.length>0?hits[0].object.userData.poiIdx:-1);
+  if(hits.length>0){
+    var idx=hits[0].object.userData.poiIdx;
+    delete closedPois[idx]; // forzar reapertura
+    showPoi(idx,true);
+  }
 });
 
 // ─── Minimap ──────────────────────────────────────────────────────────────────
@@ -674,8 +804,10 @@ function animate(){
     var dx=cam.focus.x-POIS[i].x,dz=cam.focus.z-POIS[i].z;
     var dist=Math.sqrt(dx*dx+dz*dz);
     if(dist<POIS[i].r*2.5){
-      poiDist.textContent='A '+dist.toFixed(0)+'m';
-      showPoi(i);
+      poiDist.textContent='📍 A '+Math.round(dist*10)+'m aprox.';
+      showPoi(i);           // respeta closedPois internamente
+    } else if(dist>POIS[i].r*6){
+      delete closedPois[i]; // al alejarse, resetea el cierre manual
     }
   });
   if(activePoi>=0){
