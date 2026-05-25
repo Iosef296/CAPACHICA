@@ -158,7 +158,22 @@ canvas#world{display:block;width:100vw;height:100vh;}
 </div>
 
 <canvas id="world"></canvas>
+
+<!-- ── Three.js core ── -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- ── GLTFLoader (para cargar modelo de Blender) ── -->
+<script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"
+        crossorigin="anonymous" onerror="window._gltfFailed=true"></script>
+
+<!-- ── Post-processing (bloom cinematográfico) ── -->
+<script src="https://unpkg.com/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/shaders/CopyShader.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/EffectComposer.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/RenderPass.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/ShaderPass.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js" crossorigin="anonymous"></script>
+
 <script>
 (function(){
 'use strict';
@@ -167,14 +182,16 @@ if(typeof THREE==='undefined'){
   return;
 }
 
-var loadBar=document.getElementById('loading-bar');
+// ── Progress bar ──────────────────────────────────────────────────────────────
+var loadBar =document.getElementById('loading-bar');
 var loadWrap=document.getElementById('loading');
 var loadText=document.getElementById('loading-text');
 function setP(p,msg){loadBar.style.width=p+'%';if(msg)loadText.textContent=msg;}
 
-var WORLD=150;
-var WATER_Y=-1.5;
+// ── Constantes ────────────────────────────────────────────────────────────────
+var WORLD=150, WATER_Y=-1.5;
 
+// ── Función de altura (idéntica al script de Blender) ─────────────────────────
 function getH(x,z){
   var ex=x/60,ez=z/52;
   var d2=ex*ex+ez*ez;
@@ -186,15 +203,14 @@ function getH(x,z){
   h+=Math.sin(x*1.10-z*0.82)*0.24;
   h+=Math.cos(x*0.22+z*0.31)*0.85;
   h+=Math.cos(x*0.45-z*0.55)*0.40;
-  var mx=x+5,mz=z+16; var md=Math.sqrt(mx*mx+mz*mz);
-  h+=Math.max(0,5.0-md*0.40);
-  var r2x=x-18,r2z=z+4;
-  h+=Math.max(0,2.4-Math.sqrt(r2x*r2x+r2z*r2z)*0.24);
+  var mx=x+5,mz=z+16; h+=Math.max(0,5.0-Math.sqrt(mx*mx+mz*mz)*0.40);
+  var r2x=x-18,r2z=z+4; h+=Math.max(0,2.4-Math.sqrt(r2x*r2x+r2z*r2z)*0.24);
   h*=mask;
   h+=Math.max(0,1.0-d2*1.7)*0.22;
   return h;
 }
 
+// ── Renderer ──────────────────────────────────────────────────────────────────
 var canvas=document.getElementById('world');
 var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,powerPreference:'high-performance'});
 renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
@@ -203,292 +219,343 @@ renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.1;
 
+// ── Escena base ───────────────────────────────────────────────────────────────
 var scene=new THREE.Scene();
 scene.fog=new THREE.FogExp2(0x071510,0.007);
 
-// Sky dome
-var skyGeo=new THREE.SphereGeometry(195,24,14);
-var skyCols=[];
-var skyPos=skyGeo.attributes.position;
-for(var i=0;i<skyPos.count;i++){
-  var yy=(skyPos.getY(i)/195)*0.5+0.5;
-  skyCols.push(
-    THREE.MathUtils.lerp(0.02,0.04,yy),
-    THREE.MathUtils.lerp(0.08,0.13,yy),
-    THREE.MathUtils.lerp(0.06,0.10,yy)
-  );
-}
-skyGeo.setAttribute('color',new THREE.Float32BufferAttribute(skyCols,3));
-scene.add(new THREE.Mesh(skyGeo,new THREE.MeshBasicMaterial({side:THREE.BackSide,vertexColors:true})));
+// Cielo
+(function(){
+  var geo=new THREE.SphereGeometry(195,24,14);
+  var cols=[],pos=geo.attributes.position;
+  for(var i=0;i<pos.count;i++){
+    var yy=(pos.getY(i)/195)*0.5+0.5;
+    cols.push(THREE.MathUtils.lerp(0.02,0.04,yy),THREE.MathUtils.lerp(0.08,0.13,yy),THREE.MathUtils.lerp(0.06,0.10,yy));
+  }
+  geo.setAttribute('color',new THREE.Float32BufferAttribute(cols,3));
+  scene.add(new THREE.Mesh(geo,new THREE.MeshBasicMaterial({side:THREE.BackSide,vertexColors:true})));
+})();
 
-// Stars
+// Estrellas
 (function(){
   var N=2200,pos=new Float32Array(N*3);
   for(var i=0;i<N;i++){
     var th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1),r=130+Math.random()*50;
-    pos[i*3]=r*Math.sin(ph)*Math.cos(th);
-    pos[i*3+1]=r*Math.cos(ph);
-    pos[i*3+2]=r*Math.sin(ph)*Math.sin(th);
+    pos[i*3]=r*Math.sin(ph)*Math.cos(th);pos[i*3+1]=r*Math.cos(ph);pos[i*3+2]=r*Math.sin(ph)*Math.sin(th);
   }
-  var geo=new THREE.BufferGeometry();
-  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  var geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
   scene.add(new THREE.Points(geo,new THREE.PointsMaterial({color:0xffffff,size:0.3,sizeAttenuation:true,transparent:true,opacity:0.85})));
 })();
 
 setP(12,'Agua...');
 
-// Water shader
+// ── Agua animada (shader — siempre presente, sea GLB o procedural) ────────────
 var wUni={uTime:{value:0.0},uDeep:{value:new THREE.Color(0x052a20)},uLight:{value:new THREE.Color(0x0a9080)}};
 var waterMat=new THREE.ShaderMaterial({
   uniforms:wUni,
   vertexShader:[
-    'uniform float uTime;','varying vec2 vUv; varying float vE;',
-    'void main(){','  vUv=uv; vec3 p=position;',
+    'uniform float uTime;varying vec2 vUv;varying float vE;',
+    'void main(){vUv=uv;vec3 p=position;',
     '  float w=sin(p.x*2.1+uTime*0.90)*0.17',
     '         +sin(p.z*1.8+uTime*0.70)*0.13',
     '         +sin(p.x*1.2+p.z*1.6+uTime*0.55)*0.08',
     '         +cos(p.x*3.2+uTime*1.40)*0.04;',
-    '  p.y+=w; vE=w;',
-    '  gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);',
-    '}',
+    '  p.y+=w;vE=w;gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);}',
   ].join('\n'),
   fragmentShader:[
-    'uniform float uTime;','uniform vec3 uDeep,uLight;',
-    'varying vec2 vUv; varying float vE;',
+    'uniform float uTime;uniform vec3 uDeep,uLight;varying vec2 vUv;varying float vE;',
     'void main(){',
     '  float t=clamp((vE+0.40)/0.80,0.0,1.0);',
     '  vec3 col=mix(uDeep,uLight,t*0.55);',
     '  col+=vec3(0.35,0.93,0.82)*smoothstep(0.18,0.32,vE)*0.55;',
     '  float sp=step(0.9966,sin(vUv.x*200.0+uTime)*sin(vUv.y*170.0+uTime*1.1));',
     '  col+=vec3(0.7,1.0,0.95)*sp*0.7;',
-    '  gl_FragColor=vec4(col,0.90);',
-    '}',
+    '  gl_FragColor=vec4(col,0.90);}',
   ].join('\n'),
   transparent:true,side:THREE.DoubleSide,
 });
-var waterMesh=new THREE.Mesh(new THREE.PlaneGeometry(220,220,100,100),waterMat);
-waterMesh.rotation.x=-Math.PI/2;
-waterMesh.position.y=WATER_Y;
-scene.add(waterMesh);
+var waterPlane=new THREE.Mesh(new THREE.PlaneGeometry(220,220,100,100),waterMat);
+waterPlane.rotation.x=-Math.PI/2;
+waterPlane.position.y=WATER_Y;
+scene.add(waterPlane);
 
-setP(25,'Terreno...');
+// ── Estado compartido (se rellena en afterScene) ──────────────────────────────
+var camera=null, keys={}, drag={on:false,x:0,y:0}, tPrev=null;
+var cam=null, composer=null, running=true;
+var poiMeshes=[], POIS=null;
+var activePoi=-1, closedPois={};
+var poiPanel,poiNameEl,poiDescEl,poiDistEl,poiMapEl,poiBtnRoute,poiBtnView;
+var ray=null;
+var ambLight,sunLight,rimL,villPt,wGlow;
+var clock=new THREE.Clock(), SPEED=6.5;
+var hintDone=false, hintEl=document.getElementById('hint');
+var tLabel=document.getElementById('time-label');
+var DAY=180;
+var C_DAWN=new THREE.Color(0xff7040),C_NOON=new THREE.Color(0xfff5d0);
+var C_DUSK=new THREE.Color(0xe07010),C_NIGHT=new THREE.Color(0x1a2870);
+var mmCvs=document.getElementById('minimap');
+var mmCtx=mmCvs.getContext('2d');
+var MM=160, mmImg=null;
+var cmpCvs=document.getElementById('compass');
+var cmpCtx=cmpCvs.getContext('2d');
 
-// Terrain
-(function(){
-  var segs=96;
-  var geo=new THREE.PlaneGeometry(WORLD,WORLD,segs,segs);
-  geo.rotateX(-Math.PI/2);
-  var pos=geo.attributes.position;
-  var col=new Float32Array(pos.count*3);
-  var SAND=new THREE.Color(0xb89555),GRASS=new THREE.Color(0x1e5c28),
-      HIGH=new THREE.Color(0x163d1a),ROCK=new THREE.Color(0x3a3530);
-  for(var i=0;i<pos.count;i++){
-    var x=pos.getX(i),z=pos.getZ(i);
-    var h=getH(x,z);
-    pos.setY(i,h);
-    var c;
-    if(h<WATER_Y+0.35) c=SAND;
-    else if(h<0.55)    c=SAND;
-    else if(h<1.9)     c=GRASS;
-    else if(h<3.4)     c=HIGH;
-    else               c=ROCK;
-    col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;
-  }
-  pos.needsUpdate=true;
-  geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
-  geo.computeVertexNormals();
-  var mesh=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({vertexColors:true}));
-  mesh.receiveShadow=true;
-  scene.add(mesh);
-})();
+// ── ESCENA PROCEDURAL (fallback cuando no hay GLB) ────────────────────────────
+function buildProcedural(){
+  setP(28,'Terreno...');
+  (function(){
+    var segs=96, geo=new THREE.PlaneGeometry(WORLD,WORLD,segs,segs);
+    geo.rotateX(-Math.PI/2);
+    var pos=geo.attributes.position, col=new Float32Array(pos.count*3);
+    var SAND=new THREE.Color(0xb89555),GRASS=new THREE.Color(0x1e5c28),
+        HIGH=new THREE.Color(0x163d1a), ROCK=new THREE.Color(0x3a3530);
+    for(var i=0;i<pos.count;i++){
+      var x=pos.getX(i),z=pos.getZ(i),h=getH(x,z);
+      pos.setY(i,h);
+      var c=h<WATER_Y+0.35?SAND:h<0.55?SAND:h<1.9?GRASS:h<3.4?HIGH:ROCK;
+      col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;
+    }
+    pos.needsUpdate=true;
+    geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+    geo.computeVertexNormals();
+    var mesh=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({vertexColors:true}));
+    mesh.receiveShadow=true;scene.add(mesh);
+  })();
 
-setP(42,'Árboles...');
+  setP(45,'Árboles...');
+  (function(){
+    var COUNT=45;
+    var tGeo=new THREE.CylinderGeometry(0.07,0.11,0.9,5);
+    var fGeo=new THREE.ConeGeometry(0.55,1.2,5);
+    var tInst=new THREE.InstancedMesh(tGeo,new THREE.MeshLambertMaterial({color:0x4a2f18}),COUNT);
+    var fInst=new THREE.InstancedMesh(fGeo,new THREE.MeshLambertMaterial({color:0x256025}),COUNT);
+    tInst.castShadow=fInst.castShadow=true;
+    var m4=new THREE.Matrix4(),vP=new THREE.Vector3(),qR=new THREE.Quaternion(),vS=new THREE.Vector3(),eu=new THREE.Euler();
+    var cands=[];
+    for(var i=0;i<22;i++)cands.push([-32+Math.random()*22,-24+Math.random()*48]);
+    for(var i=0;i<18;i++)cands.push([12+Math.random()*22,-22+Math.random()*44]);
+    for(var i=0;i<15;i++)cands.push([-14+Math.random()*22,-34+Math.random()*22]);
+    var placed=0;
+    for(var i=0;i<cands.length&&placed<COUNT;i++){
+      var tx=cands[i][0],tz=cands[i][1],ty=getH(tx,tz);
+      if(ty<0.35||ty>4.2)continue;
+      var h=0.75+Math.random()*0.55,fs=0.85+Math.random()*0.3;
+      eu.set(0,Math.random()*Math.PI*2,0);qR.setFromEuler(eu);
+      vP.set(tx,ty+h/2,tz);vS.set(1,h/0.9,1);m4.compose(vP,qR,vS);tInst.setMatrixAt(placed,m4);
+      vP.set(tx,ty+h+0.3,tz);vS.set(fs,fs*1.05,fs);m4.compose(vP,qR,vS);fInst.setMatrixAt(placed,m4);
+      placed++;
+    }
+    var tries=0;
+    while(placed<COUNT&&tries<300){
+      tries++;
+      var tx=(Math.random()-0.5)*88,tz=(Math.random()-0.5)*88,ty=getH(tx,tz);
+      if(ty<0.35||ty>4.2)continue;
+      var h=0.75+Math.random()*0.55,fs=0.85+Math.random()*0.3;
+      eu.set(0,Math.random()*Math.PI*2,0);qR.setFromEuler(eu);
+      vP.set(tx,ty+h/2,tz);vS.set(1,h/0.9,1);m4.compose(vP,qR,vS);tInst.setMatrixAt(placed,m4);
+      vP.set(tx,ty+h+0.3,tz);vS.set(fs,fs*1.05,fs);m4.compose(vP,qR,vS);fInst.setMatrixAt(placed,m4);
+      placed++;
+    }
+    tInst.count=fInst.count=placed;
+    tInst.instanceMatrix.needsUpdate=fInst.instanceMatrix.needsUpdate=true;
+    scene.add(tInst);scene.add(fInst);
+  })();
 
-// Trees
-(function(){
-  var COUNT=45;
-  var trunkGeo=new THREE.CylinderGeometry(0.07,0.11,0.9,5);
-  var foliageGeo=new THREE.ConeGeometry(0.55,1.2,5);
-  var trunkMat=new THREE.MeshLambertMaterial({color:0x4a2f18});
-  var trunkInst=new THREE.InstancedMesh(trunkGeo,trunkMat,COUNT);
-  var fInst=new THREE.InstancedMesh(foliageGeo,new THREE.MeshLambertMaterial({color:0x256025}),COUNT);
-  trunkInst.castShadow=fInst.castShadow=true;
-  var mat4=new THREE.Matrix4(),vPos=new THREE.Vector3(),qRot=new THREE.Quaternion(),vScl=new THREE.Vector3(),euler=new THREE.Euler();
-  var cands=[];
-  for(var i=0;i<22;i++) cands.push([-32+Math.random()*22,-24+Math.random()*48]);
-  for(var i=0;i<18;i++) cands.push([12+Math.random()*22,-22+Math.random()*44]);
-  for(var i=0;i<15;i++) cands.push([-14+Math.random()*22,-34+Math.random()*22]);
-  var placed=0;
-  for(var i=0;i<cands.length&&placed<COUNT;i++){
-    var tx=cands[i][0],tz=cands[i][1],ty=getH(tx,tz);
-    if(ty<0.35||ty>4.2) continue;
-    var h=0.75+Math.random()*0.55;
-    euler.set(0,Math.random()*Math.PI*2,0);qRot.setFromEuler(euler);
-    vPos.set(tx,ty+h/2,tz);vScl.set(1,h/0.9,1);
-    mat4.compose(vPos,qRot,vScl);trunkInst.setMatrixAt(placed,mat4);
-    var fs=0.85+Math.random()*0.3;
-    vPos.set(tx,ty+h+0.3,tz);vScl.set(fs,fs*1.05,fs);
-    mat4.compose(vPos,qRot,vScl);fInst.setMatrixAt(placed,mat4);
-    placed++;
-  }
-  var tries=0;
-  while(placed<COUNT&&tries<300){
-    tries++;
-    var tx=(Math.random()-0.5)*88,tz=(Math.random()-0.5)*88,ty=getH(tx,tz);
-    if(ty<0.35||ty>4.2) continue;
-    var h=0.75+Math.random()*0.55;
-    euler.set(0,Math.random()*Math.PI*2,0);qRot.setFromEuler(euler);
-    vPos.set(tx,ty+h/2,tz);vScl.set(1,h/0.9,1);
-    mat4.compose(vPos,qRot,vScl);trunkInst.setMatrixAt(placed,mat4);
-    var fs=0.85+Math.random()*0.3;
-    vPos.set(tx,ty+h+0.3,tz);vScl.set(fs,fs*1.05,fs);
-    mat4.compose(vPos,qRot,vScl);fInst.setMatrixAt(placed,mat4);
-    placed++;
-  }
-  trunkInst.count=fInst.count=placed;
-  trunkInst.instanceMatrix.needsUpdate=fInst.instanceMatrix.needsUpdate=true;
-  scene.add(trunkInst);scene.add(fInst);
-})();
+  setP(60,'Pueblo...');
+  (function(){
+    var bMat=new THREE.MeshLambertMaterial({color:0xc4a065});
+    var rMat=new THREE.MeshLambertMaterial({color:0x8b3a1a});
+    var dMat=new THREE.MeshLambertMaterial({color:0x5c2d0e});
+    var wMat=new THREE.MeshLambertMaterial({color:0xd4c8a0});
+    var bGeo=new THREE.BoxGeometry(1.4,1.0,1.1);
+    var rGeo=new THREE.ConeGeometry(1.05,0.7,4);
+    var dGeo=new THREE.BoxGeometry(0.22,0.38,0.06);
+    var wGeo=new THREE.BoxGeometry(0.28,0.22,0.06);
+    [{x:2,z:8,ry:.3},{x:5,z:10,ry:-.5},{x:-2,z:10,ry:1.1},
+     {x:8,z:6,ry:-.8},{x:-5,z:6,ry:.6},{x:2,z:14,ry:1.5},
+     {x:7,z:14,ry:.1},{x:-3,z:14,ry:-.4}].forEach(function(hp){
+      var ty=getH(hp.x,hp.z);if(ty<0.2)return;
+      var g=new THREE.Group();
+      var body=new THREE.Mesh(bGeo,bMat);body.position.y=0.5;body.castShadow=body.receiveShadow=true;g.add(body);
+      var roof=new THREE.Mesh(rGeo,rMat);roof.position.y=1.35;roof.rotation.y=Math.PI/4;roof.castShadow=true;g.add(roof);
+      var door=new THREE.Mesh(dGeo,dMat);door.position.set(0,0.19,0.565);g.add(door);
+      var win=new THREE.Mesh(wGeo,wMat);win.position.set(0.45,0.42,0.565);g.add(win);
+      g.position.set(hp.x,ty,hp.z);g.rotation.y=hp.ry;scene.add(g);
+    });
+    var dkMat=new THREE.MeshLambertMaterial({color:0x8b6914});
+    var pier=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.12,4.0),dkMat);
+    pier.position.set(36,getH(36,2)+0.06,2);pier.rotation.y=0.22;scene.add(pier);
+    var boat=new THREE.Mesh(new THREE.BoxGeometry(1.7,0.35,0.65),new THREE.MeshLambertMaterial({color:0xd4a832}));
+    boat.position.set(38,WATER_Y+0.12,3);boat.rotation.y=0.5;scene.add(boat);
+    var mast=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,1.5,5),new THREE.MeshLambertMaterial({color:0xa87232}));
+    mast.position.set(38,WATER_Y+0.9,3);scene.add(mast);
+    var reedMat=new THREE.MeshLambertMaterial({color:0x8da820});
+    for(var i=0;i<16;i++){
+      var rx=24+Math.random()*12,rz=-6+Math.random()*12,rh=0.4+Math.random()*0.9;
+      var reed=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.06,rh,4),reedMat);
+      reed.position.set(rx,WATER_Y+rh/2,rz);reed.rotation.z=(Math.random()-.5)*0.28;scene.add(reed);
+    }
+  })();
 
-setP(58,'Pueblo...');
-
-// Houses, dock, boat, reeds
-(function(){
-  var bMat=new THREE.MeshLambertMaterial({color:0xc4a065});
-  var rMat=new THREE.MeshLambertMaterial({color:0x8b3a1a});
-  var dMat=new THREE.MeshLambertMaterial({color:0x5c2d0e});
-  var wMat=new THREE.MeshLambertMaterial({color:0xd4c8a0});
-  var bGeo=new THREE.BoxGeometry(1.4,1.0,1.1);
-  var rGeo=new THREE.ConeGeometry(1.05,0.7,4);
-  var dGeo=new THREE.BoxGeometry(0.22,0.38,0.06);
-  var wGeo=new THREE.BoxGeometry(0.28,0.22,0.06);
-  [{x:2,z:8,ry:.3},{x:5,z:10,ry:-.5},{x:-2,z:10,ry:1.1},
-   {x:8,z:6,ry:-.8},{x:-5,z:6,ry:.6},{x:2,z:14,ry:1.5},
-   {x:7,z:14,ry:.1},{x:-3,z:14,ry:-.4}].forEach(function(hp){
-    var ty=getH(hp.x,hp.z);if(ty<0.2)return;
-    var g=new THREE.Group();
-    var body=new THREE.Mesh(bGeo,bMat);body.position.y=0.5;body.castShadow=body.receiveShadow=true;g.add(body);
-    var roof=new THREE.Mesh(rGeo,rMat);roof.position.y=1.35;roof.rotation.y=Math.PI/4;roof.castShadow=true;g.add(roof);
-    var door=new THREE.Mesh(dGeo,dMat); door.position.set(0,0.19,0.565); g.add(door);
-    var win =new THREE.Mesh(wGeo,wMat); win.position.set(0.45,0.42,0.565); g.add(win);
-    g.position.set(hp.x,ty,hp.z);g.rotation.y=hp.ry;
-    scene.add(g);
-  });
-  var dkMat=new THREE.MeshLambertMaterial({color:0x8b6914});
-  var pier=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.12,4.0),dkMat);
-  pier.position.set(36,getH(36,2)+0.06,2);pier.rotation.y=0.22;scene.add(pier);
-  var boat=new THREE.Mesh(new THREE.BoxGeometry(1.7,0.35,0.65),new THREE.MeshLambertMaterial({color:0xd4a832}));
-  boat.position.set(38,WATER_Y+0.12,3);boat.rotation.y=0.5;scene.add(boat);
-  var mast=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,1.5,5),new THREE.MeshLambertMaterial({color:0xa87232}));
-  mast.position.set(38,WATER_Y+0.9,3);scene.add(mast);
-  var reedMat=new THREE.MeshLambertMaterial({color:0x8da820});
-  for(var i=0;i<16;i++){
-    var rx=24+Math.random()*12,rz=-6+Math.random()*12,rh=0.4+Math.random()*0.9;
-    var reed=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.06,rh,4),reedMat);
-    reed.position.set(rx,WATER_Y+rh/2,rz);reed.rotation.z=(Math.random()-.5)*0.28;scene.add(reed);
-  }
-})();
-
-setP(70,'Iluminación...');
-
-var ambLight=new THREE.AmbientLight(0x1a3a2a,0.55);scene.add(ambLight);
-var sunLight=new THREE.DirectionalLight(0xfbbf24,2.0);
-sunLight.position.set(30,25,-20);sunLight.castShadow=true;
-sunLight.shadow.mapSize.width=sunLight.shadow.mapSize.height=1024;
-sunLight.shadow.camera.left=-65;sunLight.shadow.camera.right=65;
-sunLight.shadow.camera.top=65;sunLight.shadow.camera.bottom=-65;
-sunLight.shadow.camera.near=0.5;sunLight.shadow.camera.far=130;
-scene.add(sunLight);
-var rimL=new THREE.DirectionalLight(0x5eead4,0.28);rimL.position.set(-22,8,18);scene.add(rimL);
-var villPt=new THREE.PointLight(0xd97706,1.5,28);villPt.position.set(3,2,10);scene.add(villPt);
-var wGlow=new THREE.PointLight(0x0d9488,0.65,35);wGlow.position.set(0,WATER_Y+1,0);scene.add(wGlow);
-
-setP(80,'POIs...');
-
-// POIs con coordenadas GPS reales
-var POIS=[
-  {name:'Playa Llachón',       desc:'La playa más hermosa de la península. Aguas turquesa, totora y vistas al Titicaca sin igual.',         x:33,z:4,  r:4,coords:[-15.5850,-69.7744],zoom:15},
-  {name:'Mirador del Amaru',   desc:'Panorámica 360° sobre el lago, las islas y la cordillera boliviana. Mejor al amanecer.',               x:-5,z:-18,r:3,coords:[-15.6005,-69.8148],zoom:15},
-  {name:'Comunidad Capachica', desc:'El corazón de la península. Plaza principal, mercado artesanal y calidez aimara-quechua.',             x:2, z:10, r:4,coords:[-15.6183,-69.8239],zoom:15},
-  {name:'Isla Ticonata',       desc:'Isla sagrada a 2h en bote. Lodge comunitario con hospedaje en familias aimaras.',                      x:0, z:-42,r:3,coords:[-15.5067,-69.7983],zoom:14},
-  {name:'Mirador Atardeceres', desc:'Los atardeceres de Capachica son únicos en el mundo. El lago se tiñe de naranja y dorado.',            x:-28,z:18,r:4,coords:[-15.6347,-69.8502],zoom:15},
-];
-
-var torusGeo=new THREE.TorusGeometry(0.45,0.12,8,22);
-var poiMat=new THREE.MeshStandardMaterial({color:0xfbbf24,emissive:0xd97706,emissiveIntensity:0.6,metalness:0.2,roughness:0.3});
-var poiMeshes=[];
-POIS.forEach(function(p,i){
-  var ty=Math.max(getH(p.x,p.z)+0.55,WATER_Y+1.8);
-  var m=new THREE.Mesh(torusGeo,poiMat);
-  m.position.set(p.x,ty,p.z);m.userData.poiIdx=i;
-  poiMeshes.push(m);scene.add(m);
-  var dot=new THREE.Mesh(new THREE.SphereGeometry(0.14,8,8),
-    new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xfbbf24,emissiveIntensity:1.0}));
-  dot.position.set(p.x,ty+0.72,p.z);scene.add(dot);
-});
-
-setP(88,'Cámara...');
-
-var camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,0.1,380);
-var cam={
-  focus:new THREE.Vector3(0,0.5,6),yaw:0.0,pitch:0.50,radius:18.0,
-  tFocus:new THREE.Vector3(0,0.5,6),tYaw:0.0,tPitch:0.50,tRadius:18.0,
-};
-function camApply(){
-  var sp=Math.cos(cam.pitch);
-  camera.position.set(
-    cam.focus.x+sp*Math.sin(cam.yaw)*cam.radius,
-    cam.focus.y+Math.sin(cam.pitch)*cam.radius,
-    cam.focus.z+sp*Math.cos(cam.yaw)*cam.radius
-  );
-  camera.lookAt(cam.focus);
+  afterScene();
 }
 
-var keys={};
-document.addEventListener('keydown',function(e){keys[e.code]=true;});
-document.addEventListener('keyup',  function(e){keys[e.code]=false;});
-var drag={on:false,x:0,y:0};
-canvas.addEventListener('mousedown',function(e){drag.on=true;drag.x=e.clientX;drag.y=e.clientY;});
-window.addEventListener('mouseup',  function(){drag.on=false;});
-window.addEventListener('mousemove',function(e){
-  if(!drag.on)return;
-  cam.tYaw  -=(e.clientX-drag.x)*0.0040;
-  cam.tPitch=THREE.MathUtils.clamp(cam.tPitch-(e.clientY-drag.y)*0.0030,0.06,1.48);
-  drag.x=e.clientX;drag.y=e.clientY;hintFade();
-});
-var tPrev=null;
-canvas.addEventListener('touchstart',function(e){if(e.touches[0])tPrev={x:e.touches[0].clientX,y:e.touches[0].clientY};});
-window.addEventListener('touchmove',function(e){
-  if(!tPrev||!e.touches[0])return;
-  cam.tYaw  -=(e.touches[0].clientX-tPrev.x)*0.004;
-  cam.tPitch=THREE.MathUtils.clamp(cam.tPitch-(e.touches[0].clientY-tPrev.y)*0.003,0.06,1.48);
-  tPrev={x:e.touches[0].clientX,y:e.touches[0].clientY};hintFade();
-});
-window.addEventListener('touchend',function(){tPrev=null;});
-canvas.addEventListener('wheel',function(e){
-  cam.tRadius=THREE.MathUtils.clamp(cam.tRadius+e.deltaY*0.016,4,58);
-},{passive:true});
+// ── CARGAR GLB de Blender ─────────────────────────────────────────────────────
+function tryLoadGLB(paths,onOk,onFail){
+  if(!paths.length){onFail();return;}
+  var loader=new THREE.GLTFLoader();
+  loader.load(
+    paths[0],
+    onOk,
+    function(xhr){ if(xhr.total)setP(22+Math.round(xhr.loaded/xhr.total*40),'Modelo 3D...'); },
+    function(){ tryLoadGLB(paths.slice(1),onOk,onFail); }
+  );
+}
 
-var hintDone=false;
-var hintEl=document.getElementById('hint');
-function hintFade(){if(hintDone)return;hintDone=true;hintEl.style.opacity='0';}
-document.addEventListener('keydown',function(e){
-  if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].indexOf(e.code)>=0)hintFade();
-});
+function onGLBLoad(gltf){
+  setP(65,'Procesando modelo...');
+  gltf.scene.traverse(function(child){
+    if(!child.isMesh)return;
+    var n=child.name.toLowerCase();
+    // Ocultar agua estática del GLB (usamos shader animado)
+    // y POI markers del GLB (se recrean con raycasting)
+    if(n==='water'||n.startsWith('poi_')){child.visible=false;return;}
+    child.castShadow=true;
+    child.receiveShadow=true;
+  });
+  scene.add(gltf.scene);
+  afterScene();
+}
 
-setP(95,'UI...');
+// ── SETUP BLOOM (UnrealBloomPass) ─────────────────────────────────────────────
+function setupBloom(){
+  if(typeof THREE.EffectComposer==='undefined')return;
+  try{
+    composer=new THREE.EffectComposer(renderer);
+    composer.addPass(new THREE.RenderPass(scene,camera));
+    var bloom=new THREE.UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth,window.innerHeight),
+      0.45,  // strength  — sutil y cinemático
+      0.55,  // radius
+      0.80   // threshold
+    );
+    composer.addPass(bloom);
+  }catch(e){composer=null;}
+}
 
-// ── POI Panel con Google Maps ─────────────────────────────────────────────────
-var poiPanel   =document.getElementById('poi-panel');
-var poiNameEl  =document.getElementById('poi-name');
-var poiDescEl  =document.getElementById('poi-desc');
-var poiDistEl  =document.getElementById('poi-dist');
-var poiMapEl   =document.getElementById('poi-map');
-var poiBtnRoute=document.getElementById('poi-btn-route');
-var poiBtnView =document.getElementById('poi-btn-view');
-var activePoi  =-1;
-var closedPois ={};
+// ── DESPUÉS DE CARGAR GEOMETRÍA: luces, cámara, POIs, UI ─────────────────────
+function afterScene(){
+  setP(70,'Iluminación...');
+  ambLight=new THREE.AmbientLight(0x1a3a2a,0.55);scene.add(ambLight);
+  sunLight=new THREE.DirectionalLight(0xfbbf24,2.0);
+  sunLight.position.set(30,25,-20);sunLight.castShadow=true;
+  sunLight.shadow.mapSize.width=sunLight.shadow.mapSize.height=1024;
+  sunLight.shadow.camera.left=-65;sunLight.shadow.camera.right=65;
+  sunLight.shadow.camera.top=65;sunLight.shadow.camera.bottom=-65;
+  sunLight.shadow.camera.near=0.5;sunLight.shadow.camera.far=130;
+  scene.add(sunLight);
+  rimL=new THREE.DirectionalLight(0x5eead4,0.28);rimL.position.set(-22,8,18);scene.add(rimL);
+  villPt=new THREE.PointLight(0xd97706,1.5,28);villPt.position.set(3,2,10);scene.add(villPt);
+  wGlow=new THREE.PointLight(0x0d9488,0.65,35);wGlow.position.set(0,WATER_Y+1,0);scene.add(wGlow);
 
+  setP(80,'POIs...');
+  POIS=[
+    {name:'Playa Llachón',       desc:'La playa más hermosa de la península. Aguas turquesa, totora y vistas al Titicaca sin igual.',      x:33, z:4,  r:4,coords:[-15.5850,-69.7744],zoom:15},
+    {name:'Mirador del Amaru',   desc:'Panorámica 360° sobre el lago, las islas y la cordillera boliviana. Mejor al amanecer.',            x:-5, z:-18,r:3,coords:[-15.6005,-69.8148],zoom:15},
+    {name:'Comunidad Capachica', desc:'El corazón de la península. Plaza principal, mercado artesanal y calidez aimara-quechua.',          x:2,  z:10, r:4,coords:[-15.6183,-69.8239],zoom:15},
+    {name:'Isla Ticonata',       desc:'Isla sagrada a 2h en bote. Lodge comunitario con hospedaje en familias aimaras.',                   x:0,  z:-42,r:3,coords:[-15.5067,-69.7983],zoom:14},
+    {name:'Mirador Atardeceres', desc:'Los atardeceres de Capachica son únicos en el mundo. El lago se tiñe de naranja y dorado.',         x:-28,z:18, r:4,coords:[-15.6347,-69.8502],zoom:15},
+  ];
+  var torusGeo=new THREE.TorusGeometry(0.45,0.12,8,22);
+  var poiMat=new THREE.MeshStandardMaterial({color:0xfbbf24,emissive:0xd97706,emissiveIntensity:0.6,metalness:0.2,roughness:0.3});
+  POIS.forEach(function(p,i){
+    var ty=Math.max(getH(p.x,p.z)+0.55,WATER_Y+1.8);
+    var m=new THREE.Mesh(torusGeo,poiMat);
+    m.position.set(p.x,ty,p.z);m.userData.poiIdx=i;
+    poiMeshes.push(m);scene.add(m);
+    var dot=new THREE.Mesh(
+      new THREE.SphereGeometry(0.14,8,8),
+      new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xfbbf24,emissiveIntensity:1.0}));
+    dot.position.set(p.x,ty+0.72,p.z);scene.add(dot);
+  });
+
+  setP(88,'Cámara...');
+  camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,0.1,380);
+  cam={
+    focus:new THREE.Vector3(0,0.5,6),yaw:0.0,pitch:0.50,radius:18.0,
+    tFocus:new THREE.Vector3(0,0.5,6),tYaw:0.0,tPitch:0.50,tRadius:18.0,
+  };
+
+  // Controles
+  document.addEventListener('keydown',function(e){keys[e.code]=true;});
+  document.addEventListener('keyup',  function(e){keys[e.code]=false;});
+  canvas.addEventListener('mousedown',function(e){drag.on=true;drag.x=e.clientX;drag.y=e.clientY;});
+  window.addEventListener('mouseup',  function(){drag.on=false;});
+  window.addEventListener('mousemove',function(e){
+    if(!drag.on)return;
+    cam.tYaw-=(e.clientX-drag.x)*0.0040;
+    cam.tPitch=THREE.MathUtils.clamp(cam.tPitch-(e.clientY-drag.y)*0.0030,0.06,1.48);
+    drag.x=e.clientX;drag.y=e.clientY;hintFade();
+  });
+  canvas.addEventListener('touchstart',function(e){if(e.touches[0])tPrev={x:e.touches[0].clientX,y:e.touches[0].clientY};});
+  window.addEventListener('touchmove',function(e){
+    if(!tPrev||!e.touches[0])return;
+    cam.tYaw-=(e.touches[0].clientX-tPrev.x)*0.004;
+    cam.tPitch=THREE.MathUtils.clamp(cam.tPitch-(e.touches[0].clientY-tPrev.y)*0.003,0.06,1.48);
+    tPrev={x:e.touches[0].clientX,y:e.touches[0].clientY};hintFade();
+  });
+  window.addEventListener('touchend',function(){tPrev=null;});
+  canvas.addEventListener('wheel',function(e){
+    cam.tRadius=THREE.MathUtils.clamp(cam.tRadius+e.deltaY*0.016,4,58);
+  },{passive:true});
+
+  setP(95,'UI...');
+  poiPanel   =document.getElementById('poi-panel');
+  poiNameEl  =document.getElementById('poi-name');
+  poiDescEl  =document.getElementById('poi-desc');
+  poiDistEl  =document.getElementById('poi-dist');
+  poiMapEl   =document.getElementById('poi-map');
+  poiBtnRoute=document.getElementById('poi-btn-route');
+  poiBtnView =document.getElementById('poi-btn-view');
+
+  document.getElementById('poi-close').addEventListener('click',function(){
+    if(activePoi>=0)closedPois[activePoi]=true;
+    activePoi=-1;poiPanel.classList.remove('visible');
+  });
+
+  ray=new THREE.Raycaster();
+  canvas.addEventListener('click',function(e){
+    var rect=canvas.getBoundingClientRect();
+    ray.setFromCamera({
+      x:((e.clientX-rect.left)/rect.width)*2-1,
+      y:-((e.clientY-rect.top)/rect.height)*2+1,
+    },camera);
+    var hits=ray.intersectObjects(poiMeshes);
+    if(hits.length>0){var idx=hits[0].object.userData.poiIdx;delete closedPois[idx];showPoi(idx,true);}
+  });
+
+  // Minimapa
+  mmImg=mmCtx.createImageData(MM,MM);
+  for(var py=0;py<MM;py++){
+    for(var px=0;px<MM;px++){
+      var wx=((px/MM)-0.5)*WORLD,wz=((py/MM)-0.5)*WORLD,h=getH(wx,wz);
+      var r,g,b;
+      if(h<WATER_Y+0.35){r=6;g=40;b=50;}
+      else if(h<0.5)    {r=145;g=128;b=85;}
+      else if(h<1.9)    {r=32;g=82;b=40;}
+      else if(h<3.4)    {r=20;g=58;b=28;}
+      else              {r=55;g=50;b=44;}
+      var i4=(py*MM+px)*4;
+      mmImg.data[i4]=r;mmImg.data[i4+1]=g;mmImg.data[i4+2]=b;mmImg.data[i4+3]=255;
+    }
+  }
+
+  setP(98,'Post-procesado...');
+  setupBloom();
+  resize();    // ahora que camera existe, ajustar tamaño
+  setP(100,'¡Listo!');
+  startAnimation();
+}
+
+// ── POI panel ─────────────────────────────────────────────────────────────────
 function showPoi(i,force){
   if(i<0){poiPanel.classList.remove('visible');activePoi=-1;return;}
   if(!force&&closedPois[i])return;
@@ -504,81 +571,8 @@ function showPoi(i,force){
   poiBtnView.href ='https://www.google.com/maps?q='+lat+','+lng+'&z='+z;
   poiPanel.classList.add('visible');
 }
-document.getElementById('poi-close').addEventListener('click',function(){
-  if(activePoi>=0)closedPois[activePoi]=true;
-  activePoi=-1;poiPanel.classList.remove('visible');
-});
 
-var ray=new THREE.Raycaster();
-canvas.addEventListener('click',function(e){
-  var rect=canvas.getBoundingClientRect();
-  ray.setFromCamera({
-    x:((e.clientX-rect.left)/rect.width)*2-1,
-    y:-((e.clientY-rect.top)/rect.height)*2+1,
-  },camera);
-  var hits=ray.intersectObjects(poiMeshes);
-  if(hits.length>0){
-    var idx=hits[0].object.userData.poiIdx;
-    delete closedPois[idx];showPoi(idx,true);
-  }
-});
-
-// Minimap
-var mmCvs=document.getElementById('minimap');
-var mmCtx=mmCvs.getContext('2d');
-var MM=160;
-var mmImg=mmCtx.createImageData(MM,MM);
-for(var py=0;py<MM;py++){
-  for(var px=0;px<MM;px++){
-    var wx=((px/MM)-0.5)*WORLD,wz=((py/MM)-0.5)*WORLD;
-    var h=getH(wx,wz);
-    var r,g,b;
-    if(h<WATER_Y+0.35){r=6;g=40;b=50;}
-    else if(h<0.5)    {r=145;g=128;b=85;}
-    else if(h<1.9)    {r=32;g=82;b=40;}
-    else if(h<3.4)    {r=20;g=58;b=28;}
-    else              {r=55;g=50;b=44;}
-    var i4=(py*MM+px)*4;
-    mmImg.data[i4]=r;mmImg.data[i4+1]=g;mmImg.data[i4+2]=b;mmImg.data[i4+3]=255;
-  }
-}
-function drawMinimap(px,pz,yaw){
-  mmCtx.putImageData(mmImg,0,0);
-  POIS.forEach(function(p){
-    mmCtx.beginPath();
-    mmCtx.arc(((p.x/WORLD)+0.5)*MM,((p.z/WORLD)+0.5)*MM,4,0,Math.PI*2);
-    mmCtx.fillStyle='#fbbf24';mmCtx.fill();
-  });
-  var ppx=((px/WORLD)+0.5)*MM,ppz=((pz/WORLD)+0.5)*MM;
-  mmCtx.save();mmCtx.translate(ppx,ppz);mmCtx.rotate(-yaw);
-  mmCtx.beginPath();mmCtx.moveTo(0,-5);mmCtx.lineTo(-3,3);mmCtx.lineTo(3,3);mmCtx.closePath();
-  mmCtx.fillStyle='#5eead4';mmCtx.fill();mmCtx.restore();
-}
-
-// Compass
-var cmpCvs=document.getElementById('compass');
-var cmpCtx=cmpCvs.getContext('2d');
-function drawCompass(yaw){
-  cmpCtx.clearRect(0,0,60,60);
-  cmpCtx.save();cmpCtx.translate(30,30);
-  cmpCtx.beginPath();cmpCtx.arc(0,0,28,0,Math.PI*2);
-  cmpCtx.fillStyle='rgba(7,21,16,0.78)';cmpCtx.fill();
-  cmpCtx.strokeStyle='rgba(13,148,136,0.5)';cmpCtx.lineWidth=1.2;cmpCtx.stroke();
-  cmpCtx.rotate(-yaw);
-  cmpCtx.beginPath();cmpCtx.moveTo(0,-20);cmpCtx.lineTo(-4,0);cmpCtx.lineTo(4,0);cmpCtx.closePath();
-  cmpCtx.fillStyle='#ef4444';cmpCtx.fill();
-  cmpCtx.beginPath();cmpCtx.moveTo(0,20);cmpCtx.lineTo(-4,0);cmpCtx.lineTo(4,0);cmpCtx.closePath();
-  cmpCtx.fillStyle='#f0fdf4';cmpCtx.fill();
-  cmpCtx.restore();
-  cmpCtx.fillStyle='rgba(94,234,212,0.65)';cmpCtx.font='bold 9px monospace';
-  cmpCtx.textAlign='center';cmpCtx.fillText('N',30,9);
-}
-
-// Day/Night
-var DAY=180;
-var tLabel=document.getElementById('time-label');
-var C_DAWN=new THREE.Color(0xff7040),C_NOON=new THREE.Color(0xfff5d0);
-var C_DUSK=new THREE.Color(0xe07010),C_NIGHT=new THREE.Color(0x1a2870);
+// ── Día/Noche ─────────────────────────────────────────────────────────────────
 function dayNight(t){
   var ph=(t%DAY)/DAY;
   var daytime=Math.max(0,Math.sin(ph*Math.PI));
@@ -597,20 +591,72 @@ function dayNight(t){
   tLabel.textContent=ph<0.28?'🌅 Amanecer':ph<0.55?'☀️ Mediodía':ph<0.74?'🌇 Atardecer':'🌙 Noche';
 }
 
-// Resize
+// ── Cámara ────────────────────────────────────────────────────────────────────
+function camApply(){
+  var sp=Math.cos(cam.pitch);
+  camera.position.set(
+    cam.focus.x+sp*Math.sin(cam.yaw)*cam.radius,
+    cam.focus.y+Math.sin(cam.pitch)*cam.radius,
+    cam.focus.z+sp*Math.cos(cam.yaw)*cam.radius
+  );
+  camera.lookAt(cam.focus);
+}
+
+function hintFade(){if(hintDone)return;hintDone=true;hintEl.style.opacity='0';}
+document.addEventListener('keydown',function(e){
+  if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].indexOf(e.code)>=0)hintFade();
+});
+
+// ── Minimapa ──────────────────────────────────────────────────────────────────
+function drawMinimap(px,pz,yaw){
+  if(!mmImg||!POIS)return;
+  mmCtx.putImageData(mmImg,0,0);
+  POIS.forEach(function(p){
+    mmCtx.beginPath();
+    mmCtx.arc(((p.x/WORLD)+0.5)*MM,((p.z/WORLD)+0.5)*MM,4,0,Math.PI*2);
+    mmCtx.fillStyle='#fbbf24';mmCtx.fill();
+  });
+  var ppx=((px/WORLD)+0.5)*MM,ppz=((pz/WORLD)+0.5)*MM;
+  mmCtx.save();mmCtx.translate(ppx,ppz);mmCtx.rotate(-yaw);
+  mmCtx.beginPath();mmCtx.moveTo(0,-5);mmCtx.lineTo(-3,3);mmCtx.lineTo(3,3);mmCtx.closePath();
+  mmCtx.fillStyle='#5eead4';mmCtx.fill();mmCtx.restore();
+}
+
+// ── Brújula ───────────────────────────────────────────────────────────────────
+function drawCompass(yaw){
+  cmpCtx.clearRect(0,0,60,60);
+  cmpCtx.save();cmpCtx.translate(30,30);
+  cmpCtx.beginPath();cmpCtx.arc(0,0,28,0,Math.PI*2);
+  cmpCtx.fillStyle='rgba(7,21,16,0.78)';cmpCtx.fill();
+  cmpCtx.strokeStyle='rgba(13,148,136,0.5)';cmpCtx.lineWidth=1.2;cmpCtx.stroke();
+  cmpCtx.rotate(-yaw);
+  cmpCtx.beginPath();cmpCtx.moveTo(0,-20);cmpCtx.lineTo(-4,0);cmpCtx.lineTo(4,0);cmpCtx.closePath();
+  cmpCtx.fillStyle='#ef4444';cmpCtx.fill();
+  cmpCtx.beginPath();cmpCtx.moveTo(0,20);cmpCtx.lineTo(-4,0);cmpCtx.lineTo(4,0);cmpCtx.closePath();
+  cmpCtx.fillStyle='#f0fdf4';cmpCtx.fill();
+  cmpCtx.restore();
+  cmpCtx.fillStyle='rgba(94,234,212,0.65)';cmpCtx.font='bold 9px monospace';
+  cmpCtx.textAlign='center';cmpCtx.fillText('N',30,9);
+}
+
+// ── Resize ────────────────────────────────────────────────────────────────────
 function resize(){
   var w=window.innerWidth,h=window.innerHeight;
   renderer.setSize(w,h,false);
-  camera.aspect=w/h;camera.updateProjectionMatrix();
+  if(composer)composer.setSize(w,h);
+  if(camera){camera.aspect=w/h;camera.updateProjectionMatrix();}
 }
 window.addEventListener('resize',resize,{passive:true});
-resize();
-setP(100,'¡Listo!');
 
-// Animate
-var clock=new THREE.Clock();
-var running=true;
-var SPEED=6.5;
+// ── Animación ─────────────────────────────────────────────────────────────────
+function startAnimation(){
+  setTimeout(function(){
+    loadWrap.style.opacity='0';
+    setTimeout(function(){loadWrap.style.display='none';},850);
+    animate();
+  },500);
+}
+
 function animate(){
   if(!running)return;
   requestAnimationFrame(animate);
@@ -635,7 +681,7 @@ function animate(){
   cam.pitch+=(cam.tPitch-cam.pitch)*lf;
   cam.radius+=(cam.tRadius-cam.radius)*lf;
   camApply();
-  // POI rings + proximity
+  // POI markers: rotación + detección de proximidad
   poiMeshes.forEach(function(m,i){
     m.rotation.y=t*0.8;
     m.rotation.x=Math.sin(t*0.5+i)*0.16;
@@ -645,9 +691,7 @@ function animate(){
     if(dist<POIS[i].r*2.5){
       poiDistEl.textContent='📍 A '+Math.round(dist*10)+'m aprox.';
       showPoi(i);
-    } else if(dist>POIS[i].r*6){
-      delete closedPois[i];
-    }
+    }else if(dist>POIS[i].r*6){delete closedPois[i];}
   });
   if(activePoi>=0){
     var ap=POIS[activePoi];
@@ -659,14 +703,19 @@ function animate(){
   dayNight(t);
   drawMinimap(cam.focus.x,cam.focus.z,cam.yaw);
   drawCompass(cam.yaw);
-  renderer.render(scene,camera);
+  if(composer)composer.render();
+  else renderer.render(scene,camera);
 }
 
-setTimeout(function(){
-  loadWrap.style.opacity='0';
-  setTimeout(function(){loadWrap.style.display='none';},850);
-  animate();
-},500);
+// ── INICIO: intenta GLB → fallback a procedural ───────────────────────────────
+if(typeof THREE.GLTFLoader!=='undefined'){
+  setP(20,'Modelo 3D...');
+  // Intenta primero /capachica.glb (Bun server), luego frontend/capachica.glb (archivo local)
+  tryLoadGLB(['capachica.glb','frontend/capachica.glb'],onGLBLoad,buildProcedural);
+}else{
+  // GLTFLoader no disponible (sin internet) → escena procedural directa
+  buildProcedural();
+}
 
 window.addEventListener('beforeunload',function(){running=false;renderer.dispose();});
 })();
