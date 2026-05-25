@@ -4,43 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mundo 3D · Capachica</title>
-<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet"/>
-<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:#040c08;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif;color:#e2f5f0;}
-#map{position:fixed;inset:0;width:100vw;height:100vh;}
-
-/* El filtro CSS que convierte el mapa en dark-teal lo aplicamos por JS en el canvas */
-
-/* ── Overlays ── */
-#stars-canvas{position:fixed;inset:0;pointer-events:none;z-index:2;}
-/* Pulso de agua sobre el lago */
-#water-pulse{
-  position:fixed;inset:0;pointer-events:none;z-index:3;
-  background:radial-gradient(ellipse 60% 42% at 56% 60%,
-    rgba(13,148,136,0.18) 0%, rgba(5,42,32,0.08) 55%, transparent 72%);
-  animation:wPulse 3.8s ease-in-out infinite;
-}
-@keyframes wPulse{0%,100%{opacity:.45;transform:scale(1);}50%{opacity:1;transform:scale(1.07);}}
-/* Scan-lines: efecto mapa de juego */
-#scanlines{
-  position:fixed;inset:0;pointer-events:none;z-index:4;mix-blend-mode:overlay;
-  background:repeating-linear-gradient(
-    0deg,transparent,transparent 3px,rgba(0,0,0,0.18) 3px,rgba(0,0,0,0.18) 4px);
-}
-/* Viñeta */
-#vignette{
-  position:fixed;inset:0;pointer-events:none;z-index:5;
-  background:radial-gradient(ellipse 86% 86% at 50% 50%,
-    transparent 50%,rgba(4,12,8,.7) 100%);
-}
+canvas#world{display:block;width:100vw;height:100vh;}
 
 /* ── Loading ── */
 #loading{
-  position:fixed;inset:0;background:#040c08;z-index:100;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  transition:opacity .8s;
+  position:fixed;inset:0;background:#040c08;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;
+  z-index:100;transition:opacity 0.8s;
 }
 #loading-logo{
   width:80px;height:80px;border-radius:50%;background:#0d9488;
@@ -48,90 +21,103 @@ body{background:#040c08;overflow:hidden;font-family:'Plus Jakarta Sans',sans-ser
   font-size:36px;font-weight:900;color:#fff;margin-bottom:24px;
   animation:pulse 1.5s ease-in-out infinite;
 }
-@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);opacity:.85;}}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.08);opacity:0.85}}
 #loading-bar-bg{width:240px;height:4px;background:#1a3a2a;border-radius:2px;overflow:hidden;}
-#loading-bar{height:100%;width:0%;background:#0d9488;transition:width .4s;border-radius:2px;}
-#loading-text{margin-top:16px;font-size:14px;color:#5eead4;opacity:.8;}
+#loading-bar{height:100%;width:0%;background:#0d9488;transition:width 0.25s;border-radius:2px;}
+#loading-text{margin-top:16px;font-size:14px;color:#5eead4;opacity:0.8;}
 
-/* ── Back ── */
+/* ── Back button ── */
 #btn-back{
   position:fixed;top:20px;left:20px;z-index:20;
-  background:rgba(7,21,16,.88);border:1px solid #0d9488;
+  background:rgba(7,21,16,0.85);border:1px solid #0d9488;
   color:#5eead4;padding:8px 16px;border-radius:8px;font-size:13px;
-  cursor:pointer;backdrop-filter:blur(8px);text-decoration:none;transition:background .2s;
+  cursor:pointer;backdrop-filter:blur(8px);transition:background 0.2s;
+  text-decoration:none;display:inline-block;
 }
-#btn-back:hover{background:rgba(13,148,136,.3);}
+#btn-back:hover{background:rgba(13,148,136,0.3);}
 
-/* ── Time label ── */
+/* ── Day/night label ── */
 #time-label{
-  position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:20;
-  font-size:13px;color:rgba(94,234,212,.82);pointer-events:none;
-  background:rgba(4,12,8,.65);padding:4px 14px;border-radius:20px;
+  position:fixed;top:24px;left:50%;transform:translateX(-50%);
+  font-size:13px;color:rgba(94,234,212,0.7);pointer-events:none;
+  background:rgba(4,12,8,0.5);padding:4px 14px;border-radius:20px;
 }
 
-/* ── Hint ── */
+/* ── Minimap ── */
+#minimap-wrap{
+  position:fixed;bottom:24px;right:24px;pointer-events:none;
+  border:1px solid rgba(13,148,136,0.5);border-radius:10px;overflow:hidden;
+  box-shadow:0 4px 20px rgba(0,0,0,0.6);
+}
+#minimap{display:block;}
+
+/* ── Compass ── */
+#compass{position:fixed;top:24px;right:24px;pointer-events:none;}
+
+/* ── Controls hint ── */
 #hint{
-  position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:20;
-  background:rgba(7,21,16,.8);border:1px solid rgba(94,234,212,.18);
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+  background:rgba(7,21,16,0.78);border:1px solid rgba(94,234,212,0.18);
   border-radius:10px;padding:9px 20px;font-size:12px;color:#94a3b8;
-  pointer-events:none;transition:opacity 1.5s;text-align:center;white-space:nowrap;
+  pointer-events:none;transition:opacity 1.2s;text-align:center;
+  white-space:nowrap;
 }
-#hint kbd{background:rgba(13,148,136,.25);border-radius:4px;padding:1px 6px;font-family:monospace;font-size:11px;color:#5eead4;}
-
-/* ── POI Markers ── */
-.poi-marker{cursor:pointer;position:relative;width:54px;height:54px;display:flex;align-items:center;justify-content:center;z-index:10;}
-.poi-outer{position:absolute;width:46px;height:46px;border:1px solid rgba(251,191,36,.2);border-radius:50%;animation:poiO 2.4s ease-in-out infinite;}
-.poi-ring{width:26px;height:26px;border:3px solid #fbbf24;border-radius:50%;animation:poiP 2.2s ease-in-out infinite;box-shadow:0 0 18px rgba(251,191,36,.55),0 0 4px rgba(251,191,36,.9);}
-.poi-dot{position:absolute;width:9px;height:9px;background:#fbbf24;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:0 0 10px #fbbf24;}
-.poi-label{
-  position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);
-  white-space:nowrap;font-size:11px;color:#5eead4;font-weight:600;
-  background:rgba(4,12,8,.94);padding:2px 10px;border-radius:10px;
-  border:1px solid rgba(13,148,136,.5);pointer-events:none;
-  box-shadow:0 0 10px rgba(13,148,136,.3);font-family:'Plus Jakarta Sans',sans-serif;
+#hint kbd{
+  background:rgba(13,148,136,0.25);border-radius:4px;padding:1px 6px;
+  font-family:monospace;font-size:11px;color:#5eead4;
 }
-@keyframes poiP{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.25);opacity:.55;}}
-@keyframes poiO{0%,100%{transform:scale(1);opacity:.4;}50%{transform:scale(1.2);opacity:.1;}}
 
-/* ── POI Panel ── */
+/* ── POI Panel con Google Maps ── */
 #poi-panel{
-  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(30px);
-  width:min(390px,94vw);background:rgba(4,12,8,.97);
-  border:1px solid #0d9488;border-radius:18px;backdrop-filter:blur(18px);
-  opacity:0;transition:opacity .35s,transform .35s;z-index:30;overflow:hidden;pointer-events:none;
-  box-shadow:0 8px 40px rgba(0,0,0,.8),0 0 0 1px rgba(94,234,212,.1),0 0 28px rgba(13,148,136,.14);
+  position:fixed;bottom:80px;left:50%;
+  transform:translateX(-50%) translateY(30px);
+  width:min(390px,94vw);
+  background:rgba(6,18,13,0.97);
+  border:1px solid #0d9488;border-radius:18px;
+  backdrop-filter:blur(18px);
+  opacity:0;transition:opacity 0.35s,transform 0.35s;
+  z-index:30;overflow:hidden;pointer-events:none;
+  box-shadow:0 8px 40px rgba(0,0,0,0.7),0 0 0 1px rgba(94,234,212,0.08);
 }
 #poi-panel.visible{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
 #poi-header{padding:15px 16px 10px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
 #poi-header-text{flex:1;min-width:0;}
 #poi-panel h3{font-size:15px;color:#5eead4;font-weight:700;margin:0 0 3px;}
-#poi-dist{font-size:11px;color:#0d9488;font-weight:600;}
-#poi-close{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:rgba(13,148,136,.15);border:1px solid rgba(13,148,136,.4);color:#5eead4;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;padding:0;}
-#poi-close:hover{background:rgba(13,148,136,.35);}
+#poi-dist{font-size:11px;color:#0d9488;font-weight:600;letter-spacing:0.02em;}
+#poi-close{
+  flex-shrink:0;width:26px;height:26px;border-radius:50%;
+  background:rgba(13,148,136,0.15);border:1px solid rgba(13,148,136,0.4);
+  color:#5eead4;font-size:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.2s;padding:0;
+}
+#poi-close:hover{background:rgba(13,148,136,0.35);}
 #poi-desc{font-size:12px;color:#94a3b8;line-height:1.6;padding:0 16px 10px;margin:0;}
-#poi-map-wrap{width:100%;height:185px;overflow:hidden;position:relative;border-top:1px solid rgba(13,148,136,.25);border-bottom:1px solid rgba(13,148,136,.25);background:#061410;}
-#poi-map-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:12px;color:#5eead4;pointer-events:none;z-index:0;}
+#poi-map-wrap{
+  width:100%;height:185px;overflow:hidden;position:relative;
+  border-top:1px solid rgba(13,148,136,0.25);
+  border-bottom:1px solid rgba(13,148,136,0.25);
+  background:#0a1e16;
+}
+#poi-map-placeholder{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:8px;
+  font-size:12px;color:#5eead4;pointer-events:none;z-index:0;
+}
 #poi-map-placeholder span{font-size:28px;}
 #poi-map{width:100%;height:100%;border:none;position:relative;z-index:1;display:block;}
 #poi-actions{display:flex;gap:8px;padding:12px 14px 14px;}
-.poi-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 4px;border-radius:9px;font-size:12px;font-weight:600;text-decoration:none;cursor:pointer;border:none;transition:background .2s,transform .12s;font-family:inherit;}
-.poi-btn:active{transform:scale(.96);}
+.poi-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px 4px;border-radius:9px;font-size:12px;font-weight:600;
+  text-decoration:none;cursor:pointer;border:none;
+  transition:background 0.2s,transform 0.12s;font-family:inherit;
+}
+.poi-btn:active{transform:scale(0.96);}
 #poi-btn-route{background:#0d9488;color:#fff;}
 #poi-btn-route:hover{background:#0f766e;}
-#poi-btn-view{background:rgba(13,148,136,.14);color:#5eead4;border:1px solid rgba(13,148,136,.38);}
-#poi-btn-view:hover{background:rgba(13,148,136,.28);}
-
-/* MapLibre UI dark */
-.maplibregl-ctrl-group{background:rgba(4,12,8,.9)!important;border:1px solid rgba(13,148,136,.5)!important;border-radius:10px!important;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.6)!important;}
-.maplibregl-ctrl-group button{background-color:transparent!important;border-color:rgba(13,148,136,.3)!important;}
-.maplibregl-ctrl-group button:hover{background:rgba(13,148,136,.2)!important;}
-.maplibregl-ctrl-group button+button{border-top:1px solid rgba(13,148,136,.25)!important;}
-.maplibregl-ctrl-compass .maplibregl-ctrl-icon,
-.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon,
-.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon{filter:invert(.8) sepia(1) saturate(3) hue-rotate(140deg);}
-.maplibregl-ctrl-attrib{background:rgba(4,12,8,.75)!important;color:#5eead4!important;font-size:10px!important;border-radius:6px!important;}
-.maplibregl-ctrl-attrib a{color:#0d9488!important;}
-.maplibregl-ctrl-attrib-button{filter:invert(1)!important;}
+#poi-btn-view{background:rgba(13,148,136,0.14);color:#5eead4;border:1px solid rgba(13,148,136,0.38);}
+#poi-btn-view:hover{background:rgba(13,148,136,0.28);}
 </style>
 </head>
 <body>
@@ -142,21 +128,22 @@ body{background:#040c08;overflow:hidden;font-family:'Plus Jakarta Sans',sans-ser
   <div id="loading-text">Cargando mundo...</div>
 </div>
 
-<canvas id="stars-canvas"></canvas>
-<div id="water-pulse"></div>
-<div id="scanlines"></div>
-<div id="vignette"></div>
-
 <a id="btn-back" href="index.html">← Volver</a>
 <div id="time-label">☀️ Mediodía</div>
+<div id="minimap-wrap"><canvas id="minimap" width="160" height="160"></canvas></div>
+<canvas id="compass" width="60" height="60"></canvas>
 <div id="hint">
-  <kbd>Arrastrar</kbd> mover &nbsp;·&nbsp; <kbd>Clic derecho</kbd> rotar &nbsp;·&nbsp;
-  <kbd>Scroll</kbd> zoom &nbsp;·&nbsp; <kbd>📍</kbd> explorar destinos
+  <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> mover &nbsp;·&nbsp;
+  <kbd>Arrastrar</kbd> rotar &nbsp;·&nbsp; <kbd>Scroll</kbd> zoom &nbsp;·&nbsp;
+  <kbd>📍</kbd> click en marcador
 </div>
 
 <div id="poi-panel">
   <div id="poi-header">
-    <div id="poi-header-text"><h3 id="poi-name"></h3><div id="poi-dist"></div></div>
+    <div id="poi-header-text">
+      <h3 id="poi-name"></h3>
+      <div id="poi-dist"></div>
+    </div>
     <button id="poi-close" title="Cerrar">✕</button>
   </div>
   <p id="poi-desc"></p>
@@ -165,246 +152,523 @@ body{background:#040c08;overflow:hidden;font-family:'Plus Jakarta Sans',sans-ser
     <iframe id="poi-map" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
   </div>
   <div id="poi-actions">
-    <a id="poi-btn-route" class="poi-btn" href="#" target="_blank" rel="noopener">🧭 Cómo llegar</a>
-    <a id="poi-btn-view"  class="poi-btn" href="#" target="_blank" rel="noopener">🗺️ Ver en Maps</a>
+    <a id="poi-btn-route" class="poi-btn" href="#" target="_blank" rel="noopener noreferrer">🧭 Cómo llegar</a>
+    <a id="poi-btn-view"  class="poi-btn" href="#" target="_blank" rel="noopener noreferrer">🗺️ Ver en Maps</a>
   </div>
 </div>
 
-<div id="map"></div>
-
+<canvas id="world"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function(){
 'use strict';
-
-// ── Progress ─────────────────────────────────────────────────────────────────
-var lb=document.getElementById('loading-bar');
-var lw=document.getElementById('loading');
-var lt=document.getElementById('loading-text');
-function setP(p,m){lb.style.width=p+'%';if(m)lt.textContent=m;}
-setP(8,'Iniciando...');
-
-// ── POIs ─────────────────────────────────────────────────────────────────────
-var POIS=[
-  {name:'Playa Llachón',       desc:'La playa más hermosa de la península. Aguas turquesa, totora y vistas al Titicaca sin igual.',         coords:[-15.5850,-69.7744],zoom:15},
-  {name:'Mirador del Amaru',   desc:'Panorámica 360° sobre el lago, las islas y la cordillera boliviana. Mejor al amanecer.',               coords:[-15.6005,-69.8148],zoom:15},
-  {name:'Comunidad Capachica', desc:'El corazón de la península. Plaza principal, mercado artesanal y calidez aimara-quechua.',             coords:[-15.6183,-69.8239],zoom:15},
-  {name:'Isla Ticonata',       desc:'Isla sagrada a 2h en bote. Lodge comunitario con hospedaje en familias aimaras.',                      coords:[-15.5067,-69.7983],zoom:14},
-  {name:'Mirador Atardeceres', desc:'Los atardeceres de Capachica son únicos en el mundo. El lago se tiñe de naranja y dorado.',            coords:[-15.6347,-69.8502],zoom:15},
-];
-
-// ── Parámetros de animación día/noche ─────────────────────────────────────────
-// sepia(1) + hue-rotate(H) + saturate(S) + brightness(B)
-// → convierte el mapa de calles a dark-teal con todas las features visibles
-var DAY_PHASES=[
-  {th:0.00,label:'🌙 Noche',     H:140,S:2.8,B:0.22,A:1.0},
-  {th:0.20,label:'🌅 Amanecer',  H:135,S:2.5,B:0.30,A:0.5},
-  {th:0.38,label:'☀️ Mediodía',  H:142,S:3.0,B:0.38,A:0.0},
-  {th:0.62,label:'🌇 Atardecer', H:130,S:2.6,B:0.28,A:0.5},
-  {th:0.78,label:'🌙 Noche',     H:140,S:2.8,B:0.22,A:1.0},
-];
-var DAY_MS=180000; // 3 min = ciclo completo
-var startT=Date.now();
-function lerp(a,b,t){return a+(b-a)*t;}
-
-function getCurrentPhase(){
-  var ph=((Date.now()-startT)%DAY_MS)/DAY_MS;
-  for(var k=0;k<DAY_PHASES.length-1;k++){
-    if(ph>=DAY_PHASES[k].th&&ph<DAY_PHASES[k+1].th){
-      var a=DAY_PHASES[k],b=DAY_PHASES[k+1];
-      var f=(ph-a.th)/(b.th-a.th);
-      return {
-        label:a.label,
-        H:lerp(a.H,b.H,f),
-        S:lerp(a.S,b.S,f),
-        B:lerp(a.B,b.B,f),
-        A:lerp(a.A,b.A,f), // night-ness 0..1
-      };
-    }
-  }
-  return DAY_PHASES[0];
+if(typeof THREE==='undefined'){
+  document.getElementById('loading-text').textContent='Error: Three.js no disponible';
+  return;
 }
 
-// ── Construir el mapa ─────────────────────────────────────────────────────────
-setP(20,'Cargando mapa...');
+var loadBar=document.getElementById('loading-bar');
+var loadWrap=document.getElementById('loading');
+var loadText=document.getElementById('loading-text');
+function setP(p,msg){loadBar.style.width=p+'%';if(msg)loadText.textContent=msg;}
 
-var map=new maplibregl.Map({
-  container:'map',
-  style:{
-    version:8,
-    sources:{
-      // Mapa de calles Esri: muestra casas, calles, parques, agua, etiquetas
-      streets:{
-        type:'raster',
-        tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'],
-        tileSize:256,maxzoom:18,
-        attribution:'© Esri, HERE, Garmin, OpenStreetMap, GIS community'
-      },
-      // Terreno 3D real (altimetría NASA/USGS)
-      terrain:{
-        type:'raster-dem',
-        tiles:['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
-        tileSize:256,maxzoom:15,encoding:'terrarium',
-        attribution:'© Mapzen, USGS'
-      }
-    },
-    layers:[{
-      id:'streets',type:'raster',source:'streets',
-      paint:{'raster-opacity':1.0}
-    }]
-  },
-  center:[-69.8239,-15.6183],
-  zoom:10.5,pitch:52,bearing:-15,
-  maxPitch:85,antialias:true,
-});
+var WORLD=150;
+var WATER_Y=-1.5;
 
-map.addControl(new maplibregl.NavigationControl({visualizePitch:true}),'top-right');
+function getH(x,z){
+  var ex=x/60,ez=z/52;
+  var d2=ex*ex+ez*ez;
+  if(d2>=1.0) return WATER_Y-0.5;
+  var mask=1.0-d2; mask=mask*mask*(3-2*mask);
+  var h=Math.sin(x*0.18+z*0.13)*1.9;
+  h+=Math.sin(x*0.34-z*0.26)*0.95;
+  h+=Math.sin(x*0.60+z*0.49)*0.52;
+  h+=Math.sin(x*1.10-z*0.82)*0.24;
+  h+=Math.cos(x*0.22+z*0.31)*0.85;
+  h+=Math.cos(x*0.45-z*0.55)*0.40;
+  var mx=x+5,mz=z+16; var md=Math.sqrt(mx*mx+mz*mz);
+  h+=Math.max(0,5.0-md*0.40);
+  var r2x=x-18,r2z=z+4;
+  h+=Math.max(0,2.4-Math.sqrt(r2x*r2x+r2z*r2z)*0.24);
+  h*=mask;
+  h+=Math.max(0,1.0-d2*1.7)*0.22;
+  return h;
+}
 
-// ── On load ───────────────────────────────────────────────────────────────────
-map.on('load',function(){
-  setP(65,'Aplicando terreno 3D...');
-  try{map.setTerrain({source:'terrain',exaggeration:2.1});}catch(e){console.warn(e);}
+var canvas=document.getElementById('world');
+var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.1;
 
-  setP(78,'Añadiendo cielo...');
-  try{
-    map.addLayer({id:'sky',type:'sky',paint:{
-      'sky-type':'atmosphere',
-      'sky-atmosphere-sun':[0,78],
-      'sky-atmosphere-sun-intensity':6,
-      'sky-atmosphere-color':'rgba(4,16,12,1)',
-    }});
-  }catch(e){console.warn(e);}
+var scene=new THREE.Scene();
+scene.fog=new THREE.FogExp2(0x071510,0.007);
 
-  setP(90,'Colocando destinos...');
-  POIS.forEach(function(poi,i){
-    var el=document.createElement('div');
-    el.className='poi-marker';
-    el.innerHTML=
-      '<div class="poi-outer"  style="animation-delay:'+(i*.4)+'s"></div>'+
-      '<div class="poi-ring"   style="animation-delay:'+(i*.3)+'s"></div>'+
-      '<div class="poi-dot"></div>'+
-      '<div class="poi-label">'+poi.name+'</div>';
-    new maplibregl.Marker({element:el,anchor:'center'})
-      .setLngLat([poi.coords[1],poi.coords[0]])
-      .addTo(map);
-    el.addEventListener('click',function(e){
-      e.stopPropagation();
-      openPoi(i);
-      map.flyTo({
-        center:[poi.coords[1],poi.coords[0]],zoom:poi.zoom,
-        pitch:65,bearing:map.getBearing()+12,
-        duration:1400,essential:true,
-        easing:function(t){return t<.5?2*t*t:-1+(4-2*t)*t;}
-      });
-    });
-  });
+// Sky dome
+var skyGeo=new THREE.SphereGeometry(195,24,14);
+var skyCols=[];
+var skyPos=skyGeo.attributes.position;
+for(var i=0;i<skyPos.count;i++){
+  var yy=(skyPos.getY(i)/195)*0.5+0.5;
+  skyCols.push(
+    THREE.MathUtils.lerp(0.02,0.04,yy),
+    THREE.MathUtils.lerp(0.08,0.13,yy),
+    THREE.MathUtils.lerp(0.06,0.10,yy)
+  );
+}
+skyGeo.setAttribute('color',new THREE.Float32BufferAttribute(skyCols,3));
+scene.add(new THREE.Mesh(skyGeo,new THREE.MeshBasicMaterial({side:THREE.BackSide,vertexColors:true})));
 
-  setP(100,'¡Listo!');
-
-  // ── FILTRO CSS ANIMADO en el canvas del mapa ──────────────────────────────
-  // sepia(1) convierte todo a un tono cálido base,
-  // luego hue-rotate(~140°) lleva ese tono al rango teal.
-  // Resultado: casas, calles, agua → todos visibles en dark-teal animado.
-  var canvas=map.getCanvas();
-  var tAnim=Date.now();
-  var timeLabel=document.getElementById('time-label');
-
-  function animFrame(){
-    requestAnimationFrame(animFrame);
-    var t=(Date.now()-tAnim)/1000;
-    var ph=getCurrentPhase();
-    // Oscilación sutil para efecto "mundo vivo"
-    var H=ph.H+Math.sin(t*.35)*6;
-    var S=ph.S+Math.sin(t*.55)*.15;
-    var B=ph.B+Math.sin(t*.65)*.018;
-    canvas.style.filter=
-      'sepia(1) hue-rotate('+H.toFixed(1)+'deg) saturate('+S.toFixed(2)+') brightness('+B.toFixed(3)+') contrast(1.3)';
-    timeLabel.textContent=ph.label;
-    // Intensidad del pulso de agua según hora
-    document.getElementById('water-pulse').style.opacity=(0.3+ph.A*.6).toFixed(2);
-  }
-  animFrame();
-
-  // Fly-in de bienvenida
-  setTimeout(function(){
-    map.flyTo({
-      center:[-69.8239,-15.6183],zoom:13.2,pitch:62,bearing:-20,
-      duration:4200,essential:true,
-      easing:function(t){return 1-Math.pow(1-t,3);}
-    });
-  },300);
-
-  // Ocultar loading
-  setTimeout(function(){
-    lw.style.opacity='0';
-    setTimeout(function(){lw.style.display='none';},850);
-  },500);
-});
-
-map.on('error',function(e){console.warn('Map:',e&&e.error&&e.error.message);});
-map.on('click',closePoi);
-
-// ── Stars canvas ──────────────────────────────────────────────────────────────
+// Stars
 (function(){
-  var cvs=document.getElementById('stars-canvas');
-  var ctx=cvs.getContext('2d');
-  var W,H;
-  function resize(){W=cvs.width=window.innerWidth;H=cvs.height=window.innerHeight;}
-  window.addEventListener('resize',resize);resize();
-  var stars=[];
-  for(var i=0;i<280;i++) stars.push({
-    x:Math.random(),y:Math.random()*.5,
-    r:.15+Math.random()*1.1,a:.3+Math.random()*.7,
-    spd:.4+Math.random()*1.1,ph:Math.random()*Math.PI*2
-  });
-  var t0=Date.now();
-  function draw(){
-    requestAnimationFrame(draw);
-    ctx.clearRect(0,0,W,H);
-    var t=(Date.now()-t0)/1000;
-    var night=getCurrentPhase().A;
-    if(night<.04)return;
-    stars.forEach(function(s){
-      var flicker=.45+.55*Math.sin(t*s.spd+s.ph);
-      ctx.globalAlpha=s.a*.9*flicker*night;
-      ctx.fillStyle='#e2f5f0';
-      ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);ctx.fill();
-    });
-    ctx.globalAlpha=1;
+  var N=2200,pos=new Float32Array(N*3);
+  for(var i=0;i<N;i++){
+    var th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1),r=130+Math.random()*50;
+    pos[i*3]=r*Math.sin(ph)*Math.cos(th);
+    pos[i*3+1]=r*Math.cos(ph);
+    pos[i*3+2]=r*Math.sin(ph)*Math.sin(th);
   }
-  draw();
+  var geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  scene.add(new THREE.Points(geo,new THREE.PointsMaterial({color:0xffffff,size:0.3,sizeAttenuation:true,transparent:true,opacity:0.85})));
 })();
 
-// ── POI Panel ─────────────────────────────────────────────────────────────────
-var panel=document.getElementById('poi-panel');
-var pName=document.getElementById('poi-name');
-var pDesc=document.getElementById('poi-desc');
-var pDist=document.getElementById('poi-dist');
-var pMap =document.getElementById('poi-map');
-var pRoute=document.getElementById('poi-btn-route');
-var pView =document.getElementById('poi-btn-view');
-var active=-1;
+setP(12,'Agua...');
 
-function openPoi(i){
-  if(i===active)return;
-  active=i;
-  var p=POIS[i];
-  pName.textContent=p.name;
-  pDesc.textContent=p.desc;
-  pDist.textContent='📍 Lago Titicaca · Puno, Perú';
-  var lat=p.coords[0],lng=p.coords[1],z=p.zoom||15;
-  pMap.src='https://maps.google.com/maps?q='+lat+','+lng+'&z='+z+'&output=embed&hl=es';
-  pRoute.href='https://www.google.com/maps/dir/?api=1&destination='+lat+','+lng;
-  pView.href ='https://www.google.com/maps?q='+lat+','+lng+'&z='+z;
-  panel.classList.add('visible');
+// Water shader
+var wUni={uTime:{value:0.0},uDeep:{value:new THREE.Color(0x052a20)},uLight:{value:new THREE.Color(0x0a9080)}};
+var waterMat=new THREE.ShaderMaterial({
+  uniforms:wUni,
+  vertexShader:[
+    'uniform float uTime;','varying vec2 vUv; varying float vE;',
+    'void main(){','  vUv=uv; vec3 p=position;',
+    '  float w=sin(p.x*2.1+uTime*0.90)*0.17',
+    '         +sin(p.z*1.8+uTime*0.70)*0.13',
+    '         +sin(p.x*1.2+p.z*1.6+uTime*0.55)*0.08',
+    '         +cos(p.x*3.2+uTime*1.40)*0.04;',
+    '  p.y+=w; vE=w;',
+    '  gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);',
+    '}',
+  ].join('\n'),
+  fragmentShader:[
+    'uniform float uTime;','uniform vec3 uDeep,uLight;',
+    'varying vec2 vUv; varying float vE;',
+    'void main(){',
+    '  float t=clamp((vE+0.40)/0.80,0.0,1.0);',
+    '  vec3 col=mix(uDeep,uLight,t*0.55);',
+    '  col+=vec3(0.35,0.93,0.82)*smoothstep(0.18,0.32,vE)*0.55;',
+    '  float sp=step(0.9966,sin(vUv.x*200.0+uTime)*sin(vUv.y*170.0+uTime*1.1));',
+    '  col+=vec3(0.7,1.0,0.95)*sp*0.7;',
+    '  gl_FragColor=vec4(col,0.90);',
+    '}',
+  ].join('\n'),
+  transparent:true,side:THREE.DoubleSide,
+});
+var waterMesh=new THREE.Mesh(new THREE.PlaneGeometry(220,220,100,100),waterMat);
+waterMesh.rotation.x=-Math.PI/2;
+waterMesh.position.y=WATER_Y;
+scene.add(waterMesh);
+
+setP(25,'Terreno...');
+
+// Terrain
+(function(){
+  var segs=96;
+  var geo=new THREE.PlaneGeometry(WORLD,WORLD,segs,segs);
+  geo.rotateX(-Math.PI/2);
+  var pos=geo.attributes.position;
+  var col=new Float32Array(pos.count*3);
+  var SAND=new THREE.Color(0xb89555),GRASS=new THREE.Color(0x1e5c28),
+      HIGH=new THREE.Color(0x163d1a),ROCK=new THREE.Color(0x3a3530);
+  for(var i=0;i<pos.count;i++){
+    var x=pos.getX(i),z=pos.getZ(i);
+    var h=getH(x,z);
+    pos.setY(i,h);
+    var c;
+    if(h<WATER_Y+0.35) c=SAND;
+    else if(h<0.55)    c=SAND;
+    else if(h<1.9)     c=GRASS;
+    else if(h<3.4)     c=HIGH;
+    else               c=ROCK;
+    col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;
+  }
+  pos.needsUpdate=true;
+  geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+  geo.computeVertexNormals();
+  var mesh=new THREE.Mesh(geo,new THREE.MeshLambertMaterial({vertexColors:true}));
+  mesh.receiveShadow=true;
+  scene.add(mesh);
+})();
+
+setP(42,'Árboles...');
+
+// Trees
+(function(){
+  var COUNT=45;
+  var trunkGeo=new THREE.CylinderGeometry(0.07,0.11,0.9,5);
+  var foliageGeo=new THREE.ConeGeometry(0.55,1.2,5);
+  var trunkMat=new THREE.MeshLambertMaterial({color:0x4a2f18});
+  var trunkInst=new THREE.InstancedMesh(trunkGeo,trunkMat,COUNT);
+  var fInst=new THREE.InstancedMesh(foliageGeo,new THREE.MeshLambertMaterial({color:0x256025}),COUNT);
+  trunkInst.castShadow=fInst.castShadow=true;
+  var mat4=new THREE.Matrix4(),vPos=new THREE.Vector3(),qRot=new THREE.Quaternion(),vScl=new THREE.Vector3(),euler=new THREE.Euler();
+  var cands=[];
+  for(var i=0;i<22;i++) cands.push([-32+Math.random()*22,-24+Math.random()*48]);
+  for(var i=0;i<18;i++) cands.push([12+Math.random()*22,-22+Math.random()*44]);
+  for(var i=0;i<15;i++) cands.push([-14+Math.random()*22,-34+Math.random()*22]);
+  var placed=0;
+  for(var i=0;i<cands.length&&placed<COUNT;i++){
+    var tx=cands[i][0],tz=cands[i][1],ty=getH(tx,tz);
+    if(ty<0.35||ty>4.2) continue;
+    var h=0.75+Math.random()*0.55;
+    euler.set(0,Math.random()*Math.PI*2,0);qRot.setFromEuler(euler);
+    vPos.set(tx,ty+h/2,tz);vScl.set(1,h/0.9,1);
+    mat4.compose(vPos,qRot,vScl);trunkInst.setMatrixAt(placed,mat4);
+    var fs=0.85+Math.random()*0.3;
+    vPos.set(tx,ty+h+0.3,tz);vScl.set(fs,fs*1.05,fs);
+    mat4.compose(vPos,qRot,vScl);fInst.setMatrixAt(placed,mat4);
+    placed++;
+  }
+  var tries=0;
+  while(placed<COUNT&&tries<300){
+    tries++;
+    var tx=(Math.random()-0.5)*88,tz=(Math.random()-0.5)*88,ty=getH(tx,tz);
+    if(ty<0.35||ty>4.2) continue;
+    var h=0.75+Math.random()*0.55;
+    euler.set(0,Math.random()*Math.PI*2,0);qRot.setFromEuler(euler);
+    vPos.set(tx,ty+h/2,tz);vScl.set(1,h/0.9,1);
+    mat4.compose(vPos,qRot,vScl);trunkInst.setMatrixAt(placed,mat4);
+    var fs=0.85+Math.random()*0.3;
+    vPos.set(tx,ty+h+0.3,tz);vScl.set(fs,fs*1.05,fs);
+    mat4.compose(vPos,qRot,vScl);fInst.setMatrixAt(placed,mat4);
+    placed++;
+  }
+  trunkInst.count=fInst.count=placed;
+  trunkInst.instanceMatrix.needsUpdate=fInst.instanceMatrix.needsUpdate=true;
+  scene.add(trunkInst);scene.add(fInst);
+})();
+
+setP(58,'Pueblo...');
+
+// Houses, dock, boat, reeds
+(function(){
+  var bMat=new THREE.MeshLambertMaterial({color:0xc4a065});
+  var rMat=new THREE.MeshLambertMaterial({color:0x8b3a1a});
+  var dMat=new THREE.MeshLambertMaterial({color:0x5c2d0e});
+  var wMat=new THREE.MeshLambertMaterial({color:0xd4c8a0});
+  var bGeo=new THREE.BoxGeometry(1.4,1.0,1.1);
+  var rGeo=new THREE.ConeGeometry(1.05,0.7,4);
+  var dGeo=new THREE.BoxGeometry(0.22,0.38,0.06);
+  var wGeo=new THREE.BoxGeometry(0.28,0.22,0.06);
+  [{x:2,z:8,ry:.3},{x:5,z:10,ry:-.5},{x:-2,z:10,ry:1.1},
+   {x:8,z:6,ry:-.8},{x:-5,z:6,ry:.6},{x:2,z:14,ry:1.5},
+   {x:7,z:14,ry:.1},{x:-3,z:14,ry:-.4}].forEach(function(hp){
+    var ty=getH(hp.x,hp.z);if(ty<0.2)return;
+    var g=new THREE.Group();
+    var body=new THREE.Mesh(bGeo,bMat);body.position.y=0.5;body.castShadow=body.receiveShadow=true;g.add(body);
+    var roof=new THREE.Mesh(rGeo,rMat);roof.position.y=1.35;roof.rotation.y=Math.PI/4;roof.castShadow=true;g.add(roof);
+    g.add(Object.assign(new THREE.Mesh(dGeo,dMat),{position:new THREE.Vector3(0,0.19,0.565)}));
+    g.add(Object.assign(new THREE.Mesh(wGeo,wMat),{position:new THREE.Vector3(0.45,0.42,0.565)}));
+    g.position.set(hp.x,ty,hp.z);g.rotation.y=hp.ry;
+    scene.add(g);
+  });
+  var dkMat=new THREE.MeshLambertMaterial({color:0x8b6914});
+  var pier=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.12,4.0),dkMat);
+  pier.position.set(36,getH(36,2)+0.06,2);pier.rotation.y=0.22;scene.add(pier);
+  var boat=new THREE.Mesh(new THREE.BoxGeometry(1.7,0.35,0.65),new THREE.MeshLambertMaterial({color:0xd4a832}));
+  boat.position.set(38,WATER_Y+0.12,3);boat.rotation.y=0.5;scene.add(boat);
+  var mast=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,1.5,5),new THREE.MeshLambertMaterial({color:0xa87232}));
+  mast.position.set(38,WATER_Y+0.9,3);scene.add(mast);
+  var reedMat=new THREE.MeshLambertMaterial({color:0x8da820});
+  for(var i=0;i<16;i++){
+    var rx=24+Math.random()*12,rz=-6+Math.random()*12,rh=0.4+Math.random()*0.9;
+    var reed=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.06,rh,4),reedMat);
+    reed.position.set(rx,WATER_Y+rh/2,rz);reed.rotation.z=(Math.random()-.5)*0.28;scene.add(reed);
+  }
+})();
+
+setP(70,'Iluminación...');
+
+var ambLight=new THREE.AmbientLight(0x1a3a2a,0.55);scene.add(ambLight);
+var sunLight=new THREE.DirectionalLight(0xfbbf24,2.0);
+sunLight.position.set(30,25,-20);sunLight.castShadow=true;
+sunLight.shadow.mapSize.width=sunLight.shadow.mapSize.height=1024;
+sunLight.shadow.camera.left=-65;sunLight.shadow.camera.right=65;
+sunLight.shadow.camera.top=65;sunLight.shadow.camera.bottom=-65;
+sunLight.shadow.camera.near=0.5;sunLight.shadow.camera.far=130;
+scene.add(sunLight);
+var rimL=new THREE.DirectionalLight(0x5eead4,0.28);rimL.position.set(-22,8,18);scene.add(rimL);
+var villPt=new THREE.PointLight(0xd97706,1.5,28);villPt.position.set(3,2,10);scene.add(villPt);
+var wGlow=new THREE.PointLight(0x0d9488,0.65,35);wGlow.position.set(0,WATER_Y+1,0);scene.add(wGlow);
+
+setP(80,'POIs...');
+
+// POIs con coordenadas GPS reales
+var POIS=[
+  {name:'Playa Llachón',       desc:'La playa más hermosa de la península. Aguas turquesa, totora y vistas al Titicaca sin igual.',         x:33,z:4,  r:4,coords:[-15.5850,-69.7744],zoom:15},
+  {name:'Mirador del Amaru',   desc:'Panorámica 360° sobre el lago, las islas y la cordillera boliviana. Mejor al amanecer.',               x:-5,z:-18,r:3,coords:[-15.6005,-69.8148],zoom:15},
+  {name:'Comunidad Capachica', desc:'El corazón de la península. Plaza principal, mercado artesanal y calidez aimara-quechua.',             x:2, z:10, r:4,coords:[-15.6183,-69.8239],zoom:15},
+  {name:'Isla Ticonata',       desc:'Isla sagrada a 2h en bote. Lodge comunitario con hospedaje en familias aimaras.',                      x:0, z:-42,r:3,coords:[-15.5067,-69.7983],zoom:14},
+  {name:'Mirador Atardeceres', desc:'Los atardeceres de Capachica son únicos en el mundo. El lago se tiñe de naranja y dorado.',            x:-28,z:18,r:4,coords:[-15.6347,-69.8502],zoom:15},
+];
+
+var torusGeo=new THREE.TorusGeometry(0.45,0.12,8,22);
+var poiMat=new THREE.MeshStandardMaterial({color:0xfbbf24,emissive:0xd97706,emissiveIntensity:0.6,metalness:0.2,roughness:0.3});
+var poiMeshes=[];
+POIS.forEach(function(p,i){
+  var ty=Math.max(getH(p.x,p.z)+0.55,WATER_Y+1.8);
+  var m=new THREE.Mesh(torusGeo,poiMat);
+  m.position.set(p.x,ty,p.z);m.userData.poiIdx=i;
+  poiMeshes.push(m);scene.add(m);
+  var dot=new THREE.Mesh(new THREE.SphereGeometry(0.14,8,8),
+    new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xfbbf24,emissiveIntensity:1.0}));
+  dot.position.set(p.x,ty+0.72,p.z);scene.add(dot);
+});
+
+setP(88,'Cámara...');
+
+var camera=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,0.1,380);
+var cam={
+  focus:new THREE.Vector3(0,0.5,6),yaw:0.0,pitch:0.50,radius:18.0,
+  tFocus:new THREE.Vector3(0,0.5,6),tYaw:0.0,tPitch:0.50,tRadius:18.0,
+};
+function camApply(){
+  var sp=Math.cos(cam.pitch);
+  camera.position.set(
+    cam.focus.x+sp*Math.sin(cam.yaw)*cam.radius,
+    cam.focus.y+Math.sin(cam.pitch)*cam.radius,
+    cam.focus.z+sp*Math.cos(cam.yaw)*cam.radius
+  );
+  camera.lookAt(cam.focus);
 }
-function closePoi(){active=-1;panel.classList.remove('visible');}
-document.getElementById('poi-close').addEventListener('click',closePoi);
 
-// ── Hint fade ─────────────────────────────────────────────────────────────────
-var hintEl=document.getElementById('hint'),hDone=false;
-function fadeHint(){if(hDone)return;hDone=true;setTimeout(function(){hintEl.style.opacity='0';},2500);}
-map.on('dragstart',fadeHint);map.on('zoomstart',fadeHint);
+var keys={};
+document.addEventListener('keydown',function(e){keys[e.code]=true;});
+document.addEventListener('keyup',  function(e){keys[e.code]=false;});
+var drag={on:false,x:0,y:0};
+canvas.addEventListener('mousedown',function(e){drag.on=true;drag.x=e.clientX;drag.y=e.clientY;});
+window.addEventListener('mouseup',  function(){drag.on=false;});
+window.addEventListener('mousemove',function(e){
+  if(!drag.on)return;
+  cam.tYaw  -=(e.clientX-drag.x)*0.0040;
+  cam.tPitch=THREE.MathUtils.clamp(cam.tPitch-(e.clientY-drag.y)*0.0030,0.06,1.48);
+  drag.x=e.clientX;drag.y=e.clientY;hintFade();
+});
+var tPrev=null;
+canvas.addEventListener('touchstart',function(e){if(e.touches[0])tPrev={x:e.touches[0].clientX,y:e.touches[0].clientY};});
+window.addEventListener('touchmove',function(e){
+  if(!tPrev||!e.touches[0])return;
+  cam.tYaw  -=(e.touches[0].clientX-tPrev.x)*0.004;
+  cam.tPitch=THREE.MathUtils.clamp(cam.tPitch-(e.touches[0].clientY-tPrev.y)*0.003,0.06,1.48);
+  tPrev={x:e.touches[0].clientX,y:e.touches[0].clientY};hintFade();
+});
+window.addEventListener('touchend',function(){tPrev=null;});
+canvas.addEventListener('wheel',function(e){
+  cam.tRadius=THREE.MathUtils.clamp(cam.tRadius+e.deltaY*0.016,4,58);
+},{passive:true});
 
+var hintDone=false;
+var hintEl=document.getElementById('hint');
+function hintFade(){if(hintDone)return;hintDone=true;hintEl.style.opacity='0';}
+document.addEventListener('keydown',function(e){
+  if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].indexOf(e.code)>=0)hintFade();
+});
+
+setP(95,'UI...');
+
+// ── POI Panel con Google Maps ─────────────────────────────────────────────────
+var poiPanel   =document.getElementById('poi-panel');
+var poiNameEl  =document.getElementById('poi-name');
+var poiDescEl  =document.getElementById('poi-desc');
+var poiDistEl  =document.getElementById('poi-dist');
+var poiMapEl   =document.getElementById('poi-map');
+var poiBtnRoute=document.getElementById('poi-btn-route');
+var poiBtnView =document.getElementById('poi-btn-view');
+var activePoi  =-1;
+var closedPois ={};
+
+function showPoi(i,force){
+  if(i<0){poiPanel.classList.remove('visible');activePoi=-1;return;}
+  if(!force&&closedPois[i])return;
+  if(i===activePoi)return;
+  activePoi=i;
+  var p=POIS[i];
+  poiNameEl.textContent=p.name;
+  poiDescEl.textContent=p.desc;
+  poiDistEl.textContent='📍 Lago Titicaca · Puno, Perú';
+  var lat=p.coords[0],lng=p.coords[1],z=p.zoom||15;
+  poiMapEl.src='https://maps.google.com/maps?q='+lat+','+lng+'&z='+z+'&output=embed&hl=es';
+  poiBtnRoute.href='https://www.google.com/maps/dir/?api=1&destination='+lat+','+lng;
+  poiBtnView.href ='https://www.google.com/maps?q='+lat+','+lng+'&z='+z;
+  poiPanel.classList.add('visible');
+}
+document.getElementById('poi-close').addEventListener('click',function(){
+  if(activePoi>=0)closedPois[activePoi]=true;
+  activePoi=-1;poiPanel.classList.remove('visible');
+});
+
+var ray=new THREE.Raycaster();
+canvas.addEventListener('click',function(e){
+  var rect=canvas.getBoundingClientRect();
+  ray.setFromCamera({
+    x:((e.clientX-rect.left)/rect.width)*2-1,
+    y:-((e.clientY-rect.top)/rect.height)*2+1,
+  },camera);
+  var hits=ray.intersectObjects(poiMeshes);
+  if(hits.length>0){
+    var idx=hits[0].object.userData.poiIdx;
+    delete closedPois[idx];showPoi(idx,true);
+  }
+});
+
+// Minimap
+var mmCvs=document.getElementById('minimap');
+var mmCtx=mmCvs.getContext('2d');
+var MM=160;
+var mmImg=mmCtx.createImageData(MM,MM);
+for(var py=0;py<MM;py++){
+  for(var px=0;px<MM;px++){
+    var wx=((px/MM)-0.5)*WORLD,wz=((py/MM)-0.5)*WORLD;
+    var h=getH(wx,wz);
+    var r,g,b;
+    if(h<WATER_Y+0.35){r=6;g=40;b=50;}
+    else if(h<0.5)    {r=145;g=128;b=85;}
+    else if(h<1.9)    {r=32;g=82;b=40;}
+    else if(h<3.4)    {r=20;g=58;b=28;}
+    else              {r=55;g=50;b=44;}
+    var i4=(py*MM+px)*4;
+    mmImg.data[i4]=r;mmImg.data[i4+1]=g;mmImg.data[i4+2]=b;mmImg.data[i4+3]=255;
+  }
+}
+function drawMinimap(px,pz,yaw){
+  mmCtx.putImageData(mmImg,0,0);
+  POIS.forEach(function(p){
+    mmCtx.beginPath();
+    mmCtx.arc(((p.x/WORLD)+0.5)*MM,((p.z/WORLD)+0.5)*MM,4,0,Math.PI*2);
+    mmCtx.fillStyle='#fbbf24';mmCtx.fill();
+  });
+  var ppx=((px/WORLD)+0.5)*MM,ppz=((pz/WORLD)+0.5)*MM;
+  mmCtx.save();mmCtx.translate(ppx,ppz);mmCtx.rotate(-yaw);
+  mmCtx.beginPath();mmCtx.moveTo(0,-5);mmCtx.lineTo(-3,3);mmCtx.lineTo(3,3);mmCtx.closePath();
+  mmCtx.fillStyle='#5eead4';mmCtx.fill();mmCtx.restore();
+}
+
+// Compass
+var cmpCvs=document.getElementById('compass');
+var cmpCtx=cmpCvs.getContext('2d');
+function drawCompass(yaw){
+  cmpCtx.clearRect(0,0,60,60);
+  cmpCtx.save();cmpCtx.translate(30,30);
+  cmpCtx.beginPath();cmpCtx.arc(0,0,28,0,Math.PI*2);
+  cmpCtx.fillStyle='rgba(7,21,16,0.78)';cmpCtx.fill();
+  cmpCtx.strokeStyle='rgba(13,148,136,0.5)';cmpCtx.lineWidth=1.2;cmpCtx.stroke();
+  cmpCtx.rotate(-yaw);
+  cmpCtx.beginPath();cmpCtx.moveTo(0,-20);cmpCtx.lineTo(-4,0);cmpCtx.lineTo(4,0);cmpCtx.closePath();
+  cmpCtx.fillStyle='#ef4444';cmpCtx.fill();
+  cmpCtx.beginPath();cmpCtx.moveTo(0,20);cmpCtx.lineTo(-4,0);cmpCtx.lineTo(4,0);cmpCtx.closePath();
+  cmpCtx.fillStyle='#f0fdf4';cmpCtx.fill();
+  cmpCtx.restore();
+  cmpCtx.fillStyle='rgba(94,234,212,0.65)';cmpCtx.font='bold 9px monospace';
+  cmpCtx.textAlign='center';cmpCtx.fillText('N',30,9);
+}
+
+// Day/Night
+var DAY=180;
+var tLabel=document.getElementById('time-label');
+var C_DAWN=new THREE.Color(0xff7040),C_NOON=new THREE.Color(0xfff5d0);
+var C_DUSK=new THREE.Color(0xe07010),C_NIGHT=new THREE.Color(0x1a2870);
+function dayNight(t){
+  var ph=(t%DAY)/DAY;
+  var daytime=Math.max(0,Math.sin(ph*Math.PI));
+  var sunA=(ph-0.25)*Math.PI*2;
+  sunLight.position.set(65*Math.cos(sunA),65*Math.sin(Math.max(0,(ph-0.22)*Math.PI)*0.9),-28);
+  sunLight.visible=(ph>0.17&&ph<0.83);
+  var sc;
+  if(ph<0.28)      sc=C_DAWN.clone().lerp(C_NOON,Math.max(0,(ph-0.17)/0.11));
+  else if(ph<0.55) sc=C_NOON;
+  else if(ph<0.74) sc=C_NOON.clone().lerp(C_DUSK,(ph-0.55)/0.19);
+  else             sc=C_DUSK.clone().lerp(C_NIGHT,(ph-0.74)/0.26);
+  sunLight.color.copy(sc);
+  sunLight.intensity=daytime*2.1+0.15;
+  ambLight.intensity=daytime*0.55+0.07;
+  villPt.intensity=Math.max(0,1.5-daytime*1.2);
+  tLabel.textContent=ph<0.28?'🌅 Amanecer':ph<0.55?'☀️ Mediodía':ph<0.74?'🌇 Atardecer':'🌙 Noche';
+}
+
+// Resize
+function resize(){
+  var w=window.innerWidth,h=window.innerHeight;
+  renderer.setSize(w,h,false);
+  camera.aspect=w/h;camera.updateProjectionMatrix();
+}
+window.addEventListener('resize',resize,{passive:true});
+resize();
+setP(100,'¡Listo!');
+
+// Animate
+var clock=new THREE.Clock();
+var running=true;
+var SPEED=6.5;
+function animate(){
+  if(!running)return;
+  requestAnimationFrame(animate);
+  var delta=Math.min(clock.getDelta(),0.05);
+  var t=clock.getElapsedTime();
+  var mx=0,mz=0;
+  if(keys['KeyW']||keys['ArrowUp'])   {mx-=Math.sin(cam.yaw);mz-=Math.cos(cam.yaw);}
+  if(keys['KeyS']||keys['ArrowDown']) {mx+=Math.sin(cam.yaw);mz+=Math.cos(cam.yaw);}
+  if(keys['KeyA']||keys['ArrowLeft']) {mx-=Math.cos(cam.yaw);mz+=Math.sin(cam.yaw);}
+  if(keys['KeyD']||keys['ArrowRight']){mx+=Math.cos(cam.yaw);mz-=Math.sin(cam.yaw);}
+  if(mx||mz){
+    var len=Math.sqrt(mx*mx+mz*mz);
+    cam.tFocus.x+=mx/len*SPEED*delta;
+    cam.tFocus.z+=mz/len*SPEED*delta;
+    cam.tFocus.x=THREE.MathUtils.clamp(cam.tFocus.x,-WORLD*0.5,WORLD*0.5);
+    cam.tFocus.z=THREE.MathUtils.clamp(cam.tFocus.z,-WORLD*0.5,WORLD*0.5);
+    cam.tFocus.y=Math.max(getH(cam.tFocus.x,cam.tFocus.z)+0.6,WATER_Y+0.9);
+  }
+  var lf=1-Math.pow(0.08,delta*8);
+  cam.focus.lerp(cam.tFocus,lf);
+  cam.yaw  +=(cam.tYaw  -cam.yaw)  *lf;
+  cam.pitch+=(cam.tPitch-cam.pitch)*lf;
+  cam.radius+=(cam.tRadius-cam.radius)*lf;
+  camApply();
+  // POI rings + proximity
+  poiMeshes.forEach(function(m,i){
+    m.rotation.y=t*0.8;
+    m.rotation.x=Math.sin(t*0.5+i)*0.16;
+    m.scale.setScalar(1+Math.sin(t*1.2+i*1.1)*0.07);
+    var dx=cam.focus.x-POIS[i].x,dz=cam.focus.z-POIS[i].z;
+    var dist=Math.sqrt(dx*dx+dz*dz);
+    if(dist<POIS[i].r*2.5){
+      poiDistEl.textContent='📍 A '+Math.round(dist*10)+'m aprox.';
+      showPoi(i);
+    } else if(dist>POIS[i].r*6){
+      delete closedPois[i];
+    }
+  });
+  if(activePoi>=0){
+    var ap=POIS[activePoi];
+    var dx2=cam.focus.x-ap.x,dz2=cam.focus.z-ap.z;
+    if(Math.sqrt(dx2*dx2+dz2*dz2)>ap.r*4.5)showPoi(-1);
+  }
+  wUni.uTime.value=t;
+  wGlow.intensity=0.5+Math.sin(t*0.55)*0.15;
+  dayNight(t);
+  drawMinimap(cam.focus.x,cam.focus.z,cam.yaw);
+  drawCompass(cam.yaw);
+  renderer.render(scene,camera);
+}
+
+setTimeout(function(){
+  loadWrap.style.opacity='0';
+  setTimeout(function(){loadWrap.style.display='none';},850);
+  animate();
+},500);
+
+window.addEventListener('beforeunload',function(){running=false;renderer.dispose();});
 })();
 </script>
 </body>
