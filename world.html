@@ -4,41 +4,43 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mundo 3D · Capachica</title>
-<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet"/>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:#040c08;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif;color:#e2f5f0;}
 #map{position:fixed;inset:0;width:100vw;height:100vh;}
 
-/* ── Overlays de efecto ── */
+/* El filtro CSS que convierte el mapa en dark-teal lo aplicamos por JS en el canvas */
+
+/* ── Overlays ── */
 #stars-canvas{position:fixed;inset:0;pointer-events:none;z-index:2;}
-/* Brillo de agua pulsante */
-#water-glow{
+/* Pulso de agua sobre el lago */
+#water-pulse{
   position:fixed;inset:0;pointer-events:none;z-index:3;
-  background:radial-gradient(ellipse 65% 45% at 55% 60%,
-    rgba(13,148,136,0.12) 0%, rgba(5,42,32,0.06) 50%, transparent 70%);
-  animation:waterGlow 4s ease-in-out infinite;
+  background:radial-gradient(ellipse 60% 42% at 56% 60%,
+    rgba(13,148,136,0.18) 0%, rgba(5,42,32,0.08) 55%, transparent 72%);
+  animation:wPulse 3.8s ease-in-out infinite;
 }
-@keyframes waterGlow{0%,100%{opacity:0.5;transform:scale(1);}50%{opacity:1;transform:scale(1.06);}}
+@keyframes wPulse{0%,100%{opacity:.45;transform:scale(1);}50%{opacity:1;transform:scale(1.07);}}
 /* Scan-lines: efecto mapa de juego */
 #scanlines{
-  position:fixed;inset:0;pointer-events:none;z-index:4;
+  position:fixed;inset:0;pointer-events:none;z-index:4;mix-blend-mode:overlay;
   background:repeating-linear-gradient(
-    0deg, transparent, transparent 3px, rgba(0,0,0,0.10) 3px, rgba(0,0,0,0.10) 4px);
+    0deg,transparent,transparent 3px,rgba(0,0,0,0.18) 3px,rgba(0,0,0,0.18) 4px);
 }
-/* Viñeta oscura en bordes */
+/* Viñeta */
 #vignette{
   position:fixed;inset:0;pointer-events:none;z-index:5;
-  background:radial-gradient(ellipse 88% 88% at 50% 50%,
-    transparent 52%, rgba(4,12,8,0.65) 100%);
+  background:radial-gradient(ellipse 86% 86% at 50% 50%,
+    transparent 50%,rgba(4,12,8,.7) 100%);
 }
 
 /* ── Loading ── */
 #loading{
   position:fixed;inset:0;background:#040c08;z-index:100;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  transition:opacity 0.8s;
+  transition:opacity .8s;
 }
 #loading-logo{
   width:80px;height:80px;border-radius:50%;background:#0d9488;
@@ -54,54 +56,50 @@ body{background:#040c08;overflow:hidden;font-family:'Plus Jakarta Sans',sans-ser
 /* ── Back ── */
 #btn-back{
   position:fixed;top:20px;left:20px;z-index:20;
-  background:rgba(7,21,16,.85);border:1px solid #0d9488;
+  background:rgba(7,21,16,.88);border:1px solid #0d9488;
   color:#5eead4;padding:8px 16px;border-radius:8px;font-size:13px;
-  cursor:pointer;backdrop-filter:blur(8px);text-decoration:none;
-  transition:background .2s;display:inline-block;
+  cursor:pointer;backdrop-filter:blur(8px);text-decoration:none;transition:background .2s;
 }
 #btn-back:hover{background:rgba(13,148,136,.3);}
 
 /* ── Time label ── */
 #time-label{
-  position:fixed;top:24px;left:50%;transform:translateX(-50%);
-  font-size:13px;color:rgba(94,234,212,.8);pointer-events:none;z-index:20;
+  position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:20;
+  font-size:13px;color:rgba(94,234,212,.82);pointer-events:none;
   background:rgba(4,12,8,.65);padding:4px 14px;border-radius:20px;
 }
 
 /* ── Hint ── */
 #hint{
-  position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
-  background:rgba(7,21,16,.78);border:1px solid rgba(94,234,212,.18);
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:20;
+  background:rgba(7,21,16,.8);border:1px solid rgba(94,234,212,.18);
   border-radius:10px;padding:9px 20px;font-size:12px;color:#94a3b8;
-  pointer-events:none;transition:opacity 1.5s;text-align:center;
-  white-space:nowrap;z-index:20;
+  pointer-events:none;transition:opacity 1.5s;text-align:center;white-space:nowrap;
 }
 #hint kbd{background:rgba(13,148,136,.25);border-radius:4px;padding:1px 6px;font-family:monospace;font-size:11px;color:#5eead4;}
 
 /* ── POI Markers ── */
 .poi-marker{cursor:pointer;position:relative;width:54px;height:54px;display:flex;align-items:center;justify-content:center;z-index:10;}
-.poi-ring-outer{position:absolute;width:44px;height:44px;border:1px solid rgba(251,191,36,.22);border-radius:50%;animation:poiOuter 2.4s ease-in-out infinite;}
-.poi-ring{width:26px;height:26px;border:3px solid #fbbf24;border-radius:50%;animation:poiPulse 2.2s ease-in-out infinite;box-shadow:0 0 18px rgba(251,191,36,.6),0 0 5px rgba(251,191,36,1);}
-.poi-dot{position:absolute;width:9px;height:9px;background:#fbbf24;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:0 0 10px #fbbf24,0 0 4px #fff;}
+.poi-outer{position:absolute;width:46px;height:46px;border:1px solid rgba(251,191,36,.2);border-radius:50%;animation:poiO 2.4s ease-in-out infinite;}
+.poi-ring{width:26px;height:26px;border:3px solid #fbbf24;border-radius:50%;animation:poiP 2.2s ease-in-out infinite;box-shadow:0 0 18px rgba(251,191,36,.55),0 0 4px rgba(251,191,36,.9);}
+.poi-dot{position:absolute;width:9px;height:9px;background:#fbbf24;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:0 0 10px #fbbf24;}
 .poi-label{
   position:absolute;bottom:-26px;left:50%;transform:translateX(-50%);
   white-space:nowrap;font-size:11px;color:#5eead4;font-weight:600;
-  background:rgba(4,12,8,.92);padding:2px 10px;border-radius:10px;
+  background:rgba(4,12,8,.94);padding:2px 10px;border-radius:10px;
   border:1px solid rgba(13,148,136,.5);pointer-events:none;
   box-shadow:0 0 10px rgba(13,148,136,.3);font-family:'Plus Jakarta Sans',sans-serif;
 }
-@keyframes poiPulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.24);opacity:.6;}}
-@keyframes poiOuter{0%,100%{transform:scale(1);opacity:.45;}50%{transform:scale(1.18);opacity:.12;}}
+@keyframes poiP{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.25);opacity:.55;}}
+@keyframes poiO{0%,100%{transform:scale(1);opacity:.4;}50%{transform:scale(1.2);opacity:.1;}}
 
 /* ── POI Panel ── */
 #poi-panel{
-  position:fixed;bottom:80px;left:50%;
-  transform:translateX(-50%) translateY(30px);
-  width:min(390px,94vw);
-  background:rgba(4,12,8,.97);border:1px solid #0d9488;border-radius:18px;
-  backdrop-filter:blur(18px);opacity:0;transition:opacity .35s,transform .35s;
-  z-index:30;overflow:hidden;pointer-events:none;
-  box-shadow:0 8px 40px rgba(0,0,0,.8),0 0 0 1px rgba(94,234,212,.1),0 0 30px rgba(13,148,136,.15);
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(30px);
+  width:min(390px,94vw);background:rgba(4,12,8,.97);
+  border:1px solid #0d9488;border-radius:18px;backdrop-filter:blur(18px);
+  opacity:0;transition:opacity .35s,transform .35s;z-index:30;overflow:hidden;pointer-events:none;
+  box-shadow:0 8px 40px rgba(0,0,0,.8),0 0 0 1px rgba(94,234,212,.1),0 0 28px rgba(13,148,136,.14);
 }
 #poi-panel.visible{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
 #poi-header{padding:15px 16px 10px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
@@ -123,13 +121,15 @@ body{background:#040c08;overflow:hidden;font-family:'Plus Jakarta Sans',sans-ser
 #poi-btn-view{background:rgba(13,148,136,.14);color:#5eead4;border:1px solid rgba(13,148,136,.38);}
 #poi-btn-view:hover{background:rgba(13,148,136,.28);}
 
-/* ── MapLibre overrides (dark) ── */
+/* MapLibre UI dark */
 .maplibregl-ctrl-group{background:rgba(4,12,8,.9)!important;border:1px solid rgba(13,148,136,.5)!important;border-radius:10px!important;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.6)!important;}
 .maplibregl-ctrl-group button{background-color:transparent!important;border-color:rgba(13,148,136,.3)!important;}
 .maplibregl-ctrl-group button:hover{background:rgba(13,148,136,.2)!important;}
 .maplibregl-ctrl-group button+button{border-top:1px solid rgba(13,148,136,.25)!important;}
-.maplibregl-ctrl-compass .maplibregl-ctrl-icon,.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon,.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon{filter:invert(.8) sepia(1) saturate(3) hue-rotate(140deg);}
-.maplibregl-ctrl-attrib{background:rgba(4,12,8,.72)!important;color:#5eead4!important;font-size:10px!important;border-radius:6px!important;}
+.maplibregl-ctrl-compass .maplibregl-ctrl-icon,
+.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon,
+.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon{filter:invert(.8) sepia(1) saturate(3) hue-rotate(140deg);}
+.maplibregl-ctrl-attrib{background:rgba(4,12,8,.75)!important;color:#5eead4!important;font-size:10px!important;border-radius:6px!important;}
 .maplibregl-ctrl-attrib a{color:#0d9488!important;}
 .maplibregl-ctrl-attrib-button{filter:invert(1)!important;}
 </style>
@@ -143,26 +143,20 @@ body{background:#040c08;overflow:hidden;font-family:'Plus Jakarta Sans',sans-ser
 </div>
 
 <canvas id="stars-canvas"></canvas>
-<div id="water-glow"></div>
+<div id="water-pulse"></div>
 <div id="scanlines"></div>
 <div id="vignette"></div>
 
 <a id="btn-back" href="index.html">← Volver</a>
 <div id="time-label">☀️ Mediodía</div>
-
 <div id="hint">
-  <kbd>Arrastrar</kbd> mover &nbsp;·&nbsp;
-  <kbd>Clic derecho</kbd> rotar &nbsp;·&nbsp;
-  <kbd>Scroll</kbd> zoom &nbsp;·&nbsp;
-  <kbd>📍</kbd> explorar destinos
+  <kbd>Arrastrar</kbd> mover &nbsp;·&nbsp; <kbd>Clic derecho</kbd> rotar &nbsp;·&nbsp;
+  <kbd>Scroll</kbd> zoom &nbsp;·&nbsp; <kbd>📍</kbd> explorar destinos
 </div>
 
 <div id="poi-panel">
   <div id="poi-header">
-    <div id="poi-header-text">
-      <h3 id="poi-name"></h3>
-      <div id="poi-dist"></div>
-    </div>
+    <div id="poi-header-text"><h3 id="poi-name"></h3><div id="poi-dist"></div></div>
     <button id="poi-close" title="Cerrar">✕</button>
   </div>
   <p id="poi-desc"></p>
@@ -171,8 +165,8 @@ body{background:#040c08;overflow:hidden;font-family:'Plus Jakarta Sans',sans-ser
     <iframe id="poi-map" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
   </div>
   <div id="poi-actions">
-    <a id="poi-btn-route" class="poi-btn" href="#" target="_blank" rel="noopener noreferrer">🧭 Cómo llegar</a>
-    <a id="poi-btn-view"  class="poi-btn" href="#" target="_blank" rel="noopener noreferrer">🗺️ Ver en Maps</a>
+    <a id="poi-btn-route" class="poi-btn" href="#" target="_blank" rel="noopener">🧭 Cómo llegar</a>
+    <a id="poi-btn-view"  class="poi-btn" href="#" target="_blank" rel="noopener">🗺️ Ver en Maps</a>
   </div>
 </div>
 
@@ -182,261 +176,111 @@ body{background:#040c08;overflow:hidden;font-family:'Plus Jakarta Sans',sans-ser
 (function(){
 'use strict';
 
-// ─── Progress ────────────────────────────────────────────────────────────────
-var loadBar=document.getElementById('loading-bar');
-var loadWrap=document.getElementById('loading');
-var loadText=document.getElementById('loading-text');
-function setP(p,msg){loadBar.style.width=p+'%';if(msg)loadText.textContent=msg;}
+// ── Progress ─────────────────────────────────────────────────────────────────
+var lb=document.getElementById('loading-bar');
+var lw=document.getElementById('loading');
+var lt=document.getElementById('loading-text');
+function setP(p,m){lb.style.width=p+'%';if(m)lt.textContent=m;}
+setP(8,'Iniciando...');
 
-setP(8,'Preparando mundo...');
-
-// ─── POIs ─────────────────────────────────────────────────────────────────────
+// ── POIs ─────────────────────────────────────────────────────────────────────
 var POIS=[
-  {name:'Playa Llachón',       desc:'La playa más hermosa de la península. Aguas turquesa, totora y vistas al Titicaca sin igual.',           coords:[-15.5850,-69.7744],zoom:15},
-  {name:'Mirador del Amaru',   desc:'Panorámica 360° sobre el lago, las islas y la cordillera boliviana. Mejor al amanecer.',                 coords:[-15.6005,-69.8148],zoom:15},
-  {name:'Comunidad Capachica', desc:'El corazón de la península. Plaza principal, mercado artesanal y calidez aimara-quechua.',               coords:[-15.6183,-69.8239],zoom:15},
-  {name:'Isla Ticonata',       desc:'Isla sagrada a 2h en bote. Lodge comunitario con hospedaje en familias aimaras.',                        coords:[-15.5067,-69.7983],zoom:14},
-  {name:'Mirador Atardeceres', desc:'Los atardeceres de Capachica son únicos en el mundo. El lago se tiñe de naranja y dorado.',              coords:[-15.6347,-69.8502],zoom:15},
+  {name:'Playa Llachón',       desc:'La playa más hermosa de la península. Aguas turquesa, totora y vistas al Titicaca sin igual.',         coords:[-15.5850,-69.7744],zoom:15},
+  {name:'Mirador del Amaru',   desc:'Panorámica 360° sobre el lago, las islas y la cordillera boliviana. Mejor al amanecer.',               coords:[-15.6005,-69.8148],zoom:15},
+  {name:'Comunidad Capachica', desc:'El corazón de la península. Plaza principal, mercado artesanal y calidez aimara-quechua.',             coords:[-15.6183,-69.8239],zoom:15},
+  {name:'Isla Ticonata',       desc:'Isla sagrada a 2h en bote. Lodge comunitario con hospedaje en familias aimaras.',                      coords:[-15.5067,-69.7983],zoom:14},
+  {name:'Mirador Atardeceres', desc:'Los atardeceres de Capachica son únicos en el mundo. El lago se tiñe de naranja y dorado.',            coords:[-15.6347,-69.8502],zoom:15},
 ];
 
-// ─── Paleta dark-teal ─────────────────────────────────────────────────────────
-var PALETTE={
-  bg:       '#040c08',
-  water:    '#052a20',
-  waterDeep:'#031a14',
-  waterEdge:'#0a4030',
-  land:     '#0d1f15',
-  grass:    '#1a3d1f',
-  forest:   '#163618',
-  urban:    '#0d2218',
-  road:     '#0f4a38',
-  roadMajor:'#0d9488',
-  border:   '#0d5e4e',
-  label:    '#5eead4',
-  halo:     '#040c08',
-};
+// ── Parámetros de animación día/noche ─────────────────────────────────────────
+// sepia(1) + hue-rotate(H) + saturate(S) + brightness(B)
+// → convierte el mapa de calles a dark-teal con todas las features visibles
+var DAY_PHASES=[
+  {th:0.00,label:'🌙 Noche',     H:140,S:2.8,B:0.22,A:1.0},
+  {th:0.20,label:'🌅 Amanecer',  H:135,S:2.5,B:0.30,A:0.5},
+  {th:0.38,label:'☀️ Mediodía',  H:142,S:3.0,B:0.38,A:0.0},
+  {th:0.62,label:'🌇 Atardecer', H:130,S:2.6,B:0.28,A:0.5},
+  {th:0.78,label:'🌙 Noche',     H:140,S:2.8,B:0.22,A:1.0},
+];
+var DAY_MS=180000; // 3 min = ciclo completo
+var startT=Date.now();
+function lerp(a,b,t){return a+(b-a)*t;}
 
-// ─── Remapear un layer al estilo dark-teal ────────────────────────────────────
-function remapLayer(layer){
-  var id=(layer.id||'').toLowerCase();
-  var p=layer.paint||{};
-
-  // Background
-  if(layer.type==='background'){
-    return Object.assign({},layer,{paint:{'background-color':PALETTE.bg}});
-  }
-
-  var np=Object.assign({},p);
-
-  // Detección por id y source-layer
-  var sl=(layer['source-layer']||'').toLowerCase();
-  var isWater    = sl==='water'||id.includes('water')||id.includes('lake')||id.includes('ocean');
-  var isWaterway = sl==='waterway'||id.includes('waterway')||id.includes('river');
-  var isLand     = sl==='landcover'||sl==='landuse'||id.includes('land')||id.includes('ground');
-  var isGrass    = id.includes('grass')||id.includes('park')||id.includes('farmland')||id.includes('meadow')||id.includes('scrub');
-  var isForest   = id.includes('forest')||id.includes('wood')||id.includes('tree');
-  var isUrban    = id.includes('residential')||id.includes('urban')||id.includes('building');
-  var isRoad     = sl==='transportation'||sl==='road'||id.includes('road')||id.includes('path')||id.includes('transit');
-  var isBorder   = sl==='boundary'||id.includes('border')||id.includes('boundary');
-  var isLabel    = layer.type==='symbol';
-
-  if(isWater){
-    if('fill-color'      in p) np['fill-color']='#052a20';
-    if('fill-opacity'    in p) np['fill-opacity']=0.95;
-    if('fill-outline-color' in p) np['fill-outline-color']=PALETTE.waterEdge;
-    if('line-color'      in p) np['line-color']=PALETTE.waterEdge;
-  } else if(isWaterway){
-    if('line-color' in p) np['line-color']='#0a4030';
-    if('line-opacity' in p) np['line-opacity']=0.8;
-  } else if(isForest){
-    if('fill-color' in p) np['fill-color']=PALETTE.forest;
-  } else if(isGrass){
-    if('fill-color' in p) np['fill-color']=PALETTE.grass;
-  } else if(isUrban){
-    if('fill-color'           in p) np['fill-color']=PALETTE.urban;
-    if('fill-extrusion-color' in p) np['fill-extrusion-color']=PALETTE.urban;
-    if('fill-outline-color'   in p) np['fill-outline-color']='#0d3a28';
-  } else if(isLand){
-    if('fill-color' in p) np['fill-color']=PALETTE.land;
-  }
-
-  if(isRoad){
-    if('line-color' in p){
-      // Vías principales: teal suave; el resto: muy oscuras
-      var isMajor=id.includes('major')||id.includes('primary')||id.includes('trunk')||id.includes('motorway');
-      np['line-color']=isMajor?'rgba(13,148,136,0.45)':'rgba(15,74,56,0.55)';
+function getCurrentPhase(){
+  var ph=((Date.now()-startT)%DAY_MS)/DAY_MS;
+  for(var k=0;k<DAY_PHASES.length-1;k++){
+    if(ph>=DAY_PHASES[k].th&&ph<DAY_PHASES[k+1].th){
+      var a=DAY_PHASES[k],b=DAY_PHASES[k+1];
+      var f=(ph-a.th)/(b.th-a.th);
+      return {
+        label:a.label,
+        H:lerp(a.H,b.H,f),
+        S:lerp(a.S,b.S,f),
+        B:lerp(a.B,b.B,f),
+        A:lerp(a.A,b.A,f), // night-ness 0..1
+      };
     }
-    if('fill-color' in p) np['fill-color']='rgba(15,74,56,0.4)';
   }
-
-  if(isBorder){
-    if('line-color'   in p) np['line-color']=PALETTE.border;
-    if('line-opacity' in p) np['line-opacity']=0.35;
-    if('line-dasharray' in p) np['line-dasharray']=[3,3];
-  }
-
-  if(isLabel){
-    np['text-color']    =PALETTE.label;
-    np['text-halo-color']=PALETTE.halo;
-    np['text-halo-width']=1.5;
-    if('icon-color' in p) np['icon-color']=PALETTE.label;
-    // Ocultar iconos no relevantes
-    layer.layout=layer.layout||{};
-    if(layer.layout['icon-image']){layer.layout['icon-image']='';}
-  }
-
-  return Object.assign({},layer,{paint:np});
+  return DAY_PHASES[0];
 }
 
-// ─── Modificar el estilo completo ─────────────────────────────────────────────
-function applyDarkTeal(style){
-  // Fuente de terreno
-  style.sources['terrain-dem']={
-    type:'raster-dem',
-    tiles:['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
-    tileSize:256,maxzoom:15,encoding:'terrarium',
-  };
-  // Remapar todos los layers
-  style.layers=style.layers.map(remapLayer);
-  return style;
-}
+// ── Construir el mapa ─────────────────────────────────────────────────────────
+setP(20,'Cargando mapa...');
 
-// ─── Inicializar mapa ─────────────────────────────────────────────────────────
-function initMap(style){
-  setP(55,'Iniciando mapa...');
-  var map=new maplibregl.Map({
-    container:'map',
-    style:style,
-    center:[-69.8239,-15.6183],
-    zoom:10.5,pitch:52,bearing:-15,
-    maxPitch:85,antialias:true,
-  });
-
-  map.addControl(new maplibregl.NavigationControl({visualizePitch:true}),'top-right');
-
-  map.on('load',function(){
-    setP(72,'Aplicando terreno...');
-    try{map.setTerrain({source:'terrain-dem',exaggeration:2.1});}catch(e){console.warn(e);}
-
-    setP(82,'Añadiendo cielo...');
-    try{
-      map.addLayer({id:'sky',type:'sky',paint:{
-        'sky-type':'atmosphere',
-        'sky-atmosphere-sun':[0,80],
-        'sky-atmosphere-sun-intensity':5,
-        'sky-atmosphere-color':'rgba(4,18,12,1)',
-      }});
-    }catch(e){console.warn(e);}
-
-    setP(91,'Colocando destinos...');
-    addPoiMarkers(map);
-
-    setP(100,'¡Listo!');
-
-    // Fly-in de entrada
-    setTimeout(function(){
-      map.flyTo({center:[-69.8239,-15.6183],zoom:13.2,pitch:62,bearing:-20,duration:4200,essential:true,
-        easing:function(t){return 1-Math.pow(1-t,3);}});
-    },300);
-
-    setTimeout(function(){
-      loadWrap.style.opacity='0';
-      setTimeout(function(){loadWrap.style.display='none';},850);
-    },500);
-
-    // Animación del agua (real shape del Titicaca)
-    startWaterAnimation(map);
-    // Ciclo día/noche
-    startDayNight(map);
-  });
-
-  map.on('error',function(e){console.warn('Map:',e&&e.error&&e.error.message);});
-  map.on('click',closePoiPanel);
-
-  setupHint(map);
-}
-
-// ─── Fallback: satélite dark-teal si falla vector ─────────────────────────────
-function initMapFallback(){
-  setP(40,'Cargando vista satélite...');
-  var style={
+var map=new maplibregl.Map({
+  container:'map',
+  style:{
     version:8,
     sources:{
-      sat:{type:'raster',
-        tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
-        tileSize:256,maxzoom:19,attribution:'© Esri'},
-      'terrain-dem':{type:'raster-dem',
+      // Mapa de calles Esri: muestra casas, calles, parques, agua, etiquetas
+      streets:{
+        type:'raster',
+        tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'],
+        tileSize:256,maxzoom:18,
+        attribution:'© Esri, HERE, Garmin, OpenStreetMap, GIS community'
+      },
+      // Terreno 3D real (altimetría NASA/USGS)
+      terrain:{
+        type:'raster-dem',
         tiles:['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
-        tileSize:256,maxzoom:15,encoding:'terrarium'},
+        tileSize:256,maxzoom:15,encoding:'terrarium',
+        attribution:'© Mapzen, USGS'
+      }
     },
-    layers:[{id:'sat',type:'raster',source:'sat',
-      paint:{'raster-hue-rotate':162,'raster-saturation':0.55,'raster-brightness-max':0.38,'raster-contrast':0.28}}]
-  };
-  initMap(style);
-}
+    layers:[{
+      id:'streets',type:'raster',source:'streets',
+      paint:{'raster-opacity':1.0}
+    }]
+  },
+  center:[-69.8239,-15.6183],
+  zoom:10.5,pitch:52,bearing:-15,
+  maxPitch:85,antialias:true,
+});
 
-// ─── Carga el estilo vectorial de OpenFreeMap ─────────────────────────────────
-setP(15,'Cargando estilo vectorial...');
-var STYLE_URL='https://tiles.openfreemap.org/styles/liberty';
+map.addControl(new maplibregl.NavigationControl({visualizePitch:true}),'top-right');
 
-fetch(STYLE_URL)
-  .then(function(r){
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    return r.json();
-  })
-  .then(function(style){
-    setP(40,'Remapeando colores...');
-    style=applyDarkTeal(style);
-    initMap(style);
-  })
-  .catch(function(err){
-    console.warn('Vector style failed, using satellite fallback:',err);
-    initMapFallback();
-  });
+// ── On load ───────────────────────────────────────────────────────────────────
+map.on('load',function(){
+  setP(65,'Aplicando terreno 3D...');
+  try{map.setTerrain({source:'terrain',exaggeration:2.1});}catch(e){console.warn(e);}
 
-// ─── Animación de agua: cambia el fill-color del Titicaca en tiempo real ──────
-function startWaterAnimation(map){
-  var t0=Date.now();
-  var waterLayers=[];
-  // Recopilar layers de agua
-  (map.getStyle().layers||[]).forEach(function(l){
-    var id=(l.id||'').toLowerCase();
-    var sl=(l['source-layer']||'').toLowerCase();
-    if((sl==='water'||id.includes('water'))&&(l.type==='fill'||l.type==='fill-extrusion')){
-      waterLayers.push(l.id);
-    }
-  });
+  setP(78,'Añadiendo cielo...');
+  try{
+    map.addLayer({id:'sky',type:'sky',paint:{
+      'sky-type':'atmosphere',
+      'sky-atmosphere-sun':[0,78],
+      'sky-atmosphere-sun-intensity':6,
+      'sky-atmosphere-color':'rgba(4,16,12,1)',
+    }});
+  }catch(e){console.warn(e);}
 
-  function tick(){
-    requestAnimationFrame(tick);
-    var t=(Date.now()-t0)/1000;
-    // Oscilación suave entre tonos deep/light, como el shader del lago
-    var wave=Math.sin(t*0.7)*0.5+0.5;
-    var wave2=Math.sin(t*1.1+1)*0.5+0.5;
-    var r=Math.round(3+wave*4);
-    var g=Math.round(28+wave*18+wave2*6);
-    var b=Math.round(20+wave*16+wave2*4);
-    var col='rgb('+r+','+g+','+b+')';
-    waterLayers.forEach(function(id){
-      try{map.setPaintProperty(id,'fill-color',col);}catch(e){}
-    });
-    // Destellos en el borde del agua
-    var edgeAlpha=(0.35+Math.sin(t*1.8)*0.2).toFixed(2);
-    waterLayers.forEach(function(id){
-      try{map.setPaintProperty(id,'fill-outline-color','rgba(13,148,136,'+edgeAlpha+')');}catch(e){}
-    });
-  }
-  tick();
-}
-
-// ─── POI Markers ──────────────────────────────────────────────────────────────
-function addPoiMarkers(map){
+  setP(90,'Colocando destinos...');
   POIS.forEach(function(poi,i){
     var el=document.createElement('div');
     el.className='poi-marker';
     el.innerHTML=
-      '<div class="poi-ring-outer" style="animation-delay:'+(i*0.4)+'s"></div>'+
-      '<div class="poi-ring"       style="animation-delay:'+(i*0.3)+'s"></div>'+
+      '<div class="poi-outer"  style="animation-delay:'+(i*.4)+'s"></div>'+
+      '<div class="poi-ring"   style="animation-delay:'+(i*.3)+'s"></div>'+
       '<div class="poi-dot"></div>'+
       '<div class="poi-label">'+poi.name+'</div>';
     new maplibregl.Marker({element:el,anchor:'center'})
@@ -444,115 +288,122 @@ function addPoiMarkers(map){
       .addTo(map);
     el.addEventListener('click',function(e){
       e.stopPropagation();
-      openPoiPanel(i);
-      map.flyTo({center:[poi.coords[1],poi.coords[0]],zoom:poi.zoom,
-        pitch:65,bearing:map.getBearing()+12,duration:1400,essential:true,
-        easing:function(t){return t<0.5?2*t*t:-1+(4-2*t)*t;}});
+      openPoi(i);
+      map.flyTo({
+        center:[poi.coords[1],poi.coords[0]],zoom:poi.zoom,
+        pitch:65,bearing:map.getBearing()+12,
+        duration:1400,essential:true,
+        easing:function(t){return t<.5?2*t*t:-1+(4-2*t)*t;}
+      });
     });
   });
-}
 
-// ─── Ciclo día/noche ─────────────────────────────────────────────────────────
-function startDayNight(map){
+  setP(100,'¡Listo!');
+
+  // ── FILTRO CSS ANIMADO en el canvas del mapa ──────────────────────────────
+  // sepia(1) convierte todo a un tono cálido base,
+  // luego hue-rotate(~140°) lleva ese tono al rango teal.
+  // Resultado: casas, calles, agua → todos visibles en dark-teal animado.
+  var canvas=map.getCanvas();
+  var tAnim=Date.now();
   var timeLabel=document.getElementById('time-label');
-  var startT=Date.now();
-  var DAY=180000; // 3 min = ciclo completo
-  var phases=[
-    {th:0.00,label:'🌙 Noche',     hue:195,sat:0.25,brt:0.18},
-    {th:0.22,label:'🌅 Amanecer',  hue:175,sat:0.40,brt:0.28},
-    {th:0.38,label:'☀️ Mediodía',  hue:162,sat:0.55,brt:0.38},
-    {th:0.62,label:'🌇 Atardecer', hue:148,sat:0.48,brt:0.30},
-    {th:0.78,label:'🌙 Noche',     hue:195,sat:0.25,brt:0.18},
-  ];
-  function lerp(a,b,t){return a+(b-a)*t;}
-  setInterval(function(){
-    var ph=((Date.now()-startT)%DAY)/DAY;
-    var a,b;
-    for(var k=0;k<phases.length-1;k++){
-      if(ph>=phases[k].th&&ph<phases[k+1].th){a=phases[k];b=phases[k+1];break;}
-    }
-    if(!a)return;
-    var f=(ph-a.th)/(b.th-a.th);
-    // Ciclo día/noche solo para fallback satélite; en vectorial el agua ya anima
-    if(map.getLayer&&map.getLayer('sat')){
-      try{
-        map.setPaintProperty('sat','raster-hue-rotate',lerp(a.hue,b.hue,f));
-        map.setPaintProperty('sat','raster-saturation',lerp(a.sat,b.sat,f));
-        map.setPaintProperty('sat','raster-brightness-max',lerp(a.brt,b.brt,f));
-      }catch(e){}
-    }
-    timeLabel.textContent=a.label;
-    // Oscuridad nocturna general
-    var nightness=ph<0.22||ph>0.78?1:ph<0.38?1-(ph-0.22)/0.16:ph>0.62?(ph-0.62)/0.16:0;
-    document.getElementById('water-glow').style.opacity=(0.3+nightness*0.5).toFixed(2);
-  },1200);
-}
 
-// ─── Stars canvas ─────────────────────────────────────────────────────────────
+  function animFrame(){
+    requestAnimationFrame(animFrame);
+    var t=(Date.now()-tAnim)/1000;
+    var ph=getCurrentPhase();
+    // Oscilación sutil para efecto "mundo vivo"
+    var H=ph.H+Math.sin(t*.35)*6;
+    var S=ph.S+Math.sin(t*.55)*.15;
+    var B=ph.B+Math.sin(t*.65)*.018;
+    canvas.style.filter=
+      'sepia(1) hue-rotate('+H.toFixed(1)+'deg) saturate('+S.toFixed(2)+') brightness('+B.toFixed(3)+') contrast(1.3)';
+    timeLabel.textContent=ph.label;
+    // Intensidad del pulso de agua según hora
+    document.getElementById('water-pulse').style.opacity=(0.3+ph.A*.6).toFixed(2);
+  }
+  animFrame();
+
+  // Fly-in de bienvenida
+  setTimeout(function(){
+    map.flyTo({
+      center:[-69.8239,-15.6183],zoom:13.2,pitch:62,bearing:-20,
+      duration:4200,essential:true,
+      easing:function(t){return 1-Math.pow(1-t,3);}
+    });
+  },300);
+
+  // Ocultar loading
+  setTimeout(function(){
+    lw.style.opacity='0';
+    setTimeout(function(){lw.style.display='none';},850);
+  },500);
+});
+
+map.on('error',function(e){console.warn('Map:',e&&e.error&&e.error.message);});
+map.on('click',closePoi);
+
+// ── Stars canvas ──────────────────────────────────────────────────────────────
 (function(){
   var cvs=document.getElementById('stars-canvas');
   var ctx=cvs.getContext('2d');
-  var W,H,stars=[];
+  var W,H;
   function resize(){W=cvs.width=window.innerWidth;H=cvs.height=window.innerHeight;}
   window.addEventListener('resize',resize);resize();
-  for(var i=0;i<260;i++){
-    stars.push({x:Math.random(),y:Math.random()*0.5,r:.2+Math.random()*1.1,
-      a:.3+Math.random()*.7,spd:.4+Math.random()*1.2,ph:Math.random()*Math.PI*2});
-  }
-  var startT=Date.now();
-  var DAY=180000;
+  var stars=[];
+  for(var i=0;i<280;i++) stars.push({
+    x:Math.random(),y:Math.random()*.5,
+    r:.15+Math.random()*1.1,a:.3+Math.random()*.7,
+    spd:.4+Math.random()*1.1,ph:Math.random()*Math.PI*2
+  });
+  var t0=Date.now();
   function draw(){
     requestAnimationFrame(draw);
     ctx.clearRect(0,0,W,H);
-    var t=(Date.now()-startT)/1000;
-    var ph=((Date.now()-startT)%DAY)/DAY;
-    var night=ph<0.22||ph>0.78?1:ph<0.38?1-(ph-0.22)/0.16:ph>0.62?(ph-0.62)/0.16:0;
-    if(night<0.04)return;
+    var t=(Date.now()-t0)/1000;
+    var night=getCurrentPhase().A;
+    if(night<.04)return;
     stars.forEach(function(s){
-      var flicker=.5+.5*Math.sin(t*s.spd+s.ph);
-      ctx.globalAlpha=s.a*.85*flicker*night;
+      var flicker=.45+.55*Math.sin(t*s.spd+s.ph);
+      ctx.globalAlpha=s.a*.9*flicker*night;
       ctx.fillStyle='#e2f5f0';
-      ctx.beginPath();
-      ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);
-      ctx.fill();
+      ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2);ctx.fill();
     });
     ctx.globalAlpha=1;
   }
   draw();
 })();
 
-// ─── POI Panel ────────────────────────────────────────────────────────────────
-var poiPanel   =document.getElementById('poi-panel');
-var poiNameEl  =document.getElementById('poi-name');
-var poiDescEl  =document.getElementById('poi-desc');
-var poiDistEl  =document.getElementById('poi-dist');
-var poiMapEl   =document.getElementById('poi-map');
-var poiBtnRoute=document.getElementById('poi-btn-route');
-var poiBtnView =document.getElementById('poi-btn-view');
-var activePoi  =-1;
+// ── POI Panel ─────────────────────────────────────────────────────────────────
+var panel=document.getElementById('poi-panel');
+var pName=document.getElementById('poi-name');
+var pDesc=document.getElementById('poi-desc');
+var pDist=document.getElementById('poi-dist');
+var pMap =document.getElementById('poi-map');
+var pRoute=document.getElementById('poi-btn-route');
+var pView =document.getElementById('poi-btn-view');
+var active=-1;
 
-function openPoiPanel(i){
-  if(i===activePoi)return;
-  activePoi=i;
+function openPoi(i){
+  if(i===active)return;
+  active=i;
   var p=POIS[i];
-  poiNameEl.textContent=p.name;
-  poiDescEl.textContent=p.desc;
-  poiDistEl.textContent='📍 Lago Titicaca · Puno, Perú';
+  pName.textContent=p.name;
+  pDesc.textContent=p.desc;
+  pDist.textContent='📍 Lago Titicaca · Puno, Perú';
   var lat=p.coords[0],lng=p.coords[1],z=p.zoom||15;
-  poiMapEl.src='https://maps.google.com/maps?q='+lat+','+lng+'&z='+z+'&output=embed&hl=es';
-  poiBtnRoute.href='https://www.google.com/maps/dir/?api=1&destination='+lat+','+lng;
-  poiBtnView.href ='https://www.google.com/maps?q='+lat+','+lng+'&z='+z;
-  poiPanel.classList.add('visible');
+  pMap.src='https://maps.google.com/maps?q='+lat+','+lng+'&z='+z+'&output=embed&hl=es';
+  pRoute.href='https://www.google.com/maps/dir/?api=1&destination='+lat+','+lng;
+  pView.href ='https://www.google.com/maps?q='+lat+','+lng+'&z='+z;
+  panel.classList.add('visible');
 }
-function closePoiPanel(){activePoi=-1;poiPanel.classList.remove('visible');}
-document.getElementById('poi-close').addEventListener('click',closePoiPanel);
+function closePoi(){active=-1;panel.classList.remove('visible');}
+document.getElementById('poi-close').addEventListener('click',closePoi);
 
-// ─── Hint ─────────────────────────────────────────────────────────────────────
-function setupHint(map){
-  var hintEl=document.getElementById('hint'),done=false;
-  function fade(){if(done)return;done=true;setTimeout(function(){hintEl.style.opacity='0';},2500);}
-  map.on('dragstart',fade);map.on('zoomstart',fade);
-}
+// ── Hint fade ─────────────────────────────────────────────────────────────────
+var hintEl=document.getElementById('hint'),hDone=false;
+function fadeHint(){if(hDone)return;hDone=true;setTimeout(function(){hintEl.style.opacity='0';},2500);}
+map.on('dragstart',fadeHint);map.on('zoomstart',fadeHint);
 
 })();
 </script>
