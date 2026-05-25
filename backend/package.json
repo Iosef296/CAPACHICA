@@ -1,0 +1,17 @@
+{
+  "name": "capachica-backend",
+  "version": "1.0.0",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot index.ts",
+    "start": "bun index.ts",
+    "seed": "bun db/seed.ts"
+  },
+  "dependencies": {
+    "jose": "^5.9.6"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
