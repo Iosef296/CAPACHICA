@@ -39,7 +39,8 @@ export default function Navbar() {
     { label: "Gastronomía", href: "/gastronomia" },
     { label: "Festividades", href: "/festividades" },
     { label: "Artesanía", href: "/artesania" },
-    { label: "Alojamiento", href: "/alojamiento" },
+    { label: 'Cómo Llegar', href: '/como-llegar' },
+{ label: 'Alojamiento', href: '/alojamiento' },
   ];
 
   return (
