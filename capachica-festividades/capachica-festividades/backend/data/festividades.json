@@ -1,0 +1,169 @@
+[
+  {
+    "nombre": "Virgen de la Candelaria",
+    "fecha": "1 al 14 de Febrero",
+    "mes": 2,
+    "tipo": "Religiosa",
+    "ubicacion": "Capachica, Puno",
+    "descripcion": "La Festividad de la Virgen de la Candelaria es la celebracion mas grande del altiplano peruano. Declarada Patrimonio Cultural Inmaterial de la Humanidad por la UNESCO. Miles de devotos y danzarines se reunen en honor a la Patrona de Puno con coloridas danzas y procesiones.",
+    "actividades": [
+      "Procesion de la Virgen",
+      "Danzas folkloricas",
+      "Misa solemne",
+      "Feria gastronomica",
+      "Concurso de danzas"
+    ],
+    "imagen": "https://picsum.photos/seed/candelaria/800/500",
+    "galeria": [
+      "https://picsum.photos/seed/candel1/600/400",
+      "https://picsum.photos/seed/candel2/600/400",
+      "https://picsum.photos/seed/candel3/600/400",
+      "https://picsum.photos/seed/candel4/600/400"
+    ],
+    "destacado": true,
+    "id": 1
+  },
+  {
+    "id": 2,
+    "nombre": "Cruz Velacuity",
+    "fecha": "2 al 3 de Mayo",
+    "mes": 5,
+    "tipo": "Tradicional",
+    "ubicacion": "Comunidades de Capachica",
+    "descripcion": "La Cruz Velacuity es una celebracion ancestral que rinde honor a la Santa Cruz con veladas nocturnas, cantos rituales y ceremonias agricolas. Las comunidades se reúnen alrededor de cruces adornadas con flores y banderas, compartiendo comida tradicional y danzas.",
+    "actividades": [
+      "Velada nocturna",
+      "Adornacion de cruces",
+      "Rituales agricolas",
+      "Comida tradicional",
+      "Cantos ceremoniales"
+    ],
+    "imagen": "https://picsum.photos/seed/velacuity/800/500",
+    "galeria": [
+      "https://picsum.photos/seed/vela1/600/400",
+      "https://picsum.photos/seed/vela2/600/400",
+      "https://picsum.photos/seed/vela3/600/400"
+    ],
+    "destacado": false
+  },
+  {
+    "id": 3,
+    "nombre": "Inti Raymi",
+    "fecha": "21 al 24 de Junio",
+    "mes": 6,
+    "tipo": "Ceremonial",
+    "ubicacion": "Peninsula de Capachica",
+    "descripcion": "El Inti Raymi o Fiesta del Sol es la ceremonia mas importante del calendario inca. En Capachica se celebra con rituales de agradecimiento al Dios Sol, danzas ceremoniales y ofrendas en las orillas del Lago Titicaca, conectando con la cosmovision andina ancestral.",
+    "actividades": [
+      "Ceremonia al Sol",
+      "Danzas ceremoniales",
+      "Ofrendas al lago",
+      "Ritual del fuego",
+      "Peregrinacion al mirador"
+    ],
+    "imagen": "https://picsum.photos/seed/intiraymi/800/500",
+    "galeria": [
+      "https://picsum.photos/seed/inti1/600/400",
+      "https://picsum.photos/seed/inti2/600/400",
+      "https://picsum.photos/seed/inti3/600/400",
+      "https://picsum.photos/seed/inti4/600/400"
+    ],
+    "destacado": true
+  },
+  {
+    "id": 4,
+    "nombre": "Santiago Apostol",
+    "fecha": "25 de Julio",
+    "mes": 7,
+    "tipo": "Religiosa",
+    "ubicacion": "Distrito de Capachica",
+    "descripcion": "La fiesta de Santiago Apostol es una de las celebraciones religiosas mas importantes de Capachica. Se realizan procesiones con la imagen del santo, misas solemnes, ferias populares y actividades culturales que reúnen a toda la comunidad en un ambiente de fe y tradicion.",
+    "actividades": [
+      "Procesion de Santiago",
+      "Misa solemne",
+      "Feria popular",
+      "Danzas tipicas",
+      "Actividades culturales"
+    ],
+    "imagen": "https://picsum.photos/seed/santiago/800/500",
+    "galeria": [
+      "https://picsum.photos/seed/sant1/600/400",
+      "https://picsum.photos/seed/sant2/600/400",
+      "https://picsum.photos/seed/sant3/600/400"
+    ],
+    "destacado": false
+  },
+  {
+    "id": 5,
+    "nombre": "Pachamama Raymi",
+    "fecha": "1 al 15 de Agosto",
+    "mes": 8,
+    "tipo": "Ceremonial",
+    "ubicacion": "Comunidades de Capachica",
+    "descripcion": "El Pachamama Raymi es la fiesta sagrada a la Madre Tierra. En Agosto, mes de la Pachamama, las comunidades de Capachica realizan ceremonias de agradecimiento con ofrendas, pagos a la tierra, rituales ancestrales y banquetes comunitarios para pedir prosperidad y buenas cosechas.",
+    "actividades": [
+      "Ofrendas a la Pachamama",
+      "Pagos a la tierra",
+      "Rituales ancestrales",
+      "Banquete comunitario",
+      "Ceremonia del challaco"
+    ],
+    "imagen": "https://picsum.photos/seed/pachamama/800/500",
+    "galeria": [
+      "https://picsum.photos/seed/pacha1/600/400",
+      "https://picsum.photos/seed/pacha2/600/400",
+      "https://picsum.photos/seed/pacha3/600/400",
+      "https://picsum.photos/seed/pacha4/600/400"
+    ],
+    "destacado": true
+  },
+  {
+    "id": 6,
+    "nombre": "Dia de Todos los Santos",
+    "fecha": "1 al 2 de Noviembre",
+    "mes": 11,
+    "tipo": "Tradicional",
+    "ubicacion": "Capachica, Puno",
+    "descripcion": "El Dia de Todos los Santos y los Fieles Difuntos en Capachica se vive con profunda espiritualidad andina. Las familias preparan altares con flores, velas y comida favorita de sus seres queridos fallecidos, realizando visitas al cementerio con musica y oraciones ancestrales.",
+    "actividades": [
+      "Preparacion de altares",
+      "Visita al cementerio",
+      "Ofrendas de comida",
+      "Oraciones ancestrales",
+      "Musica ceremonial"
+    ],
+    "imagen": "https://picsum.photos/seed/todossantos/800/500",
+    "galeria": [
+      "https://picsum.photos/seed/santos1/600/400",
+      "https://picsum.photos/seed/santos2/600/400",
+      "https://picsum.photos/seed/santos3/600/400"
+    ],
+    "destacado": false
+  },
+  {
+    "nombre": "actividad random",
+    "fecha": "14 ",
+    "mes": 2,
+    "tipo": "Tradicional",
+    "ubicacion": "",
+    "descripcion": "",
+    "actividades": [],
+    "imagen": "https://picsum.photos/seed/fest7/800/500",
+    "galeria": [],
+    "destacado": false,
+    "id": 7
+  },
+  {
+    "nombre": "otra actividad random",
+    "fecha": "15 de marzo",
+    "mes": 3,
+    "tipo": "Tradicional",
+    "ubicacion": "",
+    "descripcion": "algoooo",
+    "actividades": [],
+    "imagen": "https://picsum.photos/seed/fest8/800/500",
+    "galeria": [],
+    "destacado": false,
+    "id": 8
+  }
+]
