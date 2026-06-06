@@ -67,10 +67,31 @@ export default function ReservaForm() {
     setLoading(true);
     setError("");
     try {
+      const familiaElegida = familias.find(
+        (f) => String(f.id) === form.familia_id,
+      );
+      const notas = [
+        form.notas,
+        familiaElegida ? `Familia preferida: ${familiaElegida.nombre}` : "",
+      ]
+        .filter(Boolean)
+        .join(" | ");
+      const payload = {
+        nombre_huesped: form.nombre,
+        email: form.email,
+        telefono: form.telefono,
+        fecha_llegada: form.fecha_llegada,
+        fecha_salida: form.fecha_salida,
+        num_personas: form.num_personas,
+        actividad_preferida: form.actividad,
+        metodo_pago: form.metodo_pago || null,
+        notas,
+        precio_total: total,
+      };
       const res = await fetch("http://localhost:4000/api/reservas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, precio_total: total }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);

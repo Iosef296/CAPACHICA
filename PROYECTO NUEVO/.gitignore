@@ -1,0 +1,21 @@
+# Dependencias
+node_modules/
+
+# Builds / salidas
+dist/
+.astro/
+
+# Variables de entorno (contienen secretos). Usa .env.example como plantilla
+.env
+backend/.env
+frontend/.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema operativo / editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
