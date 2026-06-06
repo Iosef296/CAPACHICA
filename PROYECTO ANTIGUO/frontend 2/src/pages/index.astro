@@ -1,0 +1,11 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar';
+import VivencialHero from '../components/VivencialHero';
+import Footer from '../components/Footer';
+---
+<Layout title="Capachica Turismo">
+  <Navbar client:load />
+  <VivencialHero client:load />
+  <Footer />
+</Layout>

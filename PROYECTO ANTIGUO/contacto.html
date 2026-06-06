@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contacto · Capachica Turismo</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="contacto">
+<div id="capa-nav"></div>
+
+<div class="page-hero">
+  <div class="page-hero-img" style="background:linear-gradient(135deg,#0d2a20 0%,#0d4a40 35%,#1a3a2a 65%,#0a2a18 100%)"></div>
+  <div class="page-hero-bg"></div>
+  <div class="page-hero-content">
+    <div class="page-hero-badge">Escríbenos · Planifica · Viaja</div>
+    <h1 class="page-hero-title" data-i18n="contact.title">Planifica tu <em>Viaje</em></h1>
+    <p class="page-hero-sub" data-i18n="contact.sub">Cuéntanos tu sueño y lo hacemos realidad. Respondemos en menos de 24 horas.</p>
+  </div>
+</div>
+<section class="section">
+  <div class="section-inner">
+    <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:60px;align-items:start;">
+      <div>
+        <div class="section-tag"><div class="section-tag-bar"></div><span class="section-tag-text">Contáctanos</span></div>
+        <h2 class="section-title" style="margin-bottom:24px">Hablemos de <em>tu viaje</em></h2>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:32px;">
+          <div class="icon-card" style="background:var(--bg3)"><div class="icon-card-icon">📍</div><div><div class="icon-card-title">Ubicación</div><div class="icon-card-desc">Av. Principal s/n, Capachica, Puno, Perú</div></div></div>
+          <div class="icon-card" style="background:var(--bg3)"><div class="icon-card-icon">📱</div><div><div class="icon-card-title">WhatsApp</div><div class="icon-card-desc">(+51) 973 456 789 · Lun–Dom 7am–8pm</div></div></div>
+          <div class="icon-card" style="background:var(--bg3)"><div class="icon-card-icon">📧</div><div><div class="icon-card-title">Email</div><div class="icon-card-desc">hola@capachicaturismo.pe</div></div></div>
+          <div class="icon-card" style="background:var(--bg3)"><div class="icon-card-icon">🕐</div><div><div class="icon-card-title">Horario</div><div class="icon-card-desc">Lun–Vie: 7am–7pm · Sáb–Dom: 7am–5pm</div></div></div>
+        </div>
+        <div style="background:linear-gradient(135deg,var(--turquesa-deep),var(--verde));border-radius:var(--radius-md);padding:24px;color:white;">
+          <p style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:8px;font-style:italic">"El lago te espera. Nosotros te llevamos."</p>
+          <p style="font-size:13px;opacity:0.7">— Las familias de Capachica</p>
+        </div>
+      </div>
+      <div style="background:var(--bg3);border-radius:var(--radius-lg);padding:40px;box-shadow:var(--shadow-md);border:1px solid var(--border);">
+        <h3 style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:24px;" data-i18n="form.title">Cuéntanos tu viaje</h3>
+        <form onsubmit="submitForm(event)" novalidate>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label" data-i18n="form.name">Nombre completo</label><input id="nombre" type="text" class="form-input" placeholder="Tu nombre" required></div>
+            <div class="form-group"><label class="form-label" data-i18n="form.email">Email</label><input id="email" type="email" class="form-input" placeholder="tu@email.com" required></div>
+            <div class="form-group"><label class="form-label" data-i18n="form.when">¿Cuándo viajas?</label><input id="fecha" type="date" class="form-input"></div>
+            <div class="form-group"><label class="form-label" data-i18n="form.people">Número de viajeros</label><input id="viajeros" type="number" class="form-input" placeholder="1" min="1"></div>
+            <div class="form-group full"><label class="form-label" data-i18n="form.interest">¿Qué te interesa?</label>
+              <select id="interes" class="form-select">
+                <option data-i18n="form.opt0">Selecciona una opción</option>
+                <option data-i18n="form.opt1">Turismo Vivencial con familia</option>
+                <option data-i18n="form.opt2">Actividades de aventura</option>
+                <option data-i18n="form.opt3">Gastronomía y cultura</option>
+                <option data-i18n="form.opt4">Festividades y danzas</option>
+                <option data-i18n="form.opt5">Tour completo Capachica</option>
+              </select>
+            </div>
+            <div class="form-group full"><label class="form-label" data-i18n="form.msg">Mensaje</label><textarea id="mensaje" class="form-textarea" placeholder="Cuéntanos tu sueño de viaje..." data-i18n-ph="form.msg.ph"></textarea></div>
+            <div class="form-group full"><button type="submit" class="btn-primary" style="width:100%;justify-content:center;font-size:16px;padding:16px;" data-i18n="form.submit">Enviar consulta →</button></div>
+          </div>
+        </form>
+        <div id="form-thanks" style="display:none;text-align:center;padding:32px;">
+          <div style="font-size:48px;margin-bottom:16px">🙏</div>
+          <h3 style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:8px;" data-i18n="form.thanks.t">¡Gracias por escribirnos!</h3>
+          <p style="color:var(--fg2);" data-i18n="form.thanks.s">Te respondemos en menos de 24 horas. Mientras tanto, explora más de Capachica.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+function submitForm(e){
+  e.preventDefault();
+  document.querySelector("form").style.display="none";
+  document.getElementById("form-thanks").style.display="block";
+}
+</script>
+
+<div id="capa-footer"></div>
+<script src="translations.js"></script>
+<script src="nav.js"></script>
+</body>
+</html>
