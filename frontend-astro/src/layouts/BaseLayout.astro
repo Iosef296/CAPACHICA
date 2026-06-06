@@ -1,0 +1,180 @@
+---
+// src/layouts/BaseLayout.astro
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+// El idioma se recibe como prop desde cada página
+const lang = Astro.cookies.get('lang')?.value || 'es';
+
+let translations;
+try {
+  translations = await import(`../i18n/${lang}.json`);
+} catch (e) {
+  translations = await import('../i18n/es.json');
+}
+---
+
+<!DOCTYPE html>
+<html lang={lang}>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{translations.titulo || 'Capachica Gastronomía'}</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <style>
+    /* Estilos globales: Variables optimizadas para Neón y Modo Oscuro */
+    :root {
+      /* Colores base y neón */
+      --turquesa: #2c7a7b;
+      --turquesa-claro: #4fd1c5;
+      --dorado: #d69e2e;
+      --dorado-claro: #f6e05e;
+
+      /* Fondos oscuros para resaltar el Glassmorphism */
+      --bg-oscuro: #0f172a; /* Azul pizarra muy oscuro */
+      --bg-panel: #1e293b;
+
+      /* Textos */
+      --texto-principal: #f8fafc;
+      --texto-secundario: #94a3b8;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth; /* Desplazamiento suave al hacer clic en enlaces */
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-oscuro);
+      /* Gradiente radial sutil de fondo para dar profundidad */
+      background-image:
+          radial-gradient(circle at 15% 50%, rgba(44, 122, 123, 0.08), transparent 25%),
+          radial-gradient(circle at 85% 30%, rgba(214, 158, 46, 0.05), transparent 25%);
+      color: var(--texto-principal);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Personalización de la barra de desplazamiento (Scrollbar) */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--turquesa);
+      border-radius: 5px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--turquesa-claro);
+    }
+
+    main {
+      flex: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      width: 100%;
+      /* Evitar que el contenido quede pegado al header flotante */
+      margin-top: 1rem;
+    }
+
+    a {
+      color: var(--turquesa-claro);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    a:hover {
+      color: var(--dorado-claro);
+    }
+
+    /* ==========================================================
+       CLASES GLOBALES DE BOTONES (Estilo Neón Premium)
+       ========================================================== */
+    .btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0.6rem 1.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--turquesa), #1d4ed8);
+      color: white;
+      box-shadow: 0 4px 15px rgba(44, 122, 123, 0.4);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--turquesa-claro), var(--turquesa));
+      box-shadow: 0 0 20px rgba(79, 209, 197, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--dorado), #b7791f);
+      color: white;
+      box-shadow: 0 4px 15px rgba(214, 158, 46, 0.4);
+    }
+
+    .btn-secondary:hover {
+      background: linear-gradient(135deg, var(--dorado-claro), var(--dorado));
+      box-shadow: 0 0 20px rgba(246, 224, 94, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--turquesa);
+      color: var(--turquesa-claro);
+    }
+
+    .btn-outline:hover {
+      background-color: rgba(79, 209, 197, 0.1);
+      box-shadow: 0 0 15px rgba(79, 209, 197, 0.4);
+      transform: translateY(-2px);
+    }
+
+    /* Efecto al presionar cualquier botón */
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    @media (max-width: 768px) {
+      main {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<Header translations={translations} lang={lang} />
+<main>
+  <slot />
+</main>
+<Footer translations={translations} />
+</body>
+</html>

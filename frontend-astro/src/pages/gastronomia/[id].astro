@@ -1,0 +1,539 @@
+---
+// src/pages/gastronomia/[id].astro
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PlatoCard from '../../components/PlatoCard.astro';
+import { APP_CONFIG } from '../../config/app.config.js';
+import {
+    obtenerRestaurantePorId,
+    obtenerPlatosPorRestaurante,
+    obtenerTalleresPorRestaurante,
+    obtenerRecetaPorPlato
+} from '../../services/restaurante.service.js';
+
+const { id } = Astro.params;
+const lang = Astro.cookies.get('lang')?.value || 'es';
+let translations;
+try {
+    translations = await import(`../../i18n/${lang}.json`);
+} catch(e) {
+    translations = await import('../../i18n/es.json');
+}
+
+let restaurante = null;
+let platos = [];
+let talleres = [];
+let recetasMap = {};
+let error = null;
+
+try {
+    restaurante = await obtenerRestaurantePorId(id);
+    platos = await obtenerPlatosPorRestaurante(id);
+    talleres = await obtenerTalleresPorRestaurante(id);
+
+    if (platos.length > 0) {
+        const recetasPromesas = platos.map(plato =>
+            obtenerRecetaPorPlato(plato.id).catch(() => null)
+        );
+        const recetasResultados = await Promise.all(recetasPromesas);
+        recetasMap = platos.reduce((acc, plato, index) => {
+            acc[plato.id] = recetasResultados[index];
+            return acc;
+        }, {});
+    }
+} catch (e) {
+    error = e.message;
+}
+
+// 🔴 2. Esta es la función mejorada. Parsea las barras de Windows (\) a web (/)
+const getImageUrl = (path) => {
+    if (!path) return null;
+    // Si ya es un enlace completo, lo devolvemos
+    if (path.startsWith('http')) return path;
+
+    // Cambiar barras invertidas (Windows) por barras normales
+    const cleanPath = path.replace(/\\/g, '/');
+
+    // Asegurarnos de que empiece con /
+    const prefix = cleanPath.startsWith('/') ? '' : '/';
+
+    return `${APP_CONFIG.backendUrl}${prefix}${cleanPath}`;
+};
+---
+
+<BaseLayout lang={lang}>
+    {error ? (
+            <div class="error-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span>Error al cargar el restaurante: {error}</span>
+            </div>
+    ) : restaurante ? (
+            <>
+                <!-- Información del restaurante (Glass Panel) -->
+                <section class="restaurant-hero glass-panel">
+                    <div class="hero-content">
+                        <h1 class="neon-title">{restaurante.nombre}</h1>
+
+                        <div class="meta-grid">
+                            <div class="meta-item">
+                                <span class="icon">📍</span>
+                                <div>
+                                    <strong>Dirección</strong>
+                                    <p>{restaurante.direccion || 'No disponible'}</p>
+                                </div>
+                            </div>
+                            <div class="meta-item">
+                                <span class="icon">🕒</span>
+                                <div>
+                                    <strong>Horarios</strong>
+                                    <p>{restaurante.horarios || 'No disponible'}</p>
+                                </div>
+                            </div>
+                            <div class="meta-item">
+                                <span class="icon">🍽️</span>
+                                <div>
+                                    <strong>Tipo de comida</strong>
+                                    <p>{restaurante.tipo_comida || 'Variado'}</p>
+                                </div>
+                            </div>
+                            <div class="meta-item">
+                                <span class="icon">💰</span>
+                                <div>
+                                    <strong>Precio promedio</strong>
+                                    <p class="highlight-text">{restaurante.precio_promedio ? `S/ ${restaurante.precio_promedio}` : 'No disponible'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <p class="restaurant-desc">{restaurante.descripcion || 'Descripción no disponible'}</p>
+
+                        <div class="action-container">
+                            <button id="reservar-btn" class="btn btn-primary btn-lg">
+                                {translations.reservar_mesa || 'Reservar Mesa'}
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Platos (con recetas integradas) -->
+                <section class="menu-section">
+                    <h2 class="section-title">
+                        {translations.platos || 'Nuestra Carta'}
+                        <div class="neon-line"></div>
+                    </h2>
+
+                    {platos.length === 0 ? (
+                            <div class="empty-state">No hay platos disponibles por el momento.</div>
+                    ) : (
+                            <div class="platos-grid">
+                                {platos.map(plato => (
+                                        <div class="plato-wrapper">
+                                            <!-- Tarjeta del plato -->
+                                            <PlatoCard plato={plato} translations={translations} />
+
+                                            <!-- Receta del plato (si existe) -->
+                                            {recetasMap[plato.id] && (
+                                                    <div class="receta-container">
+                                                        <!-- Botón Mejorado de Receta -->
+                                                        <button
+                                                                class="toggle-receta-btn"
+                                                                data-target={`receta-${plato.id}`}
+                                                        >
+                                                            <span class="btn-text">{translations.recetas || 'Ver Receta'}</span>
+                                                            <svg class="chevron-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                                            </svg>
+                                                        </button>
+
+
+                                                        <!-- Contenido de la Receta (Acordeón) -->
+                                                        <div id={`receta-${plato.id}`} class="receta-content">
+
+                                                            <!-- NUEVO: Mostrar la foto de la receta si existe -->
+
+                                                            {recetasMap[plato.id].foto && (
+                                                                <div style="margin-bottom: 1.5rem;">
+                                                                    <img
+                                                                        src={getImageUrl(recetasMap[plato.id].foto)}
+                                                                        alt={recetasMap[plato.id].titulo}
+                                                                        style="width: 100%; height: 200px; object-fit: cover; border-radius: 0.75rem; border: 1px solid rgba(79, 209, 197, 0.3);"
+                                                                    />
+                                                                </div>
+                                                            )}
+
+                                                            <h4 class="receta-title">{recetasMap[plato.id].titulo}</h4>
+
+                                                                <div class="receta-badges">
+                                                                    {recetasMap[plato.id].tiempo_preparacion && (
+                                                                            <span class="badge">⏱️ {recetasMap[plato.id].tiempo_preparacion}</span>
+                                                                    )}
+                                                                    {recetasMap[plato.id].dificultad && (
+                                                                            <span class="badge" style="text-transform: capitalize;">⭐ {recetasMap[plato.id].dificultad}</span>
+                                                                    )}
+                                                                </div>
+
+                                                            {recetasMap[plato.id].descripcion && (
+                                                                    <p class="receta-desc">{recetasMap[plato.id].descripcion}</p>
+                                                            )}
+
+                                                            {recetasMap[plato.id].ingredientes_detallados && recetasMap[plato.id].ingredientes_detallados.length > 0 && (
+                                                                    <div class="receta-block">
+                                                                        <strong>Ingredientes:</strong>
+                                                                        <ul>
+                                                                            {recetasMap[plato.id].ingredientes_detallados.map((ing) => (
+                                                                                    <li>{ing}</li>
+                                                                            ))}
+                                                                        </ul>
+                                                                    </div>
+                                                            )}
+
+                                                            {recetasMap[plato.id].pasos && recetasMap[plato.id].pasos.length > 0 && (
+                                                                    <div class="receta-block">
+                                                                        <strong>Pasos:</strong>
+                                                                        <ol>
+                                                                            {recetasMap[plato.id].pasos.map((paso) => (
+                                                                                    <li>{paso}</li>
+                                                                            ))}
+                                                                        </ol>
+                                                                    </div>
+                                                            )}
+
+                                                            <div class="receta-links">
+                                                                {recetasMap[plato.id].video_url && (
+                                                                        <a href={recetasMap[plato.id].video_url} target="_blank" rel="noopener noreferrer" class="link-neon">▶ Ver video</a>
+                                                                )}
+                                                                {recetasMap[plato.id].pdf_url && (
+                                                                        <a href={recetasMap[plato.id].pdf_url} target="_blank" rel="noopener noreferrer" class="link-neon">📄 Descargar PDF</a>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                            )}
+                                        </div>
+                                ))}
+                            </div>
+                    )}
+                </section>
+
+                <!-- Talleres -->
+                <section class="talleres-section">
+                    <h2 class="section-title">
+                        {translations.talleres || 'Talleres Culinarios'}
+                        <div class="neon-line"></div>
+                    </h2>
+
+                    {talleres.length === 0 ? (
+                            <div class="empty-state">No hay talleres programados.</div>
+                    ) : (
+                            <div class="talleres-grid">
+                                {talleres.map(taller => (
+                                        <div class="taller-card glass-panel">
+                                            <h4>{taller.nombre}</h4>
+                                            <p class="taller-desc">{taller.descripcion}</p>
+                                            <div class="taller-meta">
+                                                <span>⏳ {taller.duracion || 'No especificado'}</span>
+                                                <span class="taller-precio">{taller.precio ? `S/ ${taller.precio}` : 'No especificado'}</span>
+                                            </div>
+                                        </div>
+                                ))}
+                            </div>
+                    )}
+                </section>
+            </>
+    ) : (
+            <div class="loading-state">Cargando detalles del restaurante...</div>
+    )}
+</BaseLayout>
+
+<style>
+    /* =========================================
+       RESTAURANT HERO
+       ========================================= */
+    .restaurant-hero {
+        margin-bottom: 3rem;
+        padding: 0;
+        position: relative;
+    }
+
+    .hero-content {
+        padding: 3rem 2rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .neon-title {
+        font-size: 2.8rem;
+        font-weight: 800;
+        color: var(--turquesa-claro);
+        text-shadow: 0 0 15px rgba(79, 209, 197, 0.5);
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        background: rgba(255, 255, 255, 0.03);
+        padding: 1rem;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .meta-item .icon {
+        font-size: 1.5rem;
+        background: rgba(79, 209, 197, 0.1);
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+    }
+
+    .meta-item strong {
+        display: block;
+        color: #94a3b8;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        margin-bottom: 0.25rem;
+    }
+
+    .highlight-text {
+        color: var(--dorado) !important;
+        text-shadow: 0 0 8px rgba(214, 158, 46, 0.3);
+    }
+
+    .divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(79, 209, 197, 0.3), transparent);
+        margin: 2rem 0;
+    }
+
+    .restaurant-desc {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: #cbd5e0;
+        text-align: center;
+        max-width: 900px;
+        margin: 0 auto 2rem;
+    }
+
+    .action-container { text-align: center; }
+
+    /* =========================================
+       PLATOS Y RECETAS (ACORDEÓN)
+       ========================================= */
+    .menu-section, .talleres-section { margin-bottom: 4rem; }
+    .section-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .neon-line {
+        width: 50px;
+        height: 3px;
+        background: var(--turquesa);
+        border-radius: 2px;
+    }
+
+    .platos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+        align-items: start; /* Para que las tarjetas no se estiren cuando una receta se abre */
+    }
+
+    .plato-wrapper {
+        display: flex;
+        flex-direction: column;
+        background: rgba(26, 32, 44, 0.4);
+        border-radius: 1rem;
+        /* La tarjeta se integra mejor */
+    }
+
+    .receta-container {
+        margin-top: -10px; /* Sube un poco para pegarse a la tarjeta del plato */
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Diseño del nuevo botón acordeón */
+    .toggle-receta-btn {
+        width: 100%;
+        background: #1e293b;
+        border: 1px solid rgba(79, 209, 197, 0.2);
+        border-top: none;
+        color: var(--turquesa-claro);
+        padding: 0.75rem;
+        border-radius: 0 0 1rem 1rem; /* Solo curvo abajo */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .toggle-receta-btn:hover, .toggle-receta-btn.active {
+        background: rgba(44, 122, 123, 0.2);
+        box-shadow: inset 0 -5px 15px rgba(79, 209, 197, 0.1);
+    }
+
+    .chevron-icon {
+        transition: transform 0.3s ease;
+    }
+
+    /* Rota la flecha cuando está abierto */
+    .toggle-receta-btn.active .chevron-icon {
+        transform: rotate(180deg);
+    }
+
+    /* El contenido oculto de la receta */
+    .receta-content {
+        display: none; /* Oculto por defecto */
+        background: #0f172a;
+        border: 1px solid rgba(79, 209, 197, 0.3);
+        border-top: none;
+        border-radius: 0 0 1rem 1rem;
+        padding: 1.5rem;
+        margin-top: -5px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    .receta-title {
+        color: var(--dorado-claro);
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 0.5rem;
+    }
+
+    .receta-badges {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .badge {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.2rem 0.6rem;
+        border-radius: 1rem;
+        font-size: 0.8rem;
+        color: #e2e8f0;
+    }
+
+    .receta-desc { color: #cbd5e0; font-style: italic; margin-bottom: 1.5rem; }
+    .receta-block { margin-bottom: 1.5rem; }
+    .receta-block strong { color: var(--turquesa-claro); display: block; margin-bottom: 0.5rem; }
+    .receta-block ul, .receta-block ol { padding-left: 1.2rem; color: #cbd5e0; font-size: 0.95rem; }
+    .receta-block li { margin-bottom: 0.4rem; }
+
+    .receta-links {
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .link-neon { color: var(--dorado); font-weight: bold; text-decoration: none; font-size: 0.9rem; }
+    .link-neon:hover { color: var(--dorado-claro); text-shadow: 0 0 8px rgba(214, 158, 46, 0.5); }
+
+    /* =========================================
+       TALLERES Y UTILIDADES
+       ========================================= */
+    .talleres-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+    .taller-card { padding: 1.5rem; display: flex; flex-direction: column; }
+    .taller-card h4 { font-size: 1.3rem; color: var(--turquesa-claro); margin-bottom: 0.5rem; }
+    .taller-desc { color: #a0aec0; margin-bottom: 1.5rem; flex-grow: 1; }
+    .taller-meta { display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; color: #e2e8f0; }
+    .taller-precio { color: var(--dorado); font-weight: bold; font-size: 1.1rem; }
+
+    .glass-panel {
+        background: rgba(26, 32, 44, 0.5);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(79, 209, 197, 0.2);
+        border-radius: 1rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .error-box, .empty-state, .loading-state { text-align: center; padding: 2rem; border-radius: 1rem; margin: 2rem 0; }
+    .loading-state { color: var(--turquesa-claro); font-size: 1.2rem; font-weight: bold; animation: pulse 1.5s infinite; }
+
+    @media (max-width: 768px) {
+        .neon-title { font-size: 2.2rem; }
+        .hero-content { padding: 2rem 1.5rem; }
+        .platos-grid, .talleres-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Reservar
+        const reservarBtn = document.getElementById('reservar-btn');
+        if (reservarBtn) {
+            reservarBtn.addEventListener('click', () => {
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    window.location.href = `/auth/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+                } else {
+                    reservarBtn.innerHTML = '¡Procesando...!';
+                    reservarBtn.style.opacity = '0.8';
+                    setTimeout(() => {
+                        alert('Funcionalidad de reserva en desarrollo.');
+                        reservarBtn.innerHTML = 'Reservar Mesa';
+                        reservarBtn.style.opacity = '1';
+                    }, 500);
+                }
+            });
+        }
+
+        // Lógica de ACORDEÓN para Recetas
+        const botonesReceta = document.querySelectorAll('.toggle-receta-btn');
+
+        botonesReceta.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const currentBtn = e.currentTarget as HTMLButtonElement;
+                const targetId = currentBtn.getAttribute('data-target');
+                const contenido = document.getElementById(targetId);
+                const textSpan = currentBtn.querySelector('.btn-text');
+
+                const isCurrentlyOpen = contenido.style.display === 'block';
+
+                // 1. Cerrar TODAS las recetas abiertas primero
+                document.querySelectorAll('.receta-content').forEach(c => {
+                    (c as HTMLElement).style.display = 'none';
+                });
+                document.querySelectorAll('.toggle-receta-btn').forEach(b => {
+                    b.classList.remove('active');
+                    const span = b.querySelector('.btn-text');
+                    if(span) span.textContent = 'Ver Receta';
+                });
+
+                // 2. Si la que clickeamos NO estaba abierta, la abrimos
+                if (!isCurrentlyOpen) {
+                    contenido.style.display = 'block';
+                    currentBtn.classList.add('active');
+                    if(textSpan) textSpan.textContent = 'Ocultar Receta';
+                }
+            });
+        });
+    });
+</script>

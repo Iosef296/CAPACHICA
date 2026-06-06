@@ -1,0 +1,24 @@
+<mat-toolbar class="sticky top-0 z-50 backdrop-blur-xl bg-[#1a1a2e]/80 border-b border-[#1abc9c]/30 shadow-[0_4px_30px_rgba(26,188,156,0.15)] flex justify-between items-center px-6 h-16">
+
+  <div class="flex items-center gap-3">
+    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#1abc9c] to-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(26,188,156,0.5)]">
+      <span class="text-white text-xl font-bold">🌾</span>
+    </div>
+    <span class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[#1abc9c] to-[#f1c40f] tracking-wider">
+      Capachica Admin
+    </span>
+  </div>
+
+  <div class="flex items-center gap-6">
+    <div class="flex items-center gap-3 bg-white/5 px-4 py-1.5 rounded-full border border-white/10 shadow-inner">
+      <div class="bg-[#1abc9c]/20 p-1 rounded-full">
+        <mat-icon class="text-[#1abc9c] text-sm flex items-center justify-center">person</mat-icon>
+      </div>
+      <span class="text-sm font-medium text-gray-200">{{ usuario?.nombre || 'Administrador' }}</span>
+    </div>
+
+    <button mat-icon-button (click)="logout()" matTooltip="Cerrar sesión" class="text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-all duration-300">
+      <mat-icon>power_settings_new</mat-icon>
+    </button>
+  </div>
+</mat-toolbar>

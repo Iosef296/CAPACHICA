@@ -1,0 +1,121 @@
+<div class="p-6 max-w-5xl mx-auto">
+  <div class="bg-[#1a1a2e]/70 backdrop-blur-xl border border-[#1abc9c]/20 shadow-[0_10px_40px_rgba(0,0,0,0.5)] rounded-3xl overflow-hidden">
+
+    <div class="bg-gradient-to-r from-[#1abc9c]/20 to-transparent p-6 border-b border-white/10 flex items-center gap-4">
+      <button mat-icon-button routerLink="/restaurantes" class="text-gray-400 hover:text-white transition-colors">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h2 class="text-2xl font-bold text-white">Registrar Nuevo Restaurante</h2>
+        <p class="text-sm text-[#1abc9c]">Completa los datos del establecimiento</p>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-8">
+
+      <h3 class="text-lg font-semibold text-[#f1c40f] mb-4 flex items-center gap-2"><mat-icon>storefront</mat-icon> Información General</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 mb-6">
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Nombre del restaurante</mat-label>
+          <input matInput formControlName="nombre" placeholder="Ej. El Buen Sabor">
+          <mat-error *ngIf="form.get('nombre')?.invalid && form.get('nombre')?.touched">Nombre requerido (mín. 3 caracteres)</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Tipo de comida</mat-label>
+          <mat-select formControlName="tipo_comida">
+            <mat-option value="del_lago">Del lago</mat-option>
+            <mat-option value="ancestral">Ancestral</mat-option>
+            <mat-option value="productos_locales">Productos locales</mat-option>
+            <mat-option value="bebidas">Bebidas</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full md:col-span-2">
+          <mat-label>Descripción</mat-label>
+          <textarea matInput formControlName="descripcion" rows="3" placeholder="Una breve descripción del lugar..."></textarea>
+        </mat-form-field>
+      </div>
+
+      <h3 class="text-lg font-semibold text-[#f1c40f] mb-4 flex items-center gap-2 mt-4"><mat-icon>contact_phone</mat-icon> Contacto y Operación</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-2 mb-6">
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>WhatsApp</mat-label>
+          <span matPrefix class="text-gray-400 mr-2"><mat-icon size="small">phone_android</mat-icon></span>
+          <input matInput formControlName="whatsapp">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Teléfono Fijo</mat-label>
+          <input matInput formControlName="telefono">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Email de contacto</mat-label>
+          <input matInput type="email" formControlName="email_contacto">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full md:col-span-2">
+          <mat-label>Especialidades (separadas por comas)</mat-label>
+          <input matInput formControlName="especialidades" placeholder="Ej. Trucha frita, Caldo de carachi...">
+        </mat-form-field>
+
+        <div class="grid grid-cols-2 gap-4 w-full">
+          <mat-form-field appearance="fill">
+            <mat-label>Precio prom. (S/)</mat-label>
+            <input matInput type="number" formControlName="precio_promedio" step="any">
+          </mat-form-field>
+          <mat-form-field appearance="fill">
+            <mat-label>Mesas disp.</mat-label>
+            <input matInput type="number" formControlName="capacidad_mesas">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <h3 class="text-lg font-semibold text-[#f1c40f] mb-4 flex items-center gap-2 mt-4"><mat-icon>place</mat-icon> Ubicación y Multimedia</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 mb-8">
+        <mat-form-field appearance="fill" class="w-full md:col-span-2">
+          <mat-label>Dirección completa</mat-label>
+          <input matInput formControlName="direccion">
+          <mat-error *ngIf="form.get('direccion')?.invalid && form.get('direccion')?.touched">Dirección requerida</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Latitud</mat-label>
+          <input matInput type="number" formControlName="latitud" step="any">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Longitud</mat-label>
+          <input matInput type="number" formControlName="longitud" step="any">
+        </mat-form-field>
+
+        <!-- Subida de fotos mejorada -->
+        <div class="md:col-span-2 bg-black/20 border-2 border-dashed border-[#1abc9c]/30 rounded-xl p-6 text-center hover:border-[#1abc9c]/60 transition-colors mt-2">
+          <mat-icon class="text-4xl text-gray-400 mb-2">cloud_upload</mat-icon>
+          <p class="text-gray-300 font-medium mb-4">Sube las fotos de tu restaurante</p>
+          <input type="file" id="fotos" (change)="onFilesSelected($event)" multiple accept="image/*" class="hidden">
+          <label for="fotos" class="cursor-pointer px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-[#1abc9c] hover:bg-white/10 transition-colors">
+            Seleccionar Imágenes
+          </label>
+
+          <!-- AQUÍ ESTÁ LA MAGIA: Previsualización de los archivos seleccionados -->
+          <div *ngIf="selectedFiles.length > 0" class="mt-4 flex flex-wrap gap-2 justify-center animate-fade-in">
+            <span *ngFor="let file of selectedFiles" class="px-3 py-1 bg-[#1abc9c]/20 text-[#1abc9c] rounded-full text-xs font-bold border border-[#1abc9c]/50 flex items-center gap-1">
+              <mat-icon style="font-size: 14px; width: 14px; height: 14px;">image</mat-icon>
+              {{ file.name }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-4 border-t border-white/10 pt-6">
+        <button mat-button type="button" routerLink="/restaurantes" class="text-gray-400 hover:text-white">Cancelar</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid"
+                class="px-8 py-6 bg-gradient-to-r from-[#1abc9c] to-[#16a085] text-white font-bold rounded-xl shadow-[0_0_15px_rgba(26,188,156,0.4)]">
+          Guardar Restaurante
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

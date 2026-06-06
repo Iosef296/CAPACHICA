@@ -1,0 +1,15 @@
+<!-- Si es Login o Registro, mostramos SOLO el contenido de la ruta, a pantalla completa -->
+<ng-container *ngIf="esRutaAuth">
+  <router-outlet></router-outlet>
+</ng-container>
+
+<!-- Si es la App (Dashboard, Restaurantes, etc), mostramos la estructura completa -->
+<ng-container *ngIf="!esRutaAuth">
+  <div class="flex flex-col h-screen overflow-hidden">
+    <app-header class="shrink-0"></app-header>
+    <app-sidebar class="flex-1 overflow-hidden">
+      <router-outlet></router-outlet>
+    </app-sidebar>
+    <app-footer class="shrink-0"></app-footer>
+  </div>
+</ng-container>

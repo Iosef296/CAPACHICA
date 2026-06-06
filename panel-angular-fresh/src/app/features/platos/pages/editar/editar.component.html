@@ -1,0 +1,94 @@
+<div class="p-6 max-w-5xl mx-auto">
+  <div class="bg-[#1a1a2e]/70 backdrop-blur-xl border border-[#1abc9c]/20 shadow-[0_10px_40px_rgba(0,0,0,0.5)] rounded-3xl overflow-hidden relative min-h-[400px]">
+
+    <div class="bg-gradient-to-r from-[#f1c40f]/20 to-transparent p-6 border-b border-white/10 flex items-center gap-4">
+      <button mat-icon-button routerLink="/platos" class="text-gray-400 hover:text-white transition-colors">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h2 class="text-2xl font-bold text-white">Editar Plato</h2>
+        <p class="text-sm text-[#f1c40f]">Actualiza la información del menú</p>
+      </div>
+    </div>
+
+    <!-- Loader -->
+    <div *ngIf="cargando" class="absolute inset-0 flex items-center justify-center bg-[#1a1a2e]/80 backdrop-blur-sm z-10">
+      <app-loading></app-loading>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="!cargando" class="p-8">
+
+      <h3 class="text-lg font-semibold text-[#f1c40f] mb-4 flex items-center gap-2"><mat-icon>fastfood</mat-icon> Detalles del Plato</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 mb-6">
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Nombre del plato</mat-label>
+          <input matInput formControlName="nombre">
+        </mat-form-field>
+
+        <div class="grid grid-cols-2 gap-4">
+          <mat-form-field appearance="fill" class="w-full">
+            <mat-label>Categoría</mat-label>
+            <mat-select formControlName="categoria">
+              <mat-option value="del_lago">Del lago</mat-option>
+              <mat-option value="ancestral">Ancestral</mat-option>
+              <mat-option value="bebidas">Bebidas</mat-option>
+              <mat-option value="postres">Postres</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="w-full">
+            <mat-label>Temporada</mat-label>
+            <mat-select formControlName="temporada">
+              <mat-option value="todo_el_año">Todo el año</mat-option>
+              <mat-option value="verano">Verano</mat-option>
+              <mat-option value="invierno">Invierno</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <h3 class="text-lg font-semibold text-[#f1c40f] mb-4 flex items-center gap-2 mt-4"><mat-icon>local_dining</mat-icon> Composición y Precio</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-2 mb-6 items-start">
+        <mat-form-field appearance="fill" class="w-full md:col-span-2">
+          <mat-label>Descripción breve</mat-label>
+          <textarea matInput formControlName="descripcion" rows="3"></textarea>
+        </mat-form-field>
+
+        <div class="flex flex-col gap-2">
+          <mat-form-field appearance="fill" class="w-full">
+            <mat-label>Precio (S/)</mat-label>
+            <input matInput type="number" formControlName="precio" step="any">
+          </mat-form-field>
+
+          <div class="bg-gradient-to-r from-[#f1c40f]/10 to-transparent border border-[#f1c40f]/20 rounded-lg p-3 flex items-center h-[56px]">
+            <mat-checkbox formControlName="es_recomendado" color="accent" class="text-[#f1c40f] font-bold">⭐ Destacar / Recomendado</mat-checkbox>
+          </div>
+        </div>
+
+        <mat-form-field appearance="fill" class="w-full md:col-span-3 mt-2">
+          <mat-label>Ingredientes (separados por comas)</mat-label>
+          <input matInput formControlName="ingredientes">
+        </mat-form-field>
+      </div>
+
+      <h3 class="text-lg font-semibold text-[#f1c40f] mb-4 flex items-center gap-2 mt-4"><mat-icon>image</mat-icon> Fotografía</h3>
+      <div class="bg-black/20 border-2 border-dashed border-[#f1c40f]/30 rounded-xl p-8 text-center hover:border-[#f1c40f]/60 transition-colors mb-8">
+        <mat-icon class="text-5xl text-gray-400 mb-2">add_a_photo</mat-icon>
+        <p class="text-gray-300 font-medium mb-4">Cambiar la foto del plato (Opcional)</p>
+        <input type="file" id="foto_plato_edit" (change)="onFileSelected($event)" accept="image/*" class="hidden">
+        <label for="foto_plato_edit" class="cursor-pointer px-6 py-2 bg-white/5 border border-white/10 rounded-lg text-[#f1c40f] hover:bg-white/10 transition-colors">
+          Seleccionar Nueva Imagen
+        </label>
+        <p *ngIf="selectedFile" class="mt-4 text-[#1abc9c] font-medium text-sm">Archivo seleccionado: {{ selectedFile.name }}</p>
+      </div>
+
+      <div class="flex justify-end gap-4 border-t border-white/10 pt-6">
+        <button mat-button type="button" routerLink="/platos" class="text-gray-400 hover:text-white">Cancelar</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid"
+                class="px-8 py-6 bg-gradient-to-r from-[#f1c40f] to-[#d4ac0e] text-black font-bold rounded-xl shadow-[0_0_15px_rgba(241,196,15,0.4)]">
+          Actualizar Plato
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

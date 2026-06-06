@@ -1,0 +1,103 @@
+<div class="p-6 max-w-7xl mx-auto">
+  <div *ngIf="receta" class="animate-fade-in">
+
+    <!-- Header del Detalle -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-[#1a1a2e]/50 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg">
+      <div class="flex items-center gap-4">
+        <button mat-icon-button routerLink="/recetas" class="text-gray-400 hover:text-[#1abc9c] bg-white/5 rounded-full transition-colors">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div>
+          <h2 class="text-3xl font-black text-white tracking-wide">{{ receta.titulo }}</h2>
+          <p class="text-gray-400 mt-1 flex items-center gap-2">
+            <mat-icon size="small" class="text-sm">menu_book</mat-icon>
+            Detalles de preparación
+          </p>
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <button mat-raised-button color="primary" (click)="descargarPdf()" *ngIf="receta.pdf_url" class="bg-gradient-to-r from-red-500 to-red-700 text-white font-bold">
+          <mat-icon>picture_as_pdf</mat-icon> Descargar PDF
+        </button>
+        <button mat-raised-button [routerLink]="['/recetas/editar', receta.id]" class="bg-white/10 text-white hover:bg-white/20 transition-colors">
+          <mat-icon>edit</mat-icon> Editar Receta
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenido Principal Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Columna Izquierda: Ingredientes y Pasos -->
+      <div class="lg:col-span-2 flex flex-col gap-6">
+
+        <div class="bg-[#1a1a2e]/60 backdrop-blur-md p-6 rounded-2xl border border-white/5 shadow-xl">
+          <p class="text-gray-300 leading-relaxed text-lg mb-6 border-b border-white/10 pb-4">{{ receta.descripcion || 'Sin descripción disponible.' }}</p>
+
+          <h4 class="text-lg font-bold text-[#f1c40f] flex items-center gap-2 mb-4"><mat-icon>shopping_basket</mat-icon> Ingredientes Necesarios</h4>
+          <div class="flex flex-wrap gap-2 mb-8">
+            <span *ngFor="let ing of receta.ingredientes_detallados" class="px-4 py-2 bg-[#f1c40f]/10 border border-[#f1c40f]/30 rounded-xl text-sm text-[#f1c40f]">
+              {{ ing }}
+            </span>
+            <span *ngIf="!receta.ingredientes_detallados?.length" class="text-gray-500 italic">No especificados</span>
+          </div>
+
+          <h4 class="text-lg font-bold text-[#1abc9c] flex items-center gap-2 mb-4"><mat-icon>format_list_numbered</mat-icon> Instrucciones Paso a Paso</h4>
+          <ol class="space-y-4">
+            <li *ngFor="let paso of receta.pasos; let i = index" class="flex gap-4 p-4 bg-white/5 rounded-xl border border-white/5 hover:border-[#1abc9c]/30 transition-colors">
+              <div class="w-8 h-8 flex-shrink-0 bg-[#1abc9c]/20 text-[#1abc9c] font-black rounded-full flex items-center justify-center border border-[#1abc9c]/50">
+                {{ i + 1 }}
+              </div>
+              <p class="text-gray-200 mt-1">{{ paso }}</p>
+            </li>
+            <li *ngIf="!receta.pasos?.length" class="text-gray-500 italic p-4">No hay instrucciones registradas.</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Multimedia y Resumen -->
+      <div class="flex flex-col gap-6">
+
+        <!-- Tarjeta de Tiempos -->
+        <div class="bg-gradient-to-br from-[#1a1a2e] to-black p-6 rounded-2xl border border-white/10 shadow-xl grid grid-cols-2 gap-4 text-center">
+          <div>
+            <mat-icon class="text-gray-500 mb-1">timer</mat-icon>
+            <p class="text-xs text-gray-400 uppercase tracking-wide">Tiempo</p>
+            <p class="text-lg font-black text-white">{{ receta.tiempo_preparacion || '--' }}</p>
+          </div>
+          <div class="border-l border-white/10">
+            <mat-icon class="text-gray-500 mb-1">signal_cellular_alt</mat-icon>
+            <p class="text-xs text-gray-400 uppercase tracking-wide">Dificultad</p>
+            <p class="text-lg font-black text-white capitalize" [ngClass]="{'text-green-400': receta.dificultad === 'fácil', 'text-yellow-400': receta.dificultad === 'medio', 'text-red-400': receta.dificultad === 'difícil'}">
+              {{ receta.dificultad || '--' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Foto Principal -->
+        <div class="bg-[#1a1a2e]/60 backdrop-blur-md p-2 rounded-2xl border border-white/5 shadow-xl relative overflow-hidden group aspect-video flex items-center justify-center">
+          <img *ngIf="receta.foto; else noFoto" [src]="receta.foto" class="w-full h-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-105">
+          <ng-template #noFoto>
+            <div class="text-center">
+              <mat-icon style="font-size: 60px; width: 60px; height: 60px;" class="text-gray-600 mb-2">dinner_dining</mat-icon>
+              <p class="text-gray-500 font-medium text-sm">Sin fotografía</p>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Tarjeta de Video -->
+        <div *ngIf="receta.video_url" class="bg-gradient-to-br from-[#1a1a2e] to-black p-6 rounded-2xl border border-blue-500/20 shadow-xl text-center">
+          <mat-icon class="text-blue-400 text-5xl mb-2">smart_display</mat-icon>
+          <h3 class="text-lg font-bold text-white mb-4">Videotutorial</h3>
+          <a mat-raised-button color="primary" [href]="receta.video_url" target="_blank" class="w-full bg-blue-600 hover:bg-blue-700">
+            Ver video ahora
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <app-loading *ngIf="!receta"></app-loading>
+</div>

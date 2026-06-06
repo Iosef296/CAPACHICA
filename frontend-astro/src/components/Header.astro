@@ -1,0 +1,102 @@
+---
+// src/components/Header.astro
+const { translations = {}, lang = 'es' } = Astro.props;
+import { APP_CONFIG } from '../config/app.config.js';
+---
+
+<header class="header-glass">
+  <div class="header-container">
+    <a href="/" class="logo-link">
+      <img src="/images/logo.png" alt="Logo Capachica" class="logo-img" />
+      <span class="logo-text">Capachica</span>
+    </a>
+
+    <nav class="main-nav">
+      <a href="/" class="nav-link">{translations.inicio || 'Inicio'}</a>
+      <a href="/gastronomia" class="nav-link">{translations.gastronomia || 'Gastronomía'}</a>
+
+      <div id="auth-links" class="auth-container">
+      </div>
+
+      <div class="lang-wrapper">
+        <select id="lang-selector" class="lang-select">
+          <option value="es" selected={lang === 'es'}>ES - Español</option>
+          <option value="en" selected={lang === 'en'}>EN - English</option>
+          <option value="pt" selected={lang === 'pt'}>PT - Português</option>
+          <option value="qu" selected={lang === 'qu'}>QU - Quechua</option>
+
+          <option value="fr" selected={lang === 'fr'}>FR - Français</option>
+          <option value="ru" selected={lang === 'ru'}>RU - Русский</option>
+          <option value="zh" selected={lang === 'zh'}>ZH - 中文</option>
+          <option value="ko" selected={lang === 'ko'}>KO - 한국어</option>
+          <option value="ja" selected={lang === 'ja'}>JA - 日本語</option>
+        </select>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<style>
+  /* Aquí va exactamente el MISMO CSS que teníamos antes (Header Flotante, Glassmorphism, etc.) */
+  .header-glass { position: sticky; top: 0; z-index: 1000; background: rgba(26, 32, 44, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(79, 209, 197, 0.2); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); }
+  .header-container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; gap: 1rem; }
+  .logo-link { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; transition: transform 0.3s ease; }
+  .logo-link:hover { transform: scale(1.05); }
+  .logo-img { height: 45px; width: auto; filter: drop-shadow(0 0 5px rgba(214, 158, 46, 0.5)); }
+  .logo-text { font-size: 1.6rem; font-weight: 800; color: var(--dorado); text-shadow: 0 0 10px rgba(214, 158, 46, 0.4); letter-spacing: 1px; }
+  .main-nav { display: flex; gap: 2rem; align-items: center; flex-wrap: wrap; }
+  .nav-link { color: #e2e8f0; font-weight: 600; text-decoration: none; font-size: 1rem; transition: all 0.3s ease; position: relative; }
+  .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -4px; left: 0; background-color: var(--turquesa); box-shadow: 0 0 8px var(--turquesa); transition: width 0.3s ease; }
+  .nav-link:hover { color: var(--turquesa-claro, #81e6d9); text-shadow: 0 0 8px rgba(79, 209, 197, 0.6); }
+  .nav-link:hover::after { width: 100%; }
+  .auth-container { display: flex; gap: 1rem; align-items: center; }
+  .lang-wrapper { position: relative; }
+  .lang-select { appearance: none; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(79, 209, 197, 0.3); color: white; padding: 0.4rem 2rem 0.4rem 1rem; border-radius: 0.5rem; font-weight: bold; cursor: pointer; outline: none; transition: all 0.3s ease; }
+  .lang-select:focus, .lang-select:hover { border-color: var(--turquesa); box-shadow: 0 0 12px rgba(79, 209, 197, 0.5); background: rgba(26, 32, 44, 0.8); }
+  .lang-select option { background: #1a202c; color: white; }
+  .lang-wrapper::after { content: '▼'; font-size: 0.7rem; color: var(--turquesa); position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+  @media (max-width: 768px) { .header-container { padding: 1rem; justify-content: center; flex-direction: column; } .main-nav { gap: 1rem; justify-content: center; width: 100%; } .auth-container { width: 100%; justify-content: center; margin-top: 0.5rem; } }
+  :global(.btn-logout) { background: transparent; border: 1px solid #fc8181; color: #fc8181; padding: 0.4rem 1rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease; }
+  :global(.btn-logout:hover) { background: rgba(252, 129, 129, 0.1); box-shadow: 0 0 12px rgba(252, 129, 129, 0.4); }
+  :global(.btn-login) { color: var(--dorado); border: 1px solid var(--dorado); padding: 0.4rem 1rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; transition: all 0.3s ease; }
+  :global(.btn-login:hover) { background: rgba(214, 158, 46, 0.1); box-shadow: 0 0 12px rgba(214, 158, 46, 0.4); color: #f6e05e; }
+</style>
+
+<script define:vars={{
+  txtAdministracion: translations.administracion || 'Administración',
+  txtCerrarSesion: translations.cerrar_sesion || 'Cerrar sesión',
+  txtIniciarSesion: translations.iniciar_sesion || 'Iniciar sesión',
+  appConfig: APP_CONFIG
+}}>
+  document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('accessToken');
+    const authLinks = document.getElementById('auth-links');
+    const langSelector = document.getElementById('lang-selector');
+
+    if (token) {
+      // Inyectamos las variables traducidas
+      authLinks.innerHTML = `
+        <a href="${appConfig.adminPanelUrl}" class="nav-link">${txtAdministracion}</a>
+        <button id="logout-btn" class="btn-logout">${txtCerrarSesion}</button>
+      `;
+      document.getElementById('logout-btn').addEventListener('click', () => {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        window.location.href = appConfig.angularLoginUrl;
+      });
+    } else {
+      // Inyectamos la variable traducida
+      authLinks.innerHTML = `
+        <a href="${appConfig.angularLoginUrl}" class="btn-login">${txtIniciarSesion}</a>
+      `;
+    }
+
+    langSelector.addEventListener('change', (e) => {
+      const lang = e.target.value;
+      // Guardar en Cookie para que Astro pueda leerlo desde el servidor en todas las páginas
+      document.cookie = `lang=${lang}; path=/; max-age=31536000`;
+      localStorage.setItem('lang', lang);
+      window.location.reload();
+    });
+  });
+</script>

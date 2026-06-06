@@ -1,0 +1,217 @@
+---
+// src/pages/index.astro
+import BaseLayout from '../layouts/BaseLayout.astro';
+import RestauranteCard from '../components/RestauranteCard.astro';
+import { obtenerRestaurantes } from '../services/restaurante.service.js';
+
+// Obtener idioma (Fallback en servidor a 'es')
+const lang = Astro.cookies.get('lang')?.value || 'es';
+
+let translations;
+try {
+    translations = await import(`../i18n/${lang}.json`);
+} catch (e) {
+    translations = await import('../i18n/es.json');
+}
+
+let restaurantes = [];
+let error = null;
+try {
+    const data = await obtenerRestaurantes({ limit: 3 });
+    restaurantes = data;
+} catch (e) {
+    error = e.message;
+}
+---
+
+<BaseLayout lang={lang}>
+    <!-- Hero Section con la imagen hero.png de fondo luciendo al máximo -->
+    <section class="hero-section">
+        <div class="hero-glass">
+            <h1 class="hero-title">{translations.titulo || 'Gastronomía de Capachica'}</h1>
+
+            <p class="hero-subtitle">
+                {translations.hero_subtitle || 'Sabores únicos, productos locales y recetas ancestrales.'}
+            </p>
+
+            <a href="/gastronomia" class="btn btn-secondary btn-md">
+                {translations.ver_restaurantes || 'Ver Restaurantes'}
+            </a>
+        </div>
+    </section>
+
+    <!-- Restaurantes destacados -->
+    <section class="featured-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                {translations.restaurantes_destacados || 'Restaurantes Destacados'}
+            </h2>
+            <div class="neon-divider"></div>
+        </div>
+
+        {error ? (
+                <div class="error-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span>Error al cargar restaurantes: {error}</span>
+                </div>
+        ) : restaurantes.length === 0 ? (
+                <div class="empty-state">
+                    <p>{translations.no_resultados || 'Pronto agregaremos nuevas experiencias culinarias.'}</p>
+                </div>
+        ) : (
+                <div class="restaurants-grid">
+                    {restaurantes.map(rest => (
+                            <RestauranteCard restaurante={rest} translations={translations} />
+                    ))}
+                </div>
+        )}
+    </section>
+</BaseLayout>
+
+<style>
+    /* =========================================
+       HERO SECTION (Fondo con hero.png)
+       ========================================= */
+    .hero-section {
+        position: relative;
+        /* El gradiente ahora solo oscurece la parte inferior para fusionarse con el fondo y la izquierda para leer el texto */
+        background:
+                linear-gradient(to top, var(--bg-oscuro) 0%, transparent 40%),
+                linear-gradient(to right, rgba(15, 23, 42, 0.8) 0%, rgba(15, 23, 42, 0.1) 60%),
+                url('/hero.png') center/cover no-repeat;
+        border-radius: 1.5rem;
+        min-height: 60vh; /* Ocupa buena parte de la pantalla para lucir la foto */
+        display: flex;
+        align-items: center; /* Alineado verticalmente al centro */
+        justify-content: flex-start; /* Alineado a la izquierda */
+        padding: 4rem;
+        margin-bottom: 4rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Caja de cristal lateral, más fina y elegante */
+    .hero-glass {
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-left: 4px solid var(--dorado); /* Línea dorada de acento */
+        padding: 2.5rem;
+        border-radius: 0 1rem 1rem 0;
+        max-width: 500px;
+        text-align: left;
+        box-shadow: 10px 0 30px rgba(0,0,0,0.3);
+    }
+
+    .hero-title {
+        font-size: 2.2rem; /* Tamaño reducido y más refinado */
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        line-height: 1.2;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+        color: #e2e8f0;
+        margin-bottom: 2rem;
+        line-height: 1.5;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    }
+
+    .btn-md {
+        font-size: 1rem;
+        padding: 0.8rem 2rem;
+        border-radius: 2rem;
+    }
+
+    /* =========================================
+       SECCIÓN DESTACADOS
+       ========================================= */
+    .featured-section {
+        margin-bottom: 4rem;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--dorado);
+        text-shadow: 0 0 15px rgba(214, 158, 46, 0.3);
+        margin-bottom: 0.5rem;
+    }
+
+    .neon-divider {
+        width: 60px;
+        height: 3px;
+        background: var(--dorado);
+        border-radius: 2px;
+        box-shadow: 0 0 10px var(--dorado-claro);
+    }
+
+    .restaurants-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2.5rem;
+    }
+
+    .error-box {
+        background: rgba(229, 62, 62, 0.1);
+        border: 1px solid #e53e3e;
+        color: #fc8181;
+        padding: 1.5rem;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        font-weight: 600;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        color: #a0aec0;
+    }
+
+    /* =========================================
+       RESPONSIVE DESIGN (Celulares)
+       ========================================= */
+    @media (max-width: 768px) {
+        .hero-section {
+            min-height: 50vh;
+            padding: 2rem 1rem;
+            align-items: flex-end; /* En celulares, el cuadro baja para dejar ver la imagen arriba */
+            background:
+                    linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, transparent 70%),
+                    url('/hero.png') center/cover no-repeat;
+        }
+
+        .hero-glass {
+            max-width: 100%;
+            border-left: none;
+            border-top: 4px solid var(--dorado);
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+
+        .hero-title { font-size: 1.8rem; }
+        .section-title { font-size: 1.6rem; }
+    }
+</style>

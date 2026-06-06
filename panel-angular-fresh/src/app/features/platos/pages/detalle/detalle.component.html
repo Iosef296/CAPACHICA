@@ -1,0 +1,97 @@
+<div class="p-6 max-w-6xl mx-auto">
+  <div *ngIf="plato" class="animate-fade-in">
+
+    <!-- Header del Detalle -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-[#1a1a2e]/50 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg">
+      <div class="flex items-center gap-4">
+        <button mat-icon-button routerLink="/platos" class="text-gray-400 hover:text-[#1abc9c] bg-white/5 rounded-full transition-colors">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div>
+          <div class="flex items-center gap-3">
+            <h2 class="text-3xl font-black text-white tracking-wide">{{ plato.nombre }}</h2>
+            <span *ngIf="plato.es_recomendado" class="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full shadow-[0_0_10px_rgba(241,196,15,0.3)] bg-[#f1c40f]/20 text-[#f1c40f] border border-[#f1c40f]/50 flex items-center gap-1">
+              <mat-icon size="small" class="text-sm">star</mat-icon> Recomendado
+            </span>
+          </div>
+          <p class="text-gray-400 mt-1 flex items-center gap-2">
+            <span [ngClass]="plato.disponible ? 'text-green-400' : 'text-red-400'" class="font-bold">
+              {{ plato.disponible ? '● Disponible' : '● Agotado' }}
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <button mat-raised-button [routerLink]="['/platos/editar', plato.id]" class="bg-white/10 text-white hover:bg-white/20 transition-colors">
+        <mat-icon>edit</mat-icon> Editar Plato
+      </button>
+    </div>
+
+    <!-- Contenido Principal Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Columna Izquierda: Información -->
+      <div class="lg:col-span-2 flex flex-col gap-6">
+
+        <!-- Tarjeta de Info Principal -->
+        <div class="bg-[#1a1a2e]/60 backdrop-blur-md p-6 rounded-2xl border border-white/5 shadow-xl">
+          <h3 class="text-xl font-bold text-[#1abc9c] border-b border-white/10 pb-3 mb-4 flex items-center gap-2">
+            <mat-icon>info</mat-icon> Descripción del Plato
+          </h3>
+          <p class="text-gray-300 leading-relaxed text-lg mb-6">{{ plato.descripcion || 'Sin descripción disponible.' }}</p>
+
+          <h4 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-3">Ingredientes</h4>
+          <div class="flex flex-wrap gap-2">
+            <span *ngFor="let ing of plato.ingredientes" class="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-sm text-[#1abc9c]">
+              {{ ing }}
+            </span>
+            <span *ngIf="!plato.ingredientes?.length" class="text-gray-500 italic">No especificados</span>
+          </div>
+        </div>
+
+        <!-- Tarjeta de Clasificación -->
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-gradient-to-br from-[#1a1a2e] to-black p-6 rounded-2xl border border-[#1abc9c]/20 shadow-xl flex items-center gap-4">
+            <div class="bg-[#1abc9c]/20 p-3 rounded-full"><mat-icon class="text-[#1abc9c]">category</mat-icon></div>
+            <div>
+              <p class="text-xs text-gray-500 uppercase tracking-wider">Categoría</p>
+              <p class="font-bold text-white text-lg capitalize">{{ plato.categoria?.replace('_', ' ') || 'General' }}</p>
+            </div>
+          </div>
+
+          <div class="bg-gradient-to-br from-[#1a1a2e] to-black p-6 rounded-2xl border border-[#f1c40f]/20 shadow-xl flex items-center gap-4">
+            <div class="bg-[#f1c40f]/20 p-3 rounded-full"><mat-icon class="text-[#f1c40f]">ac_unit</mat-icon></div>
+            <div>
+              <p class="text-xs text-gray-500 uppercase tracking-wider">Temporada</p>
+              <p class="font-bold text-white text-lg capitalize">{{ plato.temporada?.replace('_', ' ') || 'Todo el año' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Foto y Precio -->
+      <div class="flex flex-col gap-6">
+
+        <!-- Foto Principal -->
+        <div class="bg-[#1a1a2e]/60 backdrop-blur-md p-2 rounded-2xl border border-white/5 shadow-xl relative overflow-hidden group aspect-square flex items-center justify-center">
+          <img *ngIf="plato.foto; else noFoto" [src]="plato.foto" class="w-full h-full object-cover rounded-xl transition-transform duration-500 group-hover:scale-105">
+          <ng-template #noFoto>
+            <div class="text-center">
+              <mat-icon style="font-size: 80px; width: 80px; height: 80px;" class="text-gray-600 mb-2">restaurant</mat-icon>
+              <p class="text-gray-500 font-medium">Sin imagen</p>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Tarjeta de Precio -->
+        <div class="bg-gradient-to-br from-[#1a1a2e] to-black p-8 rounded-2xl border border-[#f1c40f]/30 shadow-[0_0_20px_rgba(241,196,15,0.15)] text-center relative overflow-hidden">
+          <p class="text-gray-400 uppercase tracking-widest text-sm mb-2">Precio del Plato</p>
+          <h3 class="text-5xl font-black text-[#f1c40f]">{{ plato.precio | moneda }}</h3>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <app-loading *ngIf="!plato"></app-loading>
+</div>

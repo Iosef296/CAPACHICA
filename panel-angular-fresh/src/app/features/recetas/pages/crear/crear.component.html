@@ -1,0 +1,112 @@
+<div class="p-6 max-w-5xl mx-auto">
+  <div class="bg-[#1a1a2e]/70 backdrop-blur-xl border border-[#1abc9c]/20 shadow-[0_10px_40px_rgba(0,0,0,0.5)] rounded-3xl overflow-hidden">
+
+    <div class="bg-gradient-to-r from-[#1abc9c]/20 to-transparent p-6 border-b border-white/10 flex items-center gap-4">
+      <button mat-icon-button routerLink="/recetas" class="text-gray-400 hover:text-white transition-colors">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h2 class="text-2xl font-bold text-white">Documentar Nueva Receta</h2>
+        <p class="text-sm text-[#1abc9c]">Registra el paso a paso del plato</p>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-8">
+
+      <!-- SECCIÓN 1: Identificación -->
+      <h3 class="text-lg font-semibold text-[#f1c40f] mb-4 flex items-center gap-2"><mat-icon>restaurant</mat-icon> Identificación de la Receta</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 mb-6">
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Restaurante (Para filtrar platos)</mat-label>
+          <mat-select (selectionChange)="onRestauranteChange($event.value)">
+            <mat-option *ngFor="let r of restaurantes" [value]="r.id">{{ r.nombre }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Plato Asociado</mat-label>
+          <mat-select formControlName="plato_id">
+            <mat-option *ngFor="let p of platos" [value]="p.id">{{ p.nombre }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="form.get('plato_id')?.invalid && form.get('plato_id')?.touched">Selecciona un plato</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Título de la receta</mat-label>
+          <input matInput formControlName="titulo" placeholder="Ej. Preparación tradicional de Trucha">
+          <mat-error *ngIf="form.get('titulo')?.invalid && form.get('titulo')?.touched">Título requerido</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Descripción breve</mat-label>
+          <textarea matInput formControlName="descripcion" rows="1"></textarea>
+        </mat-form-field>
+      </div>
+
+      <!-- SECCIÓN 2: Preparación -->
+      <h3 class="text-lg font-semibold text-[#f1c40f] mb-4 flex items-center gap-2 mt-4"><mat-icon>blender</mat-icon> Preparación</h3>
+      <div class="grid grid-cols-1 gap-x-6 gap-y-2 mb-6">
+
+        <div class="grid grid-cols-2 gap-4">
+          <mat-form-field appearance="fill" class="w-full">
+            <mat-label>Tiempo de preparación</mat-label>
+            <input matInput formControlName="tiempo_preparacion" placeholder="Ej. 45 minutos">
+          </mat-form-field>
+          <mat-form-field appearance="fill" class="w-full">
+            <mat-label>Dificultad</mat-label>
+            <mat-select formControlName="dificultad">
+              <mat-option value="fácil">Fácil</mat-option>
+              <mat-option value="medio">Medio</mat-option>
+              <mat-option value="difícil">Difícil</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Ingredientes detallados (separados por comas)</mat-label>
+          <textarea matInput formControlName="ingredientes_detallados" rows="2" placeholder="Ej. 500g de trucha, 2 limones, sal al gusto..."></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Pasos a seguir (separados por punto y coma ';')</mat-label>
+          <textarea matInput formControlName="pasos" rows="4" placeholder="Ej. Limpiar el pescado; Sazonar con sal; Freír por 10 min..."></textarea>
+        </mat-form-field>
+      </div>
+
+      <!-- SECCIÓN 3: Multimedia -->
+      <h3 class="text-lg font-semibold text-[#f1c40f] mb-4 flex items-center gap-2 mt-4"><mat-icon>perm_media</mat-icon> Multimedia y Descargas</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 mb-8">
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Enlace del PDF (URL)</mat-label>
+          <mat-icon matPrefix class="text-red-400 mr-2">picture_as_pdf</mat-icon>
+          <input matInput type="url" formControlName="pdf_url" placeholder="https://...">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Enlace del Video (YouTube/Vimeo)</mat-label>
+          <mat-icon matPrefix class="text-blue-400 mr-2">play_circle_filled</mat-icon>
+          <input matInput type="url" formControlName="video_url" placeholder="https://...">
+        </mat-form-field>
+
+        <div class="md:col-span-2 bg-black/20 border-2 border-dashed border-[#1abc9c]/30 rounded-xl p-8 text-center hover:border-[#1abc9c]/60 transition-colors mt-2">
+          <mat-icon class="text-5xl text-gray-400 mb-2">add_a_photo</mat-icon>
+          <p class="text-gray-300 font-medium mb-4">Sube una foto referencial de la receta terminada</p>
+          <input type="file" id="foto_receta" (change)="onFileSelected($event)" accept="image/*" class="hidden">
+          <label for="foto_receta" class="cursor-pointer px-6 py-2 bg-white/5 border border-white/10 rounded-lg text-[#1abc9c] hover:bg-white/10 transition-colors">
+            Seleccionar Imagen
+          </label>
+          <p *ngIf="selectedFile" class="mt-4 text-[#f1c40f] font-medium text-sm">Archivo seleccionado: {{ selectedFile.name }}</p>
+        </div>
+      </div>
+
+      <!-- Acciones -->
+      <div class="flex justify-end gap-4 border-t border-white/10 pt-6">
+        <button mat-button type="button" routerLink="/recetas" class="text-gray-400 hover:text-white">Cancelar</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid"
+                class="px-8 py-6 bg-gradient-to-r from-[#1abc9c] to-[#16a085] text-white font-bold rounded-xl shadow-[0_0_15px_rgba(26,188,156,0.4)]">
+          Guardar Receta
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

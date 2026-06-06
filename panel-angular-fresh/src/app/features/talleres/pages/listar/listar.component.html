@@ -1,0 +1,71 @@
+<div class="p-6 max-w-7xl mx-auto">
+  <!-- Encabezado -->
+  <div class="flex flex-wrap justify-between items-center mb-8">
+    <div>
+      <h2 class="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[#1abc9c] to-[#f1c40f] drop-shadow-md">
+        Talleres Vivenciales
+      </h2>
+      <p class="text-gray-400 mt-2 font-medium">Administra las experiencias y talleres ofrecidos.</p>
+    </div>
+
+    <button *ngIf="puedeCrear" routerLink="/talleres/crear"
+            class="px-6 py-3 bg-gradient-to-r from-[#1abc9c] to-[#16a085] text-white font-bold rounded-xl shadow-[0_0_15px_rgba(26,188,156,0.4)] hover:shadow-[0_0_25px_rgba(26,188,156,0.6)] transition-all duration-300 flex items-center gap-2 transform hover:-translate-y-1">
+      <mat-icon>add_circle</mat-icon> Nuevo Taller
+    </button>
+  </div>
+
+  <!-- Panel de Filtros Glassmorphism -->
+  <div class="bg-[#1a1a2e]/60 backdrop-blur-md border border-white/10 shadow-2xl rounded-2xl p-6 mb-8" [formGroup]="filtrosForm">
+    <div class="flex items-center gap-2 mb-4">
+      <mat-icon class="text-[#f1c40f]">filter_alt</mat-icon>
+      <h3 class="text-lg font-semibold text-white">Filtrar Talleres</h3>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Restaurante Asociado</mat-label>
+        <mat-select formControlName="restaurante_id" (selectionChange)="aplicarFiltros()">
+          <mat-option value="">Todos los restaurantes</mat-option>
+          <mat-option *ngFor="let r of restaurantes" [value]="r.id">{{ r.nombre }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Precio mínimo (S/)</mat-label>
+        <input matInput type="number" formControlName="precio_min" (change)="aplicarFiltros()">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Precio máximo (S/)</mat-label>
+        <input matInput type="number" formControlName="precio_max" (change)="aplicarFiltros()">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Duración aprox.</mat-label>
+        <input matInput formControlName="duracion" placeholder="Ej. 2 horas" (change)="aplicarFiltros()">
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Contenedor de Tabla Elevado -->
+  <div class="bg-[#1a1a2e]/40 backdrop-blur-sm border border-white/5 rounded-2xl overflow-hidden shadow-xl">
+    <app-tabla
+      [columnas]="columnas"
+      [datos]="talleres"
+      [mostrarAcciones]="puedeEditar"
+      (editar)="irAEditar($event)"
+      (eliminar)="eliminarTaller($event)"
+    ></app-tabla>
+
+    <div class="bg-black/20 border-t border-white/5">
+      <mat-paginator
+        class="bg-transparent text-gray-300"
+        [length]="total"
+        [pageSize]="limit"
+        [pageSizeOptions]="[5, 10, 20]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons
+      ></mat-paginator>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,125 @@
+<div class="p-6 max-w-7xl mx-auto">
+  <div *ngIf="taller" class="animate-fade-in">
+
+    <!-- Header del Detalle -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-[#1a1a2e]/50 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg">
+      <div class="flex items-center gap-4">
+        <button mat-icon-button routerLink="/talleres" class="text-gray-400 hover:text-[#1abc9c] bg-white/5 rounded-full transition-colors">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div>
+          <div class="flex items-center gap-3">
+            <h2 class="text-3xl font-black text-white tracking-wide">{{ taller.nombre }}</h2>
+            <span class="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full shadow-[0_0_10px_rgba(0,0,0,0.5)]"
+                  [ngClass]="taller.disponible ? 'bg-[#1abc9c]/20 text-[#1abc9c] border border-[#1abc9c]/50' : 'bg-red-500/20 text-red-400 border border-red-500/50'">
+              {{ taller.disponible ? '✔ Disponible' : '✖ Agotado' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <button mat-raised-button [routerLink]="['/talleres/editar', taller.id]" class="bg-white/10 text-white hover:bg-white/20 transition-colors">
+          <mat-icon>edit</mat-icon> Editar Taller
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenido Principal Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Columna Izquierda: Detalles de la Experiencia -->
+      <div class="lg:col-span-2 flex flex-col gap-6">
+
+        <div class="bg-[#1a1a2e]/60 backdrop-blur-md p-6 rounded-2xl border border-white/5 shadow-xl">
+          <h3 class="text-xl font-bold text-[#1abc9c] border-b border-white/10 pb-3 mb-4 flex items-center gap-2">
+            <mat-icon>info</mat-icon> Sobre la Experiencia
+          </h3>
+          <p class="text-gray-300 leading-relaxed mb-6">{{ taller.descripcion || 'Sin descripción disponible.' }}</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div class="bg-white/5 p-4 rounded-xl border border-white/5 flex items-center gap-4">
+              <div class="bg-[#f1c40f]/20 p-3 rounded-full"><mat-icon class="text-[#f1c40f]">build</mat-icon></div>
+              <div>
+                <p class="text-xs text-gray-500 uppercase">Materiales</p>
+                <p class="font-bold text-gray-200">{{ taller.incluye_materiales ? 'Incluidos en el precio' : 'El turista debe traer' }}</p>
+              </div>
+            </div>
+
+            <div class="bg-white/5 p-4 rounded-xl border border-white/5 flex items-center gap-4">
+              <div class="bg-[#1abc9c]/20 p-3 rounded-full"><mat-icon class="text-[#1abc9c]">tapas</mat-icon></div>
+              <div>
+                <p class="text-xs text-gray-500 uppercase">Plato Principal</p>
+                <p class="font-bold text-gray-200 truncate">{{ taller.plato_principal || 'No incluye comida' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Galería -->
+        <div class="bg-[#1a1a2e]/60 backdrop-blur-md p-6 rounded-2xl border border-white/5 shadow-xl">
+          <h3 class="text-xl font-bold text-[#1abc9c] border-b border-white/10 pb-3 mb-4 flex items-center gap-2">
+            <mat-icon>photo_library</mat-icon> Galería
+          </h3>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4" *ngIf="taller.fotos?.length; else sinFotos">
+            <div *ngFor="let foto of taller.fotos" class="group relative overflow-hidden rounded-xl aspect-square border border-white/10">
+              <img [src]="foto" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            </div>
+          </div>
+          <ng-template #sinFotos>
+            <div class="p-8 text-center bg-black/20 rounded-xl border border-dashed border-white/10">
+              <mat-icon class="text-4xl text-gray-600 mb-2">hide_image</mat-icon>
+              <p class="text-gray-500">Aún no hay fotos de este taller.</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Tarjetas de Información Rápida -->
+      <div class="flex flex-col gap-6">
+
+        <!-- Tarjeta de Precio -->
+        <div class="bg-gradient-to-br from-[#1a1a2e] to-black p-8 rounded-2xl border border-[#1abc9c]/20 shadow-xl text-center relative overflow-hidden">
+          <div class="absolute -right-4 -top-4 opacity-5"><mat-icon style="font-size: 150px; width: 150px; height: 150px;">local_offer</mat-icon></div>
+          <p class="text-gray-400 uppercase tracking-widest text-sm mb-2 relative z-10">Costo por persona</p>
+          <h3 class="text-5xl font-black text-[#f1c40f] relative z-10">{{ taller.precio | moneda }}</h3>
+        </div>
+
+        <!-- Tarjeta de Logística -->
+        <div class="bg-gradient-to-br from-[#1a1a2e] to-black p-6 rounded-2xl border border-white/10 shadow-xl">
+          <h3 class="text-lg font-bold text-white mb-4 border-b border-white/10 pb-2">Logística del Taller</h3>
+
+          <ul class="space-y-4 text-gray-300">
+            <li class="flex items-start gap-3">
+              <mat-icon class="text-[#1abc9c]">hourglass_empty</mat-icon>
+              <div>
+                <p class="text-xs text-gray-500 uppercase">Duración</p>
+                <p class="font-medium">{{ taller.duracion || 'No especificada' }}</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <mat-icon class="text-[#1abc9c]">groups</mat-icon>
+              <div>
+                <p class="text-xs text-gray-500 uppercase">Capacidad Máxima</p>
+                <p class="font-medium">{{ taller.capacidad_maxima || 'Sin límite' }} personas</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <mat-icon class="text-[#1abc9c]">event_available</mat-icon>
+              <div class="w-full">
+                <p class="text-xs text-gray-500 uppercase">Horarios</p>
+                <div class="flex flex-wrap gap-1 mt-1">
+                  <span *ngFor="let h of taller.horarios" class="px-2 py-1 bg-white/5 rounded text-sm text-[#f1c40f] border border-white/5">{{ h }}</span>
+                  <span *ngIf="!taller.horarios?.length" class="text-gray-500 italic">No especificados</span>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <app-loading *ngIf="!taller"></app-loading>
+</div>

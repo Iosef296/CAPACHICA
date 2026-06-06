@@ -1,0 +1,129 @@
+@use '@angular/material' as mat;
+@import './styles/variables';
+@import './styles/global';
+
+/* Importamos el tema de material pero le sobreescribiremos cosas */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   SOBREESCRITURA DE ANGULAR MATERIAL PARA MODO OSCURO / GLASSMORPHISM
+   ========================================================================== */
+
+/* 1. Fondos transparentes para el layout principal */
+.mat-toolbar,
+.mat-sidenav-container,
+.mat-sidenav-content,
+.mat-drawer {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* Fondo del Sidebar */
+.mat-drawer-inner-container {
+  background-color: #1a1a2e !important;
+}
+
+/* 2. Estilos para los Inputs y Filtros (Form Fields) */
+.mat-form-field-appearance-fill .mat-form-field-flex {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border-radius: 8px 8px 0 0 !important;
+  border-bottom: 1px solid rgba(26, 188, 156, 0.3);
+}
+.mat-form-field-label, .mat-hint, .mat-form-field-prefix mat-icon {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+.mat-input-element, .mat-select-value, .mat-select-arrow {
+  color: #ffffff !important;
+}
+
+/* 3. Estilos para la Tabla y Paginador */
+table.mat-table {
+  background: transparent !important;
+  color: #ecf0f1 !important;
+}
+.mat-header-cell {
+  color: #1abc9c !important;
+  font-weight: 800 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+}
+.mat-cell {
+  color: #ecf0f1 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+.mat-row:hover .mat-cell {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+.mat-paginator {
+  background: transparent !important;
+  color: #ecf0f1 !important;
+}
+.mat-icon-button {
+  color: inherit;
+}
+
+/* Ocultar el scrollbar feo en webkit */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+::-webkit-scrollbar-thumb {
+  background: #1abc9c;
+  border-radius: 4px;
+}
+
+
+
+
+/* ==========================================================================
+   SOBREESCRITURA PARA FORM FIELDS MDC (ANGULAR 15+)
+   ========================================================================== */
+
+/* Fondo del input */
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border-bottom: 1px solid rgba(26, 188, 156, 0.3) !important;
+}
+
+/* Línea inferior al hacer focus */
+.mdc-line-ripple::before {
+  border-bottom-color: rgba(26, 188, 156, 0.8) !important;
+}
+
+/* Color del texto del label flotante */
+.mdc-floating-label,
+.mat-mdc-select-placeholder,
+.mat-mdc-select-value-text {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Color del texto escrito por el usuario y los iconos */
+.mat-mdc-input-element,
+.mdc-text-field:not(.mdc-text-field--disabled) .mdc-text-field__input {
+  color: #ffffff !important;
+}
+
+/* Color de los iconos de prefijo (ej. correo, candado) */
+.mat-mdc-form-field-icon-prefix .mat-icon {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Fondo del panel desplegable de los selectores (mat-select) */
+.mat-mdc-select-panel {
+  background-color: #1a1a2e !important;
+  border: 1px solid rgba(26, 188, 156, 0.3);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important;
+}
+.mat-mdc-option {
+  color: #ecf0f1 !important;
+}
+.mat-mdc-option:hover, .mat-mdc-option.mdc-list-item--selected {
+  background-color: rgba(26, 188, 156, 0.2) !important;
+}
