@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
-const PORT = 3001;
+const PORT = 3030;
 
 const DB_FILE = path.join(__dirname, "emails.json");
 

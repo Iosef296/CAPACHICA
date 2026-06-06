@@ -143,7 +143,7 @@ const handleSubscribe = async () => {
     if (!email.trim()) return;
 
     try {
-      const response = await fetch("http://localhost:3001/api/newsletter", {
+      const response = await fetch("http://localhost:3030/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
