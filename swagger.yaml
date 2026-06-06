@@ -1,0 +1,1032 @@
+openapi: 3.0.0
+info:
+  title: Gastronomía Capachica - API
+  description: Backend completo para el módulo de gastronomía del sistema de turismo comunitario en Capachica, Puno.
+  version: 1.0.0
+  contact:
+    name: Kevin Paricahua
+    email: kevin@gmail.com
+servers:
+  - url: http://localhost:3000/api
+    description: Servidor de desarrollo local
+tags:
+  - name: Autenticación
+    description: Registro, login y refresh de tokens
+  - name: Usuarios
+    description: Gestión del perfil de usuario
+  - name: Restaurantes
+    description: CRUD y aprobación de restaurantes
+  - name: Platos
+    description: CRUD de platos de un restaurante
+  - name: Talleres
+    description: CRUD de talleres de cocina
+  - name: Recetas
+    description: CRUD de recetas asociadas a platos
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    # -------- Usuario ----------
+    Usuario:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        nombre:
+          type: string
+        email:
+          type: string
+          format: email
+        rol:
+          type: string
+          enum: [admin, proveedor, turista]
+        telefono:
+          type: string
+          nullable: true
+        foto:
+          type: string
+          nullable: true
+        activo:
+          type: boolean
+        fecha_registro:
+          type: string
+          format: date-time
+    LoginDTO:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    RegistroDTO:
+      type: object
+      required: [nombre, email, password]
+      properties:
+        nombre:
+          type: string
+          minLength: 2
+          maxLength: 100
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        telefono:
+          type: string
+        rol:
+          type: string
+          enum: [turista, proveedor]
+          default: turista
+    AuthRespuesta:
+      type: object
+      properties:
+        usuario:
+          $ref: '#/components/schemas/Usuario'
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+    # -------- Restaurante ----------
+    Ubicacion:
+      type: object
+      required: [latitud, longitud]
+      properties:
+        latitud:
+          type: number
+          format: float
+          minimum: -90
+          maximum: 90
+        longitud:
+          type: number
+          format: float
+          minimum: -180
+          maximum: 180
+    Restaurante:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        usuario_id:
+          type: string
+          format: uuid
+        nombre:
+          type: string
+        descripcion:
+          type: string
+          nullable: true
+        ubicacion:
+          $ref: '#/components/schemas/Ubicacion'
+        direccion:
+          type: string
+        whatsapp:
+          type: string
+          nullable: true
+        telefono:
+          type: string
+          nullable: true
+        email_contacto:
+          type: string
+          nullable: true
+        redes_sociales:
+          type: object
+        horarios:
+          type: object
+        fotos:
+          type: array
+          items:
+            type: string
+        tipo_comida:
+          type: string
+          nullable: true
+        especialidades:
+          type: array
+          items:
+            type: string
+        precio_promedio:
+          type: number
+          nullable: true
+        capacidad_mesas:
+          type: integer
+          nullable: true
+        acepta_reservas:
+          type: boolean
+        aprobado:
+          type: boolean
+        activo:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CrearRestauranteDTO:
+      type: object
+      required: [nombre, ubicacion, direccion]
+      properties:
+        nombre:
+          type: string
+          minLength: 3
+        descripcion:
+          type: string
+        ubicacion:
+          $ref: '#/components/schemas/Ubicacion'
+        direccion:
+          type: string
+        whatsapp:
+          type: string
+        telefono:
+          type: string
+        email_contacto:
+          type: string
+          format: email
+        tipo_comida:
+          type: string
+          enum: [del_lago, ancestral, productos_locales, bebidas]
+        especialidades:
+          type: array
+          items:
+            type: string
+        precio_promedio:
+          type: number
+        capacidad_mesas:
+          type: integer
+        horarios:
+          type: object
+    # -------- Plato ----------
+    Plato:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        restaurante_id:
+          type: string
+          format: uuid
+        nombre:
+          type: string
+        descripcion:
+          type: string
+          nullable: true
+        precio:
+          type: number
+        foto:
+          type: string
+          nullable: true
+        ingredientes:
+          type: array
+          items:
+            type: string
+        categoria:
+          type: string
+          nullable: true
+        temporada:
+          type: string
+          nullable: true
+        disponible:
+          type: boolean
+        es_recomendado:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CrearPlatoDTO:
+      type: object
+      required: [restaurante_id, nombre, precio]
+      properties:
+        restaurante_id:
+          type: string
+          format: uuid
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        precio:
+          type: number
+        foto:
+          type: string
+        ingredientes:
+          type: array
+          items:
+            type: string
+        categoria:
+          type: string
+          enum: [del_lago, ancestral, bebidas, postres]
+        temporada:
+          type: string
+          enum: [todo_el_año, verano, invierno]
+        es_recomendado:
+          type: boolean
+    # -------- Taller ----------
+    Taller:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        restaurante_id:
+          type: string
+          format: uuid
+        nombre:
+          type: string
+        descripcion:
+          type: string
+          nullable: true
+        duracion:
+          type: string
+          nullable: true
+        precio:
+          type: number
+        capacidad_maxima:
+          type: integer
+          nullable: true
+        horarios:
+          type: array
+          items:
+            type: string
+        incluye_materiales:
+          type: boolean
+        plato_principal:
+          type: string
+          nullable: true
+        fotos:
+          type: array
+          items:
+            type: string
+        disponible:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CrearTallerDTO:
+      type: object
+      required: [restaurante_id, nombre, precio]
+      properties:
+        restaurante_id:
+          type: string
+          format: uuid
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        duracion:
+          type: string
+        precio:
+          type: number
+        capacidad_maxima:
+          type: integer
+        horarios:
+          type: array
+          items:
+            type: string
+        incluye_materiales:
+          type: boolean
+        plato_principal:
+          type: string
+        fotos:
+          type: array
+          items:
+            type: string
+    # -------- Receta ----------
+    Receta:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        plato_id:
+          type: string
+          format: uuid
+        titulo:
+          type: string
+        descripcion:
+          type: string
+          nullable: true
+        ingredientes_detallados:
+          type: array
+          items:
+            type: string
+        pasos:
+          type: array
+          items:
+            type: string
+        tiempo_preparacion:
+          type: string
+          nullable: true
+        dificultad:
+          type: string
+          nullable: true
+        pdf_url:
+          type: string
+          nullable: true
+        video_url:
+          type: string
+          nullable: true
+        foto:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    CrearRecetaDTO:
+      type: object
+      required: [plato_id, titulo]
+      properties:
+        plato_id:
+          type: string
+          format: uuid
+        titulo:
+          type: string
+        descripcion:
+          type: string
+        ingredientes_detallados:
+          type: array
+          items:
+            type: string
+        pasos:
+          type: array
+          items:
+            type: string
+        tiempo_preparacion:
+          type: string
+        dificultad:
+          type: string
+          enum: [fácil, medio, difícil]
+        pdf_url:
+          type: string
+          format: url
+        video_url:
+          type: string
+          format: url
+        foto:
+          type: string
+
+paths:
+  # ---------- Autenticación ----------
+  /auth/registro:
+    post:
+      tags: [Autenticación]
+      summary: Registrar un nuevo usuario (proveedor o turista)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistroDTO'
+      responses:
+        '201':
+          description: Usuario registrado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthRespuesta'
+        '400':
+          description: Error de validación o correo ya registrado
+  /auth/login:
+    post:
+      tags: [Autenticación]
+      summary: Iniciar sesión
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginDTO'
+      responses:
+        '200':
+          description: Login exitoso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthRespuesta'
+        '400':
+          description: Credenciales inválidas
+  /auth/refresh:
+    post:
+      tags: [Autenticación]
+      summary: Refrescar access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: Nuevo access token generado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+        '400':
+          description: Refresh token inválido o expirado
+
+  # ---------- Usuarios ----------
+  /usuarios/perfil:
+    get:
+      tags: [Usuarios]
+      summary: Obtener perfil del usuario autenticado
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Perfil obtenido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '401':
+          description: No autenticado
+    put:
+      tags: [Usuarios]
+      summary: Actualizar perfil del usuario autenticado
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                telefono:
+                  type: string
+                foto:
+                  type: string
+      responses:
+        '200':
+          description: Perfil actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+
+  # ---------- Restaurantes ----------
+  /restaurantes:
+    get:
+      tags: [Restaurantes]
+      summary: Listar restaurantes (público con filtros)
+      parameters:
+        - in: query
+          name: tipo_comida
+          schema:
+            type: string
+          description: Filtrar por tipo de comida
+        - in: query
+          name: precio_min
+          schema:
+            type: number
+          description: Precio mínimo
+        - in: query
+          name: precio_max
+          schema:
+            type: number
+          description: Precio máximo
+        - in: query
+          name: latitud
+          schema:
+            type: number
+          description: Latitud para búsqueda por cercanía
+        - in: query
+          name: longitud
+          schema:
+            type: number
+          description: Longitud para búsqueda por cercanía
+        - in: query
+          name: radio
+          schema:
+            type: number
+          description: Radio en km para búsqueda por cercanía
+        - in: query
+          name: solo_aprobados
+          schema:
+            type: boolean
+            default: true
+          description: Mostrar solo restaurantes aprobados
+      responses:
+        '200':
+          description: Lista de restaurantes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Restaurante'
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+    post:
+      tags: [Restaurantes]
+      summary: Crear un nuevo restaurante
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearRestauranteDTO'
+      responses:
+        '201':
+          description: Restaurante creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurante'
+        '400':
+          description: Error de validación
+
+  /restaurantes/{id}:
+    get:
+      tags: [Restaurantes]
+      summary: Obtener un restaurante por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Restaurante encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurante'
+        '404':
+          description: Restaurante no encontrado
+    put:
+      tags: [Restaurantes]
+      summary: Actualizar un restaurante
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearRestauranteDTO'
+      responses:
+        '200':
+          description: Restaurante actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurante'
+        '403':
+          description: No tienes permiso
+        '404':
+          description: Restaurante no encontrado
+    delete:
+      tags: [Restaurantes]
+      summary: Eliminar un restaurante (baja lógica)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Restaurante eliminado correctamente
+        '403':
+          description: No tienes permiso
+        '404':
+          description: Restaurante no encontrado
+
+  /restaurantes/{id}/aprobar:
+    post:
+      tags: [Restaurantes]
+      summary: Aprobar un restaurante (solo admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Restaurante aprobado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurante'
+        '403':
+          description: Solo administradores pueden aprobar
+
+  # ---------- Platos ----------
+  /platos:
+    post:
+      tags: [Platos]
+      summary: Crear un nuevo plato
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearPlatoDTO'
+      responses:
+        '201':
+          description: Plato creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plato'
+        '400':
+          description: Error de validación
+
+  /platos/restaurante/{restauranteId}:
+    get:
+      tags: [Platos]
+      summary: Listar platos de un restaurante
+      parameters:
+        - in: path
+          name: restauranteId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Lista de platos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Plato'
+
+  /platos/{id}:
+    get:
+      tags: [Platos]
+      summary: Obtener un plato por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Plato encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plato'
+        '404':
+          description: Plato no encontrado
+    put:
+      tags: [Platos]
+      summary: Actualizar un plato
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearPlatoDTO'
+      responses:
+        '200':
+          description: Plato actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plato'
+        '403':
+          description: No tienes permiso
+        '404':
+          description: Plato no encontrado
+    delete:
+      tags: [Platos]
+      summary: Eliminar un plato
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Plato eliminado
+        '403':
+          description: No tienes permiso
+        '404':
+          description: Plato no encontrado
+
+  # ---------- Talleres ----------
+  /talleres:
+    post:
+      tags: [Talleres]
+      summary: Crear un nuevo taller de cocina
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearTallerDTO'
+      responses:
+        '201':
+          description: Taller creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Taller'
+
+  /talleres/restaurante/{restauranteId}:
+    get:
+      tags: [Talleres]
+      summary: Listar talleres de un restaurante
+      parameters:
+        - in: path
+          name: restauranteId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Lista de talleres
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Taller'
+
+  /talleres/{id}:
+    get:
+      tags: [Talleres]
+      summary: Obtener un taller por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Taller encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Taller'
+        '404':
+          description: Taller no encontrado
+    put:
+      tags: [Talleres]
+      summary: Actualizar un taller
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearTallerDTO'
+      responses:
+        '200':
+          description: Taller actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Taller'
+        '403':
+          description: No tienes permiso
+        '404':
+          description: Taller no encontrado
+    delete:
+      tags: [Talleres]
+      summary: Eliminar un taller
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Taller eliminado
+        '403':
+          description: No tienes permiso
+        '404':
+          description: Taller no encontrado
+
+  # ---------- Recetas ----------
+  /recetas:
+    post:
+      tags: [Recetas]
+      summary: Crear una nueva receta
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearRecetaDTO'
+      responses:
+        '201':
+          description: Receta creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Receta'
+
+  /recetas/plato/{platoId}:
+    get:
+      tags: [Recetas]
+      summary: Obtener la receta de un plato
+      parameters:
+        - in: path
+          name: platoId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Receta encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Receta'
+        '404':
+          description: No hay receta para este plato
+
+  /recetas/{id}:
+    get:
+      tags: [Recetas]
+      summary: Obtener una receta por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Receta encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Receta'
+        '404':
+          description: Receta no encontrada
+    put:
+      tags: [Recetas]
+      summary: Actualizar una receta
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearRecetaDTO'
+      responses:
+        '200':
+          description: Receta actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Receta'
+        '403':
+          description: No tienes permiso
+        '404':
+          description: Receta no encontrada
+    delete:
+      tags: [Recetas]
+      summary: Eliminar una receta
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Receta eliminada
+        '403':
+          description: No tienes permiso
+        '404':
+          description: Receta no encontrada
