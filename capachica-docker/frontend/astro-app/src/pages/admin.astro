@@ -1,0 +1,408 @@
+---
+// src/pages/admin.astro — Panel de administración de reservas
+---
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Capachica Turismo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --tq:#2dd4bf; --tqd:#0f9488; --gold:#d4a843;
+      --navy:#0a1628; --navym:#0f2240; --navyl:#162d4e;
+      --txt:#f0ede8; --txts:rgba(240,237,232,.65);
+      --green:#22c55e; --yellow:#f59e0b; --red:#ef4444;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--txt);min-height:100vh}
+    a{text-decoration:none;color:inherit}
+
+    /* LOGIN */
+    .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}
+    .login-box{background:var(--navym);border:1px solid rgba(45,212,191,.2);border-radius:16px;padding:2.5rem;width:100%;max-width:380px;text-align:center}
+    .login-logo{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--tq),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:1.3rem;color:var(--navy);margin:0 auto 1rem}
+    .login-title{font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:.3rem}
+    .login-sub{font-size:.85rem;color:var(--txts);margin-bottom:1.5rem}
+    .login-input{width:100%;padding:.75rem 1rem;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:var(--txt);font-family:'Inter',sans-serif;font-size:.95rem;margin-bottom:1rem}
+    .login-input:focus{outline:none;border-color:var(--tq)}
+    .login-btn{width:100%;padding:.8rem;border-radius:8px;border:none;background:linear-gradient(135deg,var(--tqd),var(--tq));color:var(--navy);font-weight:700;font-size:.95rem;cursor:pointer;transition:opacity .2s}
+    .login-btn:hover{opacity:.9}
+    .login-err{color:#f87171;font-size:.8rem;margin-top:.5rem;display:none}
+
+    /* ADMIN PANEL */
+    .admin{display:none}
+    .topbar{background:var(--navym);border-bottom:1px solid rgba(45,212,191,.15);padding:.9rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+    .topbar-left{display:flex;align-items:center;gap:.75rem}
+    .topbar-logo{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--tq),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:.9rem;color:var(--navy)}
+    .topbar-title{font-family:'Playfair Display',serif;font-size:1.1rem}
+    .topbar-sub{font-size:.7rem;color:var(--txts)}
+    .topbar-right{display:flex;align-items:center;gap:.75rem}
+    .topbar-badge{padding:.3rem .7rem;border-radius:6px;background:rgba(45,212,191,.12);border:1px solid rgba(45,212,191,.25);font-size:.72rem;color:var(--tq);font-weight:600}
+    .btn-logout{padding:.35rem .8rem;border-radius:6px;border:1px solid rgba(255,255,255,.12);color:var(--txts);font-size:.75rem;cursor:pointer;background:none;transition:.2s}
+    .btn-logout:hover{color:var(--txt);border-color:rgba(255,255,255,.3)}
+
+    .content{padding:1.5rem;max-width:1300px;margin:0 auto}
+
+    /* STATS */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.5rem}
+    .stat-card{background:var(--navym);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:1.1rem 1.25rem}
+    .stat-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--txts);margin-bottom:.35rem}
+    .stat-val{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;line-height:1}
+    .stat-card.total  .stat-val{color:var(--tq)}
+    .stat-card.pend   .stat-val{color:var(--yellow)}
+    .stat-card.conf   .stat-val{color:var(--green)}
+    .stat-card.ingres .stat-val{color:var(--gold)}
+    .stat-sub{font-size:.72rem;color:var(--txts);margin-top:.25rem}
+
+    /* FILTERS BAR */
+    .filters-bar{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;margin-bottom:1.25rem}
+    .search-inp{flex:1;min-width:200px;padding:.6rem 1rem;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--txt);font-family:'Inter',sans-serif;font-size:.85rem}
+    .search-inp:focus{outline:none;border-color:var(--tq)}
+    .filter-sel{padding:.6rem .9rem;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--txts);font-family:'Inter',sans-serif;font-size:.82rem;cursor:pointer}
+    .filter-sel:focus{outline:none;border-color:var(--tq);color:var(--txt)}
+    .filter-sel option{background:var(--navym)}
+    .btn-refresh{padding:.6rem 1rem;border-radius:8px;border:1px solid rgba(45,212,191,.3);color:var(--tq);font-size:.82rem;cursor:pointer;background:rgba(45,212,191,.07);transition:.2s}
+    .btn-refresh:hover{background:rgba(45,212,191,.15)}
+
+    /* TABLE */
+    .table-wrap{background:var(--navym);border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden}
+    table{width:100%;border-collapse:collapse}
+    thead tr{background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.07)}
+    th{padding:.8rem 1rem;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--txts);font-weight:600;white-space:nowrap}
+    tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s}
+    tbody tr:hover{background:rgba(255,255,255,.03)}
+    tbody tr:last-child{border-bottom:none}
+    td{padding:.85rem 1rem;font-size:.83rem;vertical-align:middle}
+    .td-nombre strong{display:block;font-size:.88rem;color:var(--txt)}
+    .td-nombre span{font-size:.75rem;color:var(--txts)}
+    .td-actividad{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .td-precio{font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold);font-weight:700}
+    .td-fecha{font-size:.8rem;color:var(--txts)}
+    .td-fecha strong{display:block;color:var(--txt);font-size:.82rem}
+
+    /* BADGES ESTADO */
+    .badge-estado{padding:.22rem .65rem;border-radius:999px;font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+    .badge-pendiente{background:rgba(245,158,11,.15);color:var(--yellow);border:1px solid rgba(245,158,11,.3)}
+    .badge-confirmada{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+    .badge-cancelada{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+
+    /* ACTIONS */
+    .td-actions{display:flex;gap:.4rem;flex-wrap:nowrap}
+    .btn-action{padding:.3rem .6rem;border-radius:6px;font-size:.72rem;font-weight:600;cursor:pointer;border:1px solid;transition:.2s;white-space:nowrap}
+    .btn-confirmar{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:var(--green)}
+    .btn-confirmar:hover{background:rgba(34,197,94,.22)}
+    .btn-cancelar{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.25);color:var(--red)}
+    .btn-cancelar:hover{background:rgba(239,68,68,.2)}
+    .btn-ver{background:rgba(45,212,191,.08);border-color:rgba(45,212,191,.25);color:var(--tq)}
+    .btn-ver:hover{background:rgba(45,212,191,.18)}
+
+    /* EMPTY + LOADING */
+    .table-msg{text-align:center;padding:3rem 1rem;color:var(--txts)}
+    .table-msg .big{font-size:2rem;margin-bottom:.5rem}
+    .spinner{display:inline-block;width:20px;height:20px;border:2px solid rgba(45,212,191,.3);border-top-color:var(--tq);border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* MODAL DETALLE RESERVA */
+    .overlay{position:fixed;inset:0;z-index:100;background:rgba(4,13,28,.88);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .3s}
+    .overlay.open{opacity:1;pointer-events:all}
+    .modal{background:var(--navym);border:1px solid rgba(45,212,191,.2);border-radius:16px;padding:1.75rem;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;transform:translateY(16px);transition:transform .3s}
+    .overlay.open .modal{transform:none}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem}
+    .modal-head h2{font-family:'Playfair Display',serif;font-size:1.3rem}
+    .modal-close{background:none;border:none;color:var(--txts);font-size:1.3rem;cursor:pointer;transition:.2s}
+    .modal-close:hover{color:var(--txt)}
+    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem}
+    .detail-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:.65rem .85rem}
+    .detail-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--txts);margin-bottom:.2rem}
+    .detail-val{font-size:.88rem;color:var(--txt);font-weight:500}
+    .paquete-list{background:rgba(45,212,191,.05);border:1px solid rgba(45,212,191,.15);border-radius:8px;padding:.85rem;margin-top:.75rem}
+    .paquete-list h4{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--tq);margin-bottom:.5rem}
+    .paquete-list li{font-size:.82rem;color:var(--txts);padding:.2rem 0;border-bottom:1px solid rgba(255,255,255,.04)}
+    .paquete-list li:last-child{border:none}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(60px);background:var(--navym);border:1px solid var(--tq);color:var(--txt);padding:.6rem 1.3rem;border-radius:999px;font-size:.82rem;z-index:200;transition:transform .3s;pointer-events:none;white-space:nowrap}
+    .toast.show{transform:translateX(-50%) translateY(0)}
+
+    @media(max-width:768px){
+      .stats-grid{grid-template-columns:1fr 1fr}
+      th:nth-child(n+4),td:nth-child(n+4){display:none}
+      .detail-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo">C</div>
+    <h1 class="login-title">Panel Admin</h1>
+    <p class="login-sub">Capachica Turismo · Gestión de reservas</p>
+    <input class="login-input" type="password" id="loginPass" placeholder="Contraseña de administrador"
+      onkeydown="if(event.key==='Enter')doLogin()" />
+    <button class="login-btn" onclick="doLogin()">Ingresar →</button>
+    <p class="login-err" id="loginErr">Contraseña incorrecta</p>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="admin" id="adminPanel">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">C</div>
+      <div>
+        <div class="topbar-title">Capachica Admin</div>
+        <div class="topbar-sub">Panel de reservas</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-badge" id="topBadge">Cargando...</span>
+      <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- STATS -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card total"><div class="stat-label">Total reservas</div><div class="stat-val" id="sTot">—</div><div class="stat-sub">Todas las fechas</div></div>
+      <div class="stat-card pend"><div class="stat-label">Pendientes</div><div class="stat-val" id="sPend">—</div><div class="stat-sub">Esperan confirmación</div></div>
+      <div class="stat-card conf"><div class="stat-label">Confirmadas</div><div class="stat-val" id="sConf">—</div><div class="stat-sub">Listas para recibir</div></div>
+      <div class="stat-card ingres"><div class="stat-label">Ingresos estimados</div><div class="stat-val" id="sIngr">—</div><div class="stat-sub">Reservas confirmadas</div></div>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filters-bar">
+      <input class="search-inp" type="text" id="searchAdmin" placeholder="🔍 Buscar por nombre, email o actividad..." oninput="filtrarTabla()" />
+      <select class="filter-sel" id="filterEstado" onchange="filtrarTabla()">
+        <option value="all">Todos los estados</option>
+        <option value="pendiente">Pendientes</option>
+        <option value="confirmada">Confirmadas</option>
+        <option value="cancelada">Canceladas</option>
+      </select>
+      <select class="filter-sel" id="filterFecha" onchange="filtrarTabla()">
+        <option value="all">Todas las fechas</option>
+        <option value="hoy">Hoy</option>
+        <option value="semana">Esta semana</option>
+        <option value="mes">Este mes</option>
+      </select>
+      <button class="btn-refresh" onclick="cargarReservas()">↻ Actualizar</button>
+    </div>
+
+    <!-- TABLA -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Actividad</th>
+            <th>Fecha visita</th>
+            <th>Personas</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th>Recibida</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaBody">
+          <tr><td colspan="8" class="table-msg"><div class="spinner"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALLE RESERVA -->
+<div class="overlay" id="detOverlay" onclick="closeDetalle(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Detalle de reserva</h2>
+      <button class="modal-close" onclick="closeDetalle()">×</button>
+    </div>
+    <div id="detalleContent"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script is:inline>
+let adminPass = '';
+let allReservas = [];
+
+/* ── LOGIN ── */
+function doLogin() {
+  const pass = document.getElementById('loginPass').value;
+  if (!pass) return;
+  adminPass = pass;
+  cargarReservas();
+}
+
+function logout() {
+  adminPass = '';
+  allReservas = [];
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('adminPanel').style.display = 'none';
+  document.getElementById('loginPass').value = '';
+}
+
+/* ── CARGAR DATOS ── */
+async function cargarReservas() {
+  try {
+    const res = await fetch(`/api/reservas?pass=${encodeURIComponent(adminPass)}`);
+    if (res.status === 401) {
+      document.getElementById('loginErr').style.display = 'block';
+      return;
+    }
+    const data = await res.json();
+    allReservas = data.reservas || [];
+
+    // Mostrar panel
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    document.getElementById('loginErr').style.display = 'none';
+
+    actualizarStats();
+    filtrarTabla();
+    toast('✓ Reservas actualizadas');
+  } catch(e) {
+    toast('⚠️ Error de conexión');
+  }
+}
+
+/* ── STATS ── */
+function actualizarStats() {
+  const tot  = allReservas.length;
+  const pend = allReservas.filter(r=>r.estado==='pendiente').length;
+  const conf = allReservas.filter(r=>r.estado==='confirmada').length;
+  const ingr = allReservas.filter(r=>r.estado==='confirmada').reduce((s,r)=>s+r.precio_total,0);
+
+  document.getElementById('sTot').textContent  = tot;
+  document.getElementById('sPend').textContent = pend;
+  document.getElementById('sConf').textContent = conf;
+  document.getElementById('sIngr').textContent = `S/.${ingr}`;
+  document.getElementById('topBadge').textContent = `${pend} pendiente${pend!==1?'s':''}`;
+}
+
+/* ── FILTRAR TABLA ── */
+function filtrarTabla() {
+  const q      = document.getElementById('searchAdmin').value.toLowerCase();
+  const estado = document.getElementById('filterEstado').value;
+  const fecha  = document.getElementById('filterFecha').value;
+  const hoy    = new Date().toISOString().split('T')[0];
+  const semana = new Date(Date.now()-7*86400000).toISOString().split('T')[0];
+  const mes    = new Date(new Date().getFullYear(),new Date().getMonth(),1).toISOString().split('T')[0];
+
+  const filtradas = allReservas.filter(r => {
+    if (q && !r.nombre.toLowerCase().includes(q) && !r.email.toLowerCase().includes(q) && !r.actividad.toLowerCase().includes(q)) return false;
+    if (estado !== 'all' && r.estado !== estado) return false;
+    if (fecha === 'hoy'   && r.fecha_visita !== hoy)    return false;
+    if (fecha === 'semana'&& r.fecha_visita < semana)   return false;
+    if (fecha === 'mes'   && r.fecha_visita < mes)      return false;
+    return true;
+  });
+
+  renderTabla(filtradas);
+}
+
+/* ── RENDER TABLA ── */
+function renderTabla(reservas) {
+  const tbody = document.getElementById('tablaBody');
+  if (!reservas.length) {
+    tbody.innerHTML = `<tr><td colspan="8" class="table-msg"><div class="big">📋</div>Sin reservas con estos filtros</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = reservas.map(r => `
+    <tr>
+      <td class="td-nombre">
+        <strong>${esc(r.nombre)}</strong>
+        <span>${esc(r.email)}</span>
+      </td>
+      <td class="td-actividad" title="${esc(r.actividad)}">${esc(r.actividad)}</td>
+      <td class="td-fecha">
+        <strong>${formatFecha(r.fecha_visita)}</strong>
+        <span>${r.personas} persona${r.personas>1?'s':''}</span>
+      </td>
+      <td>${r.personas}</td>
+      <td class="td-precio">S/.${r.precio_total}</td>
+      <td><span class="badge-estado badge-${r.estado}">${r.estado}</span></td>
+      <td class="td-fecha">${formatFechaHora(r.created_at)}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn-action btn-ver" onclick="verDetalle('${r.id}')">Ver</button>
+          ${r.estado!=='confirmada'?`<button class="btn-action btn-confirmar" onclick="cambiarEstado('${r.id}','confirmada')">✓</button>`:''}
+          ${r.estado!=='cancelada'?`<button class="btn-action btn-cancelar" onclick="cambiarEstado('${r.id}','cancelada')">✗</button>`:''}
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+/* ── CAMBIAR ESTADO ── */
+async function cambiarEstado(id, estado) {
+  try {
+    const res = await fetch('/api/reservas', {
+      method:'PATCH',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({id, estado, pass:adminPass})
+    });
+    const data = await res.json();
+    if (data.success) {
+      const r = allReservas.find(x=>x.id===id);
+      if (r) r.estado = estado;
+      actualizarStats();
+      filtrarTabla();
+      toast(`✓ Reserva ${estado}`);
+    } else { toast('⚠️ Error al actualizar'); }
+  } catch(e) { toast('⚠️ Error de conexión'); }
+}
+
+/* ── VER DETALLE ── */
+function verDetalle(id) {
+  const r = allReservas.find(x=>x.id===id);
+  if (!r) return;
+
+  const paqueteHtml = r.es_paquete && r.actividades_paquete?.length ? `
+    <div class="paquete-list">
+      <h4>Actividades del paquete</h4>
+      <ul style="list-style:none">${r.actividades_paquete.map(a=>`
+        <li>${a.name} — S/.${a.price}</li>`).join('')}
+      </ul>
+    </div>` : '';
+
+  document.getElementById('detalleContent').innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-item"><div class="detail-label">Nombre</div><div class="detail-val">${esc(r.nombre)}</div></div>
+      <div class="detail-item"><div class="detail-label">Email</div><div class="detail-val">${esc(r.email)}</div></div>
+      <div class="detail-item"><div class="detail-label">Fecha de visita</div><div class="detail-val">${formatFecha(r.fecha_visita)}</div></div>
+      <div class="detail-item"><div class="detail-label">Personas</div><div class="detail-val">${r.personas}</div></div>
+      <div class="detail-item"><div class="detail-label">Idioma</div><div class="detail-val">${esc(r.idioma||'Español')}</div></div>
+      <div class="detail-item"><div class="detail-label">Total</div><div class="detail-val" style="color:var(--gold);font-size:1.1rem">S/.${r.precio_total}</div></div>
+      <div class="detail-item" style="grid-column:1/-1"><div class="detail-label">Actividad</div><div class="detail-val">${esc(r.actividad)}</div></div>
+      ${r.notas?`<div class="detail-item" style="grid-column:1/-1"><div class="detail-label">Notas</div><div class="detail-val">${esc(r.notas)}</div></div>`:''}
+      <div class="detail-item"><div class="detail-label">Estado</div><div class="detail-val"><span class="badge-estado badge-${r.estado}">${r.estado}</span></div></div>
+      <div class="detail-item"><div class="detail-label">Recibida</div><div class="detail-val">${formatFechaHora(r.created_at)}</div></div>
+    </div>
+    ${paqueteHtml}
+    <div style="display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap">
+      ${r.estado!=='confirmada'?`<button class="btn-action btn-confirmar" style="padding:.5rem 1rem;font-size:.82rem" onclick="cambiarEstado('${r.id}','confirmada');closeDetalle()">✓ Confirmar reserva</button>`:''}
+      ${r.estado!=='cancelada'?`<button class="btn-action btn-cancelar" style="padding:.5rem 1rem;font-size:.82rem" onclick="cambiarEstado('${r.id}','cancelada');closeDetalle()">✗ Cancelar reserva</button>`:''}
+      <a href="mailto:${esc(r.email)}" class="btn-action btn-ver" style="padding:.5rem 1rem;font-size:.82rem;text-decoration:none">✉ Enviar email</a>
+    </div>`;
+
+  document.getElementById('detOverlay').classList.add('open');
+}
+function closeDetalle(e) {
+  if (e && e.target!==document.getElementById('detOverlay')) return;
+  document.getElementById('detOverlay').classList.remove('open');
+}
+
+/* ── UTILS ── */
+function esc(s) { return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function formatFecha(d) { if(!d)return'—'; const[y,m,di]=d.split('-'); return `${di}/${m}/${y}`; }
+function formatFechaHora(d) { if(!d)return'—'; const dt=new Date(d); return `${dt.toLocaleDateString('es')} ${dt.toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})}`; }
+let toastT;
+function toast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2800); }
+</script>
+</body>
+</html>
