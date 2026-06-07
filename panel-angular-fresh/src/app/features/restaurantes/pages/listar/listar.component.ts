@@ -10,14 +10,13 @@ import { AuthService } from '@core/services/auth.service';
   templateUrl: './listar.component.html'
 })
 export class ListarComponent implements OnInit {
-  restaurantes: any[] = []; // ✅ Usamos una sola variable
+  restaurantes: any[] = [];
   total = 0;
   limit = 10;
   offset = 0;
   columnas = [
     { titulo: 'Nombre', campo: 'nombre' },
-    { titulo: 'Dirección', campo: 'direccion' },
-    { titulo: 'Estado', campo: 'estado' }
+    { titulo: 'Dirección', campo: 'direccion' }
   ];
   puedeCrear = false;
   puedeEditar = false;
@@ -36,8 +35,7 @@ export class ListarComponent implements OnInit {
       precio_max: [null],
       radio: [null],
       latitud: [null],
-      longitud: [null],
-      estado_aprobacion: ['todos']
+      longitud: [null]
     });
   }
 
@@ -55,29 +53,14 @@ export class ListarComponent implements OnInit {
       ...this.filtrosForm.value
     };
 
-    // Limpiar valores nulos o vacíos
     Object.keys(params).forEach(key => {
       if (params[key] === null || params[key] === undefined || params[key] === '') {
         delete params[key];
       }
     });
 
-    // ✅ Convertir filtro de aprobación al parámetro que entiende el backend
-    if (params.estado_aprobacion) {
-      if (params.estado_aprobacion === 'aprobados') {
-        params.solo_aprobados = true;
-      } else if (params.estado_aprobacion === 'pendientes') {
-        params.solo_aprobados = false;
-      }
-      delete params.estado_aprobacion;
-    }
-
     this.restauranteService.listar(params).subscribe(res => {
-      // ✅ Asignar directamente a restaurantes
-      this.restaurantes = res.data.map((r: any) => ({
-        ...r,
-        estado: r.aprobado ? 'Aprobado' : 'Pendiente'
-      }));
+      this.restaurantes = res.data;
       this.total = res.total;
     });
   }
@@ -108,19 +91,6 @@ export class ListarComponent implements OnInit {
     } else {
       this.notificacion.mostrarError('Geolocalización no soportada');
     }
-  }
-
-  aprobarRestaurante(restaurante: any): void {
-    if (!confirm(`¿Aprobar el restaurante "${restaurante.nombre}"?`)) {
-      return;
-    }
-    this.restauranteService.aprobar(restaurante.id).subscribe({
-      next: () => {
-        this.notificacion.mostrarExito(`Restaurante "${restaurante.nombre}" aprobado`);
-        this.cargarRestaurantes();
-      },
-      error: () => this.notificacion.mostrarError('Error al aprobar')
-    });
   }
 
   irAEditar(restaurante: any): void {

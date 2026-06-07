@@ -20,6 +20,8 @@ const CrearRestauranteDTO = z.object({
     capacidad_mesas: z.preprocess((val) => (val === undefined || val === '' ? undefined : Number(val)), z.number().int().positive('La capacidad debe ser un entero positivo').optional()),
 
     horarios: z.record(z.string()).optional(),
+
+    fotos: z.array(z.string()).optional(),
 });
 
 module.exports = { CrearRestauranteDTO };

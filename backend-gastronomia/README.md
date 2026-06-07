@@ -292,6 +292,7 @@ Instala los siguientes programas:
 
 ```bash
 git clone
+cd backend-gastronomia
 ```
 
 ### 3. Instalar dependencias

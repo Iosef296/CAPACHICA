@@ -7,25 +7,14 @@
           <mat-icon>arrow_back</mat-icon>
         </button>
         <div>
-          <div class="flex items-center gap-3">
-            <h2 class="text-3xl font-black text-white tracking-wide">{{ restaurante.nombre }}</h2>
-            <span class="px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full shadow-[0_0_10px_rgba(0,0,0,0.5)]"
-                  [ngClass]="restaurante.aprobado ? 'bg-[#1abc9c]/20 text-[#1abc9c] border border-[#1abc9c]/50' : 'bg-[#f1c40f]/20 text-[#f1c40f] border border-[#f1c40f]/50'">
-              {{ restaurante.aprobado ? '✔ Aprobado' : '⏳ Pendiente' }}
-            </span>
-          </div>
+          <h2 class="text-3xl font-black text-white tracking-wide">{{ restaurante.nombre }}</h2>
           <p class="text-gray-400 mt-1 flex items-center gap-1"><mat-icon size="small" class="text-sm">restaurant_menu</mat-icon> {{ restaurante.tipo_comida || 'Sin categoría' | uppercase }}</p>
         </div>
       </div>
 
-      <div class="flex gap-3">
-        <button mat-raised-button [routerLink]="['/restaurantes/editar', restaurante.id]" class="bg-white/10 text-white hover:bg-white/20 transition-colors">
-          <mat-icon>edit</mat-icon> Editar
-        </button>
-        <button *ngIf="!restaurante.aprobado && esAdmin" mat-raised-button (click)="aprobar()" class="bg-gradient-to-r from-[#f1c40f] to-[#d4ac0e] text-black font-bold shadow-[0_0_15px_rgba(241,196,15,0.4)]">
-          <mat-icon>verified</mat-icon> Aprobar
-        </button>
-      </div>
+      <button mat-raised-button [routerLink]="['/restaurantes/editar', restaurante.id]" class="bg-white/10 text-white hover:bg-white/20 transition-colors">
+        <mat-icon>edit</mat-icon> Editar
+      </button>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -50,7 +39,6 @@
           <div class="grid grid-cols-2 md:grid-cols-3 gap-4" *ngIf="restaurante.fotos?.length; else sinFotos">
             <div *ngFor="let foto of restaurante.fotos" class="group relative overflow-hidden rounded-xl aspect-video border border-white/10">
               <img [src]="foto" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-              <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </div>
           </div>
           <ng-template #sinFotos>
@@ -102,13 +90,6 @@
       </div>
 
     </div>
-
-    <button *ngIf="!restaurante.aprobado && esAdmin" mat-raised-button
-            (click)="aprobar()"
-            class="bg-gradient-to-r from-[#f1c40f] to-[#d4ac0e] text-black font-bold...">
-      <mat-icon>verified</mat-icon> Aprobar
-    </button>
-
   </div>
 
   <app-loading *ngIf="!restaurante"></app-loading>

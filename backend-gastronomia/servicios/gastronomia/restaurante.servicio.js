@@ -10,7 +10,6 @@ class RestauranteService {
 
     async crear(datos, usuarioId) {
         const { ubicacion, ...rest } = datos;
-        // Crear objeto con coordenadas
         const nuevo = this.restauranteRepo.create({
             ...rest,
             usuario_id: usuarioId,
@@ -18,7 +17,7 @@ class RestauranteService {
                 type: 'Point',
                 coordinates: [ubicacion.longitud, ubicacion.latitud],
             },
-            aprobado: false,
+            aprobado: true, // ✅ Cambiado de false a true
         });
 
         const guardado = await this.restauranteRepo.save(nuevo);
@@ -43,10 +42,7 @@ class RestauranteService {
             const punto = `ST_SetSRID(ST_MakePoint(${filtros.longitud}, ${filtros.latitud}), 4326)`;
             qb.andWhere(`ST_DWithin(r.ubicacion, ${punto}, ${filtros.radio * 1000})`); // radio en km -> metros
         }
-        // Solo aprobados a menos que se pida explícitamente
-        if (filtros.solo_aprobados !== false) {
-            qb.andWhere('r.aprobado = true');
-        }
+
         qb.andWhere('r.activo = true');
 
         const total = await qb.getCount();
@@ -123,20 +119,21 @@ class RestauranteService {
         const { ubicacion, ...rest } = restaurante;
         let latitud = null, longitud = null;
 
-        // TypeORM con geometry devuelve un objeto { type: 'Point', coordinates: [long, lat] }
         if (ubicacion && ubicacion.type === 'Point' && Array.isArray(ubicacion.coordinates)) {
             longitud = ubicacion.coordinates[0];
             latitud = ubicacion.coordinates[1];
-        }
-        // Si ya está formateado
-        else if (ubicacion && typeof ubicacion === 'object' && 'latitud' in ubicacion) {
+        } else if (ubicacion && typeof ubicacion === 'object' && 'latitud' in ubicacion) {
             latitud = ubicacion.latitud;
             longitud = ubicacion.longitud;
         }
 
+        // ✅ Aseguramos que fotos sea un array (aunque sea vacío)
+        const fotos = Array.isArray(restaurante.fotos) ? restaurante.fotos : [];
+
         return {
             ...rest,
             ubicacion: { latitud, longitud },
+            fotos: fotos,   // 🔥 ahora siempre está presente
         };
     }
 }
