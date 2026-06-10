@@ -1,0 +1,26 @@
+---
+// src/pages/index.astro
+// Página de ejemplo — tus compañeros hacen lo mismo en su página
+import Footer from '../components/Footer.jsx';
+---
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capachica Turismo</title>
+  </head>
+  <body>
+
+    <!-- Aquí va el contenido de cada página (artesanía, gastronomía, etc.) -->
+    <main>
+      <h1>Bienvenido a Capachica</h1>
+    </main>
+
+    <!-- El footer va AL FINAL, antes de cerrar body -->
+    <!-- client:load activa React para el formulario del newsletter -->
+    <Footer client:load />
+
+  </body>
+</html>

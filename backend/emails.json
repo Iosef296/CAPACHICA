@@ -1,0 +1,34 @@
+{
+  "emails": [
+    {
+      "id": 1780705300170,
+      "email": "prueba@gmail.com",
+      "fecha": "2026-06-06T00:21:40.170Z"
+    },
+    {
+      "id": 1780706668448,
+      "email": "deissy12@gmail.com",
+      "fecha": "2026-06-06T00:44:28.448Z"
+    },
+    {
+      "id": 1781056720855,
+      "email": "deissy600@gmail.com",
+      "fecha": "2026-06-10T01:58:40.855Z"
+    },
+    {
+      "id": 1781058550352,
+      "email": "deissy035@gmail.com",
+      "fecha": "2026-06-10T02:29:10.352Z"
+    },
+    {
+      "id": 1781059528444,
+      "email": "htaparass@gmail.com",
+      "fecha": "2026-06-10T02:45:28.444Z"
+    },
+    {
+      "id": 1781061074219,
+      "email": "iosef210801@gmail.com",
+      "fecha": "2026-06-10T03:11:14.219Z"
+    }
+  ]
+}
