@@ -1,0 +1,201 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Destinos — Capachica">
+  <style>
+    .destinos-page {
+      min-height: 100vh;
+      background: linear-gradient(180deg, #071826 0%, #0a1f30 100%);
+      color: #f4f7fb;
+      padding-top: 5rem;
+    }
+    .hero {
+      text-align: center;
+      padding: 4rem 1.5rem 3rem;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(27,166,217,0.12);
+      border: 1px solid rgba(27,166,217,0.3);
+      color: #53d3ff;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.35rem 1rem;
+      border-radius: 20px;
+      margin-bottom: 1.2rem;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #f4f7fb 40%, #53d3ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 1rem;
+    }
+    .hero p {
+      font-size: 1.1rem;
+      color: #8faabb;
+      max-width: 580px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 1.5rem 5rem;
+    }
+    .card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(120,200,255,0.1);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(27,166,217,0.35);
+      box-shadow: 0 12px 40px rgba(27,166,217,0.12);
+    }
+    .card-img {
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+    }
+    .card-body {
+      padding: 1.4rem;
+    }
+    .card-body h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #f4f7fb;
+      margin: 0 0 0.5rem;
+    }
+    .card-body p {
+      font-size: 0.88rem;
+      color: #7f95aa;
+      line-height: 1.6;
+      margin: 0 0 1rem;
+    }
+    .tag {
+      display: inline-block;
+      background: rgba(27,166,217,0.1);
+      color: #53d3ff;
+      font-size: 0.72rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 10px;
+      margin-right: 0.4rem;
+    }
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      padding: 2rem 1.5rem;
+      border-top: 1px solid rgba(120,200,255,0.08);
+      border-bottom: 1px solid rgba(120,200,255,0.08);
+      margin-bottom: 3rem;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #53d3ff;
+    }
+    .stat-label {
+      font-size: 0.78rem;
+      color: #7f95aa;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+  </style>
+
+  <div class="destinos-page">
+    <div class="hero">
+      <div class="hero-tag">✦ Descubre Capachica</div>
+      <h1>Destinos Imperdibles</h1>
+      <p>Explora las comunidades ancestrales, paisajes andinos y la magia del Lago Titicaca desde la península de Capachica.</p>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-num">8+</div>
+        <div class="stat-label">Comunidades</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">3820</div>
+        <div class="stat-label">msnm</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">12</div>
+        <div class="stat-label">Islas cercanas</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Experiencias</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-img" style="background: linear-gradient(135deg, #0a3d62, #1ba6d9)">🏔️</div>
+        <div class="card-body">
+          <h3>Llachón</h3>
+          <p>Comunidad pionera del turismo vivencial en el Titicaca. Amanecer sobre el lago desde los miradores es una experiencia única.</p>
+          <span class="tag">Vivencial</span><span class="tag">Lago</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-img" style="background: linear-gradient(135deg, #1a3a1a, #2e7d32)">🌿</div>
+        <div class="card-body">
+          <h3>Escallani</h3>
+          <p>Comunidad rodeada de totora y aves acuáticas. Ideal para la pesca tradicional y el tejido con técnicas ancestrales quechuas.</p>
+          <span class="tag">Naturaleza</span><span class="tag">Artesanía</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-img" style="background: linear-gradient(135deg, #4a1a00, #d4521a)">🏛️</div>
+        <div class="card-body">
+          <h3>Capachica Centro</h3>
+          <p>El corazón administrativo de la península. Mercados, festividades tradicionales y la mejor gastronomía lacustre de la región.</p>
+          <span class="tag">Gastronomía</span><span class="tag">Cultura</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-img" style="background: linear-gradient(135deg, #0d2137, #1565c0)">⛵</div>
+        <div class="card-body">
+          <h3>Isla Taquile</h3>
+          <p>Patrimonio inmaterial de la UNESCO. Los tejedores taquileños mantienen viva una tradición textil de más de 500 años.</p>
+          <span class="tag">Patrimonio</span><span class="tag">Textil</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-img" style="background: linear-gradient(135deg, #1a0a3a, #7b1fa2)">🌅</div>
+        <div class="card-body">
+          <h3>Mirador Puesta del Sol</h3>
+          <p>El punto más alto de la península ofrece una vista panorámica del Titicaca. Los atardeceres son de los más fotografiados del Perú.</p>
+          <span class="tag">Mirador</span><span class="tag">Fotografía</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-img" style="background: linear-gradient(135deg, #0a2a1a, #00695c)">🐟</div>
+        <div class="card-body">
+          <h3>Bahía de Chifrón</h3>
+          <p>Aguas tranquilas ideales para kayak y pesca con los pobladores locales. La trucha fresca del lago es el mejor desayuno posible.</p>
+          <span class="tag">Kayak</span><span class="tag">Pesca</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

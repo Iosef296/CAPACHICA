@@ -1,0 +1,14 @@
+---
+import Layout from '../layouts/Layout.astro';
+import VivencialHero from '../components/VivencialHero';
+import HomeStats from '../components/HomeStats';
+import HomeSections from '../components/HomeSections';
+---
+<Layout
+  title="Capachica Turismo — La joya del Lago Titicaca"
+  description="Descubre la península de Capachica: turismo vivencial, gastronomía andina, festividades ancestrales y los atardeceres más bellos del Titicaca."
+>
+  <VivencialHero client:load />
+  <HomeStats client:load />
+  <HomeSections client:load />
+</Layout>

@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: capachica_db
+    environment:
+      POSTGRES_DB: capachica
+      POSTGRES_USER: capachica_user
+      POSTGRES_PASSWORD: capachica_pass_2026
+    ports:
+      - "5432:5432"
+    volumes:
+      - capachica_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U capachica_user -d capachica"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  capachica_data:

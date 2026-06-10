@@ -1,0 +1,296 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Alojamiento — Capachica">
+  <style>
+    .aloj-page {
+      min-height: 100vh;
+      background: linear-gradient(180deg, #071826 0%, #0a1f30 100%);
+      color: #f4f7fb;
+      padding-top: 5rem;
+    }
+    .hero {
+      text-align: center;
+      padding: 4rem 1.5rem 3rem;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(27,166,217,0.12);
+      border: 1px solid rgba(27,166,217,0.3);
+      color: #53d3ff;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.35rem 1rem;
+      border-radius: 20px;
+      margin-bottom: 1.2rem;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #f4f7fb 40%, #53d3ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 1rem;
+    }
+    .hero p {
+      font-size: 1.1rem;
+      color: #8faabb;
+      max-width: 580px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+    .tipos {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      padding: 0 1.5rem 3rem;
+    }
+    .tipo-btn {
+      padding: 0.5rem 1.2rem;
+      border-radius: 20px;
+      border: 1px solid rgba(27,166,217,0.25);
+      background: rgba(27,166,217,0.08);
+      color: #b9c8d6;
+      font-size: 0.85rem;
+      cursor: default;
+    }
+    .tipo-btn.activo {
+      background: linear-gradient(135deg, #1ba6d9, #0b6ea8);
+      color: #fff;
+      border-color: transparent;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 1.5rem 3rem;
+    }
+    .card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(120,200,255,0.1);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(27,166,217,0.3);
+      box-shadow: 0 10px 30px rgba(27,166,217,0.1);
+    }
+    .card-img {
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+    }
+    .card-body { padding: 1.4rem; }
+    .card-body h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #f4f7fb;
+      margin: 0 0 0.3rem;
+    }
+    .card-location {
+      font-size: 0.78rem;
+      color: #53d3ff;
+      margin-bottom: 0.6rem;
+    }
+    .card-body p {
+      font-size: 0.87rem;
+      color: #7f95aa;
+      line-height: 1.6;
+      margin: 0 0 1rem;
+    }
+    .amenities {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+    .amenity {
+      font-size: 0.72rem;
+      color: #8faabb;
+      background: rgba(255,255,255,0.05);
+      padding: 0.2rem 0.55rem;
+      border-radius: 8px;
+    }
+    .precio {
+      display: flex;
+      align-items: baseline;
+      gap: 0.3rem;
+    }
+    .precio-num {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #53d3ff;
+    }
+    .precio-label { font-size: 0.78rem; color: #7f95aa; }
+    .cta-section {
+      text-align: center;
+      padding: 3rem 1.5rem 5rem;
+      border-top: 1px solid rgba(120,200,255,0.08);
+    }
+    .cta-section h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+    }
+    .cta-section p {
+      color: #8faabb;
+      margin-bottom: 1.5rem;
+    }
+    .btn-cta {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      background: linear-gradient(135deg, #1ba6d9, #0b6ea8);
+      color: #fff;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 20px rgba(27,166,217,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(27,166,217,0.45);
+    }
+  </style>
+
+  <div class="aloj-page">
+    <div class="hero">
+      <div class="hero-tag">🏡 Hospedaje Auténtico</div>
+      <h1>Alojamiento en Capachica</h1>
+      <p>Duerme en casa de familias quechuas, despierta con vista al Titicaca y vive Capachica desde adentro.</p>
+    </div>
+
+    <div class="tipos">
+      <span class="tipo-btn activo">Todos</span>
+      <span class="tipo-btn">Familia Anfitriona</span>
+      <span class="tipo-btn">Lodge</span>
+      <span class="tipo-btn">Hostal</span>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-img" style="background: linear-gradient(135deg, #0a2537, #1565c0)">🏡</div>
+        <div class="card-body">
+          <h3>Familia Quispe — Llachón</h3>
+          <div class="card-location">📍 Comunidad de Llachón</div>
+          <p>Hospedaje vivencial con la familia Quispe. Desayuno y cena incluidos con productos del lago y la chacra propia.</p>
+          <div class="amenities">
+            <span class="amenity">🍽 Comidas incluidas</span>
+            <span class="amenity">🌅 Vista al lago</span>
+            <span class="amenity">🚣 Paseo en bote</span>
+          </div>
+          <div class="precio">
+            <span class="precio-num">S/ 80</span>
+            <span class="precio-label">/ persona / noche</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-img" style="background: linear-gradient(135deg, #1a2a0a, #33691e)">🌿</div>
+        <div class="card-body">
+          <h3>Familia Mamani — Escallani</h3>
+          <div class="card-location">📍 Comunidad de Escallani</div>
+          <p>Rodeados de totorales y aves silvestres. La señora Mamani enseña tejido tradicional a sus huéspedes por las mañanas.</p>
+          <div class="amenities">
+            <span class="amenity">🎨 Taller de tejido</span>
+            <span class="amenity">🦆 Avistamiento</span>
+            <span class="amenity">🐟 Pesca</span>
+          </div>
+          <div class="precio">
+            <span class="precio-num">S/ 70</span>
+            <span class="precio-label">/ persona / noche</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-img" style="background: linear-gradient(135deg, #0d1b2a, #1ba6d9)">⛵</div>
+        <div class="card-body">
+          <h3>Lodge Titicaca View</h3>
+          <div class="card-location">📍 Capachica Centro</div>
+          <p>Cabaña privada con baño propio y terraza con vista panorámica al lago. Ideal para parejas y viajeros independientes.</p>
+          <div class="amenities">
+            <span class="amenity">🛁 Baño privado</span>
+            <span class="amenity">🏔 Terraza panorámica</span>
+            <span class="amenity">☕ Desayuno</span>
+          </div>
+          <div class="precio">
+            <span class="precio-num">S/ 150</span>
+            <span class="precio-label">/ habitación / noche</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-img" style="background: linear-gradient(135deg, #2a0a1a, #880e4f)">🌄</div>
+        <div class="card-body">
+          <h3>Hostal Amanecer Andino</h3>
+          <div class="card-location">📍 Capachica Centro</div>
+          <p>Hostal familiar con habitaciones compartidas y privadas. Perfecta base para explorar toda la península con guías locales.</p>
+          <div class="amenities">
+            <span class="amenity">🗺 Guías locales</span>
+            <span class="amenity">🚲 Alquiler de bici</span>
+            <span class="amenity">📶 Wifi</span>
+          </div>
+          <div class="precio">
+            <span class="precio-num">S/ 45</span>
+            <span class="precio-label">/ persona / noche</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-img" style="background: linear-gradient(135deg, #0a1a2a, #004d7a)">🏘️</div>
+        <div class="card-body">
+          <h3>Familia Ccama — Chifrón</h3>
+          <div class="card-location">📍 Bahía de Chifrón</div>
+          <p>Directamente a orillas de la bahía. Incluye kayak libre y sesión de pesca artesanal al amanecer con el señor Ccama.</p>
+          <div class="amenities">
+            <span class="amenity">🚣 Kayak libre</span>
+            <span class="amenity">🌅 Amanecer en bote</span>
+            <span class="amenity">🍽 Pensión completa</span>
+          </div>
+          <div class="precio">
+            <span class="precio-num">S/ 95</span>
+            <span class="precio-label">/ persona / noche</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-img" style="background: linear-gradient(135deg, #1a1a0a, #827717)">⭐</div>
+        <div class="card-body">
+          <h3>Casa Rural Pachamama</h3>
+          <div class="card-location">📍 Llachón Alta</div>
+          <p>La opción más completa de la península. Habitaciones amplias, restaurante con cocina novoandina y spa de medicina ancestral.</p>
+          <div class="amenities">
+            <span class="amenity">💆 Spa andino</span>
+            <span class="amenity">🍷 Restaurante</span>
+            <span class="amenity">🌿 Medicina ancestral</span>
+          </div>
+          <div class="precio">
+            <span class="precio-num">S/ 220</span>
+            <span class="precio-label">/ habitación / noche</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-section">
+      <h2>¿Quieres reservar?</h2>
+      <p>Contacta directamente con las familias anfitrionas o usa nuestro sistema de reservas.</p>
+      <a href="/actividades" class="btn-cta">Ver actividades incluidas →</a>
+    </div>
+  </div>
+</Layout>

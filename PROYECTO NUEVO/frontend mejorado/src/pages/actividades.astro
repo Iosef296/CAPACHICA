@@ -1,0 +1,1731 @@
+---
+// src/pages/actividades.astro
+---
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Actividades · Capachica Turismo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Pro:wght@300;400;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── CSS VARS ─── */
+    :root {
+      --turquoise: #2dd4bf;
+      --turquoise-dark: #0f9488;
+      --turquoise-glow: rgba(45, 212, 191, 0.25);
+      --gold: #d4a843;
+      --gold-light: #f0c96a;
+      --gold-pale: rgba(212, 168, 67, 0.15);
+      --navy: #0a1628;
+      --navy-mid: #0f2240;
+      --navy-light: #162d4e;
+      --sand: #e8dcc8;
+      --sand-dark: #c4a882;
+      --text-main: #f0ede8;
+      --text-muted: rgba(240,237,232,0.65);
+      --white: #ffffff;
+      --card-bg: rgba(10, 22, 40, 0.75);
+      --card-border: rgba(45, 212, 191, 0.18);
+      --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ─── RESET ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Crimson Pro', Georgia, serif;
+      background: var(--navy);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem;
+      height: 64px;
+      background: rgba(10, 22, 40, 0);
+      backdrop-filter: blur(0px);
+      border-bottom: 1px solid transparent;
+      transition: var(--transition);
+    }
+    nav.scrolled {
+      background: rgba(10, 22, 40, 0.92);
+      backdrop-filter: blur(16px);
+      border-bottom-color: rgba(45, 212, 191, 0.2);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px; text-decoration: none;
+    }
+    .nav-logo-icon {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--turquoise), var(--gold));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700; font-size: 16px; color: var(--navy);
+    }
+    .nav-logo-text { line-height: 1; }
+    .nav-logo-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px; font-weight: 700; color: var(--white);
+      display: block;
+    }
+    .nav-logo-sub {
+      font-size: 10px; color: var(--turquoise); letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .nav-links {
+      display: flex; align-items: center; gap: 4px; list-style: none;
+    }
+    .nav-links a {
+      display: block; padding: 6px 11px; border-radius: 6px;
+      font-family: 'Crimson Pro', serif;
+      font-size: 14px; color: var(--text-muted); text-decoration: none;
+      transition: var(--transition);
+    }
+    .nav-links a:hover { color: var(--white); background: rgba(255,255,255,0.07); }
+    .nav-links a.active {
+      background: var(--turquoise); color: var(--navy); font-weight: 600;
+    }
+    .nav-right { display: flex; align-items: center; gap: 8px; }
+    .lang-btn {
+      padding: 4px 9px; border-radius: 5px; border: none;
+      background: transparent; color: var(--text-muted);
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      cursor: pointer; transition: var(--transition);
+    }
+    .lang-btn:hover, .lang-btn.active {
+      background: var(--turquoise); color: var(--navy);
+    }
+    .nav-hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .nav-hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--text-main); border-radius: 2px; transition: var(--transition);
+    }
+    @media (max-width: 900px) {
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      overflow: hidden;
+      padding-top: 64px;
+    }
+
+    /* Sky gradient — night */
+    .hero-sky {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        180deg,
+        #040d1c 0%,
+        #071426 25%,
+        #0a1d38 55%,
+        #0d2b4a 75%,
+        #1a4060 90%,
+        #2a6070 100%
+      );
+    }
+
+    /* Stars canvas */
+    .stars-layer {
+      position: absolute; inset: 0;
+      pointer-events: none;
+    }
+
+    /* Moon */
+    .hero-moon {
+      position: absolute;
+      top: 12%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #e8e0cc, #c8bfa0 60%, #a09070);
+      box-shadow:
+        0 0 40px rgba(220, 200, 150, 0.35),
+        0 0 80px rgba(220, 200, 150, 0.15),
+        inset -12px -12px 20px rgba(0,0,0,0.25);
+      animation: moonPulse 6s ease-in-out infinite;
+    }
+    @keyframes moonPulse {
+      0%, 100% { box-shadow: 0 0 40px rgba(220,200,150,0.35), 0 0 80px rgba(220,200,150,0.15), inset -12px -12px 20px rgba(0,0,0,0.25); }
+      50% { box-shadow: 0 0 55px rgba(220,200,150,0.5), 0 0 110px rgba(220,200,150,0.25), inset -12px -12px 20px rgba(0,0,0,0.25); }
+    }
+
+    /* Seagulls */
+    .seagulls {
+      position: absolute; top: 18%; right: 10%;
+      width: 160px; height: 60px;
+      opacity: 0.55;
+    }
+    .seagulls svg { width: 100%; height: 100%; }
+
+    /* Hero content */
+    .hero-content {
+      position: relative; z-index: 5;
+      text-align: center;
+      padding: 0 1.5rem;
+      margin-bottom: 180px;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px; border-radius: 100px;
+      border: 1px solid rgba(45, 212, 191, 0.4);
+      background: rgba(45, 212, 191, 0.08);
+      font-family: 'Space Mono', monospace;
+      font-size: 10px; letter-spacing: 2px;
+      color: var(--turquoise); text-transform: uppercase;
+      margin-bottom: 1.2rem;
+      animation: fadeUp 0.8s ease both;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--turquoise);
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3.2rem, 8vw, 6rem);
+      line-height: 1.05;
+      color: var(--white);
+      animation: fadeUp 0.8s 0.1s ease both;
+      margin-bottom: 0.3rem;
+    }
+    .hero-title em {
+      display: block;
+      font-style: italic;
+      color: var(--gold);
+    }
+    .hero-subtitle {
+      font-size: clamp(1rem, 2vw, 1.3rem);
+      color: var(--text-muted);
+      max-width: 520px; margin: 1rem auto 0;
+      line-height: 1.7;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Water reflection shimmer */
+    .hero-shimmer {
+      position: absolute;
+      bottom: 180px; left: 50%; transform: translateX(-50%);
+      width: 280px; height: 50px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+      border-radius: 50%;
+      animation: shimmer 3s ease-in-out infinite;
+      filter: blur(6px);
+    }
+    @keyframes shimmer {
+      0%,100% { opacity:0.4; transform:translateX(-50%) scaleX(1); }
+      50% { opacity:0.8; transform:translateX(-50%) scaleX(1.15); }
+    }
+
+    /* Tornadito reflejo */
+    .hero-reflection {
+      position: absolute;
+      bottom: 200px; left: 50%; transform: translateX(-50%);
+      width: 5px; height: 100px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
+      filter: blur(3px);
+      animation: reflectionWave 4s ease-in-out infinite;
+    }
+    @keyframes reflectionWave {
+      0%,100% { transform: translateX(-50%) scaleX(1) skewX(0deg); }
+      25% { transform: translateX(-48%) scaleX(1.8) skewX(5deg); }
+      75% { transform: translateX(-52%) scaleX(1.5) skewX(-5deg); }
+    }
+
+    /* Wave layers */
+    .hero-waves {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 280px; overflow: hidden;
+    }
+    .wave {
+      position: absolute; bottom: 0; left: -5%; right: -5%;
+      height: 100%;
+    }
+    .wave-water {
+      background: linear-gradient(
+        180deg,
+        rgba(26, 90, 120, 0.4) 0%,
+        rgba(20, 75, 105, 0.7) 30%,
+        rgba(15, 60, 90, 0.9) 60%,
+        rgba(12, 48, 75, 1) 100%
+      );
+      clip-path: polygon(
+        0% 45%, 3% 38%, 7% 32%, 12% 27%, 18% 23%, 25% 20%, 32% 19%, 38% 20%,
+        44% 23%, 50% 27%, 56% 30%, 63% 31%, 70% 29%, 77% 25%, 84% 20%, 91% 17%,
+        97% 15%, 100% 14%, 105% 14%, 105% 100%, 0% 100%
+      );
+      animation: waveMove 8s ease-in-out infinite;
+    }
+    .wave-sand {
+      background: linear-gradient(180deg, #c4a882 0%, #b89468 30%, #a07848 100%);
+      clip-path: polygon(
+        0% 68%, 4% 62%, 9% 57%, 15% 54%, 22% 52%, 29% 53%, 36% 55%, 42% 57%,
+        49% 57%, 55% 55%, 62% 52%, 69% 50%, 76% 50%, 83% 52%, 90% 55%, 96% 58%,
+        100% 60%, 105% 60%, 105% 100%, 0% 100%
+      );
+    }
+    @keyframes waveMove {
+      0%,100% { clip-path: polygon(0% 45%, 3% 38%, 7% 32%, 12% 27%, 18% 23%, 25% 20%, 32% 19%, 38% 20%, 44% 23%, 50% 27%, 56% 30%, 63% 31%, 70% 29%, 77% 25%, 84% 20%, 91% 17%, 97% 15%, 100% 14%, 105% 14%, 105% 100%, 0% 100%); }
+      50% { clip-path: polygon(0% 50%, 3% 43%, 7% 36%, 12% 30%, 18% 26%, 25% 22%, 32% 21%, 38% 23%, 44% 26%, 50% 30%, 56% 33%, 63% 34%, 70% 32%, 77% 28%, 84% 23%, 91% 20%, 97% 18%, 100% 17%, 105% 17%, 105% 100%, 0% 100%); }
+    }
+
+    /* Stats bar */
+    .hero-stats {
+      position: relative; z-index: 5;
+      display: flex; gap: 0;
+      background: rgba(10, 22, 40, 0.7);
+      border: 1px solid rgba(45, 212, 191, 0.2);
+      border-radius: 12px;
+      backdrop-filter: blur(12px);
+      overflow: hidden;
+      margin-top: 2rem;
+      animation: fadeUp 0.8s 0.4s ease both;
+    }
+    .stat-item {
+      padding: 12px 22px; text-align: center;
+      border-right: 1px solid rgba(45, 212, 191, 0.12);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-val {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 700; color: var(--gold);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.7rem; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1px; margin-top: 3px;
+    }
+
+    /* ─── MAIN CONTENT ─── */
+    main {
+      background: linear-gradient(180deg, #0c1e34 0%, #0a1628 100%);
+      position: relative;
+    }
+
+    /* ─── FILTER BAR ─── */
+    .filter-section {
+      padding: 3rem 2rem 2rem;
+      max-width: 1200px; margin: 0 auto;
+    }
+    .filter-section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
+    }
+    .section-eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--turquoise); margin-bottom: 4px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-eyebrow::before {
+      content: ''; display: block;
+      width: 28px; height: 1px; background: var(--turquoise);
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 700; color: var(--white); line-height: 1.1;
+    }
+    .result-count {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px; color: var(--text-muted);
+      padding: 6px 14px; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 100px;
+    }
+    .result-count span { color: var(--gold); font-weight: 700; }
+
+    /* Category pills */
+    .filter-pills {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.2rem;
+    }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 16px; border-radius: 100px;
+      border: 1.5px solid rgba(255,255,255,0.12);
+      background: transparent;
+      font-family: 'Crimson Pro', serif; font-size: 14px;
+      color: var(--text-muted); cursor: pointer; transition: var(--transition);
+    }
+    .pill:hover { border-color: var(--turquoise); color: var(--turquoise); }
+    .pill.active {
+      border-color: var(--turquoise); background: rgba(45,212,191,0.12);
+      color: var(--turquoise); font-weight: 600;
+    }
+    .pill-emoji { font-size: 15px; }
+
+    /* Select filters */
+    .filter-selects {
+      display: flex; flex-wrap: wrap; gap: 10px;
+    }
+    .filter-select {
+      appearance: none;
+      padding: 8px 32px 8px 14px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04)
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%232dd4bf' stroke-width='1.5' fill='none'/%3E%3C/svg%3E")
+        no-repeat right 10px center / 10px;
+      font-family: 'Crimson Pro', serif; font-size: 14px;
+      color: var(--text-muted); cursor: pointer; transition: var(--transition);
+    }
+    .filter-select:focus {
+      outline: none; border-color: var(--turquoise); color: var(--white);
+    }
+
+    /* ─── ACTIVITIES GRID ─── */
+    .activities-section {
+      padding: 0 2rem 4rem;
+      max-width: 1200px; margin: 0 auto;
+    }
+    .activities-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+    .activity-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: var(--transition);
+      backdrop-filter: blur(12px);
+      position: relative;
+    }
+    .activity-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(45,212,191,0.45);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 30px rgba(45,212,191,0.08);
+    }
+    .activity-card.hidden { display: none; }
+
+    /* Card image area */
+    .card-img {
+      height: 180px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+      font-size: 4rem;
+    }
+    .card-img-bg {
+      position: absolute; inset: 0;
+      transition: var(--transition);
+    }
+    .activity-card:hover .card-img-bg { transform: scale(1.08); }
+    .card-emoji { position: relative; z-index: 1; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5)); }
+
+    /* Category colors */
+    .cat-aquatic  .card-img-bg { background: linear-gradient(135deg, #0a3d5e, #1a6080, #2a8fa0); }
+    .cat-terrestrial .card-img-bg { background: linear-gradient(135deg, #1a3a1a, #2d6040, #1e5030); }
+    .cat-cultural  .card-img-bg { background: linear-gradient(135deg, #3d2a0a, #7a4f18, #5a3a10); }
+    .cat-gastro   .card-img-bg { background: linear-gradient(135deg, #3d0a1a, #7a1830, #6a2040); }
+
+    .card-body { padding: 1.2rem 1.4rem 1.4rem; }
+    .card-tags {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;
+    }
+    .tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 3px 9px; border-radius: 4px;
+    }
+    .tag-cat { background: rgba(45,212,191,0.15); color: var(--turquoise); }
+    .tag-diff-easy { background: rgba(74,222,128,0.15); color: #4ade80; }
+    .tag-diff-medium { background: rgba(251,191,36,0.15); color: #fbbf24; }
+    .tag-diff-hard { background: rgba(248,113,113,0.15); color: #f87171; }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem; font-weight: 700; color: var(--white);
+      margin-bottom: 6px; line-height: 1.2;
+    }
+    .card-desc {
+      font-size: 0.92rem; color: var(--text-muted);
+      line-height: 1.65; margin-bottom: 1rem;
+    }
+    .card-meta {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.07);
+      margin-bottom: 1rem;
+    }
+    .meta-item {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 12px; color: var(--text-muted);
+    }
+    .meta-icon { font-size: 13px; }
+    .card-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 700; color: var(--gold);
+    }
+    .card-price span { font-family: 'Crimson Pro', serif; font-size: 0.8rem; color: var(--text-muted); font-weight: 400; }
+
+    .card-footer {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .btn-add {
+      flex: 1; padding: 10px 16px; border-radius: 8px; border: none;
+      background: linear-gradient(135deg, var(--turquoise-dark), var(--turquoise));
+      color: var(--navy); font-family: 'Crimson Pro', serif;
+      font-size: 14px; font-weight: 700; cursor: pointer; transition: var(--transition);
+    }
+    .btn-add:hover { transform: scale(1.02); box-shadow: 0 4px 20px var(--turquoise-glow); }
+    .btn-add.added {
+      background: linear-gradient(135deg, #1a6b5a, #2a8070);
+      color: #aef4e8;
+    }
+    .btn-reserve {
+      padding: 10px 14px; border-radius: 8px;
+      border: 1px solid rgba(212, 168, 67, 0.4);
+      background: var(--gold-pale); color: var(--gold);
+      font-family: 'Crimson Pro', serif; font-size: 13px;
+      cursor: pointer; transition: var(--transition);
+    }
+    .btn-reserve:hover {
+      background: rgba(212,168,67,0.22);
+      border-color: var(--gold);
+    }
+
+    /* ─── PACKAGE CALCULATOR SIDEBAR ─── */
+    .pkg-sidebar {
+      position: fixed; top: 50%; right: -360px;
+      transform: translateY(-50%);
+      width: 340px; max-height: 85vh;
+      background: linear-gradient(160deg, #0f2240, #0a1628);
+      border: 1px solid rgba(45,212,191,0.3);
+      border-radius: 16px 0 0 16px;
+      box-shadow: -10px 0 60px rgba(0,0,0,0.5);
+      z-index: 90;
+      transition: right 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .pkg-sidebar.open { right: 0; }
+    .pkg-header {
+      padding: 1.2rem 1.4rem;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .pkg-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; color: var(--white);
+    }
+    .pkg-close {
+      background: none; border: none; color: var(--text-muted);
+      font-size: 20px; cursor: pointer; transition: var(--transition);
+    }
+    .pkg-close:hover { color: var(--white); }
+    .pkg-body { flex: 1; overflow-y: auto; padding: 1rem 1.4rem; }
+    .pkg-empty {
+      text-align: center; padding: 2rem 0; color: var(--text-muted); font-size: 14px;
+    }
+    .pkg-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+      gap: 8px;
+    }
+    .pkg-item-name { font-size: 13px; flex: 1; }
+    .pkg-item-price { font-size: 13px; color: var(--gold); white-space: nowrap; }
+    .pkg-item-remove {
+      background: none; border: none; color: rgba(248,113,113,0.7);
+      cursor: pointer; font-size: 14px; transition: var(--transition);
+      padding: 2px 4px;
+    }
+    .pkg-item-remove:hover { color: #f87171; }
+    .pkg-footer {
+      padding: 1rem 1.4rem;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+    .pkg-persons {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;
+    }
+    .pkg-persons label { font-size: 13px; color: var(--text-muted); flex: 1; }
+    .persons-control {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .persons-btn {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 1px solid rgba(45,212,191,0.3);
+      background: rgba(45,212,191,0.08); color: var(--turquoise);
+      font-size: 16px; cursor: pointer; transition: var(--transition);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .persons-btn:hover { background: rgba(45,212,191,0.2); }
+    .persons-val {
+      font-family: 'Space Mono', monospace;
+      font-size: 14px; color: var(--white); min-width: 20px; text-align: center;
+    }
+    .pkg-total {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 1rem;
+    }
+    .pkg-total-label { font-size: 13px; color: var(--text-muted); }
+    .pkg-total-val {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem; color: var(--gold); font-weight: 700;
+    }
+    .btn-pkg-reserve {
+      width: 100%; padding: 12px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg, var(--gold) 0%, #b8902a 100%);
+      color: var(--navy); font-family: 'Playfair Display', serif;
+      font-size: 15px; font-weight: 700; cursor: pointer; transition: var(--transition);
+    }
+    .btn-pkg-reserve:hover { transform: scale(1.02); box-shadow: 0 6px 24px rgba(212,168,67,0.35); }
+
+    /* FAB */
+    .pkg-fab {
+      position: fixed; bottom: 28px; right: 28px; z-index: 89;
+      width: 58px; height: 58px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--turquoise-dark), var(--turquoise));
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 6px 28px rgba(45,212,191,0.45);
+      transition: var(--transition);
+    }
+    .pkg-fab:hover { transform: scale(1.1); }
+    .pkg-fab-badge {
+      position: absolute; top: -4px; right: -4px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--gold); color: var(--navy);
+      font-family: 'Space Mono', monospace;
+      font-size: 10px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      display: none;
+    }
+
+    /* ─── MODAL DE RESERVA ─── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(4, 13, 28, 0.88);
+      backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: linear-gradient(160deg, #0f2240, #0a1628);
+      border: 1px solid rgba(45,212,191,0.25);
+      border-radius: 20px;
+      width: 100%; max-width: 500px; max-height: 90vh;
+      overflow-y: auto;
+      padding: 2rem;
+      transform: translateY(20px); transition: transform 0.3s;
+    }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; color: var(--white);
+    }
+    .modal-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+    .modal-close {
+      background: none; border: none;
+      color: var(--text-muted); font-size: 22px;
+      cursor: pointer; transition: var(--transition);
+    }
+    .modal-close:hover { color: var(--white); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label {
+      display: block; font-size: 12px; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 10px 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; color: var(--white);
+      font-family: 'Crimson Pro', serif; font-size: 15px;
+      transition: var(--transition); resize: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none; border-color: var(--turquoise);
+      background: rgba(45,212,191,0.05);
+    }
+    .form-group select option { background: #0f2240; }
+    .cancel-policy {
+      background: rgba(212,168,67,0.08);
+      border: 1px solid rgba(212,168,67,0.2);
+      border-radius: 8px; padding: 10px 14px;
+      font-size: 12px; color: rgba(212,168,67,0.85);
+      margin-bottom: 1.2rem; line-height: 1.6;
+    }
+    .btn-submit {
+      width: 100%; padding: 13px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg, var(--turquoise-dark), var(--turquoise));
+      color: var(--navy); font-family: 'Playfair Display', serif;
+      font-size: 16px; font-weight: 700; cursor: pointer; transition: var(--transition);
+    }
+    .btn-submit:hover { box-shadow: 0 6px 24px var(--turquoise-glow); }
+
+    /* ─── SCROLL ANIMATIONS ─── */
+    .reveal {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .hero-stats { flex-wrap: wrap; width: 90%; justify-content: center; }
+      .stat-item { border-right: none; border-bottom: 1px solid rgba(45,212,191,0.12); }
+      .activities-grid { grid-template-columns: 1fr; }
+      .pkg-sidebar { width: 100%; border-radius: 16px 16px 0 0; top: auto; bottom: -100%; transform: none; right: 0; }
+      .pkg-sidebar.open { bottom: 0; top: auto; transform: none; }
+      .form-row { grid-template-columns: 1fr; }
+      .hero-moon { width: 80px; height: 80px; }
+    }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--navy); }
+    ::-webkit-scrollbar-thumb { background: rgba(45,212,191,0.3); border-radius: 3px; }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-icon">C</div>
+      <div class="nav-logo-text">
+        <span class="nav-logo-name">Capachica</span>
+        <span class="nav-logo-sub">Turismo Vivencial</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/">Inicio</a></li>
+      <li><a href="/destinos">Destinos</a></li>
+      <li><a href="/vivencial">Vivencial</a></li>
+      <li><a href="/actividades" class="active">Actividades</a></li>
+      <li><a href="/gastronomia">Gastronomía</a></li>
+      <li><a href="/festividades">Festividades</a></li>
+      <li><a href="/artesania">Artesanía</a></li>
+      <li><a href="/alojamiento">Alojamiento</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="lang-btn active" id="lang-es">ES</button>
+      <button class="lang-btn" id="lang-en">EN</button>
+      <button class="lang-btn" id="lang-fr">FR</button>
+      <button class="nav-hamburger" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-sky"></div>
+    <canvas class="stars-layer" id="starsCanvas"></canvas>
+
+    <div class="hero-moon"></div>
+
+    <div class="seagulls">
+      <svg viewBox="0 0 160 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 30 Q18 22 26 30" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        <path d="M35 20 Q45 11 55 20" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        <path d="M65 15 Q77 5 89 15" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <path d="M100 24 Q109 17 118 24" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        <path d="M130 32 Q137 26 144 32" stroke="white" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+
+    <div class="hero-content">
+      <div class="hero-badge">Actividades · Capachica · 3,812 msnm</div>
+      <h1 class="hero-title">
+        Nuestras
+        <em>Actividades</em>
+      </h1>
+      <p class="hero-subtitle">
+        Aventura, cultura y naturaleza a orillas del lago más alto del mundo.
+        Cada actividad es una ventana al alma del Titicaca.
+      </p>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-val">15+</div>
+          <div class="stat-label">Actividades</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">3,812</div>
+          <div class="stat-label">msnm</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">4.9 ★</div>
+          <div class="stat-label">Valoración</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">Todo</div>
+          <div class="stat-label">El año</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-shimmer"></div>
+    <div class="hero-reflection"></div>
+
+    <div class="hero-waves">
+      <div class="wave wave-water"></div>
+      <div class="wave wave-sand"></div>
+    </div>
+  </section>
+
+  <!-- MAIN -->
+  <main>
+    <!-- FILTERS -->
+    <section class="filter-section">
+      <div class="filter-section-header reveal">
+        <div>
+          <div class="section-eyebrow">Experiencias únicas</div>
+          <h2 class="section-title">Elige tu aventura</h2>
+        </div>
+        <div class="result-count">
+          <span id="countNum">15</span> actividades
+        </div>
+      </div>
+
+      <div class="filter-pills reveal">
+        <button class="pill active" data-cat="all">
+          <span class="pill-emoji">🌊</span> Todas
+        </button>
+        <button class="pill" data-cat="aquatic">
+          <span class="pill-emoji">🚣</span> Acuáticas
+        </button>
+        <button class="pill" data-cat="terrestrial">
+          <span class="pill-emoji">🏔️</span> Terrestres
+        </button>
+        <button class="pill" data-cat="cultural">
+          <span class="pill-emoji">🎨</span> Culturales
+        </button>
+        <button class="pill" data-cat="gastro">
+          <span class="pill-emoji">🍽️</span> Gastronómicas
+        </button>
+      </div>
+
+      <div class="filter-selects reveal">
+        <select class="filter-select" id="diffFilter">
+          <option value="all">Dificultad: Todas</option>
+          <option value="easy">Fácil</option>
+          <option value="medium">Moderada</option>
+          <option value="hard">Exigente</option>
+        </select>
+        <select class="filter-select" id="durFilter">
+          <option value="all">Duración: Todas</option>
+          <option value="2h">2 horas</option>
+          <option value="half">Medio día</option>
+          <option value="full">Día completo</option>
+        </select>
+        <select class="filter-select" id="priceFilter">
+          <option value="all">Precio: Todos</option>
+          <option value="cheap">Hasta S/.40</option>
+          <option value="mid">S/.40 – S/.80</option>
+          <option value="premium">Más de S/.80</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- ACTIVITIES GRID -->
+    <section class="activities-section">
+      <div class="activities-grid" id="activitiesGrid">
+
+        <!-- 1. Kayak -->
+        <div class="activity-card cat-aquatic reveal"
+             data-cat="aquatic" data-diff="medium" data-dur="half" data-price-tier="mid" data-price="60" data-name="Kayak en el Titicaca" data-age="10">
+          <div class="card-img">
+            <div class="card-img-bg"></div>
+            <span class="card-emoji">🚣</span>
+          </div>
+          <div class="card-body">
+            <div class="card-tags">
+              <span class="tag tag-cat">Acuático</span>
+              <span class="tag tag-diff-medium">Moderado</span>
+            </div>
+            <h3 class="card-title">Kayak en el Titicaca</h3>
+            <p class="card-desc">Navega las aguas sagradas del lago más alto del mundo en kayak, rodeado de totorales y el silencio del altiplano.</p>
+            <div class="card-meta">
+              <span class="meta-item"><span class="meta-icon">⏱️</span> Medio día</span>
+              <span class="meta-item"><span class="meta-icon">👤</span> Mín. 10 años</span>
+              <span class="meta-item"><span class="meta-icon">🎒</span> Equipo incluido</span>
+            </div>
+            <div class="card-footer">
+              <div>
+                <div class="card-price">S/.60 <span>/persona</span></div>
+              </div>
+              <button class="btn-add" onclick="addToPackage(this)">+ Paquete</button>
+              <button class="btn-reserve" onclick="openModal('Kayak en el Titicaca', 60)">Reservar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Ciclismo -->
+        <div class="activity-card cat-terrestrial reveal"
+             data-cat="terrestrial" data-diff="medium" data-dur="full" data-price-tier="mid" data-price="55" data-name="Ciclismo Panorámico 35km" data-age="14">
+          <div class="card-img">
+            <div class="card-img-bg"></div>
+            <span class="card-emoji">🚴</span>
+          </div>
+          <div class="card-body">
+            <div class="card-tags">
+              <span class="tag tag-cat">Terrestre</span>
+              <span class="tag tag-diff-medium">Moderado</span>
+            </div>
+            <h3 class="card-title">Ciclismo Panorámico 35km</h3>
+            <p class="card-desc">Recorre la peninsula entera en bicicleta con vistas impresionantes al lago Titicaca, comunidades y campos de quinua.</p>
+            <div class="card-meta">
+              <span class="meta-item"><span class="meta-icon">⏱️</span> Día completo</span>
+              <span class="meta-item"><span class="meta-icon">👤</span> Mín. 14 años</span>
+              <span class="meta-item"><span class="meta-icon">🚲</span> Bici incluida</span>
+            </div>
+            <div class="card-footer">
+              <div>
+                <div class="card-price">S/.55 <span>/persona</span></div>
+              </div>
+              <button class="btn-add" onclick="addToPackage(this)">+ Paquete</button>
+              <button class="btn-reserve" onclick="openModal('Ciclismo Panorámico 35km', 55)">Reservar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Pesca -->
+        <div class="activity-card cat-aquatic reveal"
+             data-cat="aquatic" data-diff="easy" data-dur="half" data-price-tier="cheap" data-price="35" data-name="Pesca Artesanal al Amanecer" data-age="6">
+          <div class="card-img">
+            <div class="card-img-bg"></div>
+            <span class="card-emoji">🎣</span>
+          </div>
+          <div class="card-body">
+            <div class="card-tags">
+              <span class="tag tag-cat">Acuático</span>
+              <span class="tag tag-diff-easy">Fácil</span>
+            </div>
+            <h3 class="card-title">Pesca Artesanal al Amanecer</h3>
+            <p class="card-desc">Acompaña a pescadores locales en sus balsas de totora al rayar el alba. La trucha del Titicaca como protagonista.</p>
+            <div class="card-meta">
+              <span class="meta-item"><span class="meta-icon">⏱️</span> 2-3 horas</span>
+              <span class="meta-item"><span class="meta-icon">👤</span> Mín. 6 años</span>
+              <span class="meta-item"><span class="meta-icon">🌅</span> Sale 5am</span>
+            </div>
+            <div class="card-footer">
+              <div>
+                <div class="card-price">S/.35 <span>/persona</span></div>
+              </div>
+              <button class="btn-add" onclick="addToPackage(this)">+ Paquete</button>
+              <button class="btn-reserve" onclick="openModal('Pesca Artesanal al Amanecer', 35)">Reservar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Senderismo -->
+        <div class="activity-card cat-terrestrial reveal"
+             data-cat="terrestrial" data-diff="hard" data-dur="full" data-price-tier="mid" data-price="45" data-name="Senderismo al Mirador 4000m" data-age="12">
+          <div class="card-img">
+            <div class="card-img-bg"></div>
+            <span class="card-emoji">🥾</span>
+          </div>
+          <div class="card-body">
+            <div class="card-tags">
+              <span class="tag tag-cat">Terrestre</span>
+              <span class="tag tag-diff-hard">Exigente</span>
+            </div>
+            <h3 class="card-title">Senderismo al Mirador del Amaru</h3>
+            <p class="card-desc">Asciende hasta 4,000 msnm con guía local. Vistas panorámicas 360° del Titicaca, la península y la cordillera boliviana.</p>
+            <div class="card-meta">
+              <span class="meta-item"><span class="meta-icon">⏱️</span> Día completo</span>
+              <span class="meta-item"><span class="meta-icon">👤</span> Mín. 12 años</span>
+              <span class="meta-item"><span class="meta-icon">🧗</span> Guía incluido</span>
+            </div>
+            <div class="card-footer">
+              <div>
+                <div class="card-price">S/.45 <span>/persona</span></div>
+              </div>
+              <button class="btn-add" onclick="addToPackage(this)">+ Paquete</button>
+              <button class="btn-reserve" onclick="openModal('Senderismo al Mirador del Amaru', 45)">Reservar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Aves -->
+        <div class="activity-card cat-terrestrial reveal"
+             data-cat="terrestrial" data-diff="easy" data-dur="half" data-price-tier="cheap" data-price="30" data-name="Avistamiento de Aves" data-age="0">
+          <div class="card-img">
+            <div class="card-img-bg"></div>
+            <span class="card-emoji">🦅</span>
+          </div>
+          <div class="card-body">
+            <div class="card-tags">
+              <span class="tag tag-cat">Terrestre</span>
+              <span class="tag tag-diff-easy">Fácil</span>
+            </div>
+            <h3 class="card-title">Avistamiento de Aves</h3>
+            <p class="card-desc">Descubre el flamenco andino, el pato de los torrentes y más de 60 especies que habitan los totorales del Titicaca.</p>
+            <div class="card-meta">
+              <span class="meta-item"><span class="meta-icon">⏱️</span> Medio día</span>
+              <span class="meta-item"><span class="meta-icon">👤</span> Todas las edades</span>
+              <span class="meta-item"><span class="meta-icon">🔭</span> Binoculares incl.</span>
+            </div>
+            <div class="card-footer">
+              <div>
+                <div class="card-price">S/.30 <span>/persona</span></div>
+              </div>
+              <button class="btn-add" onclick="addToPackage(this)">+ Paquete</button>
+              <button class="btn-reserve" onclick="openModal('Avistamiento de Aves', 30)">Reservar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Tejido -->
+        <div class="activity-card cat-cultural reveal"
+             data-cat="cultural" data-diff="easy" data-dur="2h" data-price-tier="cheap" data-price="35" data-name="Taller de Tejido de Alpaca" data-age="0">
+          <div class="card-img">
+            <div class="card-img-bg"></div>
+            <span class="card-emoji">🧶</span>
+          </div>
+          <div class="card-body">
+            <div class="card-tags">
+              <span class="tag tag-cat">Cultural</span>
+              <span class="tag tag-diff-easy">Fácil</span>
+            </div>
+            <h3 class="card-title">Taller de Tejido de Alpaca</h3>
+            <p class="card-desc">Aprende la técnica milenaria del telar de cintura con artesanas de la comunidad. Te llevas la pieza que creas.</p>
+            <div class="card-meta">
+              <span class="meta-item"><span class="meta-icon">⏱️</span> 2-3 horas</span>
+              <span class="meta-item"><span class="meta-icon">👤</span> Todas las edades</span>
+              <span class="meta-item"><span class="meta-icon">🎁</span> Pieza incluida</span>
+            </div>
+            <div class="card-footer">
+              <div>
+                <div class="card-price">S/.35 <span>/persona</span></div>
+              </div>
+              <button class="btn-add" onclick="addToPackage(this)">+ Paquete</button>
+              <button class="btn-reserve" onclick="openModal('Taller de Tejido de Alpaca', 35)">Reservar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. Cocina -->
+        <div class="activity-card cat-gastro reveal"
+             data-cat="gastro" data-diff="easy" data-dur="half" data-price-tier="mid" data-price="50" data-name="Taller de Cocina Andina" data-age="0">
+          <div class="card-img">
+            <div class="card-img-bg"></div>
+            <span class="card-emoji">🫕</span>
+          </div>
+          <div class="card-body">
+            <div class="card-tags">
+              <span class="tag tag-cat">Gastronómico</span>
+              <span class="tag tag-diff-easy">Fácil</span>
+            </div>
+            <h3 class="card-title">Taller de Cocina Andina</h3>
+            <p class="card-desc">Prepara trucha al ají amarillo, chairo y quinua con madres de familia locales en fogón de leña. Almuerzo incluido.</p>
+            <div class="card-meta">
+              <span class="meta-item"><span class="meta-icon">⏱️</span> Medio día</span>
+              <span class="meta-item"><span class="meta-icon">👤</span> Todas las edades</span>
+              <span class="meta-item"><span class="meta-icon">🍽️</span> Almuerzo incl.</span>
+            </div>
+            <div class="card-footer">
+              <div>
+                <div class="card-price">S/.50 <span>/persona</span></div>
+              </div>
+              <button class="btn-add" onclick="addToPackage(this)">+ Paquete</button>
+              <button class="btn-reserve" onclick="openModal('Taller de Cocina Andina', 50)">Reservar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8. Estrellas -->
+        <div class="activity-card cat-terrestrial reveal"
+             data-cat="terrestrial" data-diff="easy" data-dur="2h" data-price-tier="cheap" data-price="40" data-name="Observación de Estrellas" data-age="0">
+          <div class="card-img">
+            <div class="card-img-bg"></div>
+            <span class="card-emoji">🔭</span>
+          </div>
+          <div class="card-body">
+            <div class="card-tags">
+              <span class="tag tag-cat">Terrestre</span>
+              <span class="tag tag-diff-easy">Fácil</span>
+            </div>
+            <h3 class="card-title">Noche de Estrellas 3,812m</h3>
+            <p class="card-desc">El cielo nocturno del altiplano es inigualable. Telescopios, guía astronómico y mate de coca bajo la Vía Láctea.</p>
+            <div class="card-meta">
+              <span class="meta-item"><span class="meta-icon">⏱️</span> 2-3 horas</span>
+              <span class="meta-item"><span class="meta-icon">🌙</span> Horario nocturno</span>
+              <span class="meta-item"><span class="meta-icon">☕</span> Bebidas incl.</span>
+            </div>
+            <div class="card-footer">
+              <div>
+                <div class="card-price">S/.40 <span>/persona</span></div>
+              </div>
+              <button class="btn-add" onclick="addToPackage(this)">+ Paquete</button>
+              <button class="btn-reserve" onclick="openModal('Noche de Estrellas 3812m', 40)">Reservar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 9. Aimara -->
+        <div class="activity-card cat-cultural reveal"
+             data-cat="cultural" data-diff="easy" data-dur="2h" data-price-tier="cheap" data-price="25" data-name="Clase de Idioma Aimara" data-age="0">
+          <div class="card-img">
+            <div class="card-img-bg"></div>
+            <span class="card-emoji">🗣️</span>
+          </div>
+          <div class="card-body">
+            <div class="card-tags">
+              <span class="tag tag-cat">Cultural</span>
+              <span class="tag tag-diff-easy">Fácil</span>
+            </div>
+            <h3 class="card-title">Clase de Idioma Aimara</h3>
+            <p class="card-desc">Aprende frases esenciales del aimara, idioma ancestral del altiplano. Saludos, números, colores y palabras del lago.</p>
+            <div class="card-meta">
+              <span class="meta-item"><span class="meta-icon">⏱️</span> 2 horas</span>
+              <span class="meta-item"><span class="meta-icon">👤</span> Todas las edades</span>
+              <span class="meta-item"><span class="meta-icon">📖</span> Manual incluido</span>
+            </div>
+            <div class="card-footer">
+              <div>
+                <div class="card-price">S/.25 <span>/persona</span></div>
+              </div>
+              <button class="btn-add" onclick="addToPackage(this)">+ Paquete</button>
+              <button class="btn-reserve" onclick="openModal('Clase de Idioma Aimara', 25)">Reservar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10. Instrumentos -->
+        <div class="activity-card cat-cultural reveal"
+             data-cat="cultural" data-diff="easy" data-dur="2h" data-price-tier="cheap" data-price="30" data-name="Taller de Instrumentos Andinos" data-age="0">
+          <div class="card-img">
+            <div class="card-img-bg"></div>
+            <span class="card-emoji">🎵</span>
+          </div>
+          <div class="card-body">
+            <div class="card-tags">
+              <span class="tag tag-cat">Cultural</span>
+              <span class="tag tag-diff-easy">Fácil</span>
+            </div>
+            <h3 class="card-title">Taller de Instrumentos Andinos</h3>
+            <p class="card-desc">Zampoña, quena y bombo en manos de músicos de la comunidad. Aprende melodías del lago y te llevas recuerdo sonoro.</p>
+            <div class="card-meta">
+              <span class="meta-item"><span class="meta-icon">⏱️</span> 2 horas</span>
+              <span class="meta-item"><span class="meta-icon">👤</span> Todas las edades</span>
+              <span class="meta-item"><span class="meta-icon">🎶</span> Grabación incl.</span>
+            </div>
+            <div class="card-footer">
+              <div>
+                <div class="card-price">S/.30 <span>/persona</span></div>
+              </div>
+              <button class="btn-add" onclick="addToPackage(this)">+ Paquete</button>
+              <button class="btn-reserve" onclick="openModal('Taller de Instrumentos Andinos', 30)">Reservar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 11. Snorkel -->
+        <div class="activity-card cat-aquatic reveal"
+             data-cat="aquatic" data-diff="medium" data-dur="half" data-price-tier="mid" data-price="70" data-name="Snorkel en el Titicaca" data-age="12">
+          <div class="card-img">
+            <div class="card-img-bg"></div>
+            <span class="card-emoji">🤿</span>
+          </div>
+          <div class="card-body">
+            <div class="card-tags">
+              <span class="tag tag-cat">Acuático</span>
+              <span class="tag tag-diff-medium">Moderado</span>
+            </div>
+            <h3 class="card-title">Snorkel en el Titicaca</h3>
+            <p class="card-desc">Sumerge en las cristalinas aguas del Titicaca y descubre el ecosistema subacuático único de la rana gigante del lago.</p>
+            <div class="card-meta">
+              <span class="meta-item"><span class="meta-icon">⏱️</span> Medio día</span>
+              <span class="meta-item"><span class="meta-icon">👤</span> Mín. 12 años</span>
+              <span class="meta-item"><span class="meta-icon">🌊</span> Traje incluido</span>
+            </div>
+            <div class="card-footer">
+              <div>
+                <div class="card-price">S/.70 <span>/persona</span></div>
+              </div>
+              <button class="btn-add" onclick="addToPackage(this)">+ Paquete</button>
+              <button class="btn-reserve" onclick="openModal('Snorkel en el Titicaca', 70)">Reservar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 12. Pachamama -->
+        <div class="activity-card cat-cultural reveal"
+             data-cat="cultural" data-diff="easy" data-dur="2h" data-price-tier="cheap" data-price="35" data-name="Ceremonia Pachamama" data-age="0">
+          <div class="card-img">
+            <div class="card-img-bg"></div>
+            <span class="card-emoji">🌿</span>
+          </div>
+          <div class="card-body">
+            <div class="card-tags">
+              <span class="tag tag-cat">Cultural</span>
+              <span class="tag tag-diff-easy">Fácil</span>
+            </div>
+            <h3 class="card-title">Ceremonia Pachamama</h3>
+            <p class="card-desc">Participa en el ritual ancestral de ofrenda a la Madre Tierra con un yatiri (sabio andino) a la orilla del lago.</p>
+            <div class="card-meta">
+              <span class="meta-item"><span class="meta-icon">⏱️</span> 2 horas</span>
+              <span class="meta-item"><span class="meta-icon">🌄</span> Al atardecer</span>
+              <span class="meta-item"><span class="meta-icon">🙏</span> Ceremonial</span>
+            </div>
+            <div class="card-footer">
+              <div>
+                <div class="card-price">S/.35 <span>/persona</span></div>
+              </div>
+              <button class="btn-add" onclick="addToPackage(this)">+ Paquete</button>
+              <button class="btn-reserve" onclick="openModal('Ceremonia Pachamama', 35)">Reservar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 13. Chicha -->
+        <div class="activity-card cat-gastro reveal"
+             data-cat="gastro" data-diff="easy" data-dur="2h" data-price-tier="cheap" data-price="30" data-name="Elaboración de Chicha de Jora" data-age="18">
+          <div class="card-img">
+            <div class="card-img-bg"></div>
+            <span class="card-emoji">🍺</span>
+          </div>
+          <div class="card-body">
+            <div class="card-tags">
+              <span class="tag tag-cat">Gastronómico</span>
+              <span class="tag tag-diff-easy">Fácil</span>
+            </div>
+            <h3 class="card-title">Chicha de Jora Artesanal</h3>
+            <p class="card-desc">Elabora la bebida ceremonial andina con receta de siglos. Maíz, fermentación y tradición viva en manos de la comunidad.</p>
+            <div class="card-meta">
+              <span class="meta-item"><span class="meta-icon">⏱️</span> 2 horas</span>
+              <span class="meta-item"><span class="meta-icon">👤</span> Mín. 18 años</span>
+              <span class="meta-item"><span class="meta-icon">🌽</span> Degustación incl.</span>
+            </div>
+            <div class="card-footer">
+              <div>
+                <div class="card-price">S/.30 <span>/persona</span></div>
+              </div>
+              <button class="btn-add" onclick="addToPackage(this)">+ Paquete</button>
+              <button class="btn-reserve" onclick="openModal('Chicha de Jora Artesanal', 30)">Reservar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 14. Bote Amanecer -->
+        <div class="activity-card cat-aquatic reveal"
+             data-cat="aquatic" data-diff="easy" data-dur="half" data-price-tier="mid" data-price="55" data-name="Amanecer en Bote al Centro del Lago" data-age="0">
+          <div class="card-img">
+            <div class="card-img-bg"></div>
+            <span class="card-emoji">⛵</span>
+          </div>
+          <div class="card-body">
+            <div class="card-tags">
+              <span class="tag tag-cat">Acuático</span>
+              <span class="tag tag-diff-easy">Fácil</span>
+            </div>
+            <h3 class="card-title">Amanecer en Bote al Centro del Lago</h3>
+            <p class="card-desc">Navega hasta el corazón del Titicaca en barca de totora y vive el amanecer más mágico de tu vida a 3,812 msnm.</p>
+            <div class="card-meta">
+              <span class="meta-item"><span class="meta-icon">⏱️</span> Medio día</span>
+              <span class="meta-item"><span class="meta-icon">🌅</span> Sale 5:30am</span>
+              <span class="meta-item"><span class="meta-icon">☕</span> Desayuno incl.</span>
+            </div>
+            <div class="card-footer">
+              <div>
+                <div class="card-price">S/.55 <span>/persona</span></div>
+              </div>
+              <button class="btn-add" onclick="addToPackage(this)">+ Paquete</button>
+              <button class="btn-reserve" onclick="openModal('Amanecer en Bote al Centro del Lago', 55)">Reservar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 15. Fotografía -->
+        <div class="activity-card cat-terrestrial reveal"
+             data-cat="terrestrial" data-diff="easy" data-dur="half" data-price-tier="mid" data-price="45" data-name="Tour de Fotografía de Paisajes" data-age="0">
+          <div class="card-img">
+            <div class="card-img-bg"></div>
+            <span class="card-emoji">📸</span>
+          </div>
+          <div class="card-body">
+            <div class="card-tags">
+              <span class="tag tag-cat">Terrestre</span>
+              <span class="tag tag-diff-easy">Fácil</span>
+            </div>
+            <h3 class="card-title">Tour de Fotografía de Paisajes</h3>
+            <p class="card-desc">Guía fotógrafo profesional te lleva a los miradores secretos de Capachica para capturas épicas del Titicaca y la cordillera.</p>
+            <div class="card-meta">
+              <span class="meta-item"><span class="meta-icon">⏱️</span> Medio día</span>
+              <span class="meta-item"><span class="meta-icon">👤</span> Todas las edades</span>
+              <span class="meta-item"><span class="meta-icon">📷</span> Guía prof. incl.</span>
+            </div>
+            <div class="card-footer">
+              <div>
+                <div class="card-price">S/.45 <span>/persona</span></div>
+              </div>
+              <button class="btn-add" onclick="addToPackage(this)">+ Paquete</button>
+              <button class="btn-reserve" onclick="openModal('Tour de Fotografía de Paisajes', 45)">Reservar</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /grid -->
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer style="background:#040d1c; padding:3rem 2rem; border-top:1px solid rgba(45,212,191,0.15);">
+    <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;flex-wrap:wrap;">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#2dd4bf,#d4a843);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;color:#0a1628;">C</div>
+          <div>
+            <div style="font-family:'Playfair Display',serif;color:white;font-size:15px;">Capachica</div>
+            <div style="font-size:10px;color:#2dd4bf;letter-spacing:1.5px;">TURISMO VIVENCIAL</div>
+          </div>
+        </div>
+        <p style="font-size:14px;color:rgba(240,237,232,0.55);line-height:1.7;max-width:240px;">La joya escondida del lago Titicaca. Turismo comunitario auténtico a 3,812 msnm.</p>
+      </div>
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#2dd4bf;margin-bottom:1rem;">Destinos</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;">
+          <li><a href="#" style="font-size:14px;color:rgba(240,237,232,0.6);text-decoration:none;">Playa Llachón</a></li>
+          <li><a href="#" style="font-size:14px;color:rgba(240,237,232,0.6);text-decoration:none;">Mirador del Amaru</a></li>
+          <li><a href="#" style="font-size:14px;color:rgba(240,237,232,0.6);text-decoration:none;">Isla Ticonata</a></li>
+          <li><a href="#" style="font-size:14px;color:rgba(240,237,232,0.6);text-decoration:none;">Comunidad Capachica</a></li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#2dd4bf;margin-bottom:1rem;">Experiencias</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;">
+          <li><a href="#" style="font-size:14px;color:rgba(240,237,232,0.6);text-decoration:none;">Vivencial</a></li>
+          <li><a href="#" style="font-size:14px;color:rgba(240,237,232,0.6);text-decoration:none;">Actividades</a></li>
+          <li><a href="#" style="font-size:14px;color:rgba(240,237,232,0.6);text-decoration:none;">Gastronomía</a></li>
+          <li><a href="#" style="font-size:14px;color:rgba(240,237,232,0.6);text-decoration:none;">Festividades</a></li>
+          <li><a href="#" style="font-size:14px;color:rgba(240,237,232,0.6);text-decoration:none;">Artesanía</a></li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#2dd4bf;margin-bottom:1rem;">Info</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;">
+          <li><a href="#" style="font-size:14px;color:rgba(240,237,232,0.6);text-decoration:none;">Alojamiento</a></li>
+          <li><a href="#" style="font-size:14px;color:rgba(240,237,232,0.6);text-decoration:none;">Cómo Llegar</a></li>
+          <li><a href="#" style="font-size:14px;color:rgba(240,237,232,0.6);text-decoration:none;">Contacto</a></li>
+        </ul>
+      </div>
+    </div>
+    <div style="max-width:1200px;margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+      <p style="font-size:12px;color:rgba(240,237,232,0.35);">© 2026 Capachica Turismo</p>
+      <p style="font-size:12px;color:rgba(240,237,232,0.35);">Hecho con amor a las orillas del lago Titicaca</p>
+    </div>
+  </footer>
+
+  <!-- PACKAGE SIDEBAR -->
+  <div class="pkg-sidebar" id="pkgSidebar">
+    <div class="pkg-header">
+      <div class="pkg-title">Mi paquete personalizado</div>
+      <button class="pkg-close" onclick="closePkg()">×</button>
+    </div>
+    <div class="pkg-body" id="pkgBody">
+      <div class="pkg-empty" id="pkgEmpty">
+        <div style="font-size:2.5rem;margin-bottom:8px;">🎒</div>
+        <p>Agrega actividades para armar tu paquete ideal</p>
+      </div>
+      <div id="pkgList"></div>
+    </div>
+    <div class="pkg-footer">
+      <div class="pkg-persons">
+        <label>Personas</label>
+        <div class="persons-control">
+          <button class="persons-btn" onclick="changePeople(-1)">−</button>
+          <span class="persons-val" id="personCount">1</span>
+          <button class="persons-btn" onclick="changePeople(1)">+</button>
+        </div>
+      </div>
+      <div class="pkg-total">
+        <span class="pkg-total-label">Total estimado</span>
+        <span class="pkg-total-val">S/.<span id="pkgTotal">0</span></span>
+      </div>
+      <button class="btn-pkg-reserve" onclick="openModal('Paquete personalizado', 0, true)">
+        Reservar paquete →
+      </button>
+    </div>
+  </div>
+  <button class="pkg-fab" id="pkgFab" onclick="togglePkg()" title="Ver mi paquete">
+    🎒
+    <span class="pkg-fab-badge" id="pkgBadge">0</span>
+  </button>
+
+  <!-- MODAL DE RESERVA -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">Reservar actividad</div>
+          <div class="modal-subtitle" id="modalSubtitle">Completa los datos para confirmar</div>
+        </div>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre completo</label>
+          <input type="text" id="mNombre" placeholder="Tu nombre" />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="mEmail" placeholder="tu@email.com" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Fecha de visita</label>
+          <input type="date" id="modalDate" />
+        </div>
+        <div class="form-group">
+          <label>Personas</label>
+          <input type="number" id="mPersonas" min="1" max="30" value="1" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Idioma de atención</label>
+          <select>
+            <option>Español</option>
+            <option>English</option>
+            <option>Français</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Actividad</label>
+          <input type="text" id="modalActivity" readonly style="color:#2dd4bf;" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Necesidades especiales</label>
+        <textarea rows="2" placeholder="Dieta, accesibilidad, alergias..."></textarea>
+      </div>
+      <div class="cancel-policy">
+        📋 <strong>Política de cancelación:</strong> Cancelación gratuita hasta 48h antes. Cancelaciones con menos de 24h de anticipación no son reembolsables.
+      </div>
+      <div style="text-align:right;margin-bottom:1rem;">
+        <span style="font-family:'Playfair Display',serif;font-size:1.5rem;color:#d4a843;">
+          S/.<span id="modalPrice">0</span> <span style="font-size:0.8rem;color:rgba(240,237,232,0.5);">/persona</span>
+        </span>
+      </div>
+      <button class="btn-submit" onclick="submitReserva()">Confirmar reserva →</button>
+    </div>
+  </div>
+
+  <script is:inline>
+    /* ── STARS ── */
+    const canvas = document.getElementById('starsCanvas');
+    const ctx = canvas.getContext('2d');
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const stars = Array.from({ length: 180 }, () => ({
+      x: Math.random(), y: Math.random() * 0.65,
+      r: Math.random() * 1.6 + 0.3,
+      a: Math.random(),
+      speed: 0.003 + Math.random() * 0.008,
+      phase: Math.random() * Math.PI * 2
+    }));
+
+    function drawStars(t) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(s => {
+        const alpha = s.a * (0.6 + 0.4 * Math.sin(t * s.speed + s.phase));
+        ctx.beginPath();
+        ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 240, ${alpha})`;
+        ctx.fill();
+      });
+      requestAnimationFrame(drawStars);
+    }
+    requestAnimationFrame(drawStars);
+
+    /* ── NAV SCROLL ── */
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    /* ── LANG BUTTONS ── */
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        localStorage.setItem('lang', btn.id.split('-')[1]);
+      });
+    });
+    const savedLang = localStorage.getItem('lang');
+    if (savedLang) {
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      const btn = document.getElementById('lang-' + savedLang);
+      if (btn) btn.classList.add('active');
+    }
+
+    /* ── REVEAL ON SCROLL ── */
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 40);
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    revealEls.forEach(el => observer.observe(el));
+
+    /* ── FILTERS ── */
+    let activeCat = 'all';
+
+    document.querySelectorAll('.pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        activeCat = pill.dataset.cat;
+        applyFilters();
+      });
+    });
+
+    document.getElementById('diffFilter').addEventListener('change', applyFilters);
+    document.getElementById('durFilter').addEventListener('change', applyFilters);
+    document.getElementById('priceFilter').addEventListener('change', applyFilters);
+
+    function applyFilters() {
+      const diff = document.getElementById('diffFilter').value;
+      const dur  = document.getElementById('durFilter').value;
+      const price = document.getElementById('priceFilter').value;
+      const cards = document.querySelectorAll('.activity-card');
+      let count = 0;
+      cards.forEach(card => {
+        const catOk  = activeCat === 'all' || card.dataset.cat === activeCat;
+        const diffOk = diff === 'all' || card.dataset.diff === diff;
+        const durOk  = dur === 'all' || card.dataset.dur === dur;
+        const p = parseInt(card.dataset.price);
+        const priceOk = price === 'all' ||
+          (price === 'cheap' && p <= 40) ||
+          (price === 'mid' && p > 40 && p <= 80) ||
+          (price === 'premium' && p > 80);
+        const show = catOk && diffOk && durOk && priceOk;
+        card.classList.toggle('hidden', !show);
+        if (show) count++;
+      });
+      document.getElementById('countNum').textContent = count;
+    }
+
+    /* ── PACKAGE ── */
+    let pkgItems = [];
+    let persons = 1;
+
+    function addToPackage(btn) {
+      const card = btn.closest('.activity-card');
+      const name  = card.dataset.name;
+      const price = parseInt(card.dataset.price);
+      if (pkgItems.find(i => i.name === name)) {
+        btn.textContent = '✓ Agregado';
+        btn.classList.add('added');
+        return;
+      }
+      pkgItems.push({ name, price });
+      btn.textContent = '✓ En paquete';
+      btn.classList.add('added');
+      renderPkg();
+      if (pkgItems.length === 1) openPkg();
+      updateFabBadge();
+    }
+
+    function renderPkg() {
+      const list = document.getElementById('pkgList');
+      const empty = document.getElementById('pkgEmpty');
+      empty.style.display = pkgItems.length ? 'none' : 'block';
+      list.innerHTML = pkgItems.map((item, i) => `
+        <div class="pkg-item">
+          <span class="pkg-item-name">${item.name}</span>
+          <span class="pkg-item-price">S/.${item.price}</span>
+          <button class="pkg-item-remove" onclick="removePkgItem(${i})">✕</button>
+        </div>
+      `).join('');
+      calcTotal();
+    }
+
+    function removePkgItem(i) {
+      const name = pkgItems[i].name;
+      pkgItems.splice(i, 1);
+      // Re-enable button
+      document.querySelectorAll('.activity-card').forEach(card => {
+        if (card.dataset.name === name) {
+          const btn = card.querySelector('.btn-add');
+          btn.textContent = '+ Paquete';
+          btn.classList.remove('added');
+        }
+      });
+      renderPkg();
+      updateFabBadge();
+    }
+
+    function calcTotal() {
+      const sum = pkgItems.reduce((a, b) => a + b.price, 0);
+      document.getElementById('pkgTotal').textContent = sum * persons;
+    }
+
+    function changePeople(delta) {
+      persons = Math.max(1, Math.min(20, persons + delta));
+      document.getElementById('personCount').textContent = persons;
+      calcTotal();
+    }
+
+    function openPkg() { document.getElementById('pkgSidebar').classList.add('open'); }
+    function closePkg() { document.getElementById('pkgSidebar').classList.remove('open'); }
+    function togglePkg() { document.getElementById('pkgSidebar').classList.toggle('open'); }
+
+    function updateFabBadge() {
+      const badge = document.getElementById('pkgBadge');
+      badge.textContent = pkgItems.length;
+      badge.style.display = pkgItems.length ? 'flex' : 'none';
+    }
+
+    /* ── MODAL ── */
+    function openModal(name, price, isPkg = false) {
+      const overlay = document.getElementById('modalOverlay');
+      document.getElementById('modalActivity').value = name;
+      document.getElementById('modalPrice').textContent = isPkg
+        ? pkgItems.reduce((a,b) => a+b.price, 0) * persons
+        : price;
+      document.getElementById('modalSubtitle').textContent = isPkg
+        ? `Paquete de ${pkgItems.length} actividades · ${persons} persona(s)`
+        : name;
+      const dateInput = document.getElementById('modalDate');
+      dateInput.min = new Date().toISOString().split('T')[0];
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(e) {
+      if (!e || e.target === document.getElementById('modalOverlay')) {
+        document.getElementById('modalOverlay').classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    }
+
+    async function submitReserva() {
+      // Usar IDs específicos para evitar selectors frágiles
+      const nombreEl   = document.getElementById('mNombre');
+      const emailEl    = document.getElementById('mEmail');
+      const fechaEl    = document.getElementById('modalDate');
+      const personasEl = document.getElementById('mPersonas');
+      const actividad  = document.getElementById('modalActivity').value;
+
+      const nombre   = nombreEl  ? nombreEl.value.trim()  : '';
+      const email    = emailEl   ? emailEl.value.trim()   : '';
+      const fecha    = fechaEl   ? fechaEl.value           : '';
+      const personas = personasEl? personasEl.value        : '1';
+
+      // Limpiar errores previos
+      [nombreEl, emailEl, fechaEl].forEach(el => el && el.classList.remove('input-error'));
+
+      let valid = true;
+      if (!nombre) { nombreEl && nombreEl.classList.add('input-error'); valid = false; }
+      if (!email || !email.includes('@')) { emailEl && emailEl.classList.add('input-error'); valid = false; }
+      if (!fecha) { fechaEl && fechaEl.classList.add('input-error'); valid = false; }
+      if (!valid) {
+        showToast('⚠️ Completa los campos requeridos');
+        return;
+      }
+
+      const btn = document.querySelector('.btn-submit');
+      const originalText = btn.textContent;
+      btn.textContent = '⏳ Enviando...';
+      btn.disabled = true;
+
+      try {
+        const precioEl = document.getElementById('modalPrice');
+        const precio = precioEl ? parseInt(precioEl.textContent) || 0 : 0;
+        const esPaquete = actividad.includes('Paquete') || actividad.includes('paquete');
+
+        const res = await fetch('/api/reservas', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nombre, email,
+            fecha_visita:        fecha,
+            personas:            parseInt(personas) || 1,
+            actividad,
+            precio_total:        precio,
+            es_paquete:          esPaquete,
+            actividades_paquete: esPaquete ? pkgItems : null,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          document.getElementById('modalOverlay').classList.remove('open');
+          document.body.style.overflow = '';
+          const shortId = data.reserva_id ? data.reserva_id.slice(0,8).toUpperCase() : '—';
+          showToast('🎉 ¡Reserva guardada! ID: ' + shortId);
+          if (esPaquete) { pkgItems = []; renderPkg(); updateFabBadge(); }
+          // Limpiar form
+          [nombreEl, emailEl, fechaEl].forEach(el => el && (el.value = ''));
+        } else {
+          showToast('❌ ' + (data.error || 'Error al guardar'));
+        }
+      } catch(err) {
+        console.error('submitReserva error:', err);
+        showToast('❌ Error de conexión. Verifica que el servidor esté activo.');
+      } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }
+    }
+
+    // Toast helper (si no existe ya)
+    function showToast(msg) {
+      let t = document.getElementById('toast');
+      if (!t) {
+        t = document.createElement('div');
+        t.id = 'toast';
+        t.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(10,22,40,0.97);border:1px solid rgba(45,212,191,0.35);border-radius:12px;padding:13px 22px;font-size:15px;color:#f0ede8;opacity:0;pointer-events:none;transition:all 0.4s;z-index:600;backdrop-filter:blur(12px);white-space:nowrap;';
+        document.body.appendChild(t);
+      }
+      t.textContent = msg;
+      t.style.opacity = '1';
+      t.style.transform = 'translateX(-50%) translateY(0)';
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => {
+        t.style.opacity = '0';
+        t.style.transform = 'translateX(-50%) translateY(16px)';
+      }, 3800);
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,217 @@
+---
+// src/pages/gastronomia/index.astro
+import BaseLayout from '../../layouts/GastronomiaLayout.astro';
+import RestauranteCard from '../../components/gastronomia/RestauranteCard.astro';
+import Filtros from '../../components/gastronomia/Filtros.astro';
+import { obtenerRestaurantes } from '../../services/restaurante.service.js';
+
+// Obtener idioma (Fallback a 'es')
+const lang = Astro.cookies.get('lang')?.value || 'es';
+let translations;
+try {
+    translations = await import(`../../i18n/${lang}.json`);
+} catch (e) {
+    translations = await import('../../i18n/es.json');
+}
+
+let restaurantes = [];
+let error = null;
+try {
+    const data = await obtenerRestaurantes();
+    restaurantes = data;
+} catch (e) {
+    error = e.message;
+}
+---
+
+<BaseLayout lang={lang}>
+    <div class="page-header">
+        <h1 class="page-title">{translations.todos_los_restaurantes || 'Todos los restaurantes'}</h1>
+        <div class="neon-divider"></div>
+    </div>
+
+    <!-- Filtros -->
+    <Filtros translations={translations} />
+
+    <div id="restaurantes-list" class="list-container">
+        {error ? (
+                <div class="error-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span>Error al cargar restaurantes: {error}</span>
+                </div>
+        ) : restaurantes.length === 0 ? (
+                <div class="empty-state">
+                    <p>{translations.no_resultados || 'No se encontraron restaurantes.'}</p>
+                </div>
+        ) : (
+                <div class="restaurants-grid">
+                    {restaurantes.map(rest => (
+                            <RestauranteCard restaurante={rest} translations={translations} />
+                    ))}
+                </div>
+        )}
+    </div>
+</BaseLayout>
+
+<style>
+    /* =========================================
+       CABECERA DE LA PÁGINA
+       ========================================= */
+    .page-header {
+        margin-bottom: 2.5rem;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--turquesa);
+        text-shadow: 0 0 15px rgba(79, 209, 197, 0.4);
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
+    }
+
+    .neon-divider {
+        width: 60px;
+        height: 4px;
+        background: var(--turquesa);
+        border-radius: 2px;
+        box-shadow: 0 0 10px var(--turquesa-claro);
+    }
+
+    /* =========================================
+       CONTENEDOR DE LISTA Y GRILLA
+       ========================================= */
+    .list-container {
+        min-height: 400px; /* Evita que el footer salte al cargar */
+    }
+
+    :global(.restaurants-grid) {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2.5rem;
+    }
+
+    /* =========================================
+       ESTADOS (Carga, Error, Vacío)
+       ========================================= */
+    :global(.error-box) {
+        background: rgba(229, 62, 62, 0.1);
+        border: 1px solid #e53e3e;
+        color: #fc8181;
+        padding: 1.5rem;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        font-weight: 600;
+        box-shadow: 0 0 20px rgba(229, 62, 62, 0.2);
+    }
+
+    :global(.empty-state) {
+        text-align: center;
+        padding: 3rem;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px dashed rgba(255, 255, 255, 0.1);
+        border-radius: 1rem;
+        color: #a0aec0;
+        font-size: 1.1rem;
+    }
+
+    :global(.loading-state) {
+        text-align: center;
+        padding: 4rem;
+        color: var(--turquesa-claro);
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-shadow: 0 0 10px rgba(79, 209, 197, 0.5);
+        animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 0.5; transform: scale(0.98); }
+        50% { opacity: 1; transform: scale(1); }
+        100% { opacity: 0.5; transform: scale(0.98); }
+    }
+</style>
+
+<script>
+    import { APP_CONFIG } from '../../config/app.config.js';
+
+    document.addEventListener('filtros-aplicados', async (e) => {
+        const filtros = e.detail;
+        const params = {};
+        if (filtros.tipo_comida) params.tipo_comida = filtros.tipo_comida;
+        if (filtros.precio_min) params.precio_min = filtros.precio_min;
+        if (filtros.precio_max) params.precio_max = filtros.precio_max;
+
+        const listContainer = document.getElementById('restaurantes-list');
+        listContainer.innerHTML = '<div class="loading-state">Cargando restaurantes...</div>';
+
+        try {
+            const { obtenerRestaurantes } = await import('../../services/restaurante.service.js');
+            const resultados = await obtenerRestaurantes(params);
+
+            if (resultados.length === 0) {
+                listContainer.innerHTML = '<div class="empty-state"><p>No se encontraron restaurantes con esos filtros.</p></div>';
+            } else {
+                const cards = resultados.map(rest => {
+                    // Extraer la primera foto del array y concatenar el backendUrl
+                    let imagenUrl = (rest.fotos && rest.fotos.length > 0) ? rest.fotos[0] : null;
+                    const finalImg = imagenUrl
+                        ? (imagenUrl.startsWith('http') ? imagenUrl : APP_CONFIG.backendUrl + imagenUrl)
+                        : '/images/placeholder.jpg';
+
+                    const tipoFormat = rest.tipo_comida ? rest.tipo_comida.replace('_', ' ') : 'Variado';
+
+                    return `
+                    <article class="restaurante-card">
+                        <a href="/gastronomia/${rest.id}" class="card-link">
+                            <div class="card-image-wrapper">
+                                <img src="${finalImg}" alt="${rest.nombre}" class="card-image" />
+                                <div class="image-overlay"></div>
+                                <span class="card-badge">${tipoFormat}</span>
+                            </div>
+
+                            <div class="card-content">
+                                <h3 class="card-title">${rest.nombre}</h3>
+
+                                <div class="card-location">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                        <circle cx="12" cy="10" r="3"></circle>
+                                    </svg>
+                                    <span>${rest.direccion || 'Ubicación no disponible'}</span>
+                                </div>
+
+                                <p class="card-desc">${(rest.descripcion || '').substring(0, 80)}...</p>
+
+                                <div class="card-footer">
+                                    <span class="price-label">Precio promedio</span>
+                                    <span class="price-value">${rest.precio_promedio ? 'S/ ' + rest.precio_promedio : 'No disponible'}</span>
+                                </div>
+                            </div>
+                        </a>
+                    </article>
+                `;
+                }).join('');
+                listContainer.innerHTML = `<div class="restaurants-grid">${cards}</div>`;
+            }
+        } catch (error) {
+            listContainer.innerHTML = `
+                <div class="error-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span>Error: ${error.message}</span>
+                </div>
+            `;
+        }
+    });
+</script>

@@ -1,0 +1,90 @@
+---
+import Layout from './Layout.astro';
+
+const lang = Astro.cookies.get('lang')?.value || 'es';
+let translations;
+try {
+  translations = await import(`../i18n/${lang}.json`);
+} catch (e) {
+  translations = await import('../i18n/es.json');
+}
+
+const title = translations.default?.titulo || translations.titulo || 'Capachica Gastronomía';
+---
+
+<Layout title={title}>
+  <style is:global>
+    :root {
+      --turquesa: #2c7a7b;
+      --turquesa-claro: #4fd1c5;
+      --dorado: #d69e2e;
+      --dorado-claro: #f6e05e;
+      --bg-oscuro: #0f172a;
+      --bg-panel: #1e293b;
+      --texto-principal: #f8fafc;
+      --texto-secundario: #94a3b8;
+    }
+
+    body {
+      background-color: var(--bg-oscuro) !important;
+      background-image:
+        radial-gradient(circle at 15% 50%, rgba(44,122,123,0.08), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(214,158,46,0.05), transparent 25%);
+      color: var(--texto-principal);
+    }
+
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: var(--turquesa); border-radius: 5px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--turquesa-claro); }
+
+    .gastronomia-main {
+      flex: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 5rem 1.5rem 2rem;
+      width: 100%;
+    }
+
+    a { color: var(--turquesa-claro); text-decoration: none; transition: color 0.3s ease; }
+    a:hover { color: var(--dorado-claro); }
+
+    .btn {
+      display: inline-flex; justify-content: center; align-items: center;
+      padding: 0.6rem 1.5rem; border: none; border-radius: 0.5rem;
+      cursor: pointer; font-weight: 600; letter-spacing: 0.5px;
+      transition: all 0.3s ease; text-decoration: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--turquesa), #1d4ed8);
+      color: white; box-shadow: 0 4px 15px rgba(44,122,123,0.4);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--turquesa-claro), var(--turquesa));
+      box-shadow: 0 0 20px rgba(79,209,197,0.6); transform: translateY(-2px);
+    }
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--dorado), #b7791f);
+      color: white; box-shadow: 0 4px 15px rgba(214,158,46,0.4);
+    }
+    .btn-secondary:hover {
+      background: linear-gradient(135deg, var(--dorado-claro), var(--dorado));
+      box-shadow: 0 0 20px rgba(246,224,94,0.6); transform: translateY(-2px);
+    }
+    .btn-outline {
+      background-color: transparent; border: 1px solid var(--turquesa); color: var(--turquesa-claro);
+    }
+    .btn-outline:hover {
+      background-color: rgba(79,209,197,0.1);
+      box-shadow: 0 0 15px rgba(79,209,197,0.4); transform: translateY(-2px);
+    }
+    .btn:active { transform: translateY(0); }
+    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+
+    @media (max-width: 768px) { .gastronomia-main { padding: 4rem 1rem 1rem; } }
+  </style>
+
+  <div class="gastronomia-main">
+    <slot />
+  </div>
+</Layout>
