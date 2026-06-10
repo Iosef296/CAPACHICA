@@ -1,0 +1,33 @@
+---
+const destinations = [
+  { name: 'Capachica', sub: 'Pueblo Principal', desc: 'Distrito ribereño al norte del Lago Titicaca con tradiciones ancestrales y festividades vibrantes.', grad: 'linear-gradient(135deg,#FF6B35,#FF8C5A)', emoji: '🏔️' },
+  { name: 'Llachón', sub: 'Comunidad Ancestral', desc: 'Comunidad campesina conocida por su hospitalidad, tejidos y cerquía al lago.', grad: 'linear-gradient(135deg,#4A90D9,#87CEEB)', emoji: '🛶' },
+  { name: 'Lago Titicaca', sub: 'Mar de los Andes', desc: 'El lago navegable más alto del mundo. Hogar de islas flotantes y cultura viva.', grad: 'linear-gradient(135deg,#1B6B93,#4FC0D0)', emoji: '🌊' },
+];
+---
+
+<section class="py-20" id="destinos">
+  <div class="max-w-7xl mx-auto px-6">
+    <h2 class="text-center text-3xl md:text-4xl font-bold mb-3">
+      Nuestros Destinos
+    </h2>
+    <p class="text-center text-sm mb-12" style="color:rgba(255,255,255,0.4);">A orillas del Lago Titicaca, Puno - Perú</p>
+    <div class="grid md:grid-cols-3 gap-8">
+      {destinations.map((d) => (
+        <article class="rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(12px);">
+          <div class="h-48 flex items-center justify-center" style={`background:${d.grad}`}>
+            <span class="text-6xl drop-shadow-lg" style="filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));">{d.emoji}</span>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold mb-1">{d.name}</h3>
+            <span class="font-semibold text-sm uppercase tracking-wider" style="color:#FF6B35;">{d.sub}</span>
+            <p class="mt-3 text-sm leading-relaxed" style="color:rgba(255,255,255,0.5);">{d.desc}</p>
+            <a href="#festividades" class="inline-block mt-4 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-transform hover:-translate-y-0.5" style="background:linear-gradient(135deg,#FF6B35,#FF8C5A); box-shadow:0 3px 12px rgba(255,107,53,0.3);">
+              Ver Festividades →
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

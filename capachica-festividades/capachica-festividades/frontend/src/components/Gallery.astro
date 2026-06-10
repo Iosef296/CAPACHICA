@@ -1,0 +1,73 @@
+---
+const photos = [
+  { src: 'https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?w=600&q=80', alt: 'Lago Titicaca al amanecer', title: 'Amanecer en el Lago' },
+  { src: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=600&q=80', alt: 'Vista del Lago Titicaca', title: 'Vista Panorámica' },
+  { src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80', alt: 'Montañas andinas', title: 'Montañas Sagradas' },
+  { src: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80', alt: 'Paisaje andino', title: 'Paisaje Andino' },
+  { src: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&q=80', alt: 'Naturaleza del lago', title: 'Naturaleza Viva' },
+  { src: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=600&q=80', alt: 'Reflejo en el lago', title: 'Reflejos del Lago' },
+];
+---
+
+<section class="py-20" id="galeria">
+  <div class="max-w-7xl mx-auto px-6">
+    <h2 class="text-center text-3xl md:text-4xl font-bold mb-3 text-white">
+      📸 Galería de Capachica
+    </h2>
+    <p class="text-center text-sm mb-12" style="color:rgba(255,255,255,0.4);">La belleza del Lago Titicaca y sus tradiciones</p>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4" id="galleryGrid">
+      {photos.map((p, i) => (
+        <div class="group relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl" style={`aspect-ratio:${i === 0 || i === 3 ? '1/1' : '4/3'}; border:1px solid rgba(255,255,255,0.08);`}>
+          <img
+            src={p.src}
+            alt={p.alt}
+            loading="lazy"
+            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+            <span class="text-white font-semibold text-sm">{p.title}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Modal de imagen grande -->
+    <div class="fixed inset-0 z-[10001] hidden items-center justify-center" id="imageModal" style="background:rgba(0,0,0,0.9); backdrop-filter:blur(10px);">
+      <button class="absolute top-6 right-6 text-white text-3xl cursor-pointer hover:scale-110 transition-transform" id="closeModal">&times;</button>
+      <img id="modalImg" src="" alt="" class="max-w-[90vw] max-h-[85vh] rounded-2xl object-contain" />
+      <p id="modalTitle" class="text-white text-center mt-4 font-semibold"></p>
+    </div>
+  </div>
+</section>
+
+<script>
+  const modal = document.getElementById('imageModal');
+  const modalImg = document.getElementById('modalImg') as HTMLImageElement;
+  const modalTitle = document.getElementById('modalTitle');
+  const closeBtn = document.getElementById('closeModal');
+
+  document.querySelectorAll('#galleryGrid img').forEach(img => {
+    img.addEventListener('click', () => {
+      if (modalImg && modal && modalTitle) {
+        modalImg.src = (img as HTMLImageElement).src;
+        modalImg.alt = (img as HTMLImageElement).alt;
+        modalTitle.textContent = (img as HTMLImageElement).alt;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    });
+  });
+
+  closeBtn?.addEventListener('click', () => {
+    modal?.classList.add('hidden');
+    modal?.classList.remove('flex');
+  });
+
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  });
+</script>

@@ -1,0 +1,113 @@
+---
+---
+
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden" id="inicio">
+  <!-- ====== CIELO NOCTURNO ====== -->
+  <div class="absolute inset-0 transition-opacity duration-1000 pointer-events-none" id="skyNight" style="background: linear-gradient(180deg, #070D1A 0%, #0B1426 30%, #132042 60%, #1B2D5A 100%); opacity: 1;">
+    <!-- Estrellas -->
+    <div class="absolute inset-0" id="starsContainer"></div>
+    <!-- Luna con brillo -->
+    <div class="absolute animate-float" style="top:8%; right:14%;">
+      <div style="width:80px; height:80px; background:#F5F0D0; border-radius:50%; animation: moonGlow 4s ease-in-out infinite;"></div>
+      <div style="position:absolute; top:-6px; left:20px; width:65px; height:65px; background:#0B1426; border-radius:50%;"></div>
+    </div>
+  </div>
+
+  <!-- ====== CIELO DIURNO ====== -->
+  <div class="absolute inset-0 transition-opacity duration-1000 pointer-events-none" id="skyDay" style="background: linear-gradient(180deg, #4A90D9 0%, #87CEEB 35%, #B4D7EE 65%, #F4E4BA 90%, #E8D5A3 100%); opacity: 0;">
+    <!-- Sol que SALE -->
+    <div class="absolute" id="sunWrapper" style="top:10%; right:15%; animation: sunrise 2s ease-out forwards, sunPulse 4s ease-in-out 2s infinite;">
+      <!-- Rayos del sol -->
+      <div style="width:180px; height:180px; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:conic-gradient(from 0deg,transparent 0deg,rgba(255,215,0,0.35) 8deg,transparent 16deg,transparent 30deg,rgba(255,215,0,0.35) 38deg,transparent 46deg,transparent 60deg,rgba(255,215,0,0.35) 68deg,transparent 76deg,transparent 90deg,rgba(255,215,0,0.35) 98deg,transparent 106deg,transparent 120deg,rgba(255,215,0,0.35) 128deg,transparent 136deg,transparent 150deg,rgba(255,215,0,0.35) 158deg,transparent 166deg,transparent 180deg,rgba(255,215,0,0.35) 188deg,transparent 196deg,transparent 210deg,rgba(255,215,0,0.35) 218deg,transparent 226deg,transparent 240deg,rgba(255,215,0,0.35) 248deg,transparent 256deg,transparent 270deg,rgba(255,215,0,0.35) 278deg,transparent 286deg,transparent 300deg,rgba(255,215,0,0.35) 308deg,transparent 316deg,transparent 330deg,rgba(255,215,0,0.35) 338deg,transparent 346deg,transparent 360deg); border-radius:50%; animation: rotateRays 25s linear infinite;"></div>
+      <!-- Cuerpo del sol -->
+      <div style="width:70px; height:70px; background:radial-gradient(circle, #FFF9C4, #FFD700, #FF8C00); border-radius:50%; position:relative; z-index:2; margin:auto;"></div>
+    </div>
+    <!-- Nubes -->
+    <div class="absolute" style="top:6%; left:0; width:100%; opacity:0.6;">
+      <span class="absolute" style="font-size:3.5rem; animation: cloudDrift 30s linear infinite;">☁️</span>
+      <span class="absolute" style="top:30px; font-size:2.5rem; animation: cloudDrift 40s linear 10s infinite;">☁️</span>
+      <span class="absolute" style="top:60px; font-size:2rem; animation: cloudDrift 35s linear 18s infinite;">☁️</span>
+    </div>
+    <!-- Aves sobre el lago -->
+    <div class="absolute" style="top:18%; left:0; width:100%;">
+      <span class="absolute" style="font-size:1.2rem; animation: seagullFly 14s linear infinite;">🐦</span>
+      <span class="absolute" style="top:20px; font-size:1rem; animation: seagullFly 18s linear 5s infinite;">🐦</span>
+    </div>
+  </div>
+
+  <!-- ====== LAGO TITICACA (siempre visible abajo) ====== -->
+  <div class="absolute bottom-0 left-0 right-0 z-[3]" style="height:25%;">
+    <div style="position:absolute; bottom:0; left:0; right:0; height:100%; background:linear-gradient(180deg, transparent 0%, rgba(30,80,140,0.4) 30%, rgba(20,60,110,0.7) 100%);"></div>
+    <!-- Olas del lago -->
+    <div class="absolute" style="bottom:0; left:0; right:0;">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none" style="display:block; width:100%; height:70px;">
+        <path id="lakeWave" d="M0,40 C180,70 360,10 540,40 C720,70 900,10 1080,40 C1260,70 1380,30 1440,40 L1440,120 L0,120Z" style="fill:rgba(30,80,140,0.6); animation: float 5s ease-in-out infinite;"/>
+      </svg>
+    </div>
+    <!-- Reflejo shimmer -->
+    <div class="absolute" style="bottom:10px; left:30%; width:40%; height:3px; background:rgba(255,255,255,0.2); border-radius:50%; animation: lakeShimmer 3s ease-in-out infinite;"></div>
+    <div class="absolute" style="bottom:25px; left:20%; width:25%; height:2px; background:rgba(255,255,255,0.15); border-radius:50%; animation: lakeShimmer 4s ease-in-out 1s infinite;"></div>
+    <div class="absolute" style="bottom:15px; left:55%; width:20%; height:2px; background:rgba(255,255,255,0.15); border-radius:50%; animation: lakeShimmer 3.5s ease-in-out 0.5s infinite;"></div>
+  </div>
+
+  <!-- ====== CONTENIDO PRINCIPAL ====== -->
+  <div class="relative z-10 text-center px-6 pt-20" style="animation: fadeInUp 0.8s ease both;">
+    <h1 class="text-4xl md:text-6xl font-extrabold mb-5 max-w-4xl mx-auto leading-tight">
+      Descubre las <span style="background:linear-gradient(135deg,#FF6B35,#FF8C5A); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">Festividades</span> de Capachica
+    </h1>
+    <p class="text-lg md:text-xl max-w-2xl mx-auto mb-4" style="color:rgba(255,255,255,0.6);">
+      Tradición, cultura y espiritualidad a orillas del Lago Titicaca
+    </p>
+    <p class="text-sm md:text-base max-w-xl mx-auto mb-8" style="color:rgba(255,255,255,0.4);">
+      🏔️ Capachica · Puno · Perú
+    </p>
+    <div class="flex gap-4 justify-center flex-wrap">
+      <a href="#festividades" class="px-7 py-3 rounded-xl font-semibold text-white transition-transform hover:-translate-y-0.5" style="background:linear-gradient(135deg,#FF6B35,#FF8C5A); box-shadow:0 4px 20px rgba(255,107,53,0.4);">
+        🎉 Explorar Festividades
+      </a>
+      <a href="#calendario" class="px-7 py-3 rounded-xl font-semibold border-2 transition-colors" style="border-color:rgba(255,255,255,0.2); color:#fff; background:rgba(255,255,255,0.05);">
+        📅 Ver Calendario
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+  // ── Generar estrellas ──
+  const container = document.getElementById('starsContainer');
+  if (container) {
+    for (let i = 0; i < 150; i++) {
+      const star = document.createElement('div');
+      const isBig = Math.random() > 0.82;
+      const size = isBig ? 5 : (2 + Math.random() * 2);
+      star.className = 'star' + (isBig ? ' big' : '');
+      star.style.width = size + 'px';
+      star.style.height = size + 'px';
+      star.style.left = Math.random() * 100 + '%';
+      star.style.top = Math.random() * 75 + '%';
+      const dur = (2 + Math.random() * 5).toFixed(1);
+      const del = (Math.random() * 6).toFixed(1);
+      star.style.setProperty('--dur', dur + 's');
+      star.style.setProperty('--del', del + 's');
+      container.appendChild(star);
+    }
+  }
+
+  // ── Cambiar cielo con el tema ──
+  const html = document.documentElement;
+  const skyNight = document.getElementById('skyNight');
+  const skyDay = document.getElementById('skyDay');
+  const lakeWave = document.getElementById('lakeWave');
+
+  function updateSky() {
+    const theme = html.getAttribute('data-theme');
+    if (skyNight) skyNight.style.opacity = theme === 'night' ? '1' : '0';
+    if (skyDay) skyDay.style.opacity = theme === 'day' ? '1' : '0';
+    if (lakeWave) lakeWave.style.fill = theme === 'night' ? 'rgba(15,40,80,0.7)' : 'rgba(30,80,140,0.6)';
+  }
+
+  // Observar cambios de tema
+  const observer = new MutationObserver(updateSky);
+  observer.observe(html, { attributes: true, attributeFilter: ['data-theme'] });
+  updateSky();
+</script>

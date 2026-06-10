@@ -1,0 +1,102 @@
+---
+import { getNextFestivity, festivities } from '../data/festivities';
+const next = getNextFestivity();
+---
+
+<div class="fixed bottom-6 right-6 w-[280px] rounded-2xl shadow-2xl z-[9999] overflow-hidden select-none transition-shadow" id="floatingCalendar" style="background:rgba(11,20,38,0.92); border:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(20px);">
+  <div class="flex items-center justify-between px-4 py-2.5 cursor-grab rounded-t-2xl" id="fcHeader" style="background:linear-gradient(135deg,#FF6B35,#FF8C5A);">
+    <div class="flex items-center gap-2 text-white">
+      <span>📅</span>
+      <span class="text-xs font-bold uppercase tracking-wider">Próxima Festividad</span>
+    </div>
+    <button class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-white text-sm hover:bg-white/40 transition" id="fcMinimize" aria-label="Minimizar">−</button>
+  </div>
+
+  <div class="p-4" id="fcBody">
+    {next && (
+      <div class="flex flex-col items-center gap-1 mb-3 text-white">
+        <span class="text-3xl">{next.festivity.icon}</span>
+        <span class="font-bold text-center text-sm">{next.festivity.name}</span>
+        <span class="text-xs" style="color:rgba(255,255,255,0.5);">{next.dateThisYear.toLocaleDateString('es-PE', { day:'numeric', month:'long' })}</span>
+        <div class="flex items-baseline gap-1 mt-1">
+          <span class="text-3xl font-extrabold leading-none" style="color:#FF6B35;">{next.daysUntil}</span>
+          <span class="text-[0.65rem]" style="color:rgba(255,255,255,0.4);">días restantes</span>
+        </div>
+      </div>
+    )}
+    <div class="text-[0.65rem] text-white" id="fcMiniCal"></div>
+  </div>
+</div>
+
+<!-- Ícono minimizado -->
+<div class="fixed bottom-6 right-6 w-14 h-14 rounded-full flex items-center justify-center text-2xl cursor-pointer shadow-lg z-[9999] hidden" id="fcMiniIcon" style="background:linear-gradient(135deg,#FF6B35,#FF8C5A); box-shadow:0 4px 16px rgba(255,107,53,0.4); animation:float 3s ease-in-out infinite;">📅</div>
+
+<script define:vars={{ nextData: next, festData: festivities }}>
+  // ── Mini calendario ──
+  const cal = document.getElementById('fcMiniCal');
+  if (cal) {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const today = now.getDate();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const dayNames = ['Do','Lu','Ma','Mi','Ju','Vi','Sa'];
+    const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const festDays = festData.filter(f => f.month === month + 1).map(f => f.day);
+
+    let html = '<div style="text-align:center;font-weight:700;margin-bottom:4px;font-size:0.75rem;color:rgba(255,255,255,0.8);">' + monthNames[month] + ' ' + year + '</div>';
+    html += '<table style="width:100%;text-align:center;"><tr>';
+    dayNames.forEach(d => { html += '<th style="color:rgba(255,255,255,0.35);font-weight:600;padding:2px;font-size:0.6rem;">' + d + '</th>'; });
+    html += '</tr><tr>';
+    let c = 0;
+    for (let i = 0; i < firstDay; i++) { html += '<td></td>'; c++; }
+    for (let d = 1; d <= daysInMonth; d++) {
+      let style = 'padding:2px;font-size:0.6rem;color:rgba(255,255,255,0.5);';
+      if (d === today) style = 'padding:2px;font-size:0.6rem;background:#FF6B35;color:#fff;font-weight:700;border-radius:50%;display:inline-flex;width:20px;height:20px;align-items:center;justify-content:center;';
+      else if (festDays.includes(d)) style = 'padding:2px;font-size:0.6rem;background:rgba(255,107,53,0.2);color:#FF6B35;font-weight:700;border-radius:50%;display:inline-flex;width:20px;height:20px;align-items:center;justify-content:center;';
+      html += '<td><span style="' + style + '">' + d + '</span></td>';
+      c++;
+      if (c % 7 === 0) html += '</tr><tr>';
+    }
+    html += '</tr></table>';
+    cal.innerHTML = html;
+  }
+
+  // ── Minimizar / Maximizar ──
+  const fcEl = document.getElementById('floatingCalendar');
+  const fcMiniIcon = document.getElementById('fcMiniIcon');
+  document.getElementById('fcMinimize')?.addEventListener('click', () => {
+    fcEl?.classList.add('hidden');
+    fcMiniIcon?.classList.remove('hidden');
+  });
+  fcMiniIcon?.addEventListener('click', () => {
+    fcMiniIcon?.classList.add('hidden');
+    fcEl?.classList.remove('hidden');
+  });
+
+  // ── Arrastrar ──
+  let isDragging = false, offsetX = 0, offsetY = 0;
+  const fcHeader = document.getElementById('fcHeader');
+
+  function startDrag(cx, cy) {
+    isDragging = true;
+    const r = fcEl.getBoundingClientRect();
+    offsetX = cx - r.left; offsetY = cy - r.top;
+    fcEl.classList.add('dragging');
+  }
+  function moveDrag(cx, cy) {
+    if (!isDragging) return;
+    fcEl.style.left = (cx - offsetX) + 'px';
+    fcEl.style.top = (cy - offsetY) + 'px';
+    fcEl.style.right = 'auto'; fcEl.style.bottom = 'auto';
+  }
+  function endDrag() { isDragging = false; fcEl.classList.remove('dragging'); }
+
+  fcHeader?.addEventListener('mousedown', e => startDrag(e.clientX, e.clientY));
+  document.addEventListener('mousemove', e => moveDrag(e.clientX, e.clientY));
+  document.addEventListener('mouseup', endDrag);
+  fcHeader?.addEventListener('touchstart', e => { const t = e.touches[0]; startDrag(t.clientX, t.clientY); }, { passive: true });
+  document.addEventListener('touchmove', e => { if (!isDragging) return; const t = e.touches[0]; moveDrag(t.clientX, t.clientY); }, { passive: true });
+  document.addEventListener('touchend', endDrag);
+</script>

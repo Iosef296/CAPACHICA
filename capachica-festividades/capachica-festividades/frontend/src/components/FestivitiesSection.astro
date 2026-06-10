@@ -1,0 +1,95 @@
+---
+import { getAllSorted } from '../data/festivities';
+const all = getAllSorted();
+const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const catColors: Record<string,string> = { religious: '#9333EA', cultural: '#FF6B35', national: '#2563EB', traditional: '#D97706' };
+const catLabels: Record<string,string> = { religious: 'Religiosa', cultural: 'Cultural', national: 'Nacional', traditional: 'Tradicional' };
+const currentMonth = new Date().getMonth() + 1;
+---
+
+<section class="py-20" id="festividades">
+  <div class="max-w-7xl mx-auto px-6">
+    <h2 class="text-center text-3xl md:text-4xl font-bold mb-3">
+      🎉 Festividades de Capachica
+    </h2>
+    <p class="text-center text-sm mb-10" style="color:rgba(255,255,255,0.4);">Tradición viva a orillas del Lago Titicaca</p>
+
+    <!-- Filtros -->
+    <div class="flex flex-wrap gap-2 justify-center mb-10" id="monthFilters">
+      <button class="month-chip px-4 py-2 rounded-full text-sm font-semibold transition-all" data-month="" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.5);">
+        Todos
+      </button>
+      {months.map((m, i) => (
+        <button
+          class:list={['month-chip px-4 py-2 rounded-full text-sm font-semibold transition-all', i+1===currentMonth ? 'active' : '']}
+          data-month={i + 1}
+          style={`background:${i+1===currentMonth ? 'linear-gradient(135deg,#FF6B35,#FF8C5A)' : 'rgba(255,255,255,0.06)'}; border:1px solid ${i+1===currentMonth ? '#FF6B35' : 'rgba(255,255,255,0.1)'}; color:${i+1===currentMonth ? '#fff' : 'rgba(255,255,255,0.5)'};`}
+        >
+          {m}
+        </button>
+      ))}
+    </div>
+
+    <!-- Grid -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="festGrid">
+      {all.map((f) => (
+        <article class="fest-card-elegant rounded-2xl p-6 flex flex-col gap-3 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl cursor-pointer" data-month={f.month} style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); backdrop-filter:blur(12px);">
+          <!-- Header -->
+          <div class="flex justify-between items-start">
+            <span class="text-4xl">{f.icon}</span>
+            <span class="text-[0.65rem] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider" style={`background:${catColors[f.category]}18; color:${catColors[f.category]}; border:1px solid ${catColors[f.category]}30;`}>
+              {catLabels[f.category]}
+            </span>
+          </div>
+          <!-- Nombre -->
+          <h3 class="text-lg font-bold" style="color:#fff;">{f.name}</h3>
+          <!-- Fecha -->
+          <p class="font-semibold text-sm" style="color:#FF6B35;">📅 {months[f.month-1]} {f.day}{f.endDay ? ` – ${f.endDay}` : ''}</p>
+          <!-- Descripción -->
+          <p class="text-sm leading-relaxed" style="color:rgba(255,255,255,0.5);">{f.description}</p>
+          <!-- Highlights -->
+          <div class="flex flex-wrap gap-1.5 mt-1">
+            {f.highlights.slice(0,4).map((h) => (
+              <span class="rounded-full px-2.5 py-0.5 text-[0.7rem] font-medium" style="background:rgba(255,107,53,0.1); color:#FF8C5A; border:1px solid rgba(255,107,53,0.15);">
+                ✦ {h}
+              </span>
+            ))}
+          </div>
+          <!-- Ubicación -->
+          <p class="text-xs mt-auto pt-2" style="color:rgba(255,255,255,0.3);">📍 {f.location}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  const chips = document.querySelectorAll('.month-chip');
+  const cards = document.querySelectorAll('.fest-card-elegant');
+
+  function filterMonth(month: string | null) {
+    cards.forEach(card => {
+      const m = (card as HTMLElement).dataset.month;
+      (card as HTMLElement).style.display = (month !== null && m !== month) ? 'none' : '';
+    });
+    chips.forEach(c => {
+      const cm = (c as HTMLElement).dataset.month;
+      const isActive = month !== null && cm === month;
+      (c as HTMLElement).style.background = isActive ? 'linear-gradient(135deg,#FF6B35,#FF8C5A)' : 'rgba(255,255,255,0.06)';
+      (c as HTMLElement).style.borderColor = isActive ? '#FF6B35' : 'rgba(255,255,255,0.1)';
+      (c as HTMLElement).style.color = isActive ? '#fff' : 'rgba(255,255,255,0.5)';
+    });
+  }
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const m = (chip as HTMLElement).dataset.month || null;
+      const isActive = (chip as HTMLElement).style.background.includes('gradient');
+      if (m === '' || isActive) {
+        filterMonth(null);
+      } else {
+        filterMonth(m);
+      }
+    });
+  });
+</script>

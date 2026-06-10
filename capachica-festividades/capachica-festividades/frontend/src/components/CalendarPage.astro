@@ -1,0 +1,98 @@
+---
+---
+
+<section class="py-20" id="calendario">
+  <div class="max-w-5xl mx-auto px-6">
+    <h2 class="text-center text-3xl md:text-4xl font-bold mb-3 text-white">
+      📅 Calendario de Festividades
+    </h2>
+    <p class="text-center text-sm mb-12" style="color:rgba(255,255,255,0.4);">Planifica tu visita a Capachica</p>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="calendarGrid"></div>
+  </div>
+</section>
+
+<script>
+  const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const dayNames = ['Do','Lu','Ma','Mi','Ju','Vi','Sa'];
+
+  const festividades = [
+    { month:1, day:6, endDay:null, name:'Epifanía', icon:'👑' },
+    { month:2, day:2, endDay:null, name:'Virgen Candelaria', icon:'🕯️' },
+    { month:2, day:20, endDay:25, name:'Carnavales', icon:'🎭' },
+    { month:5, day:3, endDay:5, name:'Fiesta de la Cruz', icon:'✝️' },
+    { month:5, day:3, endDay:5, name:'Danza Triunfal', icon:'💃' },
+    { month:6, day:19, endDay:null, name:'Corpus Christi', icon:'⛪' },
+    { month:6, day:21, endDay:null, name:'Inti Raymi', icon:'☀️' },
+    { month:6, day:24, endDay:null, name:'San Juan', icon:'🔥' },
+    { month:7, day:25, endDay:27, name:'Fiesta Santos', icon:'🙏' },
+    { month:7, day:28, endDay:null, name:'Aniv. Llachón', icon:'🏘️' },
+    { month:8, day:1, endDay:null, name:'Pachamama', icon:'🌍' },
+    { month:8, day:15, endDay:null, name:'Virgen Asunción', icon:'🕊️' },
+    { month:9, day:21, endDay:null, name:'Primavera', icon:'🌸' },
+    { month:10, day:18, endDay:null, name:'Señor Milagros', icon:'✝️' },
+    { month:11, day:1, endDay:null, name:'Todos Santos', icon:'🕯️' },
+    { month:11, day:2, endDay:null, name:'Día Difuntos', icon:'🪔' },
+    { month:12, day:8, endDay:null, name:'Inmaculada', icon:'🌟' },
+    { month:12, day:16, endDay:24, name:'Novena', icon:'🎶' },
+    { month:12, day:25, endDay:null, name:'Navidad', icon:'🎄' },
+  ];
+
+  const now = new Date();
+  const year = now.getFullYear();
+  const currentMonth = now.getMonth();
+  const today = now.getDate();
+  const grid = document.getElementById('calendarGrid');
+
+  if (grid) {
+    for (let m = 0; m < 12; m++) {
+      const isCurrent = m === currentMonth;
+      const daysInMonth = new Date(year, m + 1, 0).getDate();
+      const firstDay = new Date(year, m, 1).getDay();
+      const festDays = festividades.filter(f => f.month === m + 1);
+
+      const card = document.createElement('div');
+      card.className = 'rounded-2xl p-4 transition-all duration-300 hover:-translate-y-1';
+      card.style.background = isCurrent ? 'rgba(255,107,53,0.08)' : 'rgba(255,255,255,0.04)';
+      card.style.border = '1px solid ' + (isCurrent ? 'rgba(255,107,53,0.3)' : 'rgba(255,255,255,0.08)');
+
+      let html = '<h3 class="font-bold text-center mb-3 text-sm" style="color:' + (isCurrent ? '#FF6B35' : 'rgba(255,255,255,0.7)') + ';">' + months[m] + ' ' + year + '</h3>';
+
+      html += '<table class="w-full text-center" style="font-size:0.65rem;"><thead><tr>';
+      dayNames.forEach(d => { html += '<th class="py-1" style="color:rgba(255,255,255,0.3);">' + d + '</th>'; });
+      html += '</tr></thead><tbody>';
+
+      let col = 0;
+      html += '<tr>';
+      for (let i = 0; i < firstDay; i++) { html += '<td></td>'; col++; }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const isToday = isCurrent && d === today;
+        const fest = festDays.find(f => d >= f.day && (f.endDay ? d <= f.endDay : d === f.day));
+
+        let cellStyle = 'padding:3px; color:rgba(255,255,255,0.4);';
+        if (isToday) {
+          cellStyle = 'padding:3px; background:#FF6B35; color:#fff; font-weight:700; border-radius:50%; display:inline-flex; width:22px; height:22px; align-items:center; justify-content:center;';
+        } else if (fest) {
+          cellStyle = 'padding:3px; background:rgba(255,107,53,0.15); color:#FF8C5A; font-weight:700; border-radius:50%; display:inline-flex; width:22px; height:22px; align-items:center; justify-content:center; cursor:pointer;';
+        }
+
+        const title = fest ? fest.icon + ' ' + fest.name : '';
+        html += '<td><span style="' + cellStyle + '" title="' + title + '">' + d + '</span></td>';
+        col++;
+        if (col % 7 === 0 && d < daysInMonth) { html += '</tr><tr>'; col = 0; }
+      }
+      html += '</tr></tbody></table>';
+
+      if (festDays.length > 0) {
+        html += '<div class="mt-3 pt-2" style="border-top:1px solid rgba(255,255,255,0.06);">';
+        festDays.forEach(f => {
+          html += '<div class="flex items-center gap-1.5 py-0.5"><span style="font-size:0.75rem;">' + f.icon + '</span><span style="font-size:0.6rem; color:rgba(255,255,255,0.5);">' + f.name + ' (' + f.day + (f.endDay ? '-' + f.endDay : '') + ')</span></div>';
+        });
+        html += '</div>';
+      }
+
+      card.innerHTML = html;
+      grid.appendChild(card);
+    }
+  }
+</script>

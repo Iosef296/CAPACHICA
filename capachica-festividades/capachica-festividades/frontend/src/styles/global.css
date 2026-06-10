@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --nav-h: 64px;
+}
+
+/* ── TEMA NOCHE (por defecto) ── */
+[data-theme='night'] body {
+  background: #0B1426 !important;
+  color: #FFFFFF !important;
+}
+
+/* ── TEMA DÍA ── */
+[data-theme='day'] body {
+  background: #87CEEB !important;
+  color: #1A2744 !important;
+}
+
+body {
+  overflow-x: hidden;
+  transition: background 0.8s ease, color 0.6s ease;
+}
+
+/* ── Estrellas ── */
+.star {
+  position: absolute;
+  background: #FFE566;
+  border-radius: 50%;
+  animation: twinkle var(--dur, 3s) ease-in-out var(--del, 0s) infinite;
+}
+.star.big {
+  box-shadow: 0 0 8px 3px rgba(255, 229, 102, 0.6);
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.5); }
+  50%      { opacity: 1;    transform: scale(1.4); }
+}
+
+/* ── Sol ── */
+@keyframes sunrise {
+  0%   { transform: translateY(100px) scale(0.5); opacity: 0; }
+  60%  { opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes sunPulse {
+  0%, 100% { box-shadow: 0 0 60px rgba(255,215,0,0.5), 0 0 120px rgba(255,140,0,0.25); }
+  50%      { box-shadow: 0 0 90px rgba(255,215,0,0.7), 0 0 180px rgba(255,140,0,0.4); }
+}
+
+@keyframes rotateRays {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ── Luna ── */
+@keyframes moonGlow {
+  0%, 100% { box-shadow: 0 0 30px rgba(245,240,208,0.3), 0 0 60px rgba(245,240,208,0.15); }
+  50%      { box-shadow: 0 0 50px rgba(245,240,208,0.5), 0 0 100px rgba(245,240,208,0.25); }
+}
+
+/* ── Nubes ── */
+@keyframes cloudDrift {
+  0%   { transform: translateX(-120%); }
+  100% { transform: translateX(120vw); }
+}
+
+/* ── Gaviotas ── */
+@keyframes seagullFly {
+  0%   { transform: translateX(-100vw) translateY(0); }
+  25%  { transform: translateX(-25vw) translateY(-15px); }
+  50%  { transform: translateX(0) translateY(5px); }
+  75%  { transform: translateX(25vw) translateY(-10px); }
+  100% { transform: translateX(100vw) translateY(0); }
+}
+
+/* ── Flotar ── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-14px); }
+}
+
+/* ── Fade in ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Calendario arrastrable ── */
+#floatingCalendar.dragging {
+  transform: scale(1.03);
+  box-shadow: 0 16px 56px rgba(0, 0, 0, 0.5);
+  cursor: grabbing;
+}
+
+/* ── Card festividad hover ── */
+.fest-card-elegant {
+  position: relative;
+  overflow: hidden;
+}
+.fest-card-elegant::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+  transition: left 0.5s;
+}
+.fest-card-elegant:hover::before {
+  left: 100%;
+}
+
+/* ── Reflecto del lago ── */
+@keyframes lakeShimmer {
+  0%, 100% { opacity: 0.3; }
+  50%      { opacity: 0.6; }
+}

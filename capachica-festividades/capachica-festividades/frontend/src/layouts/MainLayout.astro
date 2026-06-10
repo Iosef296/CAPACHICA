@@ -1,0 +1,20 @@
+---
+interface Props { title?: string }
+const title = Astro.props.title ?? 'Capachica - Festividades del Lago Titicaca';
+---
+
+<!doctype html>
+<html lang="es" data-theme="night">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen" style="background:#0B1426; color:#FFFFFF;">
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  @import '../styles/global.css';
+</style>

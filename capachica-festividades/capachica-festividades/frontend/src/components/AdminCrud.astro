@@ -1,0 +1,220 @@
+---
+import { getAllSorted } from '../data/festivities';
+const all = getAllSorted();
+const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const categories = [
+  { value: 'religious', label: 'Religiosa', color: '#9333EA' },
+  { value: 'cultural', label: 'Cultural', color: '#FF6B35' },
+  { value: 'national', label: 'Nacional', color: '#2563EB' },
+  { value: 'traditional', label: 'Tradicional', color: '#D97706' },
+];
+---
+
+<section class="py-20" id="admin">
+  <div class="max-w-5xl mx-auto px-6">
+    <h2 class="text-center text-3xl md:text-4xl font-bold mb-3 text-white">
+      ✏️ Administrar Festividades
+    </h2>
+    <p class="text-center text-sm mb-10" style="color:rgba(255,255,255,0.4);">Agrega, edita o elimina festividades</p>
+
+    <!-- Formulario -->
+    <div class="rounded-2xl p-6 mb-10" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(12px);">
+      <h3 class="font-bold text-lg mb-4 text-white" id="formTitle">➕ Nueva Festividad</h3>
+      <form id="festForm" class="grid md:grid-cols-2 gap-4">
+        <input type="hidden" id="editId" value="" />
+
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:rgba(255,255,255,0.5);">Nombre *</label>
+          <input type="text" id="fName" required class="w-full px-3 py-2 rounded-lg text-sm text-white outline-none focus:ring-2 focus:ring-[#FF6B35]" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);" placeholder="Ej: Inti Raymi" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:rgba(255,255,255,0.5);">Icono</label>
+          <input type="text" id="fIcon" class="w-full px-3 py-2 rounded-lg text-sm text-white outline-none focus:ring-2 focus:ring-[#FF6B35]" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);" placeholder="Ej: ☀️" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:rgba(255,255,255,0.5);">Mes *</label>
+          <select id="fMonth" required class="w-full px-3 py-2 rounded-lg text-sm text-white outline-none focus:ring-2 focus:ring-[#FF6B35]" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);">
+            <option value="">Seleccionar mes</option>
+            {months.map((m, i) => <option value={i+1}>{m}</option>)}
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:rgba(255,255,255,0.5);">Día *</label>
+          <input type="number" id="fDay" required min="1" max="31" class="w-full px-3 py-2 rounded-lg text-sm text-white outline-none focus:ring-2 focus:ring-[#FF6B35]" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);" placeholder="1-31" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:rgba(255,255,255,0.5);">Día final (opcional)</label>
+          <input type="number" id="fEndDay" min="1" max="31" class="w-full px-3 py-2 rounded-lg text-sm text-white outline-none focus:ring-2 focus:ring-[#FF6B35]" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);" placeholder="Si dura varios días" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:rgba(255,255,255,0.5);">Categoría *</label>
+          <select id="fCategory" required class="w-full px-3 py-2 rounded-lg text-sm text-white outline-none focus:ring-2 focus:ring-[#FF6B35]" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);">
+            <option value="">Seleccionar</option>
+            {categories.map(c => <option value={c.value}>{c.label}</option>)}
+          </select>
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-xs font-semibold mb-1" style="color:rgba(255,255,255,0.5);">Descripción *</label>
+          <textarea id="fDesc" required rows="3" class="w-full px-3 py-2 rounded-lg text-sm text-white outline-none focus:ring-2 focus:ring-[#FF6B35]" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);" placeholder="Describe la festividad..."></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:rgba(255,255,255,0.5);">Ubicación</label>
+          <input type="text" id="fLocation" class="w-full px-3 py-2 rounded-lg text-sm text-white outline-none focus:ring-2 focus:ring-[#FF6B35]" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);" placeholder="Ej: Capachica" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:rgba(255,255,255,0.5);">Destacados (separados por coma)</label>
+          <input type="text" id="fHighlights" class="w-full px-3 py-2 rounded-lg text-sm text-white outline-none focus:ring-2 focus:ring-[#FF6B35]" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1);" placeholder="Ej: Procesión, Música, Danza" />
+        </div>
+
+        <div class="md:col-span-2 flex gap-3 mt-2">
+          <button type="submit" class="px-6 py-2.5 rounded-xl font-semibold text-white transition-transform hover:-translate-y-0.5" style="background:linear-gradient(135deg,#FF6B35,#FF8C5A); box-shadow:0 4px 16px rgba(255,107,53,0.35);">
+            💾 Guardar Festividad
+          </button>
+          <button type="button" id="cancelEdit" class="px-6 py-2.5 rounded-xl font-semibold transition-colors hidden" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); color:rgba(255,255,255,0.5);">
+            ✖ Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Lista de festividades -->
+    <div class="rounded-2xl p-6" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06);">
+      <h3 class="font-bold text-lg mb-4 text-white">📋 Festividades Registradas ({all.length})</h3>
+      <div class="space-y-3" id="crudList">
+        {all.map((f) => {
+          const catInfo = categories.find(c => c.value === f.category);
+          return (
+            <div class="flex items-center gap-3 p-3 rounded-xl transition-all hover:translate-x-1" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06);" data-id={f.id}>
+              <span class="text-2xl">{f.icon}</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="font-semibold text-sm text-white truncate">{f.name}</span>
+                  <span class="text-[0.6rem] font-bold px-2 py-0.5 rounded-full" style={`background:${catInfo?.color || '#666'}18; color:${catInfo?.color || '#666'};`}>{catInfo?.label}</span>
+                </div>
+                <span class="text-xs" style="color:rgba(255,255,255,0.35);">📅 {months[f.month-1]} {f.day} · 📍 {f.location}</span>
+              </div>
+              <div class="flex gap-1.5 shrink-0">
+                <button class="edit-btn w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors" data-id={f.id} style="background:rgba(59,130,246,0.15); color:#3B82F6;" title="Editar">✏️</button>
+                <button class="delete-btn w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors" data-id={f.id} style="background:rgba(239,68,68,0.15); color:#EF4444;" title="Eliminar">🗑️</button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const form = document.getElementById('festForm') as HTMLFormElement;
+  const cancelBtn = document.getElementById('cancelEdit');
+  const formTitle = document.getElementById('formTitle');
+
+  // Guardar (crear o editar)
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const editId = (document.getElementById('editId') as HTMLInputElement).value;
+    const name = (document.getElementById('fName') as HTMLInputElement).value;
+    const icon = (document.getElementById('fIcon') as HTMLInputElement).value || '🎉';
+    const month = parseInt((document.getElementById('fMonth') as HTMLSelectElement).value);
+    const day = parseInt((document.getElementById('fDay') as HTMLInputElement).value);
+    const endDay = parseInt((document.getElementById('fEndDay') as HTMLInputElement).value) || undefined;
+    const category = (document.getElementById('fCategory') as HTMLSelectElement).value as any;
+    const description = (document.getElementById('fDesc') as HTMLTextAreaElement).value;
+    const location = (document.getElementById('fLocation') as HTMLInputElement).value || 'Capachica';
+    const highlights = (document.getElementById('fHighlights') as HTMLInputElement).value.split(',').map(s => s.trim()).filter(Boolean);
+
+    const festData = { id: editId || name.toLowerCase().replace(/\s+/g, '-'), name, icon, month, day, endDay, category, description, location, highlights };
+
+    // Enviar al backend API
+    const method = editId ? 'PUT' : 'POST';
+    const url = editId ? `/api/festivities/${editId}` : '/api/festivities';
+
+    fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(festData),
+    }).then(res => {
+      if (res.ok) {
+        alert(editId ? '✅ Festividad actualizada' : '✅ Festividad creada');
+        form.reset();
+        (document.getElementById('editId') as HTMLInputElement).value = '';
+        if (formTitle) formTitle.textContent = '➕ Nueva Festividad';
+        cancelBtn?.classList.add('hidden');
+        // Recargar para ver cambios
+        window.location.reload();
+      } else {
+        alert('❌ Error al guardar. Verifica que el backend esté corriendo.');
+      }
+    }).catch(() => {
+      // Si no hay backend, guardar en localStorage
+      let stored = JSON.parse(localStorage.getItem('capachica_festivities') || '[]');
+      if (editId) {
+        stored = stored.map((f: any) => f.id === editId ? festData : f);
+      } else {
+        stored.push(festData);
+      }
+      localStorage.setItem('capachica_festivities', JSON.stringify(stored));
+      alert(editId ? '✅ Guardado localmente' : '✅ Creado localmente');
+      form.reset();
+      window.location.reload();
+    });
+  });
+
+  // Editar
+  document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = (btn as HTMLElement).dataset.id;
+      if (formTitle) formTitle.textContent = '✏️ Editar Festividad';
+      cancelBtn?.classList.remove('hidden');
+      (document.getElementById('editId') as HTMLInputElement).value = id || '';
+      // Aquí podrías precargar los datos del formulario
+      // Por ahora, scroll al formulario
+      form?.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // Eliminar
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = (btn as HTMLElement).dataset.id;
+      if (confirm('¿Eliminar esta festividad?')) {
+        fetch(`/api/festivities/${id}`, { method: 'DELETE' })
+          .then(res => {
+            if (res.ok) { alert('🗑️ Eliminada'); window.location.reload(); }
+            else {
+              // Fallback localStorage
+              let stored = JSON.parse(localStorage.getItem('capachica_festivities') || '[]');
+              stored = stored.filter((f: any) => f.id !== id);
+              localStorage.setItem('capachica_festivities', JSON.stringify(stored));
+              alert('🗑️ Eliminada localmente');
+              window.location.reload();
+            }
+          })
+          .catch(() => {
+            let stored = JSON.parse(localStorage.getItem('capachica_festivities') || '[]');
+            stored = stored.filter((f: any) => f.id !== id);
+            localStorage.setItem('capachica_festivities', JSON.stringify(stored));
+            alert('🗑️ Eliminada localmente');
+            window.location.reload();
+          });
+      }
+    });
+  });
+
+  // Cancelar edición
+  cancelBtn?.addEventListener('click', () => {
+    form?.reset();
+    (document.getElementById('editId') as HTMLInputElement).value = '';
+    if (formTitle) formTitle.textContent = '➕ Nueva Festividad';
+    cancelBtn.classList.add('hidden');
+  });
+</script>
