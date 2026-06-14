@@ -1,0 +1,39 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Política de Cookies — Capachica Turismo">
+  <style is:global>
+    .legal-page { min-height:100vh; padding:7rem 2rem 5rem; background:linear-gradient(180deg,#0a1628 0%,#070d1a 100%); }
+    [data-theme="light"] .legal-page { background:linear-gradient(180deg,#005f73 0%,#007288 100%); }
+    .legal-container { max-width:780px; margin:0 auto; }
+    .legal-eyebrow { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:2.5px; text-transform:uppercase; color:rgba(255,107,53,0.85); margin-bottom:0.75rem; display:block; }
+    .legal-h1 { font-family:'Playfair Display',serif; font-size:clamp(2rem,5vw,3rem); font-weight:700; color:#f0ede8; margin-bottom:2rem; line-height:1.2; }
+    [data-theme="light"] .legal-h1 { color:#fff; }
+    .legal-body { font-family:'Crimson Pro',Georgia,serif; }
+    .legal-body h2 { font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:700; color:rgba(212,168,67,0.9); margin:2rem 0 0.6rem; padding-left:12px; border-left:3px solid rgba(212,168,67,0.4); }
+    [data-theme="light"] .legal-body h2 { color:rgba(255,255,255,0.9); border-left-color:rgba(255,255,255,0.45); }
+    .legal-body p { font-size:1.05rem; line-height:1.8; color:rgba(240,237,232,0.65); margin-bottom:1rem; }
+    [data-theme="light"] .legal-body p { color:rgba(255,255,255,0.8); }
+    .legal-back { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:8px; background:rgba(45,212,191,0.08); border:1px solid rgba(45,212,191,0.25); color:#2dd4bf; text-decoration:none; margin-bottom:2.5rem; font-family:'Space Mono',monospace; font-size:11px; letter-spacing:1px; transition:background 0.2s; }
+    .legal-back:hover { background:rgba(45,212,191,0.16); }
+  </style>
+  <div class="legal-page">
+    <div class="legal-container">
+      <a href="/" class="legal-back">← Volver al inicio</a>
+      <span class="legal-eyebrow">Legal · Capachica Turismo</span>
+      <h1 class="legal-h1">Política de Cookies</h1>
+      <div class="legal-body">
+        <p>Este sitio utiliza cookies para mejorar tu experiencia de navegación.</p>
+        <h2>¿Qué son las cookies?</h2>
+        <p>Las cookies son pequeños archivos de texto que se almacenan en tu dispositivo cuando visitas un sitio web.</p>
+        <h2>Cookies que usamos</h2>
+        <p><strong style="color:#d4a843;">capachica-theme:</strong> Guarda tu preferencia de modo oscuro/claro. Expira en 1 año.</p>
+        <p><strong style="color:#d4a843;">lang:</strong> Guarda tu idioma preferido (ES, EN o FR). Expira al cerrar el navegador.</p>
+        <h2>Cookies de terceros</h2>
+        <p>No usamos cookies de seguimiento, publicidad ni redes sociales. No compartimos datos con Google Analytics ni servicios similares.</p>
+        <h2>¿Cómo desactivarlas?</h2>
+        <p>Puedes borrar o desactivar cookies desde la configuración de tu navegador. Esto puede afectar algunas funcionalidades del sitio.</p>
+      </div>
+    </div>
+  </div>
+</Layout>

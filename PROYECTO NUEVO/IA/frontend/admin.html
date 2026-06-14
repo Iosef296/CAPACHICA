@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Educar IA Capachica</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0c4a6e, #1e3a5f);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    header h1 { font-size: 22px; font-weight: 700; color: #f1f5f9; }
+    header p  { font-size: 13px; color: #94a3b8; margin-top: 2px; }
+    .badge {
+      background: rgba(6,182,212,0.15);
+      color: #06b6d4;
+      border: 1px solid rgba(6,182,212,0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-left: auto;
+    }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+
+    /* ── TABS ── */
+    .tabs { display: flex; gap: 4px; margin-bottom: 28px; }
+    .tab {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: transparent;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .tab.active {
+      background: rgba(6,182,212,0.15);
+      border-color: rgba(6,182,212,0.4);
+      color: #06b6d4;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── CARDS ── */
+    .card {
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .card h2 { font-size: 16px; font-weight: 600; color: #f1f5f9; margin-bottom: 16px; }
+
+    /* ── FORM ── */
+    .form-group { margin-bottom: 14px; }
+    label { display: block; font-size: 13px; color: #94a3b8; margin-bottom: 6px; }
+    input, select, textarea {
+      width: 100%;
+      background: #273549;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #e2e8f0;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #06b6d4; }
+    textarea { resize: vertical; min-height: 80px; }
+    select option { background: #1e293b; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #06b6d4, #0284c7);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .btn-danger {
+      background: rgba(239,68,68,0.15);
+      color: #f87171;
+      border: 1px solid rgba(239,68,68,0.3);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-danger:hover { background: rgba(239,68,68,0.25); }
+
+    /* ── KNOWLEDGE LIST ── */
+    .knowledge-item {
+      background: #273549;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+    .knowledge-item-info { flex: 1; min-width: 0; }
+    .knowledge-item-info .cat {
+      font-size: 11px;
+      color: #06b6d4;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .knowledge-item-info .pregunta { font-size: 14px; font-weight: 600; color: #f1f5f9; margin-bottom: 4px; }
+    .knowledge-item-info .respuesta { font-size: 13px; color: #94a3b8; line-height: 1.4; }
+
+    /* ── ALERT ── */
+    .alert {
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .alert.success { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); color: #86efac; }
+    .alert.error   { background: rgba(239,68,68,0.15);  border: 1px solid rgba(239,68,68,0.3);  color: #fca5a5; }
+
+    .loading { color: #64748b; text-align: center; padding: 32px; font-size: 14px; }
+    .count-badge {
+      background: rgba(6,182,212,0.15);
+      color: #06b6d4;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-left: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>🤖</div>
+  <div>
+    <h1>Panel de Educación — Inti</h1>
+    <p>Agrega conocimiento para que la IA responda mejor</p>
+  </div>
+  <div class="badge" id="status-badge">Conectando...</div>
+</header>
+
+<div class="container">
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('agregar')">+ Agregar Conocimiento</button>
+    <button class="tab" onclick="showTab('lista')">📚 Base de Conocimiento</button>
+    <button class="tab" onclick="showTab('reservaciones')">📅 Reservaciones</button>
+    <button class="tab" onclick="showTab('contexto')">⚙️ Configuración IA</button>
+  </div>
+
+  <!-- ── TAB: AGREGAR ── -->
+  <div id="tab-agregar" class="tab-content active">
+    <div class="card">
+      <h2>Enseñar nueva respuesta a la IA</h2>
+      <div id="alert-agregar" class="alert"></div>
+
+      <div class="form-group">
+        <label>Categoría</label>
+        <select id="add-categoria">
+          <option value="general">General</option>
+          <option value="alojamiento">Alojamiento</option>
+          <option value="actividades">Actividades</option>
+          <option value="gastronomia">Gastronomía</option>
+          <option value="transporte">Transporte / Cómo llegar</option>
+          <option value="festividades">Festividades</option>
+          <option value="artesania">Artesanía</option>
+          <option value="precios">Precios</option>
+          <option value="cultura">Cultura y tradiciones</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Pregunta típica del turista</label>
+        <input type="text" id="add-pregunta" placeholder="Ej: ¿Cuáles son los horarios de atención?" />
+      </div>
+
+      <div class="form-group">
+        <label>Respuesta que debe dar la IA</label>
+        <textarea id="add-respuesta" placeholder="Escribe aquí la respuesta detallada que quieres que la IA use..."></textarea>
+      </div>
+
+      <button class="btn-primary" onclick="agregarConocimiento()">Agregar a la IA</button>
+    </div>
+  </div>
+
+  <!-- ── TAB: LISTA ── -->
+  <div id="tab-lista" class="tab-content">
+    <div class="card">
+      <h2>
+        Conocimiento actual
+        <span class="count-badge" id="knowledge-count">0</span>
+      </h2>
+      <div id="alert-lista" class="alert"></div>
+      <div id="knowledge-list">
+        <div class="loading">Cargando base de conocimiento...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: RESERVACIONES ── -->
+  <div id="tab-reservaciones" class="tab-content">
+    <div class="card">
+      <h2>
+        Reservaciones recibidas
+        <span class="count-badge" id="reserva-count">0</span>
+      </h2>
+      <div id="alert-reservaciones" class="alert"></div>
+      <div id="reservaciones-list">
+        <div class="loading">Cargando reservaciones...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: CONTEXTO ── -->
+  <div id="tab-contexto" class="tab-content">
+    <div class="card">
+      <h2>Personalidad de la IA</h2>
+      <div id="alert-contexto" class="alert"></div>
+
+      <div class="form-group">
+        <label>Nombre de la IA</label>
+        <input type="text" id="ctx-nombre" placeholder="Ej: Inti" />
+      </div>
+
+      <div class="form-group">
+        <label>Descripción</label>
+        <input type="text" id="ctx-descripcion" placeholder="Ej: Asistente virtual de Capachica Turismo" />
+      </div>
+
+      <div class="form-group">
+        <label>Instrucciones de comportamiento (System Prompt)</label>
+        <textarea id="ctx-contexto" rows="6"
+          placeholder="Ej: Eres un asistente amable especializado en turismo de Capachica..."></textarea>
+      </div>
+
+      <button class="btn-primary" onclick="actualizarContexto()">Guardar Configuración</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const API = 'http://localhost:5000';
+
+  // ── HEALTH CHECK ──────────────────────────────────────
+  async function checkHealth() {
+    try {
+      const res = await fetch(`${API}/api/health`);
+      const data = await res.json();
+      const badge = document.getElementById('status-badge');
+      badge.textContent = `✓ Conectado — ${data.modelo}`;
+      badge.style.background = 'rgba(34,197,94,0.15)';
+      badge.style.borderColor = 'rgba(34,197,94,0.3)';
+      badge.style.color = '#86efac';
+    } catch {
+      const badge = document.getElementById('status-badge');
+      badge.textContent = '✗ Backend offline';
+      badge.style.background = 'rgba(239,68,68,0.15)';
+      badge.style.borderColor = 'rgba(239,68,68,0.3)';
+      badge.style.color = '#fca5a5';
+    }
+  }
+
+  // ── TABS ─────────────────────────────────────────────
+  function showTab(name) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', ['agregar','lista','reservaciones','contexto'][i] === name);
+    });
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById(`tab-${name}`).classList.add('active');
+    if (name === 'lista')          loadKnowledge();
+    if (name === 'reservaciones')  loadReservaciones();
+    if (name === 'contexto')       loadContexto();
+  }
+
+  // ── ALERT ────────────────────────────────────────────
+  function showAlert(id, type, msg) {
+    const el = document.getElementById(id);
+    el.className = `alert ${type}`;
+    el.textContent = msg;
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 4000);
+  }
+
+  // ── AGREGAR CONOCIMIENTO ──────────────────────────────
+  async function agregarConocimiento() {
+    const categoria = document.getElementById('add-categoria').value;
+    const pregunta  = document.getElementById('add-pregunta').value.trim();
+    const respuesta = document.getElementById('add-respuesta').value.trim();
+
+    if (!pregunta || !respuesta) {
+      showAlert('alert-agregar', 'error', 'Completa la pregunta y la respuesta.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/api/admin/conocimiento`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoria, pregunta, respuesta })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        showAlert('alert-agregar', 'success', `✓ Conocimiento agregado (ID: ${data.id})`);
+        document.getElementById('add-pregunta').value = '';
+        document.getElementById('add-respuesta').value = '';
+      } else {
+        showAlert('alert-agregar', 'error', data.error || 'Error al agregar');
+      }
+    } catch {
+      showAlert('alert-agregar', 'error', 'No se puede conectar al backend.');
+    }
+  }
+
+  // ── LISTAR CONOCIMIENTO ───────────────────────────────
+  async function loadKnowledge() {
+    const list = document.getElementById('knowledge-list');
+    list.innerHTML = '<div class="loading">Cargando...</div>';
+
+    try {
+      const res  = await fetch(`${API}/api/admin/conocimiento`);
+      const data = await res.json();
+      const items = data.conocimiento;
+
+      document.getElementById('knowledge-count').textContent = items.length;
+
+      if (items.length === 0) {
+        list.innerHTML = '<div class="loading">No hay conocimiento guardado aún.</div>';
+        return;
+      }
+
+      list.innerHTML = items.map(item => `
+        <div class="knowledge-item" id="item-${item.id}">
+          <div class="knowledge-item-info">
+            <div class="cat">${item.categoria}</div>
+            <div class="pregunta">${escapeHtml(item.pregunta)}</div>
+            <div class="respuesta">${escapeHtml(item.respuesta)}</div>
+          </div>
+          <button class="btn-danger" onclick="eliminar(${item.id})">Eliminar</button>
+        </div>
+      `).join('');
+
+    } catch {
+      list.innerHTML = '<div class="loading">Error al cargar. ¿Está el backend corriendo?</div>';
+    }
+  }
+
+  // ── ELIMINAR ──────────────────────────────────────────
+  async function eliminar(id) {
+    if (!confirm(`¿Eliminar entrada ID ${id}?`)) return;
+
+    try {
+      const res = await fetch(`${API}/api/admin/conocimiento/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+
+      if (res.ok) {
+        document.getElementById(`item-${id}`)?.remove();
+        const badge = document.getElementById('knowledge-count');
+        badge.textContent = parseInt(badge.textContent) - 1;
+        showAlert('alert-lista', 'success', '✓ Entrada eliminada');
+      } else {
+        showAlert('alert-lista', 'error', data.error);
+      }
+    } catch {
+      showAlert('alert-lista', 'error', 'Error al eliminar');
+    }
+  }
+
+  // ── CARGAR CONTEXTO ───────────────────────────────────
+  async function loadContexto() {
+    try {
+      const res  = await fetch(`${API}/api/admin/conocimiento`);
+      const data = await res.json();
+      document.getElementById('ctx-nombre').value      = data.nombre_ia || '';
+      document.getElementById('ctx-descripcion').value = data.descripcion || '';
+      document.getElementById('ctx-contexto').value    = data.contexto_base || '';
+    } catch {}
+  }
+
+  // ── ACTUALIZAR CONTEXTO ───────────────────────────────
+  async function actualizarContexto() {
+    const body = {
+      nombre_ia:    document.getElementById('ctx-nombre').value.trim(),
+      descripcion:  document.getElementById('ctx-descripcion').value.trim(),
+      contexto_base: document.getElementById('ctx-contexto').value.trim()
+    };
+
+    try {
+      const res  = await fetch(`${API}/api/admin/contexto`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+
+      if (res.ok) showAlert('alert-contexto', 'success', '✓ Configuración guardada');
+      else        showAlert('alert-contexto', 'error', data.error);
+    } catch {
+      showAlert('alert-contexto', 'error', 'Error al guardar');
+    }
+  }
+
+  // ── RESERVACIONES ─────────────────────────────────────
+  const ESTADO_COLORS = {
+    pendiente:  '#f59e0b',
+    confirmada: '#22c55e',
+    cancelada:  '#ef4444'
+  };
+
+  async function loadReservaciones() {
+    const list = document.getElementById('reservaciones-list');
+    list.innerHTML = '<div class="loading">Cargando...</div>';
+
+    try {
+      const res  = await fetch(`${API}/api/admin/reservaciones`);
+      const data = await res.json();
+
+      document.getElementById('reserva-count').textContent = data.length;
+
+      if (data.length === 0) {
+        list.innerHTML = '<div class="loading">No hay reservaciones aún.</div>';
+        return;
+      }
+
+      list.innerHTML = data.reverse().map(r => `
+        <div class="knowledge-item" id="reserva-${r.id}">
+          <div class="knowledge-item-info">
+            <div class="cat" style="color:${ESTADO_COLORS[r.estado] || '#94a3b8'}">${r.estado.toUpperCase()}</div>
+            <div class="pregunta">${escapeHtml(r.nombre)} — ${escapeHtml(r.hospedaje || r.tipo || '')}</div>
+            <div class="respuesta">
+              📞 ${escapeHtml(r.contacto)} &nbsp;|&nbsp;
+              📅 ${escapeHtml(r.fecha_llegada || r.fecha)} &nbsp;|&nbsp;
+              👥 ${r.personas} persona(s)
+              ${r.dias_estancia ? `&nbsp;|&nbsp; 🌙 ${r.dias_estancia} día(s)` : ''}
+              ${r.idioma && r.idioma !== 'es' ? `&nbsp;|&nbsp; 🌐 ${r.idioma.toUpperCase()}` : ''}
+              ${r.origen ? `<br>📍 Origen: ${r.origen}` : ''}
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+            <select onchange="cambiarEstado(${r.id}, this.value)" style="background:#1e293b;border:1px solid rgba(255,255,255,0.1);color:#e2e8f0;padding:4px 8px;border-radius:6px;font-size:12px;cursor:pointer;">
+              <option value="pendiente"  ${r.estado==='pendiente'  ? 'selected':''}>Pendiente</option>
+              <option value="confirmada" ${r.estado==='confirmada' ? 'selected':''}>Confirmada</option>
+              <option value="cancelada"  ${r.estado==='cancelada'  ? 'selected':''}>Cancelada</option>
+            </select>
+            <button class="btn-danger" onclick="eliminarReserva(${r.id})">Eliminar</button>
+          </div>
+        </div>
+      `).join('');
+    } catch {
+      list.innerHTML = '<div class="loading">Error al cargar.</div>';
+    }
+  }
+
+  async function cambiarEstado(id, estado) {
+    try {
+      await fetch(`${API}/api/admin/reservaciones/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado })
+      });
+      showAlert('alert-reservaciones', 'success', `✓ Estado actualizado a "${estado}"`);
+    } catch {
+      showAlert('alert-reservaciones', 'error', 'Error al actualizar');
+    }
+  }
+
+  async function eliminarReserva(id) {
+    if (!confirm(`¿Eliminar reservación ${id}?`)) return;
+    try {
+      const res = await fetch(`${API}/api/admin/reservaciones/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        document.getElementById(`reserva-${id}`)?.remove();
+        const badge = document.getElementById('reserva-count');
+        badge.textContent = parseInt(badge.textContent) - 1;
+        showAlert('alert-reservaciones', 'success', '✓ Reservación eliminada');
+      }
+    } catch {
+      showAlert('alert-reservaciones', 'error', 'Error al eliminar');
+    }
+  }
+
+  function escapeHtml(str) {
+    return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  checkHealth();
+</script>
+</body>
+</html>

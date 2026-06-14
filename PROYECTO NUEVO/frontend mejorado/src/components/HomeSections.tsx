@@ -144,7 +144,7 @@ export default function HomeSections() {
 
                 <h3 style={{
                   fontFamily: "var(--font-display)", fontSize: "1.25rem", fontWeight: 700,
-                  color: "#f0f6fc", marginBottom: "0.6rem", lineHeight: 1.3,
+                  color: "#f0ede8", marginBottom: "0.6rem", lineHeight: 1.3,
                 }}>{s.title}</h3>
 
                 <p style={{
@@ -177,13 +177,13 @@ export default function HomeSections() {
       {/* CTA Banner */}
       <section style={{
         padding: "80px 0",
-        background: "linear-gradient(135deg, rgba(14,165,233,0.08) 0%, rgba(6,15,26,0) 50%, rgba(251,191,36,0.06) 100%)",
+        background: "linear-gradient(135deg, rgba(45,212,191,0.06) 0%, rgba(7,13,26,0) 50%, rgba(212,168,67,0.06) 100%)",
         borderTop: "1px solid var(--border)",
       }}>
         <div className="container">
           <div style={{
-            background: "linear-gradient(135deg, rgba(14,165,233,0.1), rgba(8,49,80,0.4))",
-            border: "1px solid rgba(56,189,248,0.2)",
+            background: "linear-gradient(135deg, rgba(45,212,191,0.08), rgba(10,22,40,0.5))",
+            border: "1px solid rgba(45,212,191,0.18)",
             borderRadius: "var(--radius-lg)",
             padding: "3.5rem 2.5rem",
             textAlign: "center",
@@ -193,7 +193,7 @@ export default function HomeSections() {
             <div style={{
               position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
               width: "400px", height: "200px",
-              background: "radial-gradient(ellipse, rgba(56,189,248,0.1) 0%, transparent 70%)",
+              background: "radial-gradient(ellipse, rgba(45,212,191,0.08) 0%, transparent 70%)",
               pointerEvents: "none",
             }} />
             <span className="section-label" style={{ marginBottom: "1.5rem" }}>🌊 Reserva tu viaje</span>

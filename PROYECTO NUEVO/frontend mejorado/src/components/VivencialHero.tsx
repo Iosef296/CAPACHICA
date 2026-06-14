@@ -6,7 +6,7 @@ export default function VivencialHero() {
 
   useEffect(() => {
     // leer tema inicial
-    const saved = localStorage.getItem("theme");
+    const saved = localStorage.getItem("capachica-theme") || localStorage.getItem("theme");
     setIsDark(saved !== "light");
 
     // escuchar cambios de tema
@@ -40,24 +40,24 @@ export default function VivencialHero() {
     });
   }, [isDark]);
 
-  // colores según tema
+  // colores según tema — paleta actividades (navy/turquoise/gold)
   const heroBg = isDark
-    ? "linear-gradient(to bottom, #123f61 0%, #0d2c45 45%, #06192a 100%)"
-    : "linear-gradient(to bottom, #a8d4ee 0%, #7bbcd8 45%, #5ba3c9 100%)";
+    ? "linear-gradient(to bottom, #0B1426 0%, #0a1628 45%, #070D1A 100%)"
+    : "linear-gradient(to bottom, #0d47a1 0%, #1565c0 45%, #005f73 100%)";
 
-  const lakeBg = isDark ? "#03192b" : "#4a8fba";
-  const moonBg = isDark ? "#d7e4ef" : "#f5b32f";
+  const lakeBg = isDark ? "#020b14" : "#005f73";
+  const moonBg = isDark ? "#F5F0D0" : "#f5b32f";
   const moonShadow = isDark
-    ? "0 0 40px rgba(255,255,255,.35), 0 0 80px rgba(255,255,255,.15)"
+    ? "0 0 30px rgba(245,240,208,0.4), 0 0 60px rgba(245,240,208,0.15)"
     : "0 0 60px rgba(245,179,47,.6), 0 0 120px rgba(245,179,47,.3)";
   const moonSize = isDark ? 90 : 110;
-  const badgeColor = isDark ? "#53d3ff" : "#0b7ab5";
-  const titleColor = isDark ? "#f4f7fb" : "#071826";
-  const subtitleColor = isDark ? "#f5b32f" : "#c47d00";
-  const descColor = isDark ? "#b9c8d6" : "#1a3a52";
-  const lineColor = isDark ? "#89e3ff" : "#0b7ab5";
-  const badgeBg = isDark ? "rgba(83,211,255,0.1)" : "rgba(11,122,181,0.1)";
-  const badgeBorder = isDark ? "rgba(83,211,255,0.3)" : "rgba(11,122,181,0.3)";
+  const badgeColor = isDark ? "#2dd4bf" : "#0f9488";
+  const titleColor = isDark ? "#f0ede8" : "#ffffff";
+  const subtitleColor = isDark ? "#d4a843" : "#f0c96a";
+  const descColor = isDark ? "rgba(240,237,232,0.65)" : "rgba(255,255,255,0.8)";
+  const lineColor = isDark ? "#2dd4bf" : "#0f9488";
+  const badgeBg = isDark ? "rgba(45,212,191,0.10)" : "rgba(15,148,136,0.12)";
+  const badgeBorder = isDark ? "rgba(45,212,191,0.30)" : "rgba(15,148,136,0.35)";
 
   return (
     <section

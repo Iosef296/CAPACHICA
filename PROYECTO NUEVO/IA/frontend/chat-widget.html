@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inti - Asistente Capachica</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* ── BOTÓN FLOTANTE ── */
+    #chat-toggle {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #06b6d4, #f59e0b);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(6,182,212,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+      z-index: 1000;
+    }
+    #chat-toggle:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(6,182,212,0.5); }
+    #chat-toggle svg { width: 28px; height: 28px; fill: white; }
+    #chat-toggle .close-icon { display: none; }
+
+    /* ── VENTANA CHAT ── */
+    #chat-window {
+      position: fixed;
+      bottom: 96px;
+      right: 24px;
+      width: 380px;
+      height: 520px;
+      background: #1e293b;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 999;
+      animation: slideUp 0.25s ease;
+    }
+    #chat-window.open { display: flex; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── HEADER ── */
+    .chat-header {
+      background: linear-gradient(135deg, #0c4a6e, #1e3a5f);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .chat-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #06b6d4, #f59e0b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .chat-header-info h3 { color: #f1f5f9; font-size: 15px; font-weight: 600; }
+    .chat-header-info p  { color: #94a3b8; font-size: 12px; }
+    .status-dot {
+      width: 8px; height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 4px;
+    }
+
+    /* ── MENSAJES ── */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-track { background: transparent; }
+    .chat-messages::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+
+    .msg {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      animation: fadeIn 0.2s ease;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .msg.streaming::after {
+      content: '▋';
+      display: inline;
+      color: #06b6d4;
+      animation: cursor-blink 0.6s steps(1) infinite;
+      margin-left: 1px;
+    }
+    @keyframes cursor-blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .msg.bot {
+      background: #273549;
+      color: #e2e8f0;
+      border-radius: 12px 12px 12px 2px;
+      align-self: flex-start;
+    }
+    .msg.user {
+      background: linear-gradient(135deg, #0369a1, #0e7490);
+      color: white;
+      border-radius: 12px 12px 2px 12px;
+      align-self: flex-end;
+    }
+
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      padding: 12px 14px;
+      background: #273549;
+      border-radius: 12px 12px 12px 2px;
+      align-self: flex-start;
+      width: fit-content;
+    }
+    .typing-indicator span {
+      width: 7px; height: 7px;
+      background: #94a3b8;
+      border-radius: 50%;
+      animation: bounce 1.2s infinite;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-6px); }
+    }
+
+    /* ── INPUT ── */
+    .chat-input-area {
+      padding: 12px 16px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    #chat-input {
+      flex: 1;
+      background: #273549;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #e2e8f0;
+      font-size: 14px;
+      resize: none;
+      max-height: 100px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    #chat-input:focus { border-color: #06b6d4; }
+    #chat-input::placeholder { color: #64748b; }
+
+    #send-btn {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, #06b6d4, #0284c7);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.2s, transform 0.15s;
+      flex-shrink: 0;
+    }
+    #send-btn:hover { opacity: 0.9; transform: scale(1.05); }
+    #send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    #send-btn svg { width: 18px; height: 18px; fill: white; }
+
+    /* ── SUGERENCIAS ── */
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 8px 16px 0;
+    }
+    .suggestion-btn {
+      background: #1e3a5f;
+      border: 1px solid rgba(6,182,212,0.2);
+      color: #7dd3fc;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .suggestion-btn:hover { background: #1e4a7a; }
+
+    /* ── FORMULARIO RESERVA ── */
+    .reserva-form {
+      background: #1a2f4a;
+      border: 1px solid rgba(6,182,212,0.25);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 6px;
+      animation: fadeIn 0.3s ease;
+    }
+    .reserva-form h4 { color: #7dd3fc; font-size: 13px; margin-bottom: 10px; }
+    .reserva-form input,
+    .reserva-form select {
+      width: 100%;
+      background: #0f1f33;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 7px;
+      padding: 8px 10px;
+      color: #e2e8f0;
+      font-size: 13px;
+      margin-bottom: 7px;
+      outline: none;
+      font-family: inherit;
+    }
+    .reserva-form input:focus,
+    .reserva-form select:focus { border-color: #06b6d4; }
+    .reserva-form .row { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .reserva-form .btn-reserva {
+      width: 100%;
+      background: linear-gradient(135deg, #06b6d4, #0284c7);
+      color: white;
+      border: none;
+      padding: 9px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+      transition: opacity 0.2s;
+    }
+    .reserva-form .btn-reserva:hover { opacity: 0.88; }
+
+    /* ── MAPA ── */
+    .mapa-embed {
+      margin-top: 8px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+      animation: fadeIn 0.3s ease;
+    }
+    .mapa-embed iframe { display: block; width: 100%; height: 180px; border: none; }
+    .mapa-link {
+      display: block;
+      text-align: center;
+      padding: 6px;
+      background: rgba(6,182,212,0.1);
+      color: #7dd3fc;
+      font-size: 12px;
+      text-decoration: none;
+    }
+    .mapa-link:hover { background: rgba(6,182,212,0.2); }
+
+    /* ── DEMO PAGE ── */
+    .demo-info {
+      color: #94a3b8;
+      text-align: center;
+      font-size: 13px;
+      padding: 20px;
+    }
+    .demo-info h1 { color: #f1f5f9; font-size: 24px; margin-bottom: 8px; }
+    .demo-info p  { margin-bottom: 6px; }
+    .demo-info code {
+      background: #1e293b;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #06b6d4;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-info">
+    <h1>🤖 Inti — IA Capachica</h1>
+    <p>Chat widget listo para embeber en tu web.</p>
+    <p>Backend: <code>http://localhost:5000</code></p>
+    <p>Haz clic en el botón azul ↘</p>
+  </div>
+
+  <!-- Botón flotante -->
+  <button id="chat-toggle" onclick="toggleChat()" aria-label="Abrir chat">
+    <svg class="open-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+    <svg class="close-icon" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+  </button>
+
+  <!-- Ventana de chat -->
+  <div id="chat-window">
+    <div class="chat-header">
+      <div class="chat-avatar">🌊</div>
+      <div class="chat-header-info">
+        <h3>Inti</h3>
+        <p><span class="status-dot"></span>Asistente de Capachica</p>
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chat-messages">
+      <!-- Mensaje de bienvenida se agrega por JS -->
+    </div>
+
+    <div class="suggestions" id="suggestions">
+      <button class="suggestion-btn" onclick="sendSuggestion('¿Qué es Capachica?')">¿Qué es Capachica?</button>
+      <button class="suggestion-btn" onclick="sendSuggestion('¿Dónde me hospedo?')">¿Dónde me hospedo?</button>
+      <button class="suggestion-btn" onclick="sendSuggestion('¿Cómo llego?')">¿Cómo llego?</button>
+    </div>
+
+    <div class="chat-input-area">
+      <textarea id="chat-input" placeholder="Escribe tu pregunta..." rows="1"
+        onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button id="send-btn" onclick="sendMessage()" aria-label="Enviar">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:5000';
+    let historial = [];
+    let isOpen = false;
+
+    function toggleChat() {
+      isOpen = !isOpen;
+      const win = document.getElementById('chat-window');
+      const toggle = document.getElementById('chat-toggle');
+
+      if (isOpen) {
+        win.classList.add('open');
+        toggle.querySelector('.open-icon').style.display = 'none';
+        toggle.querySelector('.close-icon').style.display = 'block';
+        if (document.getElementById('chat-messages').children.length === 0) {
+          addMessage('bot', '¡Hola! Soy Inti 🌊, tu asistente de turismo en Capachica. ¿En qué puedo ayudarte?');
+        }
+        setTimeout(() => document.getElementById('chat-input').focus(), 100);
+      } else {
+        win.classList.remove('open');
+        toggle.querySelector('.open-icon').style.display = 'block';
+        toggle.querySelector('.close-icon').style.display = 'none';
+      }
+    }
+
+    function addMessage(role, text) {
+      const container = document.getElementById('chat-messages');
+      const div = document.createElement('div');
+      div.className = `msg ${role}`;
+      div.textContent = text;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+      return div;
+    }
+
+    function showTyping() {
+      const container = document.getElementById('chat-messages');
+      const div = document.createElement('div');
+      div.className = 'typing-indicator';
+      div.id = 'typing';
+      div.innerHTML = '<span></span><span></span><span></span>';
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function hideTyping() {
+      const el = document.getElementById('typing');
+      if (el) el.remove();
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const mensaje = input.value.trim();
+      if (!mensaje) return;
+
+      document.getElementById('suggestions').style.display = 'none';
+      addMessage('user', mensaje);
+      historial.push({ role: 'user', content: mensaje });
+      input.value = '';
+      input.style.height = 'auto';
+
+      const btn = document.getElementById('send-btn');
+      btn.disabled = true;
+      showTyping();
+
+      try {
+        const res = await fetch(`${API_URL}/api/chat/stream`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mensaje, historial: historial.slice(-10) })
+        });
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let botMsgEl = null;
+        let displayed = '';
+        let charQueue = [];
+        let streamDone = false;
+        let finalText = '';
+        let typingHidden = false;
+        let animating = false;
+        let buffer = '';
+        const msgs = document.getElementById('chat-messages');
+        const scrollToBottom = () => { msgs.scrollTop = msgs.scrollHeight; };
+
+        // Typewriter: drains charQueue at 14ms/char
+        function animateNext() {
+          if (charQueue.length === 0) {
+            animating = false;
+            if (streamDone) {
+              if (botMsgEl) botMsgEl.classList.remove('streaming');
+              historial.push({ role: 'assistant', content: finalText || displayed });
+            }
+            return;
+          }
+          animating = true;
+          displayed += charQueue.shift();
+          if (botMsgEl) {
+            botMsgEl.textContent = displayed;
+            scrollToBottom();
+          }
+          setTimeout(animateNext, 14);
+        }
+
+        function enqueue(text) {
+          if (!typingHidden) { hideTyping(); typingHidden = true; }
+          if (!botMsgEl) {
+            botMsgEl = addMessage('bot', '');
+            botMsgEl.classList.add('streaming');
+          }
+          charQueue.push(...text.split(''));
+          if (!animating) animateNext();
+        }
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
+
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            const raw = line.slice(6).trim();
+            if (raw === '[DONE]') continue;
+
+            let payload;
+            try { payload = JSON.parse(raw); } catch { continue; }
+
+            if (payload.type === 'meta') {
+              if (payload.accion === 'reserva_form') showReservaForm();
+              if (payload.mapa_url) showMapa(payload.mapa_url);
+
+            } else if (payload.type === 'token') {
+              enqueue(payload.text);
+
+            } else if (payload.type === 'done') {
+              finalText = payload.fullText || displayed;
+              streamDone = true;
+              if (!animating) {
+                if (botMsgEl) botMsgEl.classList.remove('streaming');
+                historial.push({ role: 'assistant', content: finalText });
+              }
+
+            } else if (payload.type === 'reserva_confirmada') {
+              finalText = payload.respuesta || '';
+              streamDone = true;
+              enqueue(finalText);
+              showReservaConfirmada(payload.reserva_id);
+
+            } else if (payload.type === 'reserva_incompleta') {
+              finalText = payload.respuesta || '';
+              streamDone = true;
+              enqueue(finalText);
+
+            } else if (payload.type === 'error') {
+              if (!typingHidden) { hideTyping(); typingHidden = true; }
+              addMessage('bot', '⚠️ ' + payload.message);
+            }
+          }
+        }
+        streamDone = true;
+        if (!animating && botMsgEl) {
+          botMsgEl.classList.remove('streaming');
+          historial.push({ role: 'assistant', content: finalText || displayed });
+        }
+
+      } catch (err) {
+        hideTyping();
+        addMessage('bot', '⚠️ No puedo conectar con el servidor. Verifica que el backend esté corriendo.');
+      } finally {
+        btn.disabled = false;
+        input.focus();
+      }
+    }
+
+    function showReservaForm() {
+      const container = document.getElementById('chat-messages');
+      const div = document.createElement('div');
+      div.className = 'reserva-form';
+      div.innerHTML = `
+        <h4>📅 Formulario de Reserva</h4>
+        <input type="text"   id="r-nombre"        placeholder="Nombre completo *" />
+        <input type="text"   id="r-contacto"      placeholder="Teléfono o email *" />
+        <div class="row">
+          <input type="date"   id="r-fecha_llegada" />
+          <input type="number" id="r-personas"      placeholder="Personas" min="1" value="1" />
+        </div>
+        <div class="row">
+          <input type="number" id="r-dias_estancia" placeholder="Días de estancia" min="1" value="1" />
+          <input type="text"   id="r-hospedaje"     placeholder="Hospedaje elegido *" />
+        </div>
+        <button class="btn-reserva" onclick="enviarReserva(this)">Confirmar Reserva</button>
+      `;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    async function enviarReserva(btn) {
+      const nombre        = document.getElementById('r-nombre').value.trim();
+      const contacto      = document.getElementById('r-contacto').value.trim();
+      const fecha_llegada = document.getElementById('r-fecha_llegada').value;
+      const personas      = document.getElementById('r-personas').value;
+      const dias_estancia = document.getElementById('r-dias_estancia').value;
+      const hospedaje     = document.getElementById('r-hospedaje').value.trim();
+
+      if (!nombre || !contacto || !fecha_llegada || !hospedaje) {
+        addMessage('bot', '⚠️ Por favor completa nombre, contacto, fecha de llegada y hospedaje.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+
+      try {
+        const res = await fetch(`${API_URL}/api/reservar`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombre, contacto, fecha_llegada, personas, dias_estancia, hospedaje })
+        });
+        const data = await res.json();
+
+        btn.closest('.reserva-form').remove();
+
+        if (res.ok) {
+          addMessage('bot', `✅ ${data.mensaje} Tu reserva ha sido registrada. Nos pondremos en contacto con ${contacto} para confirmar.`);
+          historial.push({ role: 'assistant', content: data.mensaje });
+        } else {
+          addMessage('bot', `❌ ${data.error}`);
+          btn.disabled = false;
+          btn.textContent = 'Confirmar Reserva';
+        }
+      } catch {
+        addMessage('bot', '⚠️ Error al enviar la reserva. Intenta de nuevo.');
+        btn.disabled = false;
+        btn.textContent = 'Confirmar Reserva';
+      }
+    }
+
+    function showReservaConfirmada(id) {
+      const container = document.getElementById('chat-messages');
+      const div = document.createElement('div');
+      div.className = 'msg bot';
+      div.style.background = 'rgba(34,197,94,0.12)';
+      div.style.border = '1px solid rgba(34,197,94,0.3)';
+      div.style.color = '#86efac';
+      div.style.fontSize = '13px';
+      div.innerHTML = `✅ <strong>Reserva guardada</strong> · ID: <code style="background:rgba(0,0,0,0.2);padding:1px 5px;border-radius:4px">${id}</code><br><span style="color:#94a3b8;font-size:12px">Recibirás confirmación pronto.</span>`;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function showMapa(url) {
+      const container = document.getElementById('chat-messages');
+      const div = document.createElement('div');
+      div.className = 'mapa-embed';
+      div.innerHTML = `
+        <iframe
+          src="https://maps.google.com/maps?q=Capachica,Puno,Peru&z=13&output=embed"
+          allowfullscreen loading="lazy">
+        </iframe>
+        <a class="mapa-link" href="${url}" target="_blank">🗺️ Abrir en Google Maps</a>
+      `;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function sendSuggestion(text) {
+      document.getElementById('chat-input').value = text;
+      sendMessage();
+    }
+
+    function handleKey(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    }
+
+    function autoResize(el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+    }
+  </script>
+</body>
+</html>

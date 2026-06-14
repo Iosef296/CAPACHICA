@@ -40,7 +40,7 @@ export default function HomeStats() {
   return (
     <section style={{
       padding: "64px 0",
-      background: "linear-gradient(90deg, rgba(6,15,26,0.98), rgba(8,49,80,0.3), rgba(6,15,26,0.98))",
+      background: "linear-gradient(90deg, rgba(7,13,26,0.98), rgba(10,22,40,0.4), rgba(7,13,26,0.98))",
       borderTop: "1px solid var(--border)",
       borderBottom: "1px solid var(--border)",
     }}>
@@ -55,18 +55,18 @@ export default function HomeStats() {
               textAlign: "center",
               padding: "1.5rem 1rem",
               borderRadius: "var(--radius)",
-              background: "rgba(56,189,248,0.04)",
+              background: "rgba(45,212,191,0.04)",
               border: "1px solid var(--border)",
               transition: "all 0.3s",
               transitionDelay: `${i * 0.1}s`,
             }}
             onMouseEnter={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "var(--border-hover)";
-              (e.currentTarget as HTMLElement).style.background = "rgba(56,189,248,0.08)";
+              (e.currentTarget as HTMLElement).style.background = "rgba(45,212,191,0.08)";
             }}
             onMouseLeave={e => {
               (e.currentTarget as HTMLElement).style.borderColor = "var(--border)";
-              (e.currentTarget as HTMLElement).style.background = "rgba(56,189,248,0.04)";
+              (e.currentTarget as HTMLElement).style.background = "rgba(45,212,191,0.04)";
             }}>
               <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>{s.icon}</div>
               <div style={{

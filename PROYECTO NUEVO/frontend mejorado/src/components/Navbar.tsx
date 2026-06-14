@@ -20,7 +20,7 @@ export default function Navbar() {
   const [path, setPath]           = useState("/");
 
   useEffect(() => {
-    const saved = localStorage.getItem("theme");
+    const saved = localStorage.getItem("capachica-theme") || localStorage.getItem("theme");
     const isDark = saved ? saved === "dark" : true;
     setDark(isDark);
     document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
@@ -41,6 +41,7 @@ export default function Navbar() {
     const next = !dark;
     setDark(next);
     document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
+    localStorage.setItem("capachica-theme", next ? "dark" : "light");
     localStorage.setItem("theme", next ? "dark" : "light");
   };
 

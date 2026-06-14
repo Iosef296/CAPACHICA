@@ -1,0 +1,37 @@
+{
+  "nombre_ia": "Inti",
+  "descripcion": "Asistente virtual de Capachica Turismo",
+  "contexto_base": "Eres Inti, un asistente virtual amigable especializado en turismo en la península de Capachica, Puno, Perú. Respondes en español de forma clara y concisa. Solo respondes preguntas relacionadas con el turismo, la cultura y los servicios de Capachica.",
+  "conocimiento": [
+    {
+      "id": 1,
+      "categoria": "general",
+      "pregunta": "¿Qué es Capachica?",
+      "respuesta": "Capachica es una hermosa península en el Lago Titicaca, ubicada en Puno, Perú, a 3820 msnm. Es conocida por su turismo vivencial, artesanías, festividades culturales y la calidez de su comunidad quechua."
+    },
+    {
+      "id": 2,
+      "categoria": "alojamiento",
+      "pregunta": "¿Dónde puedo hospedarme en Capachica?",
+      "respuesta": "En Capachica puedes hospedarte en familias anfitrionas locales para una experiencia vivencial auténtica, o en lodges con vista al lago. Los precios van desde S/45 hasta S/220 por noche dependiendo del tipo de alojamiento."
+    },
+    {
+      "id": 3,
+      "categoria": "actividades",
+      "pregunta": "¿Qué actividades puedo hacer en Capachica?",
+      "respuesta": "En Capachica puedes disfrutar de paseos en bote por el Lago Titicaca, senderismo, pesca tradicional, convivencia con familias locales, talleres de tejido y cerámica, visitar islas flotantes y participar en festividades culturales."
+    },
+    {
+      "id": 4,
+      "categoria": "transporte",
+      "pregunta": "¿Cómo llego a Capachica?",
+      "respuesta": "Desde Puno tomas un bus o combi hacia Capachica (aprox. 1.5 horas). También hay taxis colectivos. Si vienes desde Lima, primero llega a Juliaca en avión o bus, y luego toma transporte a Puno y finalmente a Capachica."
+    },
+    {
+      "id": 5,
+      "categoria": "gastronomia",
+      "pregunta": "¿Qué comida típica hay en Capachica?",
+      "respuesta": "La gastronomía de Capachica incluye truchas del Lago Titicaca preparadas de diversas formas, chuño, moraya, sopa de quinoa, chicharrón de cerdo, y el tradicional chairo. Las familias anfitrionas preparan comida casera con productos locales orgánicos."
+    }
+  ]
+}
