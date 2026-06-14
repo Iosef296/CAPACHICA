@@ -170,7 +170,7 @@ const transportistas = [
   },
 ];
 
-export default function ComoLlegar() {
+export default function ComoLlegar({ hideHero = false }: { hideHero?: boolean }) {
   const [rutaActiva, setRutaActiva] = useState("tierra");
   const [origen, setOrigen] = useState("");
 
@@ -292,51 +292,26 @@ export default function ComoLlegar() {
       `}</style>
 
       {/* HERO */}
-      <section className="llegar-hero">
-        <div className="container">
-          <span
-            className="badge badge-cyan"
-            style={{ marginBottom: 20, display: "inline-block" }}
-          >
-            CÓMO LLEGAR · CAPACHICA
-          </span>
-          <h1 style={{ fontFamily: "var(--font-display)", lineHeight: 0.95 }}>
-            <span
-              className="sec-title"
-              style={{
-                display: "block",
-                fontSize: "clamp(42px,7vw,80px)",
-                fontWeight: 700,
-              }}
-            >
-              Planifica tu
+      {!hideHero && (
+        <section className="llegar-hero">
+          <div className="container">
+            <span className="badge badge-cyan" style={{ marginBottom: 20, display: "inline-block" }}>
+              CÓMO LLEGAR · CAPACHICA
             </span>
-            <span
-              className="gold"
-              style={{
-                display: "block",
-                fontSize: "clamp(38px,6.5vw,72px)",
-                fontStyle: "italic",
-                fontWeight: 400,
-              }}
-            >
-              Viaje
-            </span>
-          </h1>
-          <p
-            className="sec-text"
-            style={{
-              marginTop: 20,
-              fontSize: 16,
-              maxWidth: 500,
-              margin: "20px auto 0",
-              lineHeight: 1.7,
-            }}
-          >
-            Cuentanos tu sueño y lo hacemos realidad. Respondemos en 24 horas.
-          </p>
-        </div>
-      </section>
+            <h1 style={{ fontFamily: "var(--font-display)", lineHeight: 0.95 }}>
+              <span className="sec-title" style={{ display: "block", fontSize: "clamp(42px,7vw,80px)", fontWeight: 700 }}>
+                Planifica tu
+              </span>
+              <span className="gold" style={{ display: "block", fontSize: "clamp(38px,6.5vw,72px)", fontStyle: "italic", fontWeight: 400 }}>
+                Viaje
+              </span>
+            </h1>
+            <p className="sec-text" style={{ marginTop: 20, fontSize: 16, maxWidth: 500, margin: "20px auto 0", lineHeight: 1.7 }}>
+              Cuentanos tu sueño y lo hacemos realidad. Respondemos en 24 horas.
+            </p>
+          </div>
+        </section>
+      )}
 
       {/* CALCULADORA */}
       <section className="llegar-section llegar-bg">

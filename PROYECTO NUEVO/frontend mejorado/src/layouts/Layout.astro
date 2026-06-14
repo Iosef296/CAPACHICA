@@ -14,6 +14,8 @@ const {
   description = 'Descubre la península de Capachica: turismo vivencial, gastronomía andina, festividades ancestrales y los atardeceres más bellos del Titicaca.',
   image = '/og-capachica.jpg',
 } = Astro.props;
+
+const hasHero = Astro.slots.has('hero');
 ---
 <!DOCTYPE html>
 <html lang="es" data-theme="dark">
@@ -72,16 +74,31 @@ const {
       @property --sky-c5 { syntax:'<color>'; initial-value:#1B2D5A; inherits:false; }
       @property --sky-c6 { syntax:'<color>'; initial-value:#243870; inherits:false; }
 
-      /* ── Hero container ── */
+      /* ── Hero container: CIELO (in-flow sky section) ── */
       .layout-hero {
         position: relative;
-        min-height: 100vh;
+        overflow: hidden;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        overflow: hidden;
         padding-top: 64px;
+      }
+      .layout-hero.hero-full  { min-height: 88vh; }
+      .layout-hero.hero-mini  { min-height: 360px; }
+
+      /* ── Hero content zone (page title overlay) ── */
+      .layout-hero-content {
+        position: relative;
+        z-index: 5;
+        text-align: center;
+        padding: clamp(60px, 10vh, 120px) 1.5rem 0;
+        margin-bottom: 200px;
+        width: 100%;
+        max-width: 860px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
 
       /* ── Sky gradient ── */
@@ -248,7 +265,7 @@ const {
         background: linear-gradient(180deg, rgba(200,238,255,0.18) 0%, rgba(0,112,142,0.44) 42%, rgba(0,80,100,0.74) 70%, #005f73 100%) !important;
       }
 
-      /* ── Ocean content area (slot) ── */
+      /* ── MAR: ocean body ── */
       .layout-ocean {
         background: #043a48;
         position: relative;
@@ -271,20 +288,25 @@ const {
 
     <Navbar client:load />
 
-    <!-- ═══════════ HERO ATMOSFÉRICO ═══════════ -->
-    <section class="layout-hero">
+    <!-- ═══════════ CIELO (hero atmosférico) ═══════════ -->
+    <section class={`layout-hero ${hasHero ? 'hero-full' : 'hero-mini'}`}>
       <div class="hero-sky"></div>
       <div class="sky-glow" id="skyGlow"></div>
       <canvas class="stars-layer" id="starsCanvas"></canvas>
       <div class="hero-birds" id="heroBirds"></div>
       <div class="hero-moon"></div>
+      {hasHero && (
+        <div class="layout-hero-content">
+          <slot name="hero" />
+        </div>
+      )}
       <div class="hero-waves">
         <div class="wave wave-sand"></div>
         <div class="wave wave-water"></div>
       </div>
     </section>
 
-    <!-- ═══════════ CONTENIDO DE PÁGINA ═══════════ -->
+    <!-- ═══════════ MAR (contenido de página) ═══════════ -->
     <main class="layout-ocean">
       <slot />
     </main>

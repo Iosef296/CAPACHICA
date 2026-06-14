@@ -609,6 +609,28 @@ const tipoColor: Record<string,string> = { Religiosa:'#9333ea', Ceremonial:'#f59
     @keyframes birdFloat2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-14px,-10px)} }
     @keyframes birdFloat3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(22px,-8px)} }
     @keyframes birdFloat4 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-10px,-14px)} }
+
+    /* ─── CAMPFIRE (dark mode) ─── */
+    .illo-campfire  { position:absolute; bottom:0; right:40px; width:300px; height:300px; z-index:5; pointer-events:none; animation:campfireFlicker 2.0s ease-in-out infinite; }
+    .illo-campfire2 { position:absolute; bottom:0; left:40px;  width:300px; height:300px; z-index:5; pointer-events:none; animation:campfireFlicker 2.4s ease-in-out infinite 0.35s; transform:scaleX(-1); }
+    [data-theme="light"] .illo-campfire  { display:none !important; }
+    [data-theme="light"] .illo-campfire2 { display:none !important; }
+    .illo-campfire img, .illo-campfire2 img { width:100%; height:100%; display:block; image-rendering:pixelated; }
+    @keyframes campfireFlicker {
+      0%,100% { filter:drop-shadow(0 0 28px rgba(255,110,10,0.80)) drop-shadow(0 0 65px rgba(255,60,0,0.45)); }
+      25%     { filter:drop-shadow(0 0 44px rgba(255,150,20,0.95)) drop-shadow(0 0 90px rgba(255,80,10,0.60)); }
+      60%     { filter:drop-shadow(0 0 18px rgba(255,80,0,0.60))  drop-shadow(0 0 45px rgba(255,40,0,0.35)); }
+    }
+    /* ─── BEACH BALLS (light mode) ─── */
+    [data-theme="dark"] .beach-ball-wrap { display:none !important; }
+    .beach-ball-wrap { position:absolute; z-index:5; pointer-events:none; display:flex; flex-direction:column; align-items:center; }
+    .beach-ball { position:relative; border-radius:50%; background:conic-gradient(from 12deg,#FF3333 0deg 60deg,#FFD700 60deg 120deg,#33CC55 120deg 180deg,#1E8FFF 180deg 240deg,#FF33AA 240deg 300deg,#FF7700 300deg 360deg); box-shadow:0 16px 40px rgba(0,0,0,0.40),0 5px 12px rgba(0,0,0,0.22),inset 0 -18px 32px rgba(0,0,0,0.32),inset 0 16px 24px rgba(255,255,255,0.42); animation:beachBallBounce var(--bb-dur,2.8s) linear infinite; animation-delay:var(--bb-delay,0s); }
+    .beach-ball::before { content:''; position:absolute; inset:0; border-radius:50%; background:radial-gradient(ellipse 58% 46% at 30% 25%,rgba(255,255,255,0.75) 0%,rgba(255,255,255,0.22) 35%,transparent 64%); }
+    .beach-ball-shadow { border-radius:50%; background:radial-gradient(ellipse,rgba(0,0,0,0.30) 0%,transparent 72%); transform:scaleY(0.25); transform-origin:center top; margin-top:-2px; animation:beachShadowAnim var(--bb-dur,2.8s) linear infinite; animation-delay:var(--bb-delay,0s); }
+    @keyframes beachBallBounce { 0%{transform:translateY(0) rotate(0deg);animation-timing-function:cubic-bezier(0.33,0,0.66,0)} 50%{transform:translateY(-28px) rotate(16deg);animation-timing-function:cubic-bezier(0.33,1,0.66,1)} 100%{transform:translateY(0) rotate(32deg)} }
+    @keyframes beachShadowAnim { 0%{transform:scaleY(0.24) scaleX(1.0);opacity:0.55} 50%{transform:scaleY(0.10) scaleX(0.64);opacity:0.20} 100%{transform:scaleY(0.24) scaleX(1.0);opacity:0.55} }
+    @media(max-width:900px) { .illo-campfire{transform:scale(0.65);transform-origin:bottom right} .illo-campfire2{transform:scaleX(-1) scale(0.65);transform-origin:bottom left} }
+    @media(max-width:768px) { .illo-campfire{transform:scale(0.48);bottom:0;right:-10px;opacity:0.55;transform-origin:bottom right} .illo-campfire2{transform:scaleX(-1) scale(0.48);bottom:0;left:-10px;opacity:0.55;transform-origin:bottom left} .beach-ball-wrap{display:none} }
   </style>
 </head>
 <body>
@@ -780,6 +802,22 @@ const tipoColor: Record<string,string> = { Religiosa:'#9333ea', Ceremonial:'#f59
 
 <!-- FOOTER -->
 <footer class="arena-footer">
+  <!-- Fogatas (dark mode) -->
+  <div class="illo-campfire">
+    <img src="/campfire.png" alt="" aria-hidden="true" />
+  </div>
+  <div class="illo-campfire2">
+    <img src="/campfire.png" alt="" aria-hidden="true" />
+  </div>
+  <!-- Pelotas (light mode) -->
+  <div class="beach-ball-wrap" style="bottom:22px;right:65px;">
+    <div class="beach-ball" style="width:100px;height:100px;--bb-dur:2.9s;--bb-delay:0s;"></div>
+    <div class="beach-ball-shadow" style="width:100px;height:26px;"></div>
+  </div>
+  <div class="beach-ball-wrap" style="bottom:22px;left:65px;">
+    <div class="beach-ball" style="width:100px;height:100px;--bb-dur:3.3s;--bb-delay:0.55s;"></div>
+    <div class="beach-ball-shadow" style="width:100px;height:26px;"></div>
+  </div>
   <div class="arena-footer-body">
     <div class="arena-footer-grid">
       <div class="arena-brand-col">

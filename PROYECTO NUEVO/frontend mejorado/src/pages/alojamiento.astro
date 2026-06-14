@@ -90,36 +90,24 @@ function stars(n: number) {
   title="Alojamiento — Capachica Turismo"
   description="Hospedaje auténtico en Capachica: familias anfitrionas quechuas, lodges con vista al Titicaca y hostales para todos los presupuestos."
 >
-  <div style="min-height:100vh;background:var(--bg-main);padding-top:66px;">
-
-    <!-- Hero -->
-    <div style="position:relative;padding:5.5rem 1.5rem 3.5rem;text-align:center;overflow:hidden;">
-      <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(56,189,248,0.1) 0%,transparent 65%);pointer-events:none;"></div>
-      <div style="position:relative;z-index:1;max-width:660px;margin:0 auto;">
-        <span class="section-label reveal">🏡 Hospedaje Auténtico</span>
-        <h1 class="section-title reveal" style="font-size:clamp(2.2rem,5.5vw,3.8rem);margin-bottom:1rem;">
-          Duerme en <span class="gradient-text">Capachica</span>
-        </h1>
-        <p class="reveal" style="font-size:1rem;color:var(--text2);line-height:1.78;max-width:520px;margin:0 auto 2rem;">
-          Despierta con el lago en tu ventana. Desde familias anfitrionas auténticas hasta lodges con vistas espectaculares, hay un alojamiento perfecto para ti.
-        </p>
-
-        <!-- Filtros visuales -->
-        <div class="reveal" style="display:flex;justify-content:center;gap:0.6rem;flex-wrap:wrap;">
-          {["Todos","Familia Anfitriona","Lodge","Hostal","Casa Rural"].map((f,i) => (
-            <span style={`
-              padding:0.45rem 1.1rem;border-radius:999px;font-size:0.82rem;font-weight:500;cursor:default;
-              ${i===0
-                ? "background:linear-gradient(135deg,#0ea5e9,#0369a1);color:#fff;box-shadow:0 2px 12px rgba(56,189,248,0.3);"
-                : "background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.2);color:var(--text2);"}
-            `}>{f}</span>
-          ))}
-        </div>
-      </div>
+  <!-- CIELO: hero -->
+  <Fragment slot="hero">
+    <span class="section-label">🏡 Hospedaje Auténtico</span>
+    <h1 class="section-title" style="font-size:clamp(2.2rem,5.5vw,3.8rem);margin-bottom:1rem;">
+      Duerme en <span class="gradient-text">Capachica</span>
+    </h1>
+    <p style="font-size:1rem;color:var(--text2);line-height:1.78;max-width:520px;margin:0 auto 2rem;">
+      Despierta con el lago en tu ventana. Desde familias anfitrionas auténticas hasta lodges con vistas espectaculares, hay un alojamiento perfecto para ti.
+    </p>
+    <div style="display:flex;justify-content:center;gap:0.6rem;flex-wrap:wrap;">
+      {["Todos","Familia Anfitriona","Lodge","Hostal","Casa Rural"].map((f,i) => (
+        <span style={`padding:0.45rem 1.1rem;border-radius:999px;font-size:0.82rem;font-weight:500;cursor:default;${i===0?"background:linear-gradient(135deg,#0ea5e9,#0369a1);color:#fff;box-shadow:0 2px 12px rgba(56,189,248,0.3);":"background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.2);color:var(--text2);"}`}>{f}</span>
+      ))}
     </div>
+  </Fragment>
 
-    <!-- Grid -->
-    <div style="max-width:1200px;margin:0 auto;padding:0 1.5rem 4rem;">
+  <!-- MAR: contenido -->
+  <div style="max-width:1200px;margin:0 auto;padding:4rem 1.5rem 4rem;">
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.5rem;">
         {opciones.map((o, i) => (
           <div class="reveal card" style={`padding:0;overflow:hidden;transition-delay:${i*0.07}s;position:relative;`}>
@@ -183,9 +171,9 @@ function stars(n: number) {
       </div>
     </div>
 
-    <!-- Info Banner -->
-    <div style="border-top:1px solid var(--border);padding:4rem 1.5rem;background:linear-gradient(to bottom,rgba(56,189,248,0.04),transparent);">
-      <div style="max-width:900px;margin:0 auto;">
+  <!-- Info Banner -->
+  <div style="border-top:1px solid rgba(45,212,191,0.14);padding:4rem 1.5rem;">
+    <div style="max-width:900px;margin:0 auto;">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;">
           {[
             {icon:"✅",title:"Verificados",desc:"Todos los alojamientos son inspeccionados y verificados por nuestro equipo."},
@@ -201,7 +189,5 @@ function stars(n: number) {
           ))}
         </div>
       </div>
-    </div>
-
   </div>
 </Layout>

@@ -3,5 +3,17 @@ import Layout from '../layouts/Layout.astro';
 import Artesania from '../components/Artesania';
 ---
 <Layout title="Artesanía — Capachica">
-  <Artesania client:load />
+  <Fragment slot="hero">
+    <span class="section-label">ARTESANÍA · CAPACHICA</span>
+    <h1 style="font-family:var(--font-display);font-size:clamp(3rem,7vw,5.5rem);line-height:1.05;color:var(--text-main);margin-bottom:0.4rem;">
+      Artesanía
+    </h1>
+    <h1 style="font-family:var(--font-display);font-size:clamp(2.6rem,6.5vw,5rem);font-style:italic;font-weight:400;color:var(--gold);line-height:1.05;margin-bottom:1.2rem;">
+      Capachiqueña
+    </h1>
+    <p style="font-size:clamp(1rem,2vw,1.1rem);color:var(--text2);max-width:480px;margin:0 auto 2rem;line-height:1.7;">
+      Tejidos de alpaca, cerámica andina y artesanías hechas a mano centenarias.
+    </p>
+  </Fragment>
+  <Artesania client:load hideHero={true} />
 </Layout>

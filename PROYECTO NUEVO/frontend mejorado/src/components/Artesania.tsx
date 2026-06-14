@@ -121,7 +121,7 @@ const talleres: TallerItem[] = [
   },
 ];
 
-export default function ArtesaniaPage() {
+export default function ArtesaniaPage({ hideHero = false }: { hideHero?: boolean }) {
   const { lang, t } = useLang();
   const [categoria, setCategoria] = useState("todos");
   const [moneda, setMoneda] = useState<"soles" | "usd">("soles");
@@ -184,48 +184,26 @@ export default function ArtesaniaPage() {
         @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
       `}</style>
 
-      <section className="artesania-hero" id="artesania">
-        <div className="container">
-          <span className="badge badge-gold">
-            {t?.artesania?.badge || "ARTESANÍA"}
-          </span>
-          <h1 style={{ fontFamily: "var(--font-display)", lineHeight: 0.95 }}>
-            <span
-              className="sec-title"
-              style={{
-                display: "block",
-                fontSize: "clamp(42px,7vw,80px)",
-                fontWeight: 700,
-              }}
-            >
-              {t?.artesania?.titulo || "Artesanía"}
+      {!hideHero && (
+        <section className="artesania-hero" id="artesania">
+          <div className="container">
+            <span className="badge badge-gold">
+              {t?.artesania?.badge || "ARTESANÍA"}
             </span>
-            <span
-              className="art-gold"
-              style={{
-                display: "block",
-                fontSize: "clamp(38px,6.5vw,72px)",
-                fontStyle: "italic",
-                fontWeight: 400,
-              }}
-            >
-              {t?.artesania?.subtitulo || "Capachiqueña"}
-            </span>
-          </h1>
-          <p
-            className="sec-text"
-            style={{
-              marginTop: 20,
-              fontSize: 16,
-              maxWidth: 500,
-              margin: "20px auto 0",
-              lineHeight: 1.7,
-            }}
-          >
-            {t?.artesania?.descripcion || "Artesanía tradicional de Capachica"}
-          </p>
-        </div>
-      </section>
+            <h1 style={{ fontFamily: "var(--font-display)", lineHeight: 0.95 }}>
+              <span className="sec-title" style={{ display: "block", fontSize: "clamp(42px,7vw,80px)", fontWeight: 700 }}>
+                {t?.artesania?.titulo || "Artesanía"}
+              </span>
+              <span className="art-gold" style={{ display: "block", fontSize: "clamp(38px,6.5vw,72px)", fontStyle: "italic", fontWeight: 400 }}>
+                {t?.artesania?.subtitulo || "Capachiqueña"}
+              </span>
+            </h1>
+            <p className="sec-text" style={{ marginTop: 20, fontSize: 16, maxWidth: 500, margin: "20px auto 0", lineHeight: 1.7 }}>
+              {t?.artesania?.descripcion || "Artesanía tradicional de Capachica"}
+            </p>
+          </div>
+        </section>
+      )}
 
       <section className="artesania-catalogo">
         <div className="container">
