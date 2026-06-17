@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Navbar from '../components/Navbar';
 import ArenaFooter from '../components/ArenaFooter.astro';
+import ChatWidget from '../components/ChatWidget';
 
 interface Props {
   title?: string;
@@ -236,22 +237,43 @@ const hasHero = Astro.slots.has('hero');
         will-change: transform, opacity, filter;
       }
       @keyframes themeSwitchDown {
-        0%   { transform:translateX(-50%) translateY(0) rotate(0deg) scale(1);              opacity:1;    filter:brightness(1) blur(0px); }
-        20%  { transform:translateX(calc(-50% + 8vw)) translateY(5vh) rotate(-20deg) scale(0.97);    opacity:0.95; filter:brightness(0.92) blur(0.2px); }
-        40%  { transform:translateX(calc(-50% + 18vw)) translateY(14vh) rotate(-60deg) scale(0.88);  opacity:0.8;  filter:brightness(0.76) blur(0.7px); }
-        60%  { transform:translateX(calc(-50% + 30vw)) translateY(24vh) rotate(-120deg) scale(0.66); opacity:0.5;  filter:brightness(0.45) blur(1.5px); }
-        80%  { transform:translateX(calc(-50% + 40vw)) translateY(36vh) rotate(-200deg) scale(0.32); opacity:0.17; filter:brightness(0.15) blur(3.3px); }
-        100% { transform:translateX(calc(-50% + 52vw)) translateY(52vh) rotate(-360deg) scale(0.02); opacity:0;    filter:brightness(0.02) blur(7px); }
+        0%   { transform:translateX(-50%)              translateY(0)    rotate(0deg)   scale(1);    opacity:1;    filter:brightness(1)   blur(0px);   }
+        5%   { transform:translateX(calc(-50% + 3vw))  translateY(2vh)  rotate(10deg)  scale(0.99); opacity:0.99; filter:brightness(0.99) blur(0px);   }
+        12%  { transform:translateX(calc(-50% + 8vw))  translateY(6vh)  rotate(26deg)  scale(0.96); opacity:0.96; filter:brightness(0.95) blur(0.1px); }
+        20%  { transform:translateX(calc(-50% + 15vw)) translateY(12vh) rotate(48deg)  scale(0.91); opacity:0.90; filter:brightness(0.87) blur(0.2px); }
+        30%  { transform:translateX(calc(-50% + 23vw)) translateY(20vh) rotate(76deg)  scale(0.84); opacity:0.81; filter:brightness(0.75) blur(0.5px); }
+        40%  { transform:translateX(calc(-50% + 31vw)) translateY(28vh) rotate(104deg) scale(0.74); opacity:0.69; filter:brightness(0.60) blur(0.9px); }
+        50%  { transform:translateX(calc(-50% + 38vw)) translateY(36vh) rotate(130deg) scale(0.62); opacity:0.56; filter:brightness(0.46) blur(1.4px); }
+        60%  { transform:translateX(calc(-50% + 44vw)) translateY(43vh) rotate(154deg) scale(0.48); opacity:0.42; filter:brightness(0.33) blur(2px);   }
+        70%  { transform:translateX(calc(-50% + 49vw)) translateY(49vh) rotate(175deg) scale(0.34); opacity:0.27; filter:brightness(0.21) blur(3px);   }
+        80%  { transform:translateX(calc(-50% + 53vw)) translateY(53vh) rotate(194deg) scale(0.20); opacity:0.14; filter:brightness(0.11) blur(4.5px); }
+        90%  { transform:translateX(calc(-50% + 56vw)) translateY(56vh) rotate(209deg) scale(0.09); opacity:0.05; filter:brightness(0.05) blur(6.5px); }
+        100% { transform:translateX(calc(-50% + 58vw)) translateY(58vh) rotate(220deg) scale(0.02); opacity:0;    filter:brightness(0.02) blur(8px);   }
       }
       @keyframes themeSwitchUp {
-        0%   { transform:translateX(calc(-50% + 52vw)) translateY(52vh) rotate(0deg) scale(0.02);    opacity:0;    filter:brightness(0.02) blur(7px); }
-        20%  { transform:translateX(calc(-50% + 36vw)) translateY(31vh) rotate(70deg) scale(0.36);   opacity:0.23; filter:brightness(0.25) blur(2.3px); }
-        40%  { transform:translateX(calc(-50% + 18vw)) translateY(12vh) rotate(150deg) scale(0.74);  opacity:0.6;  filter:brightness(0.64) blur(0.8px); }
-        60%  { transform:translateX(calc(-50% + 6vw))  translateY(2vh)  rotate(230deg) scale(0.935); opacity:0.89; filter:brightness(0.92) blur(0.2px); }
-        80%  { transform:translateX(calc(-50% + 0.8vw)) translateY(0.1vh) rotate(310deg) scale(0.994);opacity:0.985;filter:brightness(0.99) blur(0px); }
-        100% { transform:translateX(-50%) translateY(0) rotate(360deg) scale(1);              opacity:1;    filter:brightness(1) blur(0px); }
+        0%   { transform:translateX(calc(-50% - 58vw)) translateY(58vh) rotate(0deg)    scale(0.02); opacity:0;    filter:brightness(0.02) blur(8px);   }
+        10%  { transform:translateX(calc(-50% - 56vw)) translateY(56vh) rotate(-12deg)  scale(0.09); opacity:0.05; filter:brightness(0.05) blur(6.5px); }
+        20%  { transform:translateX(calc(-50% - 53vw)) translateY(53vh) rotate(-28deg)  scale(0.20); opacity:0.14; filter:brightness(0.11) blur(4.5px); }
+        30%  { transform:translateX(calc(-50% - 49vw)) translateY(49vh) rotate(-47deg)  scale(0.34); opacity:0.27; filter:brightness(0.21) blur(3px);   }
+        40%  { transform:translateX(calc(-50% - 44vw)) translateY(43vh) rotate(-68deg)  scale(0.48); opacity:0.42; filter:brightness(0.33) blur(2px);   }
+        50%  { transform:translateX(calc(-50% - 38vw)) translateY(36vh) rotate(-92deg)  scale(0.62); opacity:0.56; filter:brightness(0.46) blur(1.4px); }
+        60%  { transform:translateX(calc(-50% - 31vw)) translateY(28vh) rotate(-118deg) scale(0.74); opacity:0.69; filter:brightness(0.60) blur(0.9px); }
+        70%  { transform:translateX(calc(-50% - 23vw)) translateY(20vh) rotate(-146deg) scale(0.84); opacity:0.81; filter:brightness(0.75) blur(0.5px); }
+        80%  { transform:translateX(calc(-50% - 15vw)) translateY(12vh) rotate(-174deg) scale(0.91); opacity:0.90; filter:brightness(0.87) blur(0.2px); }
+        88%  { transform:translateX(calc(-50% - 8vw))  translateY(6vh)  rotate(-196deg) scale(0.96); opacity:0.96; filter:brightness(0.95) blur(0.1px); }
+        95%  { transform:translateX(calc(-50% - 3vw))  translateY(2vh)  rotate(-212deg) scale(0.99); opacity:0.99; filter:brightness(0.99) blur(0px);   }
+        100% { transform:translateX(-50%)              translateY(0)    rotate(-220deg) scale(1);    opacity:1;    filter:brightness(1)    blur(0px);   }
       }
 
+      /* Lock falling sphere to its PRE-transition color until off-screen */
+      [data-theme="light"] .hero-moon.theme-switching-down {
+        background: radial-gradient(circle at 35% 35%, #e8e0cc, #c8bfa0 60%, #a09070) !important;
+        box-shadow: 0 0 40px rgba(220,200,150,0.35), 0 0 80px rgba(220,200,150,0.15), inset -12px -12px 20px rgba(0,0,0,0.25) !important;
+      }
+      [data-theme="dark"] .hero-moon.theme-switching-down {
+        background: radial-gradient(circle at 35% 35%, #FFD700, #FFA500 60%, #FF8C00) !important;
+        box-shadow: 0 0 40px rgba(255,215,0,0.45), 0 0 80px rgba(255,165,0,0.25), inset -12px -12px 20px rgba(0,0,0,0.1) !important;
+      }
       /* ── Birds (light mode) ── */
       .hero-birds { position:absolute; inset:0; z-index:2; pointer-events:none; overflow:visible; opacity:0; transition:opacity 2.4s cubic-bezier(0.33,0,0.12,1); }
       [data-theme="light"] .hero-birds { opacity:1; }
@@ -357,6 +379,18 @@ const hasHero = Astro.slots.has('hero');
     </main>
 
     <ArenaFooter />
+    <ChatWidget client:load />
+
+    <style is:global>
+      @keyframes chatPanelIn {
+        from { opacity:0; transform:translateY(16px) scale(0.96); }
+        to   { opacity:1; transform:translateY(0)    scale(1); }
+      }
+      @keyframes chatDot {
+        0%,80%,100% { transform:scale(0.6); opacity:0.4; }
+        40%          { transform:scale(1);   opacity:1; }
+      }
+    </style>
 
     <script is:inline>
       /* ── STARS (gentle twinkle, same as index.astro) ── */

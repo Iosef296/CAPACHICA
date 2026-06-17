@@ -124,6 +124,26 @@
   </div>
 </footer>
 
+<style is:global>
+  [data-theme="light"] .arena-footer { background: linear-gradient(180deg,#edd890 0%,#dbb852 28%,#c89838 60%,#ae7e20 100%) !important; }
+  [data-theme="light"] .arena-footer::before { display: none; }
+  [data-theme="light"] .arena-brand-name { color: rgba(26,16,4,0.95) !important; }
+  [data-theme="light"] .arena-brand-tagline { color: rgba(90,55,5,0.80) !important; }
+  [data-theme="light"] .arena-heading { color: rgba(60,35,4,0.90) !important; }
+  [data-theme="light"] .arena-link { color: rgba(26,14,2,0.80) !important; }
+  [data-theme="light"] .arena-link:hover { color: rgba(26,14,2,1) !important; }
+  [data-theme="light"] .arena-text { color: rgba(26,14,2,0.72) !important; }
+  [data-theme="light"] .arena-social-btn { color: rgba(26,14,2,0.70) !important; border-color: rgba(90,55,5,0.40); background: rgba(90,55,5,0.12); }
+  [data-theme="light"] .arena-social-btn:hover { color: rgba(26,14,2,1) !important; background: rgba(90,55,5,0.25); border-color: rgba(90,55,5,0.65); }
+  [data-theme="light"] .arena-contact-item { color: rgba(26,14,2,0.72) !important; }
+  [data-theme="light"] .arena-contact-item:hover { color: rgba(26,14,2,1) !important; }
+  [data-theme="light"] .arena-newsletter-input { background: rgba(255,255,255,0.50) !important; border-color: rgba(90,55,5,0.40) !important; color: rgba(26,14,2,0.95) !important; }
+  [data-theme="light"] .arena-newsletter-input::placeholder { color: rgba(26,14,2,0.40) !important; }
+  [data-theme="light"] .arena-link-list li::before { background: rgba(90,55,5,0.55) !important; }
+  [data-theme="light"] .arena-footer-grid { border-bottom-color: rgba(90,55,5,0.22) !important; }
+  [data-theme="light"] .arena-bottom-bar { border-top-color: rgba(90,55,5,0.22) !important; }
+</style>
+
 <script is:inline>
   (function() {
     const form  = document.getElementById('arenaNewsletterForm');

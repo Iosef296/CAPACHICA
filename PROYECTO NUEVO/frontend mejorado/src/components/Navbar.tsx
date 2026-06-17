@@ -60,12 +60,12 @@ export default function Navbar() {
           border-radius: 999px;
           font-size: 13px;
           font-weight: 500;
-          color: var(--text2);
+          color: rgba(240,237,232,0.85);
           text-decoration: none;
           transition: all 0.22s;
           white-space: nowrap;
         }
-        .nav-link:hover { color: var(--accent); background: var(--accent-light); }
+        .nav-link:hover { color: #fff; background: rgba(255,255,255,0.15); }
         .nav-link.active {
           background: linear-gradient(135deg,#0ea5e9,#0369a1);
           color: #fff !important;
@@ -99,13 +99,14 @@ export default function Navbar() {
       <nav style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
         background: scrolled || menuOpen
-          ? dark ? "rgba(6,15,26,0.92)" : "rgba(230,243,252,0.94)"
+          ? dark ? "rgba(6,15,26,0.75)" : "rgba(13,71,161,0.35)"
           : "transparent",
-        backdropFilter: scrolled || menuOpen ? "blur(20px) saturate(180%)" : "none",
-        WebkitBackdropFilter: scrolled || menuOpen ? "blur(20px) saturate(180%)" : "none",
+        backdropFilter: scrolled || menuOpen ? "blur(24px) saturate(200%)" : "none",
+        WebkitBackdropFilter: scrolled || menuOpen ? "blur(24px) saturate(200%)" : "none",
         borderBottom: scrolled || menuOpen
           ? `1px solid rgba(56,189,248,${dark ? "0.12" : "0.2"})`
           : "1px solid transparent",
+        boxShadow: scrolled || menuOpen ? "0 4px 24px rgba(0,0,0,0.08)" : "none",
         transition: "all 0.35s ease",
         padding: "0 1.5rem",
       }}>
@@ -123,10 +124,10 @@ export default function Navbar() {
               animation: "pulse-glow 3s ease-in-out infinite",
             }}>C</div>
             <div>
-              <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "var(--text)", lineHeight: 1 }}>
+              <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "rgba(240,237,232,0.95)", lineHeight: 1 }}>
                 Capachica
               </div>
-              <div style={{ fontSize: 9, color: "var(--text3)", letterSpacing: "0.14em", textTransform: "uppercase" }}>
+              <div style={{ fontSize: 9, color: "rgba(240,237,232,0.50)", letterSpacing: "0.14em", textTransform: "uppercase" }}>
                 Turismo Vivencial
               </div>
             </div>

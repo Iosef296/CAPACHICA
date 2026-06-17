@@ -1,6 +1,7 @@
 ---
 // src/pages/festividades.astro
 import Navbar from '../components/Navbar';
+import ArenaFooter from '../components/ArenaFooter.astro';
 let festividades = [];
 try {
   const res = await fetch('http://localhost:3000/api/festividades');
@@ -31,6 +32,10 @@ const tipoColor: Record<string,string> = { Religiosa:'#9333ea', Ceremonial:'#f59
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Pro:wght@300;400;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <style is:global>
+    @property --sky-c1 { syntax:'<color>'; initial-value:#070D1A; inherits:false; }
+    @property --sky-c2 { syntax:'<color>'; initial-value:#0B1426; inherits:false; }
+    @property --sky-c3 { syntax:'<color>'; initial-value:#132042; inherits:false; }
+    @property --sky-c4 { syntax:'<color>'; initial-value:#1B2D5A; inherits:false; }
     /* ─── CSS VARS (same as actividades) ─── */
     :root {
       --turquoise: #2dd4bf;
@@ -107,49 +112,106 @@ const tipoColor: Record<string,string> = { Religiosa:'#9333ea', Ceremonial:'#f59
     .stars-layer { position:absolute; inset:0; z-index:1; pointer-events:none; }
     [data-theme="light"] .stars-layer { opacity:0; transition:opacity 1s ease; }
     .hero-moon {
-      position:absolute; top:8%; right:14%; z-index:2; pointer-events:none;
-      animation:moonFloat 8s ease-in-out infinite;
+      position:absolute; top:9%; left:50%; transform:translateX(-50%);
+      width:90px; height:90px; border-radius:50%; z-index:6; pointer-events:none;
+      background: radial-gradient(circle at 35% 35%, #e8e0cc, #c8bfa0 60%, #a09070);
+      box-shadow: 0 0 40px rgba(220,200,150,0.35), 0 0 80px rgba(220,200,150,0.15), inset -12px -12px 20px rgba(0,0,0,0.25);
+      animation: moonPulse 6s ease-in-out infinite;
     }
-    .hero-moon::before {
-      content:''; display:block; width:72px; height:72px;
-      border-radius:50%; background:#F5F0D0;
-      box-shadow: 0 0 30px rgba(245,240,208,0.4), 0 0 60px rgba(245,240,208,0.15);
+    .hero-moon::before, .hero-moon::after { display:none; }
+    [data-theme="light"] .hero-moon {
+      background: radial-gradient(circle at 35% 35%, #FFD700, #FFA500 60%, #FF8C00) !important;
+      box-shadow: 0 0 40px rgba(255,215,0,0.45), 0 0 80px rgba(255,165,0,0.25), inset -12px -12px 20px rgba(0,0,0,0.1) !important;
+      animation: sunPulse 6s ease-in-out infinite !important;
     }
-    .hero-moon::after {
-      content:''; position:absolute; top:-4px; left:16px;
-      width:58px; height:58px; border-radius:50%; background:#0B1426;
+    .hero-moon.theme-switching-down {
+      animation: themeSwitchDown 2.4s cubic-bezier(0.33,0,0.12,1) forwards !important;
+      will-change: transform, opacity, filter;
     }
-    [data-theme="light"] .hero-moon { opacity:0; }
-    @keyframes moonFloat {
-      0%,100% { transform:translateY(0); }
-      50% { transform:translateY(-10px); }
+    .hero-moon.theme-switching-up {
+      animation: themeSwitchUp 2.4s cubic-bezier(0.33,0,0.12,1) forwards !important;
+      will-change: transform, opacity, filter;
     }
-    .hero-sun {
-      position:absolute; top:9%; right:15%; z-index:2; pointer-events:none;
-      opacity:0; transition:opacity 1.5s ease;
+    .hero-sky.sky-transitioning         { animation: skyToLight 2.4s cubic-bezier(0.33,0,0.12,1) forwards !important; }
+    .hero-sky.sky-transitioning-reverse { animation: skyToDark  2.4s cubic-bezier(0.33,0,0.12,1) forwards !important; }
+    @keyframes moonPulse {
+      0%,100% { box-shadow: 0 0 40px rgba(220,200,150,0.35), 0 0 80px rgba(220,200,150,0.15), inset -12px -12px 20px rgba(0,0,0,0.25); }
+      50%     { box-shadow: 0 0 55px rgba(220,200,150,0.5),  0 0 110px rgba(220,200,150,0.25), inset -12px -12px 20px rgba(0,0,0,0.25); }
     }
-    [data-theme="light"] .hero-sun { opacity:1; }
-    .sun-rays {
-      width:160px; height:160px; position:absolute; top:50%; left:50%;
-      transform:translate(-50%,-50%);
-      background:conic-gradient(from 0deg,transparent 0deg,rgba(255,215,0,0.3) 8deg,transparent 16deg,transparent 30deg,rgba(255,215,0,0.3) 38deg,transparent 46deg,transparent 60deg,rgba(255,215,0,0.3) 68deg,transparent 76deg,transparent 90deg,rgba(255,215,0,0.3) 98deg,transparent 106deg,transparent 120deg,rgba(255,215,0,0.3) 128deg,transparent 136deg,transparent 150deg,rgba(255,215,0,0.3) 158deg,transparent 166deg,transparent 180deg,rgba(255,215,0,0.3) 188deg,transparent 196deg,transparent 210deg,rgba(255,215,0,0.3) 218deg,transparent 226deg,transparent 240deg,rgba(255,215,0,0.3) 248deg,transparent 256deg,transparent 270deg,rgba(255,215,0,0.3) 278deg,transparent 286deg,transparent 300deg,rgba(255,215,0,0.3) 308deg,transparent 316deg,transparent 330deg,rgba(255,215,0,0.3) 338deg,transparent 346deg,transparent 360deg);
-      border-radius:50%; animation:rotateSun 25s linear infinite;
+    @keyframes sunPulse {
+      0%,100% { box-shadow: 0 0 40px rgba(255,215,0,0.35), 0 0 80px rgba(255,165,0,0.15), inset -12px -12px 20px rgba(0,0,0,0.1); }
+      50%     { box-shadow: 0 0 55px rgba(255,215,0,0.5),  0 0 110px rgba(255,165,0,0.25), inset -12px -12px 20px rgba(0,0,0,0.1); }
     }
-    .sun-body {
-      width:65px; height:65px; position:absolute; top:50%; left:50%;
-      transform:translate(-50%,-50%);
-      background:radial-gradient(circle,#FFF9C4,#FFD700,#FF8C00);
-      border-radius:50%; z-index:2;
-      box-shadow:0 0 30px rgba(255,200,0,0.5),0 0 60px rgba(255,150,0,0.3);
+    @keyframes themeSwitchDown {
+      0%   { transform:translateX(-50%)              translateY(0)    rotate(0deg)   scale(1);    opacity:1;    filter:brightness(1)   blur(0px);   }
+      5%   { transform:translateX(calc(-50% + 3vw))  translateY(2vh)  rotate(10deg)  scale(0.99); opacity:0.99; filter:brightness(0.99) blur(0px);   }
+      12%  { transform:translateX(calc(-50% + 8vw))  translateY(6vh)  rotate(26deg)  scale(0.96); opacity:0.96; filter:brightness(0.95) blur(0.1px); }
+      20%  { transform:translateX(calc(-50% + 15vw)) translateY(12vh) rotate(48deg)  scale(0.91); opacity:0.90; filter:brightness(0.87) blur(0.2px); }
+      30%  { transform:translateX(calc(-50% + 23vw)) translateY(20vh) rotate(76deg)  scale(0.84); opacity:0.81; filter:brightness(0.75) blur(0.5px); }
+      40%  { transform:translateX(calc(-50% + 31vw)) translateY(28vh) rotate(104deg) scale(0.74); opacity:0.69; filter:brightness(0.60) blur(0.9px); }
+      50%  { transform:translateX(calc(-50% + 38vw)) translateY(36vh) rotate(130deg) scale(0.62); opacity:0.56; filter:brightness(0.46) blur(1.4px); }
+      60%  { transform:translateX(calc(-50% + 44vw)) translateY(43vh) rotate(154deg) scale(0.48); opacity:0.42; filter:brightness(0.33) blur(2px);   }
+      70%  { transform:translateX(calc(-50% + 49vw)) translateY(49vh) rotate(175deg) scale(0.34); opacity:0.27; filter:brightness(0.21) blur(3px);   }
+      80%  { transform:translateX(calc(-50% + 53vw)) translateY(53vh) rotate(194deg) scale(0.20); opacity:0.14; filter:brightness(0.11) blur(4.5px); }
+      90%  { transform:translateX(calc(-50% + 56vw)) translateY(56vh) rotate(209deg) scale(0.09); opacity:0.05; filter:brightness(0.05) blur(6.5px); }
+      100% { transform:translateX(calc(-50% + 58vw)) translateY(58vh) rotate(220deg) scale(0.02); opacity:0;    filter:brightness(0.02) blur(8px);   }
     }
-    @keyframes rotateSun { to { transform:translate(-50%,-50%) rotate(360deg); } }
+    @keyframes themeSwitchUp {
+      0%   { transform:translateX(calc(-50% - 58vw)) translateY(58vh) rotate(0deg)    scale(0.02); opacity:0;    filter:brightness(0.02) blur(8px);   }
+      10%  { transform:translateX(calc(-50% - 56vw)) translateY(56vh) rotate(-12deg)  scale(0.09); opacity:0.05; filter:brightness(0.05) blur(6.5px); }
+      20%  { transform:translateX(calc(-50% - 53vw)) translateY(53vh) rotate(-28deg)  scale(0.20); opacity:0.14; filter:brightness(0.11) blur(4.5px); }
+      30%  { transform:translateX(calc(-50% - 49vw)) translateY(49vh) rotate(-47deg)  scale(0.34); opacity:0.27; filter:brightness(0.21) blur(3px);   }
+      40%  { transform:translateX(calc(-50% - 44vw)) translateY(43vh) rotate(-68deg)  scale(0.48); opacity:0.42; filter:brightness(0.33) blur(2px);   }
+      50%  { transform:translateX(calc(-50% - 38vw)) translateY(36vh) rotate(-92deg)  scale(0.62); opacity:0.56; filter:brightness(0.46) blur(1.4px); }
+      60%  { transform:translateX(calc(-50% - 31vw)) translateY(28vh) rotate(-118deg) scale(0.74); opacity:0.69; filter:brightness(0.60) blur(0.9px); }
+      70%  { transform:translateX(calc(-50% - 23vw)) translateY(20vh) rotate(-146deg) scale(0.84); opacity:0.81; filter:brightness(0.75) blur(0.5px); }
+      80%  { transform:translateX(calc(-50% - 15vw)) translateY(12vh) rotate(-174deg) scale(0.91); opacity:0.90; filter:brightness(0.87) blur(0.2px); }
+      88%  { transform:translateX(calc(-50% - 8vw))  translateY(6vh)  rotate(-196deg) scale(0.96); opacity:0.96; filter:brightness(0.95) blur(0.1px); }
+      95%  { transform:translateX(calc(-50% - 3vw))  translateY(2vh)  rotate(-212deg) scale(0.99); opacity:0.99; filter:brightness(0.99) blur(0px);   }
+      100% { transform:translateX(-50%)              translateY(0)    rotate(-220deg) scale(1);    opacity:1;    filter:brightness(1)    blur(0px);   }
+    }
+    @keyframes skyToLight {
+      0%   { --sky-c1:#070D1A; --sky-c2:#0B1426; --sky-c3:#132042; --sky-c4:#1B2D5A; }
+      30%  { --sky-c1:#0a1828; --sky-c2:#12243c; --sky-c3:#1a345c; --sky-c4:#264c74; }
+      60%  { --sky-c1:#183040; --sky-c2:#24405e; --sky-c3:#32567e; --sky-c4:#46749c; }
+      100% { --sky-c1:#0d47a1; --sky-c2:#1565c0; --sky-c3:#42a5f5; --sky-c4:#90caf9; }
+    }
+    @keyframes skyToDark {
+      0%   { --sky-c1:#0d47a1; --sky-c2:#1565c0; --sky-c3:#42a5f5; --sky-c4:#90caf9; }
+      30%  { --sky-c1:#183040; --sky-c2:#24405e; --sky-c3:#32567e; --sky-c4:#46749c; }
+      60%  { --sky-c1:#0a1828; --sky-c2:#12243c; --sky-c3:#1a345c; --sky-c4:#264c74; }
+      100% { --sky-c1:#070D1A; --sky-c2:#0B1426; --sky-c3:#132042; --sky-c4:#1B2D5A; }
+    }
+    .sky-glow {
+      position:absolute; inset:0; pointer-events:none; z-index:1; opacity:0;
+      transition: opacity 2.4s cubic-bezier(0.33,0,0.12,1);
+    }
+    .sky-glow.glow-sunrise {
+      background: radial-gradient(ellipse at 50% 80%, rgba(255,200,100,0.2) 0%, rgba(200,160,100,0.1) 40%, transparent 70%);
+      opacity:1;
+    }
+    .sky-glow.glow-sunset {
+      background: radial-gradient(ellipse at 50% 80%, rgba(10,20,50,0.2) 0%, rgba(20,30,60,0.1) 40%, transparent 70%);
+      opacity:1;
+    }
+    .hero-birds.birds-fade-in  { opacity:1 !important; transition:opacity 1.8s cubic-bezier(0.33,0,0.12,1) 0.6s !important; }
+    .hero-birds.birds-fade-out { opacity:0 !important; transition:opacity 1.2s cubic-bezier(0.33,0,0.12,1) !important; }
+    .hero-sun { display:none !important; }
+    /* Lock falling sphere to its PRE-transition color until off-screen */
+    [data-theme="light"] .hero-moon.theme-switching-down {
+      background: radial-gradient(circle at 35% 35%, #e8e0cc, #c8bfa0 60%, #a09070) !important;
+      box-shadow: 0 0 40px rgba(220,200,150,0.35), 0 0 80px rgba(220,200,150,0.15), inset -12px -12px 20px rgba(0,0,0,0.25) !important;
+    }
+    [data-theme="dark"] .hero-moon.theme-switching-down {
+      background: radial-gradient(circle at 35% 35%, #FFD700, #FFA500 60%, #FF8C00) !important;
+      box-shadow: 0 0 40px rgba(255,215,0,0.45), 0 0 80px rgba(255,165,0,0.25), inset -12px -12px 20px rgba(0,0,0,0.1) !important;
+    }
     .hero-lake {
       position:absolute; bottom:0; left:0; right:0; z-index:3;
       height:28%; pointer-events:none;
     }
     .hero-lake svg { display:block; width:100%; height:80px; }
-    .hero-birds { position:absolute; inset:0; z-index:2; pointer-events:none; overflow:visible; opacity:0; transition:opacity 2s ease; }
-    [data-theme="light"] .hero-birds { opacity:1; }
+    .hero-birds { position:absolute; inset:0; z-index:2; pointer-events:none; overflow:visible; opacity:0; transition:opacity 2s ease; color:rgba(26,14,4,0.70); }
     .bird { position:absolute; }
     .hero-content {
       position:relative; z-index:10; text-align:center;
@@ -491,106 +553,6 @@ const tipoColor: Record<string,string> = { Religiosa:'#9333ea', Ceremonial:'#f59
     .wave-sep { position:relative; height:60px; overflow:hidden; }
     .wave-sep svg { position:absolute; bottom:0; width:100%; }
 
-    /* ─── FOOTER (same as actividades) ─── */
-    .bottom-wave {
-      position:relative; height:80px; overflow:hidden; margin-top:-2px;
-      background:linear-gradient(180deg,#043a48 0%,#342e24 35%,#342e24 65%,#4a3a28 100%);
-    }
-    [data-theme="light"] .bottom-wave {
-      background:linear-gradient(180deg,#00a0b5 0%,#2aaa90 28%,#a09050 52%,#d4b262 76%,#edd890 100%);
-    }
-    .arena-footer {
-      background:linear-gradient(180deg,#4a3a28 0%,#3a2a18 30%,#2a1a10 60%,#1a1008 100%);
-      padding:3.5rem 2rem 2rem; position:relative; overflow:hidden;
-    }
-    [data-theme="light"] .arena-footer {
-      background:linear-gradient(180deg,#edd890 0%,#dbb852 28%,#c89838 60%,#ae7e20 100%) !important;
-    }
-    .arena-footer::before {
-      content:''; position:absolute; bottom:0; left:0; right:0; height:300px;
-      background:
-        radial-gradient(ellipse 280px 220px at 7% 95%,rgba(255,110,10,0.18) 0%,rgba(255,60,0,0.08) 45%,transparent 72%),
-        radial-gradient(ellipse 280px 220px at 93% 95%,rgba(255,110,10,0.18) 0%,rgba(255,60,0,0.08) 45%,transparent 72%);
-      pointer-events:none; z-index:0;
-    }
-    .arena-footer::after {
-      content:''; position:absolute; top:0; left:0; right:0; height:1px;
-      background:linear-gradient(90deg,transparent 5%,rgba(212,168,67,0.25) 30%,rgba(45,212,191,0.15) 70%,transparent 95%);
-    }
-    .arena-footer-body { max-width:1100px; margin:0 auto; position:relative; z-index:2; }
-    .arena-footer-grid {
-      display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:2rem 2.5rem;
-      padding-bottom:2rem; border-bottom:1px solid rgba(212,168,67,0.15); align-items:start;
-    }
-    [data-theme="light"] .arena-footer-grid { border-bottom-color:rgba(110,65,8,0.15); }
-    .arena-brand-logo { display:flex; align-items:center; gap:10px; margin-bottom:1rem; }
-    .arena-logo-circle {
-      width:42px; height:42px; border-radius:50%;
-      background:linear-gradient(135deg,#2dd4bf,#d4a843);
-      display:flex; align-items:center; justify-content:center;
-      font-family:'Playfair Display',serif; font-weight:700; font-size:18px; color:#0a1628; flex-shrink:0;
-    }
-    .arena-brand-name { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:rgba(240,237,232,0.92); line-height:1.1; }
-    .arena-brand-tagline { font-family:'Space Mono',monospace; font-size:9px; color:rgba(212,168,67,0.6); letter-spacing:2px; }
-    .arena-brand-desc { font-size:13px; line-height:1.65; max-width:225px; margin-bottom:1.1rem; }
-    [data-theme="light"] .arena-brand-name { color:rgba(70,40,5,0.95) !important; }
-    [data-theme="light"] .arena-brand-desc { color:rgba(70,40,5,0.65) !important; }
-    .arena-social-row { display:flex; gap:9px; flex-wrap:wrap; }
-    .arena-social-btn {
-      width:34px; height:34px; border-radius:50%;
-      border:1px solid rgba(212,168,67,0.25); background:rgba(212,168,67,0.08);
-      display:flex; align-items:center; justify-content:center;
-      color:rgba(240,237,232,0.50); cursor:pointer;
-      transition:background 0.2s,color 0.2s,border-color 0.2s; text-decoration:none;
-    }
-    .arena-social-btn:hover { background:rgba(212,168,67,0.22); color:rgba(240,237,232,0.95); border-color:rgba(212,168,67,0.55); }
-    [data-theme="light"] .arena-social-btn { border-color:rgba(110,65,8,0.22); background:rgba(110,65,8,0.06); color:rgba(110,65,8,0.55); }
-    [data-theme="light"] .arena-social-btn:hover { background:rgba(110,65,8,0.15); color:rgba(70,40,5,0.9); border-color:rgba(110,65,8,0.45); }
-    .arena-heading { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:2.5px; text-transform:uppercase; color:rgba(212,168,67,0.7); margin-bottom:1rem; }
-    [data-theme="light"] .arena-heading { color:rgba(110,65,8,0.75) !important; }
-    .arena-link-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
-    .arena-link-list li { display:flex; align-items:center; gap:7px; }
-    .arena-link-list li::before { content:''; display:block; width:4px; height:4px; border-radius:50%; background:rgba(212,168,67,0.45); flex-shrink:0; }
-    [data-theme="light"] .arena-link-list li::before { background:rgba(110,65,8,0.40); }
-    .arena-link { color:rgba(240,237,232,0.55) !important; transition:color 0.2s ease,padding-left 0.2s ease; display:inline-block; text-decoration:none; font-size:13.5px; }
-    .arena-link:hover { color:rgba(240,237,232,0.95) !important; padding-left:3px; }
-    [data-theme="light"] .arena-link { color:rgba(70,40,5,0.60) !important; }
-    [data-theme="light"] .arena-link:hover { color:rgba(70,40,5,0.96) !important; }
-    .arena-link-list .arena-link { padding-left:0 !important; display:inline !important; }
-    .arena-link-list .arena-link:hover { padding-left:0 !important; }
-    .arena-newsletter-form { display:flex; flex-direction:column; gap:8px; margin-bottom:0.75rem; }
-    .arena-newsletter-input {
-      background:rgba(255,255,255,0.07); border:1px solid rgba(212,168,67,0.25); border-radius:6px;
-      padding:8px 12px; font-size:13px; color:rgba(240,237,232,0.92);
-      font-family:'Crimson Pro',serif; outline:none; width:100%; transition:border-color 0.2s;
-    }
-    .arena-newsletter-input::placeholder { color:rgba(240,237,232,0.30); }
-    .arena-newsletter-input:focus { border-color:rgba(212,168,67,0.55); }
-    [data-theme="light"] .arena-newsletter-input { border-color:rgba(110,65,8,0.28); background:rgba(255,255,255,0.38); color:rgba(70,40,5,0.9); }
-    [data-theme="light"] .arena-newsletter-input::placeholder { color:rgba(110,65,8,0.38); }
-    .arena-subscribe-btn {
-      background:linear-gradient(135deg,#d4a843,#c08a28); color:#0a1628; border:none; border-radius:6px;
-      padding:9px 12px; font-size:13px; font-weight:700; cursor:pointer; transition:opacity 0.15s,transform 0.15s; width:100%;
-    }
-    .arena-subscribe-btn:hover { opacity:0.88; transform:translateY(-1px); }
-    [data-theme="light"] .arena-subscribe-btn { background:linear-gradient(135deg,#7a4e06,#5e3a04); color:#fff8ef; }
-    .arena-contact-row { display:flex; flex-direction:column; gap:8px; margin-top:1.25rem; }
-    .arena-contact-item { display:flex; align-items:center; gap:7px; font-size:12px; color:rgba(240,237,232,0.48); text-decoration:none; transition:color 0.15s; }
-    .arena-contact-item:hover { color:rgba(240,237,232,0.95) !important; }
-    [data-theme="light"] .arena-contact-item { color:rgba(70,40,5,0.52); }
-    [data-theme="light"] .arena-contact-item:hover { color:rgba(70,40,5,0.95) !important; }
-    .arena-bottom-bar { padding-top:1.2rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; }
-    .arena-legal-links { display:flex; gap:1.25rem; flex-wrap:wrap; }
-    .arena-legal-links .arena-link { font-size:12px; display:inline !important; padding-left:0 !important; }
-    .arena-text { color:rgba(240,237,232,0.45) !important; }
-    [data-theme="light"] .arena-text { color:rgba(70,40,5,0.58) !important; }
-
-    @media(max-width:900px) {
-      .arena-footer-grid { grid-template-columns:1fr 1fr; gap:1.5rem; }
-      .arena-brand-col { grid-column:1/-1; }
-    }
-    @media(max-width:480px) { .arena-footer-grid { grid-template-columns:1fr; } }
-
     /* ─── RESPONSIVE ─── */
     @media(max-width:768px) {
       .hero-stats { flex-direction:column; gap:0; }
@@ -609,6 +571,71 @@ const tipoColor: Record<string,string> = { Religiosa:'#9333ea', Ceremonial:'#f59
     @keyframes birdFloat2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-14px,-10px)} }
     @keyframes birdFloat3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(22px,-8px)} }
     @keyframes birdFloat4 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-10px,-14px)} }
+
+    /* ─── BOTTOM WAVE ─── */
+    .bottom-wave { position:relative; height:80px; overflow:hidden; margin-top:-2px; background:linear-gradient(180deg,#043a48 0%,#342e24 35%,#342e24 65%,#4a3a28 100%); }
+    .sand-wave { position:absolute; bottom:0; left:-5%; right:-5%; height:100%; background:linear-gradient(180deg,rgba(20,32,24,0.25) 0%,rgba(48,44,34,0.5) 45%,#4a3a28 100%); clip-path:polygon(0% 52%,4% 46%,10% 41%,18% 37%,26% 35%,34% 36%,42% 38%,50% 40%,58% 40%,66% 38%,74% 35%,82% 34%,90% 36%,96% 40%,100% 44%,105% 44%,105% 100%,0% 100%); animation:sandWave 10s ease-in-out infinite; }
+    @keyframes sandWave { 0%,100%{clip-path:polygon(0% 52%,4% 46%,10% 41%,18% 37%,26% 35%,34% 36%,42% 38%,50% 40%,58% 40%,66% 38%,74% 35%,82% 34%,90% 36%,96% 40%,100% 44%,105% 44%,105% 100%,0% 100%)} 50%{clip-path:polygon(0% 57%,4% 51%,10% 46%,18% 42%,26% 40%,34% 41%,42% 43%,50% 45%,58% 45%,66% 43%,74% 40%,82% 39%,90% 41%,96% 45%,100% 49%,105% 49%,105% 100%,0% 100%)} }
+    [data-theme="light"] .bottom-wave { height:180px !important; background:linear-gradient(180deg,#00a0b5 0%,#04a8ac 10%,#10a89e 20%,#2aaa90 30%,#52a872 40%,#7ea055 50%,#a89440 60%,#c4a032 70%,#d4b048 80%,#e0c468 90%,#edd890 100%) !important; }
+    [data-theme="light"] .sand-wave { background:linear-gradient(180deg,rgba(0,160,181,0.20) 0%,rgba(40,168,144,0.35) 28%,rgba(120,152,80,0.45) 52%,rgba(210,184,100,0.70) 78%,#edd890 100%) !important; }
+
+    /* ─── ARENA FOOTER ─── */
+    .arena-footer { background:linear-gradient(180deg,#4a3a28 0%,#3a2a18 30%,#2a1a10 60%,#1a1008 100%); padding:3.5rem 2rem 2rem; position:relative; overflow:hidden; }
+    .arena-footer::before { content:''; position:absolute; bottom:0; left:0; right:0; height:340px; background:radial-gradient(ellipse 340px 260px at 8% 95%,rgba(255,130,10,0.28) 0%,rgba(255,80,10,0.14) 42%,rgba(255,40,0,0.05) 65%,transparent 80%),radial-gradient(ellipse 340px 260px at 92% 95%,rgba(255,130,10,0.28) 0%,rgba(255,80,10,0.14) 42%,rgba(255,40,0,0.05) 65%,transparent 80%); pointer-events:none; z-index:0; animation:footerGlowPulse 2.2s ease-in-out infinite; }
+    @keyframes footerGlowPulse { 0%,100%{opacity:1} 50%{opacity:0.65} }
+    .arena-footer::after { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent 5%,rgba(212,168,67,0.25) 30%,rgba(45,212,191,0.15) 70%,transparent 95%); }
+    [data-theme="light"] .arena-footer { background:linear-gradient(180deg,#edd890 0%,#dbb852 28%,#c89838 60%,#ae7e20 100%) !important; margin-top:-4px !important; }
+    [data-theme="light"] .arena-footer::before { display:none; }
+    [data-theme="light"] .arena-footer::after { display:none; }
+    .arena-footer-body { max-width:1100px; margin:0 auto; position:relative; z-index:2; }
+    .arena-footer-grid { display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:2rem 2.5rem; padding-bottom:2rem; border-bottom:1px solid rgba(212,168,67,0.15); align-items:start; }
+    [data-theme="light"] .arena-footer-grid { border-bottom-color:rgba(90,55,5,0.22) !important; }
+    .arena-brand-logo { display:flex; align-items:center; gap:10px; margin-bottom:1rem; }
+    .arena-logo-circle { width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#2dd4bf,#d4a843); display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-weight:700; font-size:18px; color:#0a1628; flex-shrink:0; }
+    .arena-brand-name { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:rgba(240,237,232,0.92); line-height:1.1; }
+    .arena-brand-tagline { font-family:'Space Mono',monospace; font-size:9px; color:rgba(212,168,67,0.6); letter-spacing:2px; }
+    .arena-brand-desc { font-size:13px; line-height:1.65; max-width:225px; margin-bottom:1.1rem; }
+    [data-theme="light"] .arena-brand-name { color:rgba(26,16,4,0.95) !important; }
+    [data-theme="light"] .arena-brand-tagline { color:rgba(90,55,5,0.80) !important; }
+    .arena-social-row { display:flex; gap:9px; flex-wrap:wrap; }
+    .arena-social-btn { width:34px; height:34px; border-radius:50%; border:1px solid rgba(212,168,67,0.25); background:rgba(212,168,67,0.08); display:flex; align-items:center; justify-content:center; color:rgba(240,237,232,0.50); cursor:pointer; transition:background 0.2s,color 0.2s,border-color 0.2s; text-decoration:none; }
+    .arena-social-btn:hover { background:rgba(212,168,67,0.22); color:rgba(240,237,232,0.95); border-color:rgba(212,168,67,0.55); }
+    [data-theme="light"] .arena-social-btn { color:rgba(26,14,2,0.70) !important; border-color:rgba(90,55,5,0.40); background:rgba(90,55,5,0.12); }
+    [data-theme="light"] .arena-social-btn:hover { color:rgba(26,14,2,1) !important; background:rgba(90,55,5,0.25); border-color:rgba(90,55,5,0.65); }
+    .arena-heading { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:2.5px; text-transform:uppercase; color:rgba(212,168,67,0.7); margin-bottom:1rem; }
+    [data-theme="light"] .arena-heading { color:rgba(80,48,4,0.85) !important; }
+    .arena-link-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
+    .arena-link-list li { display:flex; align-items:center; gap:7px; }
+    .arena-link-list li::before { content:''; display:block; width:4px; height:4px; border-radius:50%; background:rgba(212,168,67,0.45); flex-shrink:0; }
+    [data-theme="light"] .arena-link-list li::before { background:rgba(90,55,5,0.50) !important; }
+    .arena-link { color:rgba(240,237,232,0.55) !important; transition:color 0.25s ease,padding-left 0.25s ease; display:inline-block; text-decoration:none; font-size:13.5px; }
+    .arena-link:hover { color:rgba(240,237,232,0.95) !important; padding-left:4px; }
+    [data-theme="light"] .arena-link { color:rgba(30,18,4,0.72) !important; }
+    [data-theme="light"] .arena-link:hover { color:rgba(30,18,4,1) !important; }
+    .arena-link-list .arena-link { padding-left:0 !important; display:inline !important; }
+    .arena-link-list .arena-link:hover { padding-left:0 !important; }
+    .arena-newsletter-form { display:flex; flex-direction:column; gap:8px; margin-bottom:0.75rem; }
+    .arena-newsletter-input { background:rgba(255,255,255,0.07); border:1px solid rgba(212,168,67,0.25); border-radius:6px; padding:8px 12px; font-size:13px; color:rgba(240,237,232,0.92); font-family:'Crimson Pro',serif; outline:none; width:100%; transition:border-color 0.2s; }
+    .arena-newsletter-input::placeholder { color:rgba(240,237,232,0.30); }
+    .arena-newsletter-input:focus { border-color:rgba(212,168,67,0.55); }
+    [data-theme="light"] .arena-newsletter-input { background:rgba(255,255,255,0.50) !important; border-color:rgba(90,55,5,0.40) !important; color:rgba(26,14,2,0.95) !important; }
+    [data-theme="light"] .arena-newsletter-input::placeholder { color:rgba(26,14,2,0.40) !important; }
+    .arena-subscribe-btn { background:linear-gradient(135deg,#d4a843,#c08a28); color:#0a1628; border:none; border-radius:6px; padding:9px 12px; font-size:13px; font-weight:700; cursor:pointer; transition:opacity 0.15s,transform 0.15s; width:100%; }
+    .arena-subscribe-btn:hover { opacity:0.88; transform:translateY(-1px); }
+    [data-theme="light"] .arena-subscribe-btn { background:linear-gradient(135deg,#7a4e06,#5e3a04); color:#fff8ef; }
+    .arena-contact-row { display:flex; flex-direction:column; gap:8px; margin-top:1.25rem; }
+    .arena-contact-item { display:flex; align-items:center; gap:7px; font-size:12px; color:rgba(240,237,232,0.48); text-decoration:none; transition:color 0.15s; }
+    .arena-contact-item:hover { color:rgba(240,237,232,0.98); }
+    [data-theme="light"] .arena-contact-item { color:rgba(26,14,2,0.72) !important; }
+    [data-theme="light"] .arena-contact-item:hover { color:rgba(26,14,2,1) !important; }
+    .arena-text { color:rgba(240,237,232,0.45) !important; }
+    [data-theme="light"] .arena-text { color:rgba(30,18,4,0.65) !important; }
+    .arena-bottom-bar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; padding-top:1.25rem; }
+    .arena-legal-links { display:flex; gap:1.2rem; }
+    .arena-legal-links .arena-link { font-size:12px; display:inline !important; padding-left:0 !important; }
+    .arena-legal-links .arena-link:hover { padding-left:0 !important; }
+    @media(max-width:900px) { .arena-footer-grid{grid-template-columns:1fr 1fr} .arena-brand-col{grid-column:1/-1} }
+    @media(max-width:768px) { .bottom-wave{height:50px} .arena-footer{padding:2rem 1rem} .arena-footer-grid{grid-template-columns:1fr} }
 
     /* ─── CAMPFIRE (dark mode) ─── */
     .illo-campfire  { position:absolute; bottom:0; right:40px; width:300px; height:300px; z-index:5; pointer-events:none; animation:campfireFlicker 2.0s ease-in-out infinite; }
@@ -632,6 +659,12 @@ const tipoColor: Record<string,string> = { Religiosa:'#9333ea', Ceremonial:'#f59
     @media(max-width:900px) { .illo-campfire{transform:scale(0.65);transform-origin:bottom right} .illo-campfire2{transform:scaleX(-1) scale(0.65);transform-origin:bottom left} }
     @media(max-width:768px) { .illo-campfire{transform:scale(0.48);bottom:0;right:-10px;opacity:0.55;transform-origin:bottom right} .illo-campfire2{transform:scaleX(-1) scale(0.48);bottom:0;left:-10px;opacity:0.55;transform-origin:bottom left} .beach-ball-wrap{display:none} }
   </style>
+  <script is:inline>
+    (function() {
+      const saved = localStorage.getItem('capachica-theme') || localStorage.getItem('theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
 </head>
 <body>
 
@@ -640,12 +673,9 @@ const tipoColor: Record<string,string> = { Religiosa:'#9333ea', Ceremonial:'#f59
 <!-- HERO -->
 <section class="hero" id="inicio">
   <div class="hero-sky"></div>
+  <div class="sky-glow" id="skyGlow"></div>
   <canvas class="stars-layer" id="starsCanvas"></canvas>
-  <div class="hero-moon"></div>
-  <div class="hero-sun" id="heroSun">
-    <div class="sun-rays"></div>
-    <div class="sun-body"></div>
-  </div>
+  <div class="hero-moon" id="heroMoon"></div>
   <div class="hero-birds" id="heroBirds"></div>
   <div class="hero-lake">
     <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
@@ -792,117 +822,7 @@ const tipoColor: Record<string,string> = { Religiosa:'#9333ea', Ceremonial:'#f59
   <p id="galleryModalLabel" style="color:rgba(255,255,255,0.65);font-size:13px;margin-top:10px;"></p>
 </div>
 
-<!-- BOTTOM WAVE -->
-<div class="bottom-wave">
-  <svg viewBox="0 0 1440 80" preserveAspectRatio="none" style="position:absolute;bottom:0;left:-5%;width:110%;height:100%;" xmlns="http://www.w3.org/2000/svg">
-    <path d="M0,20 C220,55 480,5 720,30 C980,55 1240,8 1440,22 L1440,80 L0,80Z" fill="rgba(74,58,40,0.55)"/>
-    <path d="M0,40 C300,20 600,55 960,35 C1200,22 1380,50 1440,40 L1440,80 L0,80Z" fill="rgba(74,58,40,0.4)"/>
-  </svg>
-</div>
-
-<!-- FOOTER -->
-<footer class="arena-footer">
-  <!-- Fogatas (dark mode) -->
-  <div class="illo-campfire">
-    <img src="/campfire.png" alt="" aria-hidden="true" />
-  </div>
-  <div class="illo-campfire2">
-    <img src="/campfire.png" alt="" aria-hidden="true" />
-  </div>
-  <!-- Pelotas (light mode) -->
-  <div class="beach-ball-wrap" style="bottom:22px;right:65px;">
-    <div class="beach-ball" style="width:100px;height:100px;--bb-dur:2.9s;--bb-delay:0s;"></div>
-    <div class="beach-ball-shadow" style="width:100px;height:26px;"></div>
-  </div>
-  <div class="beach-ball-wrap" style="bottom:22px;left:65px;">
-    <div class="beach-ball" style="width:100px;height:100px;--bb-dur:3.3s;--bb-delay:0.55s;"></div>
-    <div class="beach-ball-shadow" style="width:100px;height:26px;"></div>
-  </div>
-  <div class="arena-footer-body">
-    <div class="arena-footer-grid">
-      <div class="arena-brand-col">
-        <div class="arena-brand-logo">
-          <div class="arena-logo-circle">C</div>
-          <div>
-            <div class="arena-brand-name">Capachica</div>
-            <div class="arena-brand-tagline">TURISMO VIVENCIAL</div>
-          </div>
-        </div>
-        <p class="arena-text arena-brand-desc">La joya escondida del lago Titicaca. Turismo comunitario auténtico a 3,812 msnm.</p>
-        <div class="arena-social-row">
-          <a href="https://instagram.com/capachicaturismo" target="_blank" rel="noopener noreferrer" class="arena-social-btn" aria-label="Instagram">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-          </a>
-          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="arena-social-btn" aria-label="Facebook">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-          </a>
-          <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="arena-social-btn" aria-label="YouTube">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.96-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#1a1008"/></svg>
-          </a>
-          <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" class="arena-social-btn" aria-label="TikTok">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>
-          </a>
-        </div>
-      </div>
-      <div>
-        <div class="arena-heading">Destinos</div>
-        <ul class="arena-link-list">
-          <li><a href="/destinos/playa-llacho" class="arena-link">Playa Llachón</a></li>
-          <li><a href="/destinos/mirador-amaru" class="arena-link">Mirador del Amaru</a></li>
-          <li><a href="/destinos/isla-ticonata" class="arena-link">Isla Ticonata</a></li>
-          <li><a href="/destinos/comunidad" class="arena-link">Comunidad Capachica</a></li>
-          <li><a href="/destinos/islas-flotantes" class="arena-link">Islas flotantes</a></li>
-        </ul>
-      </div>
-      <div>
-        <div class="arena-heading">Experiencias</div>
-        <ul class="arena-link-list">
-          <li><a href="/vivencias" class="arena-link">Vivencias</a></li>
-          <li><a href="/actividades" class="arena-link">Actividades</a></li>
-          <li><a href="/gastronomia" class="arena-link">Gastronomía</a></li>
-          <li><a href="/festividades" class="arena-link">Festividades</a></li>
-          <li><a href="/artesania" class="arena-link">Artesanía</a></li>
-        </ul>
-        <div class="arena-heading" style="margin-top:1.25rem;">Info</div>
-        <ul class="arena-link-list">
-          <li><a href="/nosotros" class="arena-link">Nosotros</a></li>
-          <li><a href="/alojamiento" class="arena-link">Alojamiento</a></li>
-          <li><a href="/como-llegar" class="arena-link">Cómo llegar</a></li>
-          <li><a href="/contacto" class="arena-link">Contacto</a></li>
-        </ul>
-      </div>
-      <div>
-        <div class="arena-heading">Newsletter</div>
-        <p class="arena-text" style="font-size:12px;margin-bottom:0.8rem;line-height:1.55;">Novedades y ofertas exclusivas · 1 email/semana</p>
-        <div class="arena-newsletter-form" id="arenaNewsletterForm">
-          <input type="email" id="arenaEmailInput" class="arena-newsletter-input" placeholder="tu@email.com" autocomplete="email" />
-          <button class="arena-subscribe-btn" id="arenaSubscribeBtn" type="button">Suscribirme</button>
-          <span class="arena-text" style="font-size:11px;opacity:0.7;">Sin spam, prometido</span>
-        </div>
-        <p id="arenaSubscribedMsg" style="display:none;font-size:13px;color:rgba(212,168,67,0.9);">¡Gracias! Te escribiremos pronto 🌊</p>
-        <div class="arena-contact-row">
-          <a href="https://wa.me/51955949404" target="_blank" rel="noopener noreferrer" class="arena-contact-item">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.6 19.79 19.79 0 0 1 1.61 5.1 2 2 0 0 1 3.6 3h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.6a16 16 0 0 0 6 6l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 18z"/></svg>
-            <span>+51 955 949 404</span>
-          </a>
-          <a href="mailto:torresdeissy56@gmail.com" class="arena-contact-item">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            <span>torresdeissy56@gmail.com</span>
-          </a>
-        </div>
-      </div>
-    </div>
-    <div class="arena-bottom-bar">
-      <p class="arena-text" style="font-size:12px;">© 2026 Capachica Turismo · <span style="color:rgba(212,168,67,0.75);">Hecho con ❤️ a las orillas del lago Titicaca</span></p>
-      <div class="arena-legal-links">
-        <a href="/privacidad" class="arena-link">Privacidad</a>
-        <a href="/terminos" class="arena-link">Términos</a>
-        <a href="/cookies" class="arena-link">Cookies</a>
-        <a href="/cancelaciones" class="arena-link">Cancelaciones</a>
-      </div>
-    </div>
-  </div>
-</footer>
+<ArenaFooter />
 
 <!-- FLOATING CALENDAR -->
 <div class="floating-cal" id="floatingCal">
@@ -1225,6 +1145,62 @@ const tipoColor: Record<string,string> = { Religiosa:'#9333ea', Ceremonial:'#f59
       entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
     }, { threshold:0.1 });
     els.forEach(el => io.observe(el));
+  })();
+
+  /* ─── CINEMATIC THEME TRANSITION ─── */
+  (function initThemeTransition() {
+    const html  = document.documentElement;
+    const moon  = document.getElementById('heroMoon');
+    const sky   = document.querySelector('.hero-sky');
+    const glow  = document.getElementById('skyGlow');
+    const birds = document.getElementById('heroBirds');
+    const starsCanvas = document.getElementById('starsCanvas');
+    if (!moon || !sky || !glow) return;
+
+    let lastTheme = html.getAttribute('data-theme') || 'dark';
+    new MutationObserver(() => {
+      const currentTheme = lastTheme;
+      const newTheme = html.getAttribute('data-theme');
+      if (newTheme === currentTheme) return;
+      lastTheme = newTheme;
+
+      const wash = document.createElement('div');
+      wash.style.cssText = 'position:fixed;inset:0;z-index:180;pointer-events:none;opacity:0;transition:opacity 0.45s ease;';
+      wash.style.background = currentTheme === 'dark'
+        ? 'linear-gradient(180deg,rgba(14,72,160,0.18) 0%,rgba(0,100,120,0.26) 50%,rgba(190,170,55,0.18) 100%)'
+        : 'linear-gradient(180deg,rgba(4,13,28,0.26) 0%,rgba(4,58,72,0.30) 55%,rgba(26,16,8,0.18) 100%)';
+      document.body.appendChild(wash);
+
+      moon.classList.remove('theme-switching-down', 'theme-switching-up');
+      glow.classList.remove('glow-sunrise', 'glow-sunset');
+      void moon.offsetWidth;
+
+      if (currentTheme === 'dark') {
+        moon.classList.add('theme-switching-down');
+        sky.classList.add('sky-transitioning');
+        glow.classList.add('glow-sunrise');
+        if (starsCanvas) { starsCanvas.style.transition = 'opacity 2.4s cubic-bezier(0.33,0,0.12,1)'; starsCanvas.style.opacity = '0'; }
+        if (birds) { birds.classList.add('birds-fade-in'); birds.classList.remove('birds-fade-out'); }
+      } else {
+        moon.classList.add('theme-switching-down');
+        sky.classList.add('sky-transitioning-reverse');
+        glow.classList.add('glow-sunset');
+        if (starsCanvas) { starsCanvas.style.transition = 'opacity 1.2s cubic-bezier(0.33,0,0.12,1)'; starsCanvas.style.opacity = '1'; }
+        if (birds) { birds.classList.add('birds-fade-out'); birds.classList.remove('birds-fade-in'); }
+      }
+
+      setTimeout(() => { wash.style.opacity = '1'; }, 1900);
+      setTimeout(() => {
+        moon.classList.remove('theme-switching-down');
+        sky.classList.remove('sky-transitioning', 'sky-transitioning-reverse');
+        glow.classList.remove('glow-sunrise', 'glow-sunset');
+        void moon.offsetWidth;
+        moon.classList.add('theme-switching-up');
+        wash.style.transition = 'opacity 1.1s cubic-bezier(0.33,0,0.12,1)';
+        wash.style.opacity = '0';
+        setTimeout(() => { moon.classList.remove('theme-switching-up'); wash.remove(); }, 2500);
+      }, 2400);
+    }).observe(html, { attributes: true, attributeFilter: ['data-theme'] });
   })();
 </script>
 

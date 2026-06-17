@@ -1,0 +1,94 @@
+import { c as createComponent } from './astro-component_Btt82VVH.mjs';
+import 'piccolore';
+import { o as renderComponent, h as renderTemplate, q as Fragment, m as maybeRenderHead, g as addAttribute } from './server_80AW_iNR.mjs';
+import { $ as $$Layout } from './Layout_BxerFJFs.mjs';
+
+const $$Destinos = createComponent(($$result, $$props, $$slots) => {
+  const destinos = [
+    {
+      emoji: "🏖️",
+      nombre: "Llachón",
+      comunidad: "Comunidad de Llachón",
+      desc: "Pionera del turismo vivencial en el Titicaca. Los miradores ofrecen vistas del lago que cortan la respiración al amanecer y al atardecer.",
+      tags: ["Turismo vivencial", "Mirador", "Amanecer"],
+      color: "#0ea5e9",
+      highlight: "Mejor destino vivencial"
+    },
+    {
+      emoji: "🌿",
+      nombre: "Escallani",
+      comunidad: "Comunidad de Escallani",
+      desc: "Rodeada de totorales y aves acuáticas. La pesca artesanal y el tejido con técnicas quechuas de siglos son el corazón de esta comunidad.",
+      tags: ["Naturaleza", "Artesanía", "Pesca"],
+      color: "#34d399",
+      highlight: "Biodiversidad única"
+    },
+    {
+      emoji: "🏛️",
+      nombre: "Capachica Centro",
+      comunidad: "Capital del distrito",
+      desc: "Mercados coloridos, festividades tradicionales que mezclan lo andino y lo católico. La mejor gastronomía lacustre de la región se sirve aquí.",
+      tags: ["Gastronomía", "Cultura", "Mercado"],
+      color: "#fbbf24",
+      highlight: "Corazón cultural"
+    },
+    {
+      emoji: "⛵",
+      nombre: "Isla Taquile",
+      comunidad: "Patrimonio UNESCO",
+      desc: "Los tejedores taquileños mantienen viva una tradición textil de más de 500 años. Las vistas del lago desde la plaza principal son incomparables.",
+      tags: ["Patrimonio", "Textil", "Historia"],
+      color: "#a78bfa",
+      highlight: "Patrimonio Inmaterial UNESCO"
+    },
+    {
+      emoji: "🌅",
+      nombre: "Mirador Puesta del Sol",
+      comunidad: "Cerro Capu",
+      desc: "El punto más alto de la península. Vistas panorámicas de 360° del lago Titicaca. Los atardeceres son de los más fotografiados del Perú.",
+      tags: ["Mirador", "Fotografía", "Trekking"],
+      color: "#f472b6",
+      highlight: "Atardecer épico"
+    },
+    {
+      emoji: "🚣",
+      nombre: "Bahía de Chifrón",
+      comunidad: "Aguas tranquilas",
+      desc: "Aguas calmas perfectas para kayak y paddleboard. La trucha fresca del lago es el mejor desayuno después de una madrugada en el agua.",
+      tags: ["Kayak", "Paddleboard", "Deportes"],
+      color: "#38bdf8",
+      highlight: "Deportes acuáticos"
+    }
+  ];
+  return renderTemplate`${renderComponent($$result, "Layout", $$Layout, { "title": "Destinos — Capachica Turismo", "description": "Explora las comunidades ancestrales, paisajes andinos y la magia del Lago Titicaca desde la península de Capachica." }, { "default": ($$result2) => renderTemplate`    ${maybeRenderHead()}<div style="max-width:1200px;margin:0 auto;padding:4rem 1.5rem 6rem;"> <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.5rem;"> ${destinos.map((d, i) => renderTemplate`<div class="reveal card"${addAttribute(`padding:0;overflow:hidden;transition-delay:${i * 0.08}s;border-color:rgba(255,255,255,0.06);`, "style")}> <!-- Card header --> <div${addAttribute(`
+              height:180px;
+              background:linear-gradient(135deg,rgba(6,15,26,0.9),rgba(${d.color.replace("#", "").match(/.{2}/g)?.map((h) => parseInt(h, 16)).join(",")},0.15));
+              display:flex;flex-direction:column;align-items:center;justify-content:center;
+              position:relative;overflow:hidden;border-bottom:1px solid var(--border);
+            `, "style")}> <div${addAttribute(`
+                position:absolute;top:-30px;right:-30px;width:160px;height:160px;border-radius:50%;
+                background:radial-gradient(circle,rgba(${d.color.replace("#", "").match(/.{2}/g)?.map((h) => parseInt(h, 16)).join(",")},0.18) 0%,transparent 70%);
+              `, "style")}></div> <div style="font-size:3.5rem;z-index:1;filter:drop-shadow(0 4px 16px rgba(0,0,0,0.4));">${d.emoji}</div> <span${addAttribute(`
+                margin-top:0.75rem;padding:3px 12px;border-radius:999px;font-size:10px;font-weight:700;
+                letter-spacing:0.1em;text-transform:uppercase;
+                background:rgba(${d.color.replace("#", "").match(/.{2}/g)?.map((h) => parseInt(h, 16)).join(",")},0.15);
+                color:${d.color};border:1px solid rgba(${d.color.replace("#", "").match(/.{2}/g)?.map((h) => parseInt(h, 16)).join(",")},0.3);
+              `, "style")}>${d.highlight}</span> </div> <!-- Card body --> <div style="padding:1.5rem;"> <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.4rem;"> <h3 style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--text);">${d.nombre}</h3> </div> <div style="font-size:0.75rem;color:var(--accent);margin-bottom:0.75rem;font-weight:500;">📍 ${d.comunidad}</div> <p style="font-size:0.87rem;color:var(--text2);line-height:1.7;margin-bottom:1rem;">${d.desc}</p> <div style="display:flex;flex-wrap:wrap;gap:0.4rem;"> ${d.tags.map((t) => renderTemplate`<span style="padding:3px 10px;border-radius:999px;font-size:11px;background:var(--accent-light);color:var(--accent);border:1px solid rgba(56,189,248,0.2);">${t}</span>`)} </div> </div> </div>`)} </div> </div>  <div style="border-top:1px solid rgba(45,212,191,0.14);padding:5rem 1.5rem;text-align:center;"> <div style="max-width:540px;margin:0 auto;" class="reveal"> <h2 class="section-title" style="margin-bottom:1rem;">¿Cuál es tu próximo destino?</h2> <p style="color:var(--text2);margin-bottom:2rem;line-height:1.7;">Diseñamos itinerarios personalizados según tus intereses y el tiempo que dispongas.</p> <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;"> <a href="/alojamiento" class="btn-primary">Ver alojamiento →</a> <a href="/actividades" class="btn-outline">Actividades disponibles</a> </div> </div> </div> `, "hero": ($$result2) => renderTemplate`${renderComponent($$result2, "Fragment", Fragment, { "slot": "hero" }, { "default": ($$result3) => renderTemplate` <span class="section-label">🗺️ Explora la Península</span> <h1 class="section-title" style="font-size:clamp(2.5rem,6vw,4rem);margin-bottom:1.2rem;">
+Destinos <span class="gradient-text">Imperdibles</span> </h1> <p style="font-size:1.05rem;color:var(--text2);line-height:1.75;max-width:560px;margin:0 auto 2.5rem;">
+Cada rincón de la península de Capachica guarda una historia, una tradición y un paisaje que no encontrarás en ningún otro lugar del planeta.
+</p> <div style="display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap;"> ${[["8+", "Comunidades"], ["3820", "msnm"], ["12", "Islas"], ["500+", "años historia"]].map(([v, l]) => renderTemplate`<div style="text-align:center;"> <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:800;color:var(--gold);line-height:1;">${v}</div> <div style="font-size:0.73rem;color:var(--text2);letter-spacing:0.1em;text-transform:uppercase;">${l}</div> </div>`)} </div> ` })}` })}`;
+}, "F:/SISTEMAS/CAPACHICA/PROYECTO NUEVO/frontend mejorado/src/pages/destinos.astro", void 0);
+
+const $$file = "F:/SISTEMAS/CAPACHICA/PROYECTO NUEVO/frontend mejorado/src/pages/destinos.astro";
+const $$url = "/destinos";
+
+const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
+  __proto__: null,
+  default: $$Destinos,
+  file: $$file,
+  url: $$url
+}, Symbol.toStringTag, { value: 'Module' }));
+
+const page = () => _page;
+
+export { page };

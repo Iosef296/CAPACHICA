@@ -68,7 +68,12 @@ app.use(errorHandler);
 
 async function start() {
     try {
-        await Promise.all([initializeDatabase(), waitForDB()]);
+        // TypeORM (gastronomía) — no fatal si falla
+        initializeDatabase().catch(err =>
+            console.warn('⚠️  TypeORM no disponible (gastronomía):', err.message)
+        );
+        // pg Pool (actividades/reservas) — obligatorio
+        await waitForDB();
 
         const swaggerUi = require('swagger-ui-express');
         const YAML      = require('yamljs');

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 
-const API_URL = "http://localhost:4000";
+const API_URL = "http://localhost:3000";
+const IA_URL  = "http://localhost:5000";
 
 interface Familia {
   id: string;
@@ -51,7 +52,10 @@ interface Artesania {
   activo: boolean;
 }
 
-type Tab = "reservas" | "familias" | "artesanias";
+interface KnowEntry { id: number; categoria: string; pregunta: string; respuesta: string; }
+interface IAKnowledge { conocimiento: KnowEntry[]; contexto_base: string; nombre_ia: string; }
+
+type Tab = "reservas" | "familias" | "artesanias" | "ia";
 
 export default function AdminPanel() {
   const [token, setToken] = useState("");
@@ -67,6 +71,14 @@ export default function AdminPanel() {
   const [msgType, setMsgType] = useState<"ok" | "err">("ok");
 
   // Modales
+  // IA Knowledge
+  const [iaData, setIaData]         = useState<IAKnowledge>({ conocimiento: [], contexto_base: '', nombre_ia: 'Inti' });
+  const [iaEntry, setIaEntry]       = useState({ categoria: 'general', pregunta: '', respuesta: '' });
+  const [editCtx, setEditCtx]       = useState('');
+  const [showCtx, setShowCtx]       = useState(false);
+  const [iaLoading, setIaLoading]   = useState(false);
+  const [iaSearch, setIaSearch]     = useState('');
+
   const [modalFamilia, setModalFamilia] = useState(false);
   const [modalArtesania, setModalArtesania] = useState(false);
   const [familiaEdit, setFamiliaEdit] = useState<Partial<Familia>>({});
@@ -217,6 +229,56 @@ export default function AdminPanel() {
     });
     showMsg("✅ Artesanía eliminada");
     loadData();
+  };
+
+  // ── IA functions ──
+  const loadIA = useCallback(async () => {
+    setIaLoading(true);
+    try {
+      const res = await fetch(`${IA_URL}/api/admin/conocimiento`);
+      const data: IAKnowledge = await res.json();
+      setIaData(data);
+      setEditCtx(data.contexto_base || '');
+    } catch { showMsg('Error al cargar conocimiento IA', 'err'); }
+    setIaLoading(false);
+  }, []);
+
+  useEffect(() => { if (tab === 'ia') loadIA(); }, [tab, loadIA]);
+
+  const addEntry = async () => {
+    if (!iaEntry.pregunta.trim() || !iaEntry.respuesta.trim()) {
+      showMsg('Pregunta y Respuesta son obligatorias', 'err'); return;
+    }
+    try {
+      await fetch(`${IA_URL}/api/admin/conocimiento`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoria: iaEntry.categoria || 'general', pregunta: iaEntry.pregunta.trim(), respuesta: iaEntry.respuesta.trim() }),
+      });
+      setIaEntry({ categoria: 'general', pregunta: '', respuesta: '' });
+      showMsg('✅ Conocimiento agregado a Inti');
+      loadIA();
+    } catch { showMsg('Error al agregar', 'err'); }
+  };
+
+  const deleteEntry = async (id: number) => {
+    if (!confirm('¿Eliminar este conocimiento?')) return;
+    await fetch(`${IA_URL}/api/admin/conocimiento/${id}`, { method: 'DELETE' });
+    showMsg('✅ Eliminado');
+    loadIA();
+  };
+
+  const saveContexto = async () => {
+    try {
+      await fetch(`${IA_URL}/api/admin/contexto`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contexto_base: editCtx }),
+      });
+      setShowCtx(false);
+      showMsg('✅ Contexto base actualizado');
+      loadIA();
+    } catch { showMsg('Error al guardar contexto', 'err'); }
   };
 
   const inputStyle: React.CSSProperties = {
@@ -475,6 +537,12 @@ export default function AdminPanel() {
               onClick={() => setTab("artesanias")}
             >
               🎨 Artesanías
+            </button>
+            <button
+              className={`admin-tab ${tab === "ia" ? "active" : ""}`}
+              onClick={() => setTab("ia")}
+            >
+              🤖 Conocimiento IA
             </button>
           </div>
 
@@ -991,6 +1059,141 @@ export default function AdminPanel() {
               </div>
             </div>
           )}
+          {/* ─── IA KNOWLEDGE ─── */}
+          {tab === "ia" && (
+            <div>
+              {/* Header */}
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:24, flexWrap:"wrap", gap:12 }}>
+                <div>
+                  <h2 className="sec-title" style={{ fontFamily:"var(--font-display)", fontSize:22 }}>
+                    🤖 Conocimiento de Inti
+                  </h2>
+                  <p className="sec-muted" style={{ fontSize:12, marginTop:4 }}>
+                    {iaData.conocimiento.length} entradas · IA Backend: {IA_URL}
+                  </p>
+                </div>
+                <div style={{ display:"flex", gap:8 }}>
+                  <button onClick={() => setShowCtx(c => !c)} className="btn-outline" style={{ fontSize:12, padding:"8px 14px" }}>
+                    {showCtx ? "Ocultar contexto" : "✏️ Editar contexto base"}
+                  </button>
+                  <button onClick={loadIA} className="btn-outline" style={{ fontSize:12, padding:"8px 14px" }}>🔄</button>
+                </div>
+              </div>
+
+              {/* Contexto base editor */}
+              {showCtx && (
+                <div className="admin-card" style={{ marginBottom:24 }}>
+                  <p className="sec-muted" style={{ fontSize:12, marginBottom:8 }}>
+                    Contexto base del sistema — instrucciones globales que Inti siempre sigue
+                  </p>
+                  <textarea
+                    value={editCtx}
+                    onChange={e => setEditCtx(e.target.value)}
+                    rows={8}
+                    style={{ ...inputStyle, resize:"vertical", fontFamily:"monospace", fontSize:12 }}
+                  />
+                  <div style={{ display:"flex", gap:10, marginTop:12 }}>
+                    <button onClick={saveContexto} className="btn-primary" style={{ fontSize:13 }}>💾 Guardar contexto</button>
+                    <button onClick={() => { setEditCtx(iaData.contexto_base); setShowCtx(false); }} className="btn-outline" style={{ fontSize:13 }}>Cancelar</button>
+                  </div>
+                </div>
+              )}
+
+              {/* Add new entry */}
+              <div className="admin-card" style={{ marginBottom:28 }}>
+                <h3 className="sec-title" style={{ fontSize:16, marginBottom:16 }}>+ Agregar nuevo conocimiento</h3>
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 2fr 2fr", gap:12, alignItems:"end" }}>
+                  <div>
+                    <label style={{ fontSize:11, color:"#7f95aa", display:"block", marginBottom:5 }}>Categoría</label>
+                    <select
+                      value={iaEntry.categoria}
+                      onChange={e => setIaEntry(p => ({ ...p, categoria: e.target.value }))}
+                      style={{ ...inputStyle, fontSize:13 }}
+                    >
+                      <option value="general">general</option>
+                      <option value="precios">precios</option>
+                      <option value="actividades">actividades</option>
+                      <option value="alojamiento">alojamiento</option>
+                      <option value="transporte">transporte</option>
+                      <option value="gastronomia">gastronomía</option>
+                      <option value="cultura">cultura</option>
+                      <option value="clima">clima</option>
+                      <option value="reservas">reservas</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize:11, color:"#7f95aa", display:"block", marginBottom:5 }}>Pregunta *</label>
+                    <input
+                      value={iaEntry.pregunta}
+                      onChange={e => setIaEntry(p => ({ ...p, pregunta: e.target.value }))}
+                      placeholder="¿Cuánto cuesta el kayak?"
+                      style={{ ...inputStyle, fontSize:13 }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize:11, color:"#7f95aa", display:"block", marginBottom:5 }}>Respuesta *</label>
+                    <input
+                      value={iaEntry.respuesta}
+                      onChange={e => setIaEntry(p => ({ ...p, respuesta: e.target.value }))}
+                      placeholder="El kayak cuesta S/. 30 por persona..."
+                      onKeyDown={e => { if (e.key === 'Enter') addEntry(); }}
+                      style={{ ...inputStyle, fontSize:13 }}
+                    />
+                  </div>
+                </div>
+                <button onClick={addEntry} className="btn-primary" style={{ marginTop:14, fontSize:13 }}>
+                  + Agregar a Inti
+                </button>
+              </div>
+
+              {/* Search */}
+              <div style={{ marginBottom:16 }}>
+                <input
+                  value={iaSearch}
+                  onChange={e => setIaSearch(e.target.value)}
+                  placeholder="🔍 Buscar en conocimiento..."
+                  style={{ ...inputStyle, maxWidth:380, fontSize:13 }}
+                />
+              </div>
+
+              {/* Knowledge list */}
+              {iaLoading && <p className="sec-muted">Cargando...</p>}
+              {!iaLoading && (
+                <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+                  {iaData.conocimiento
+                    .filter(k => !iaSearch || k.pregunta.toLowerCase().includes(iaSearch.toLowerCase()) || k.respuesta.toLowerCase().includes(iaSearch.toLowerCase()) || k.categoria.toLowerCase().includes(iaSearch.toLowerCase()))
+                    .map(k => (
+                      <div key={k.id} className="admin-card" style={{ display:"flex", gap:16, alignItems:"flex-start" }}>
+                        <span style={{
+                          padding:"3px 10px", borderRadius:999, fontSize:10, fontWeight:700, letterSpacing:"0.06em",
+                          background:"rgba(45,212,191,0.1)", color:"rgba(45,212,191,0.85)",
+                          border:"1px solid rgba(45,212,191,0.2)", flexShrink:0, marginTop:2,
+                        }}>{k.categoria}</span>
+                        <div style={{ flex:1, minWidth:0 }}>
+                          <div style={{ color:"#f4f7fb", fontWeight:600, fontSize:14, marginBottom:4 }}>
+                            {k.pregunta}
+                          </div>
+                          <div className="sec-muted" style={{ fontSize:13, lineHeight:1.55 }}>
+                            {k.respuesta}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => deleteEntry(k.id)}
+                          style={{ padding:"6px 10px", borderRadius:8, border:"1px solid rgba(248,113,113,0.3)", background:"transparent", color:"#f87171", fontSize:12, cursor:"pointer", flexShrink:0 }}
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    ))
+                  }
+                  {iaData.conocimiento.length === 0 && (
+                    <p className="sec-muted">No hay entradas de conocimiento aún. Agrega la primera arriba.</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
         </div>
       </section>
 
