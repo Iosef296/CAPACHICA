@@ -1,8 +1,319 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import AdminPanel from '../components/AdminPanel';
+const API_URL = "http://localhost:3000";
+const IA_URL  = "http://localhost:5000";
 ---
 
-<Layout title="Admin Dashboard — Capachica">
-  <AdminPanel client:load />
-</Layout>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Capachica Turismo</title>
+  <style is:global>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #071826; color: #f4f7fb; min-height: 100vh; }
+    .page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+    .card { background: #122f4c; border: 1px solid rgba(83,211,255,0.35); border-radius: 20px; padding: 48px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 0 60px rgba(83,211,255,0.12); }
+    h2 { font-size: 26px; margin-bottom: 6px; }
+    .sub { color: #7f95aa; font-size: 13px; margin-bottom: 28px; }
+    input { width: 100%; padding: 11px 14px; margin-bottom: 12px; background: rgba(11,60,96,0.6); border: 1px solid rgba(83,211,255,0.2); border-radius: 10px; color: #f4f7fb; font-size: 14px; }
+    input:focus { outline: none; border-color: rgba(83,211,255,0.5); }
+    .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; background: linear-gradient(135deg,#1ba6d9,#0b6ea8); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 6px; }
+    .btn:hover { opacity: 0.87; }
+    .hint { color: #7f95aa; font-size: 11px; margin-top: 16px; }
+    .err { color: #f87171; font-size: 13px; margin-bottom: 10px; }
+    /* Panel */
+    .panel { display: none; padding: 40px 24px; max-width: 1100px; margin: 0 auto; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 12px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
+    .tab { padding: 9px 20px; border-radius: 999px; border: 1px solid rgba(83,211,255,0.25); background: transparent; color: #7f95aa; cursor: pointer; font-size: 13px; }
+    .tab.active { background: linear-gradient(135deg,#1ba6d9,#0b6ea8); color: #fff; border-color: transparent; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .ia-card { background: #0d2840; border: 1px solid rgba(83,211,255,0.15); border-radius: 14px; padding: 20px; margin-bottom: 12px; }
+    .ia-entry { display: flex; gap: 12px; align-items: flex-start; }
+    .cat-badge { padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 700; background: rgba(45,212,191,0.1); color: rgba(45,212,191,0.9); border: 1px solid rgba(45,212,191,0.2); flex-shrink: 0; margin-top: 3px; }
+    .ia-q { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+    .ia-r { color: #7f95aa; font-size: 13px; line-height: 1.5; }
+    .del-btn { background: transparent; border: 1px solid rgba(248,113,113,0.3); color: #f87171; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; flex-shrink: 0; }
+    .form-row { display: grid; grid-template-columns: 1fr 2fr 2fr; gap: 12px; align-items: end; margin-bottom: 14px; }
+    label { font-size: 11px; color: #7f95aa; display: block; margin-bottom: 5px; }
+    select { width: 100%; padding: 11px 14px; background: rgba(11,60,96,0.6); border: 1px solid rgba(83,211,255,0.2); border-radius: 10px; color: #f4f7fb; font-size: 13px; }
+    .msg { padding: 10px 16px; border-radius: 10px; margin-bottom: 18px; font-size: 13px; display: none; }
+    .msg.ok { background: rgba(83,211,255,0.1); border: 1px solid rgba(83,211,255,0.3); color: #53d3ff; }
+    .msg.err { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: #f87171; }
+    .sec-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    h3 { font-size: 20px; }
+    .logout-btn { padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(83,211,255,0.25); background: transparent; color: #7f95aa; cursor: pointer; font-size: 12px; }
+    .search-inp { padding: 9px 14px; background: rgba(11,60,96,0.6); border: 1px solid rgba(83,211,255,0.2); border-radius: 10px; color: #f4f7fb; font-size: 13px; width: 320px; max-width: 100%; margin-bottom: 16px; }
+    textarea { width: 100%; padding: 11px 14px; background: rgba(11,60,96,0.6); border: 1px solid rgba(83,211,255,0.2); border-radius: 10px; color: #f4f7fb; font-size: 13px; resize: vertical; }
+    .ctx-area { margin-bottom: 16px; }
+    .empty { color: #7f95aa; padding: 20px 0; }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="page" id="loginPage">
+  <div class="card">
+    <div style="font-size:48px;margin-bottom:14px">🔐</div>
+    <h2>Panel Admin</h2>
+    <p class="sub">Capachica Turismo</p>
+    <div class="err" id="loginErr"></div>
+    <input type="email" id="emailInp" placeholder="Email" />
+    <input type="password" id="passInp" placeholder="Contraseña" />
+    <button class="btn" id="loginBtn">Ingresar</button>
+    <p class="hint">admin@capachica.pe · admin123</p>
+  </div>
+</div>
+
+<!-- PANEL -->
+<div class="panel" id="adminPanel">
+  <div class="header">
+    <div>
+      <h2>⚙️ Panel de Administración</h2>
+      <p style="color:#7f95aa;font-size:12px;margin-top:4px">Capachica Turismo</p>
+    </div>
+    <button class="logout-btn" id="logoutBtn">Salir</button>
+  </div>
+
+  <div id="globalMsg" class="msg"></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="ia">🤖 Conocimiento IA</button>
+    <button class="tab" data-tab="reservas">📋 Reservas</button>
+  </div>
+
+  <!-- IA TAB -->
+  <div class="section active" id="tab-ia">
+    <div class="ia-card" style="margin-bottom:20px">
+      <h3 style="margin-bottom:14px;font-size:16px">+ Agregar conocimiento a Inti</h3>
+      <div class="form-row">
+        <div>
+          <label>Categoría</label>
+          <select id="iaCat">
+            <option value="general">general</option>
+            <option value="precios">precios</option>
+            <option value="actividades">actividades</option>
+            <option value="alojamiento">alojamiento</option>
+            <option value="transporte">transporte</option>
+            <option value="gastronomia">gastronomía</option>
+            <option value="cultura">cultura</option>
+            <option value="clima">clima</option>
+            <option value="reservas">reservas</option>
+          </select>
+        </div>
+        <div>
+          <label>Pregunta *</label>
+          <input type="text" id="iaQ" placeholder="¿Cuánto cuesta el kayak?" />
+        </div>
+        <div>
+          <label>Respuesta *</label>
+          <input type="text" id="iaR" placeholder="El kayak cuesta S/. 30..." />
+        </div>
+      </div>
+      <button class="btn" style="width:auto;padding:10px 24px" id="addIaBtn">+ Agregar a Inti</button>
+    </div>
+
+    <div style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <h3>🧠 Base de conocimiento</h3>
+      <button class="tab" id="ctxToggle">✏️ Editar contexto base</button>
+    </div>
+
+    <div id="ctxEditor" style="display:none" class="ia-card ctx-area">
+      <label>Contexto base del sistema (instrucciones globales para Inti)</label>
+      <textarea id="ctxText" rows="7"></textarea>
+      <div style="display:flex;gap:10px;margin-top:12px">
+        <button class="btn" style="width:auto;padding:9px 20px" id="saveCtxBtn">💾 Guardar contexto</button>
+        <button class="logout-btn" id="cancelCtxBtn">Cancelar</button>
+      </div>
+    </div>
+
+    <input class="search-inp" id="iaSearch" placeholder="🔍 Buscar..." />
+    <div id="iaList"><p class="empty">Cargando...</p></div>
+  </div>
+
+  <!-- RESERVAS TAB -->
+  <div class="section" id="tab-reservas">
+    <div id="reservasList"><p class="empty">Cargando...</p></div>
+  </div>
+</div>
+
+<script define:vars={{ API_URL, IA_URL }}>
+  let TOKEN = localStorage.getItem('admin_token') || '';
+  let iaData = { conocimiento: [], contexto_base: '' };
+
+  const $ = id => document.getElementById(id);
+  const show = (msg, type='ok') => {
+    const el = $('globalMsg');
+    el.textContent = msg;
+    el.className = 'msg ' + type;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 4000);
+  };
+
+  function showPanel() {
+    $('loginPage').style.display = 'none';
+    $('adminPanel').style.display = 'block';
+    loadIA();
+  }
+
+  if (TOKEN) showPanel();
+
+  // LOGIN
+  $('loginBtn').onclick = async () => {
+    const email = $('emailInp').value;
+    const pass = $('passInp').value;
+    $('loginErr').textContent = '';
+    try {
+      const res = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pass })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error al iniciar sesión');
+      TOKEN = data.token;
+      localStorage.setItem('admin_token', TOKEN);
+      showPanel();
+    } catch (e) {
+      $('loginErr').textContent = '⚠️ ' + e.message;
+      $('loginErr').style.display = 'block';
+    }
+  };
+  $('passInp').onkeydown = e => { if (e.key === 'Enter') $('loginBtn').click(); };
+
+  // LOGOUT
+  $('logoutBtn').onclick = () => {
+    TOKEN = '';
+    localStorage.removeItem('admin_token');
+    $('adminPanel').style.display = 'none';
+    $('loginPage').style.display = 'flex';
+  };
+
+  // TABS
+  document.querySelectorAll('.tab[data-tab]').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('.tab[data-tab]').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      $('tab-' + btn.dataset.tab).classList.add('active');
+      if (btn.dataset.tab === 'reservas') loadReservas();
+    };
+  });
+
+  // IA
+  async function loadIA() {
+    try {
+      const res = await fetch(`${IA_URL}/api/admin/conocimiento`);
+      iaData = await res.json();
+      renderIA();
+      $('ctxText').value = iaData.contexto_base || '';
+    } catch { show('Error al cargar IA', 'err'); }
+  }
+
+  function renderIA() {
+    const q = $('iaSearch').value.toLowerCase();
+    const list = (iaData.conocimiento || []).filter(k =>
+      !q || k.pregunta.toLowerCase().includes(q) || k.respuesta.toLowerCase().includes(q) || k.categoria.toLowerCase().includes(q)
+    );
+    if (!list.length) { $('iaList').innerHTML = '<p class="empty">No hay entradas.</p>'; return; }
+    $('iaList').innerHTML = list.map(k => `
+      <div class="ia-card">
+        <div class="ia-entry">
+          <span class="cat-badge">${k.categoria}</span>
+          <div style="flex:1">
+            <div class="ia-q">${k.pregunta}</div>
+            <div class="ia-r">${k.respuesta}</div>
+          </div>
+          <button class="del-btn" onclick="deleteIA(${k.id})">🗑️</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  $('iaSearch').oninput = renderIA;
+
+  $('addIaBtn').onclick = async () => {
+    const q = $('iaQ').value.trim();
+    const r = $('iaR').value.trim();
+    if (!q || !r) { show('Pregunta y Respuesta son obligatorias', 'err'); return; }
+    try {
+      await fetch(`${IA_URL}/api/admin/conocimiento`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoria: $('iaCat').value, pregunta: q, respuesta: r })
+      });
+      $('iaQ').value = ''; $('iaR').value = '';
+      show('✅ Conocimiento agregado a Inti');
+      loadIA();
+    } catch { show('Error al agregar', 'err'); }
+  };
+
+  window.deleteIA = async (id) => {
+    if (!confirm('¿Eliminar este conocimiento?')) return;
+    await fetch(`${IA_URL}/api/admin/conocimiento/${id}`, { method: 'DELETE' });
+    show('✅ Eliminado');
+    loadIA();
+  };
+
+  $('ctxToggle').onclick = () => {
+    const ed = $('ctxEditor');
+    ed.style.display = ed.style.display === 'none' ? 'block' : 'none';
+  };
+
+  $('saveCtxBtn').onclick = async () => {
+    try {
+      await fetch(`${IA_URL}/api/admin/contexto`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contexto_base: $('ctxText').value })
+      });
+      $('ctxEditor').style.display = 'none';
+      show('✅ Contexto actualizado');
+      loadIA();
+    } catch { show('Error al guardar', 'err'); }
+  };
+  $('cancelCtxBtn').onclick = () => { $('ctxEditor').style.display = 'none'; };
+
+  // RESERVAS
+  async function loadReservas() {
+    try {
+      const res = await fetch(`${API_URL}/api/reservas`, {
+        headers: { Authorization: `Bearer ${TOKEN}` }
+      });
+      const data = await res.json();
+      if (!Array.isArray(data)) { $('reservasList').innerHTML = '<p class="empty">Sin acceso o sin reservas.</p>'; return; }
+      if (!data.length) { $('reservasList').innerHTML = '<p class="empty">No hay reservas.</p>'; return; }
+      $('reservasList').innerHTML = data.map(r => `
+        <div class="ia-card" style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px">
+            <div>
+              <span style="color:#53d3ff;font-weight:700">${r.codigo || r.id}</span>
+              <span style="padding:2px 10px;border-radius:999px;font-size:11px;background:rgba(251,146,60,0.15);color:#fb923c;margin-left:8px">${r.estado?.toUpperCase()}</span>
+              <div style="font-weight:600;margin-top:6px">${r.nombre_huesped || r.nombre}</div>
+              <div style="color:#7f95aa;font-size:12px;margin-top:4px">📅 ${r.fecha_llegada} · 👥 ${r.num_personas || r.personas} personas</div>
+            </div>
+            <select onchange="updateEstado('${r.id}', this.value)" style="height:36px;align-self:center">
+              <option ${r.estado==='pendiente'?'selected':''} value="pendiente">⏳ Pendiente</option>
+              <option ${r.estado==='confirmada'?'selected':''} value="confirmada">✅ Confirmada</option>
+              <option ${r.estado==='cancelada'?'selected':''} value="cancelada">❌ Cancelada</option>
+              <option ${r.estado==='completada'?'selected':''} value="completada">🏁 Completada</option>
+            </select>
+          </div>
+        </div>
+      `).join('');
+    } catch { $('reservasList').innerHTML = '<p class="empty">Error al cargar reservas.</p>'; }
+  }
+
+  window.updateEstado = async (id, estado) => {
+    await fetch(`${API_URL}/api/reservas/${id}/estado`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` },
+      body: JSON.stringify({ estado })
+    });
+    show('✅ Estado actualizado');
+  };
+</script>
+</body>
+</html>

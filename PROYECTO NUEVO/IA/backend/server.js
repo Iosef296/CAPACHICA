@@ -17,6 +17,7 @@ const ADMIN_PHONE        = process.env.ADMIN_PHONE || '';
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 const openai = new OpenAI({
   baseURL: 'https://openrouter.ai/api/v1',

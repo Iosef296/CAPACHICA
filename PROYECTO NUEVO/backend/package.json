@@ -6,7 +6,8 @@
   "type": "commonjs",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "dev:all": "concurrently \"nodemon app.js\" \"node --env-file=../IA/backend/.env ../IA/backend/server.js\""
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -24,6 +25,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "concurrently": "^10.0.3",
     "nodemon": "^3.1.14"
   }
 }
