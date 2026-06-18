@@ -8,8 +8,215 @@
       {
         "tipo": "hero",
         "titulo": "Destinos Imperdibles",
-        "subtitulo": "Cada rincón de la península guarda una historia y un paisaje único. asdasdasdasd",
+        "subtitulo": "Cada rincón de la península guarda una historia y un paisaje único. Joquin es kvro",
         "imagen": ""
+      }
+    ]
+  },
+  "index": {
+    "titulo": "Inicio",
+    "slug": "index",
+    "descripcion": "Capachica Turismo - La joya del Lago Titicaca.",
+    "publicado": true,
+    "secciones": [
+      {
+        "tipo": "hero",
+        "titulo": "Descubre Capachica",
+        "subtitulo": "Una península andina a 3,820 msnm donde el lago más alto del mundo navegable se convierte en horizonte y cinco siglos de cultura quechua siguen vivos en cada",
+        "imagen": "",
+        "boton_texto": "Explorar destinos →",
+        "boton_url": "/destinos",
+        "boton2_texto": "Cómo llegar",
+        "boton2_url": "/como-llegar"
+      },
+      {
+        "tipo": "stats",
+        "items": [
+          {
+            "valor": "8+",
+            "label": "Comunidades"
+          },
+          {
+            "valor": "3,820",
+            "label": "msnm"
+          },
+          {
+            "valor": "500+",
+            "label": "Años historia"
+          },
+          {
+            "valor": "12",
+            "label": "Islas cercanas"
+          }
+        ]
+      },
+      {
+        "tipo": "bienvenida",
+        "titulo": "Capachica",
+        "label": "✦ La Joya Escondida del Titicaca",
+        "intro": "En el corazón del altiplano peruano, a orillas del lago más alto del mundo, se esconde una de las experiencias más auténticas del Perú.",
+        "parrafo1": "Capachica es una península quechua ubicada en la región Puno, Perú — a solo 80 km de la ciudad de Puno por carretera. Sus ocho comunidades conservan vivas las tradiciones andinas que preceden incluso al Imperio Inca.",
+        "parrafo2": "Aquí el turismo vivencial no es una escenificación: es la vida real de sus habitantes. Dormirás en casas familiares, aprenderás a tejer con lana de alpaca, pescarás trucha al amanecer y contemplarás atardeceres que transforman el Titicaca en un espejo de oro y plata.",
+        "items": [
+          {
+            "icono": "🌊",
+            "titulo": "Lago navegable más alto del mundo",
+            "desc": "El Titicaca tiene 8,372 km² de superficie a 3,812 msnm — un océano interior en los Andes."
+          },
+          {
+            "icono": "🌿",
+            "titulo": "Turismo 100% comunitario",
+            "desc": "Los ingresos van directamente a las familias locales. Sin intermediarios, sin cadenas hoteleras."
+          },
+          {
+            "icono": "⭐",
+            "titulo": "Cielos sin contaminación lumínica",
+            "desc": "Noches perfectas para astronomía y fotografía. La Vía Láctea visible a simple vista."
+          },
+          {
+            "icono": "🎨",
+            "titulo": "Cultura viva y auténtica",
+            "desc": "Tradiciones quechuas pre-incaicas, textiles ancestrales y festividades únicas en el mundo."
+          }
+        ]
+      },
+      {
+        "tipo": "destinos-showcase",
+        "titulo": "imperdibles",
+        "label": "✦ Lugares que visitar",
+        "intro": "Cada rincón de Capachica guarda una sorpresa. Estos son los lugares que no puedes dejar de visitar.",
+        "items": [
+          {
+            "nombre": "Playa Llachón",
+            "subtitulo": "La única playa del Titicaca",
+            "desc": "Arena blanca y aguas turquesas a 3,820 msnm. Un milagro geológico en el corazón del altiplano peruano.",
+            "icono": "🏖️",
+            "color": "#2dd4bf"
+          },
+          {
+            "nombre": "Isla Ticonata",
+            "subtitulo": "Isla sagrada de totora",
+            "desc": "A 40 minutos en bote, Ticonata guarda secretos ancestrales y ofrece una vista privilegiada del lago.",
+            "icono": "🏝️",
+            "color": "#38bdf8"
+          },
+          {
+            "nombre": "Mirador del Amaru",
+            "subtitulo": "360° del Lago Titicaca",
+            "desc": "Desde la cima del cerro Amaru, el Titicaca se despliega infinito. El mejor punto para fotografiar los atardeceres.",
+            "icono": "🏔️",
+            "color": "#a78bfa"
+          },
+          {
+            "nombre": "Comunidad Capachica",
+            "subtitulo": "Corazón de la península",
+            "desc": "Mercados artesanales, iglesia colonial y la calidez de las familias quechuas preservando sus tradiciones por cinco siglos.",
+            "icono": "🏘️",
+            "color": "#fbbf24"
+          }
+        ]
+      },
+      {
+        "tipo": "info-practica",
+        "titulo": "necesitas saber",
+        "label": "✦ Planifica tu viaje",
+        "items": [
+          {
+            "icono": "🚌",
+            "titulo": "Cómo llegar",
+            "color": "#2dd4bf",
+            "lista": "✈️ Lima → Juliaca (1h 30min vuelo)\n🚌 Juliaca → Puno (35 min bus)\n🚗 Puno → Capachica (1h 30min)\n⭐ Total: ~3.5h desde Lima",
+            "link": "/como-llegar",
+            "link_texto": "Ver ruta completa"
+          },
+          {
+            "icono": "📅",
+            "titulo": "Mejor época para visitar",
+            "color": "#d4a843",
+            "lista": "☀️ Mayo – Octubre: temporada seca\n🌧️ Nov – Abril: lluvias, verde intenso\n🎊 Febrero: Virgen de la Candelaria\n🌅 Todo el año: atardeceres únicos",
+            "link": "/festividades",
+            "link_texto": "Ver calendario de festividades"
+          },
+          {
+            "icono": "🤝",
+            "titulo": "Turismo responsable",
+            "color": "#a78bfa",
+            "lista": "💚 100% ingresos a comunidades locales\n♻️ Residuos manejados responsablemente\n🌱 Cultivos orgánicos ancestrales\n📸 Respeto pleno a la cultura local",
+            "link": "/vivencial",
+            "link_texto": "Conocer familias anfitrionas"
+          }
+        ]
+      },
+      {
+        "tipo": "experiencias",
+        "titulo": "Capachica",
+        "label": "✦ Todo en un lugar",
+        "intro": "Seis experiencias únicas que hacen de la península de Capachica el destino más auténtico del Lago Titicaca.",
+        "items": [
+          {
+            "emoji": "🏠",
+            "etiqueta": "Vivencial",
+            "titulo": "Vive con familias quechuas",
+            "desc": "Más que turismo: una inmersión real en la vida andina. Cocina con las familias, aprende sobre la cosmovisión andina y duerme bajo las estrellas del Titicaca.",
+            "href": "/vivencial",
+            "color": "#0ea5e9",
+            "tags": "Familia anfitriona,Cocina andina,Tejido"
+          },
+          {
+            "emoji": "🚣",
+            "etiqueta": "Actividades",
+            "titulo": "Aventura en el Titicaca",
+            "desc": "Kayak al amanecer, pesca artesanal con los comuneros, cabalgata entre totorales y escalada en los acantilados con vista panorámica al lago.",
+            "href": "/actividades",
+            "color": "#34d399",
+            "tags": "Kayak,Pesca,Escalada"
+          },
+          {
+            "emoji": "🍽️",
+            "etiqueta": "Gastronomía",
+            "titulo": "Sabores del altiplano",
+            "desc": "Trucha del lago, quinua nativa, chuño ancestral. Los mejores restaurantes de la península sirven una cocina que lleva cinco siglos de historia.",
+            "href": "/gastronomia",
+            "color": "#fbbf24",
+            "tags": "Trucha,Quinua,Chuño"
+          },
+          {
+            "emoji": "🎊",
+            "etiqueta": "Festividades",
+            "titulo": "Fiestas ancestrales",
+            "desc": "Virgen Candelaria, Inti Raymi, Todos los Santos. El calendario festivo de Capachica mezcla cosmovisión andina y devoción católica en explosiones de color.",
+            "href": "/festividades",
+            "color": "#f472b6",
+            "tags": "Candelaria,Inti Raymi,Danzas"
+          },
+          {
+            "emoji": "🧶",
+            "etiqueta": "Artesanía",
+            "titulo": "Textiles con historia",
+            "desc": "Aguayos, chullos y mantas tejidas con técnicas ancestrales que las comunidades han preservado por generaciones. Cada pieza es única e irrepetible.",
+            "href": "/artesania",
+            "color": "#a78bfa",
+            "tags": "Aguayo,Chullo,Bordado"
+          },
+          {
+            "emoji": "🏔️",
+            "etiqueta": "Destinos",
+            "titulo": "Paisajes que quitan el aliento",
+            "desc": "Miradores con vistas del Titicaca, comunidades a orillas del lago, islas flotantes y la magia de los atardeceres más fotogénicos del Perú.",
+            "href": "/destinos",
+            "color": "#38bdf8",
+            "tags": "Llachón,Taquile,Miradores"
+          }
+        ]
+      },
+      {
+        "tipo": "contacto",
+        "titulo": "¿Listo para vivir Capachica?",
+        "subtitulo": "Contacta con nosotros y te ayudamos a diseñar el itinerario perfecto según tus intereses y fechas.",
+        "boton_texto": "Ver actividades",
+        "boton_url": "/actividades",
+        "boton2_texto": "Volver al Inicio",
+        "boton2_url": ""
       }
     ]
   }

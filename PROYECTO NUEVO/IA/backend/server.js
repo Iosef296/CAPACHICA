@@ -16,6 +16,7 @@ const RESERVACIONES_PATH = path.join(__dirname, 'reservaciones.json');
 const DESTINOS_PATH      = path.join(__dirname, 'destinos.json');
 const PAGINAS_PATH       = path.join(__dirname, 'paginas.json');
 const CONTENIDO_PATH     = path.join(__dirname, 'contenido.json');
+const SITECONFIG_PATH    = path.join(__dirname, 'siteconfig.json');
 const ADMIN_PHONE        = process.env.ADMIN_PHONE || '';
 
 app.use(cors());
@@ -640,6 +641,23 @@ function loadContenido() {
 function saveContenido(data) {
   fs.writeFileSync(CONTENIDO_PATH, JSON.stringify(data, null, 2), 'utf8');
 }
+
+function loadSiteconfig() {
+  try {
+    if (!fs.existsSync(SITECONFIG_PATH)) return { navbar: {}, footer: {} };
+    return JSON.parse(fs.readFileSync(SITECONFIG_PATH, 'utf8'));
+  } catch { return { navbar: {}, footer: {} }; }
+}
+function saveSiteconfig(data) {
+  fs.writeFileSync(SITECONFIG_PATH, JSON.stringify(data, null, 2), 'utf8');
+}
+
+app.get('/api/siteconfig', (req, res) => res.json(loadSiteconfig()));
+app.get('/api/admin/siteconfig', (req, res) => res.json(loadSiteconfig()));
+app.put('/api/admin/siteconfig', (req, res) => {
+  try { saveSiteconfig(req.body); res.json({ ok: true }); }
+  catch (e) { res.status(500).json({ error: e.message }); }
+});
 
 app.get('/api/contenido/:slug', (req, res) => {
   const c = loadContenido();

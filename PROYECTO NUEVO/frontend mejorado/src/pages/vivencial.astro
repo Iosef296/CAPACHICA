@@ -3,11 +3,13 @@ import Layout from '../layouts/Layout.astro';
 import VivencialTimeline from '../components/VivencialTimeline';
 import FamiliasGrid from '../components/FamiliasGrid';
 import ReservaForm from '../components/ReservaForm';
+import SectionRenderer from '../components/SectionRenderer.astro';
 
 const IA_URL = 'http://localhost:5000';
 let cms: any = null;
 try { const r = await fetch(`${IA_URL}/api/contenido/vivencial`); if (r.ok) cms = await r.json(); } catch {}
 const cmsHero = cms?.secciones?.find((s: any) => s.tipo === 'hero');
+const hasBody  = cms?.secciones?.some((s: any) => s.tipo !== 'hero');
 ---
 <Layout title="Turismo Vivencial — Capachica">
   <Fragment slot="hero">
@@ -24,7 +26,15 @@ const cmsHero = cms?.secciones?.find((s: any) => s.tipo === 'hero');
     </div>
   </Fragment>
 
-  <VivencialTimeline client:load />
-  <FamiliasGrid client:load />
-  <ReservaForm client:load />
+  {hasBody ? (
+    <div style="max-width:1100px;margin:0 auto;padding:3rem 1.5rem 6rem;">
+      <SectionRenderer secciones={cms.secciones} skipHero={true} />
+    </div>
+  ) : (
+    <>
+      <VivencialTimeline client:load />
+      <FamiliasGrid client:load />
+      <ReservaForm client:load />
+    </>
+  )}
 </Layout>

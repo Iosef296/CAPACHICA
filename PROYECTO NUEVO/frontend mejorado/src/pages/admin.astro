@@ -173,6 +173,7 @@ const IA_URL  = "http://localhost:5000";
 
     .section { display: none; animation: fadeUp .18s ease; }
     .section.active { display: block; }
+    #sec-global.active { display: block !important; padding: 0 !important; }
 
     @keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
 
@@ -388,26 +389,103 @@ const IA_URL  = "http://localhost:5000";
     .pe-body { display: flex; flex: 1; overflow: hidden; }
 
     .pe-left {
-      width: 280px; flex-shrink: 0; border-right: 1px solid var(--border);
+      width: 340px; flex-shrink: 0; border-right: 1px solid var(--border);
       overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 14px;
     }
-    .pe-right { flex: 1; overflow-y: auto; padding: 24px 28px; }
+    .pe-right { flex: 1; overflow: hidden; display: flex; flex-direction: column; padding: 0; min-width: 0; }
+    .pe-canvas-topbar { height:38px; border-bottom:1px solid var(--border); padding:0 16px; display:flex; align-items:center; gap:8px; background:var(--s1); flex-shrink:0; font-size:11px; color:var(--muted); }
+    #pe-preview-iframe { flex:1; width:100%; border:none; display:block; }
+    #pe-canvas { flex:1; overflow-y:auto; padding:28px 40px 100px; background:var(--bg); }
+    .pe-canvas-empty { text-align:center; padding:80px 40px; color:var(--muted); }
+    .pe-canvas-empty > div { font-size:3rem; margin-bottom:14px; }
+    .pe-canvas-sec { border:1px solid var(--border); border-radius:12px; margin-bottom:16px; overflow:hidden; transition:border-color .15s, box-shadow .15s; }
+    .pe-canvas-sec:hover { border-color:var(--border2); }
+    .pe-canvas-sec.active { border-color:var(--cyan-b); box-shadow:0 0 0 3px var(--cyan-dim); }
+    .pe-canvas-sec-bar { display:flex; align-items:center; gap:8px; padding:8px 14px; background:var(--s3); border-bottom:1px solid var(--border); }
+    .pe-canvas-sec-badge { font-size:11px; font-weight:700; color:var(--cyan); background:var(--cyan-dim); border:1px solid var(--cyan-b); border-radius:5px; padding:2px 7px; }
+    .pe-canvas-sec-bar-controls { margin-left:auto; display:flex; gap:4px; }
+    .pe-canvas-sec-bar-controls button { background:transparent; border:1px solid var(--border); border-radius:5px; color:var(--muted); font-size:12px; cursor:pointer; padding:3px 7px; font-family:inherit; transition:all .12s; }
+    .pe-canvas-sec-bar-controls button:hover { border-color:var(--border2); color:var(--text); }
+    .pe-canvas-sec-bar-controls button:disabled { opacity:.2; cursor:default; pointer-events:none; }
+    .pe-canvas-sec-bar-controls .del-btn:hover { color:var(--red); border-color:var(--red); }
+    .pe-canvas-sec-body { padding:20px 24px; cursor:pointer; position:relative; transition:background .15s; min-height:60px; }
+    .pe-canvas-sec.active .pe-canvas-sec-body { cursor:default; }
+    .pe-canvas-hover-hint { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(45,212,191,.05); opacity:0; transition:opacity .2s; pointer-events:none; }
+    .pe-canvas-sec-body:hover .pe-canvas-hover-hint { opacity:1; }
+    .pe-canvas-hover-hint span { background:var(--cyan); color:#000; font-size:12px; font-weight:700; padding:6px 18px; border-radius:20px; }
+
+    /* VISUAL SECTION PREVIEW CARDS */
+    .pe-empty-hint { text-align:center; padding:80px 40px; color:var(--muted); }
+    .pe-empty-hint div:first-child { font-size:3rem; margin-bottom:14px; }
+    .pe-empty-hint h3 { font-size:16px; font-weight:700; color:var(--text); margin-bottom:6px; }
+    .pe-empty-hint p { font-size:13px; margin-bottom:18px; }
+    #pe-overview { padding: 24px 32px 100px; }
+    .pe-sec-card { background:var(--s2); border:1px solid var(--border); border-radius:14px; margin-bottom:14px; overflow:hidden; transition:border-color .15s, box-shadow .15s; }
+    .pe-sec-card:hover { border-color:var(--border2); }
+    .pe-sec-card.active { border-color:var(--cyan-b); box-shadow:0 0 0 3px var(--cyan-dim); }
+    .pe-sec-card-hdr { display:flex; align-items:center; gap:10px; padding:10px 14px; background:var(--s3); border-bottom:1px solid var(--border); }
+    .pe-sec-card-badge { display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:var(--cyan); background:var(--cyan-dim); border:1px solid var(--cyan-b); border-radius:6px; padding:3px 8px; flex-shrink:0; }
+    .pe-sec-card-hint { font-size:13px; color:var(--text); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+    .pe-sec-card-actions { display:flex; align-items:center; gap:5px; margin-left:auto; flex-shrink:0; }
+    .pe-sec-card-actions button { background:transparent; border:1px solid var(--border); border-radius:6px; color:var(--muted); font-size:12px; cursor:pointer; padding:4px 8px; font-family:inherit; transition:all .12s; }
+    .pe-sec-card-actions button:hover { border-color:var(--border2); color:var(--text); }
+    .pe-sec-card-actions button:disabled { opacity:.22; cursor:default; pointer-events:none; }
+    .pe-sec-card-actions .btn-edit { color:var(--cyan); border-color:var(--cyan-b); }
+    .pe-sec-card-actions .btn-edit:hover { background:var(--cyan-dim); }
+    .pe-sec-card-actions .btn-done { color:#4ade80; border-color:rgba(74,222,128,.4); }
+    .pe-sec-card-actions .btn-done:hover { background:rgba(74,222,128,.08); }
+    .pe-sec-card-actions .btn-del:hover { color:var(--red); border-color:var(--red); }
+    .pe-sec-card-preview { padding:16px 18px; }
+    .pe-sec-card-edit-body { display:grid; grid-template-columns:1fr 1fr; border-top:2px solid var(--cyan-b); }
+    @media(max-width:900px) { .pe-sec-card-edit-body { grid-template-columns:1fr; } }
+    .pe-live-col { padding:20px 22px; background:var(--bg); border-right:1px solid var(--border); overflow-y:auto; max-height:520px; }
+    .pe-form-col { padding:20px 22px; background:var(--s2); overflow-y:auto; max-height:520px; }
+    .pe-col-label { font-size:10px; font-weight:700; color:var(--dim); text-transform:uppercase; letter-spacing:.08em; margin-bottom:14px; display:flex; align-items:center; gap:6px; }
+
+    /* PREVIEW MINI RENDERERS */
+    .prev-hero { text-align:center; padding:12px 24px; }
+    .prev-hero-title { font-size:1.5rem; font-weight:800; color:var(--text); margin-bottom:6px; font-family:var(--font-display,serif); }
+    .prev-hero-sub { font-size:0.82rem; color:var(--muted); line-height:1.55; }
+    .prev-stats { display:flex; gap:10px; flex-wrap:wrap; }
+    .prev-stat { text-align:center; background:var(--s3); border-radius:8px; padding:8px 14px; min-width:65px; }
+    .prev-stat-v { font-size:1.15rem; font-weight:800; color:var(--cyan); line-height:1.1; }
+    .prev-stat-l { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.07em; margin-top:2px; }
+    .prev-cards { display:flex; gap:8px; flex-wrap:wrap; }
+    .prev-card-mini { background:var(--s3); border:1px solid var(--border); border-radius:8px; padding:6px 12px; font-size:12px; color:var(--text); }
+    .prev-texto { font-size:13px; color:var(--muted); line-height:1.65; }
+    .prev-simple { font-size:13px; color:var(--muted); }
+    .prev-contacto { text-align:center; }
+    .prev-contacto-title { font-size:14px; font-weight:600; color:var(--text); margin-bottom:8px; }
+    .prev-btn-sample { font-size:11px; background:var(--cyan-dim); border:1px solid var(--cyan-b); color:var(--cyan); border-radius:6px; padding:4px 10px; }
+    .prev-features { display:flex; gap:8px; flex-wrap:wrap; }
+    .prev-feature { background:var(--s3); border:1px solid var(--border); border-radius:8px; padding:6px 12px; font-size:12px; color:var(--text); }
+    .prev-pasos { display:flex; flex-direction:column; gap:6px; }
+    .prev-paso { font-size:12px; color:var(--text); padding:5px 10px; background:var(--s3); border-radius:7px; }
 
     .pe-sec-label {
       font-size: 10px; font-weight: 700; color: var(--dim);
       text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px;
     }
 
-    .sec-chip {
+    .sec-block {
       background: var(--s2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 9px 12px; margin-bottom: 6px;
+      border-radius: 10px; padding: 10px 12px; margin-bottom: 6px;
       display: flex; align-items: center; gap: 8px; cursor: pointer;
-      transition: border-color .15s;
+      transition: border-color .15s, background .15s;
     }
-    .sec-chip:hover { border-color: var(--border2); }
-    .sec-chip.active { border-color: var(--cyan-b); background: var(--cyan-dim); }
-    .sec-chip-type { font-size: 12px; font-weight: 700; color: var(--muted); flex: 1; }
-    .sec-chip.active .sec-chip-type { color: var(--cyan); }
+    .sec-block:hover { border-color: var(--border2); background: var(--s3); }
+    .sec-block.active { border-color: var(--cyan-b); background: var(--cyan-dim); }
+    .sec-block-main { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+    .sec-block-icon { font-size: 18px; flex-shrink: 0; }
+    .sec-block-info { min-width: 0; }
+    .sec-block-type { font-size: 12px; font-weight: 700; color: var(--muted); }
+    .sec-block.active .sec-block-type { color: var(--cyan); }
+    .sec-block-preview { font-size: 11px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; max-width: 140px; }
+    .sec-block-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+    .sec-block-actions button { background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 3px 5px; font-size: 13px; border-radius: 4px; transition: color .12s; }
+    .sec-block-actions button:hover { color: var(--text); }
+    .sec-block-actions button:disabled { opacity: 0.25; cursor: default; }
+    .sec-block-actions .del-btn:hover { color: var(--red); }
 
     .add-sec-btn {
       display: flex; align-items: center; justify-content: center; gap: 6px;
@@ -511,6 +589,10 @@ const IA_URL  = "http://localhost:5000";
       <button class="nav-btn" data-section="reservas">
         <span>📋</span> Reservas
         <span class="nav-count" id="nav-res-count">—</span>
+      </button>
+      <div class="nav-label">Sitio</div>
+      <button class="nav-btn" data-section="global">
+        <span>🎨</span> Navbar &amp; Footer
       </button>
     </aside>
 
@@ -670,6 +752,77 @@ const IA_URL  = "http://localhost:5000";
         </div>
       </div>
 
+      <!-- ─── GLOBAL SECTION ─── -->
+      <div class="section" id="sec-global" style="height:calc(100vh - 56px);margin:-28px -32px;overflow:hidden;">
+        <div style="display:flex;height:100%;">
+
+          <!-- LEFT: forms -->
+          <div style="width:460px;flex-shrink:0;overflow-y:auto;padding:28px 24px;border-right:1px solid var(--border);background:var(--s1);">
+            <div class="page-hdr">
+              <h2>Navbar &amp; Footer</h2>
+              <p>Configura el menú y el pie de página</p>
+            </div>
+
+            <!-- NAVBAR -->
+            <div class="card" id="global-card-navbar">
+              <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">🧭 Barra de navegación</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+                <div class="fg" style="margin:0">
+                  <label>Nombre del logo</label>
+                  <input type="text" id="nb-logo-nombre" placeholder="Capachica" />
+                </div>
+                <div class="fg" style="margin:0">
+                  <label>Tagline del logo</label>
+                  <input type="text" id="nb-logo-tagline" placeholder="Turismo Vivencial" />
+                </div>
+              </div>
+              <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Links del menú</div>
+              <div id="nb-links-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+              <button class="btn-sm" onclick="nbAddLink()" style="padding:6px 12px;font-size:12px;">+ Agregar link</button>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="card" id="global-card-footer">
+              <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">🏛️ Footer</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                <div class="fg" style="margin:0"><label>Nombre de marca</label><input type="text" id="ft-brand-nombre" placeholder="Capachica" /></div>
+                <div class="fg" style="margin:0"><label>Tagline</label><input type="text" id="ft-brand-tagline" placeholder="TURISMO VIVENCIAL" /></div>
+              </div>
+              <div class="fg"><label>Descripción de marca</label><input type="text" id="ft-brand-desc" placeholder="La joya escondida del lago Titicaca..." /></div>
+              <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 8px;">Redes sociales</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+                <div class="fg" style="margin:0"><label>Instagram</label><input type="text" id="ft-instagram" placeholder="https://instagram.com/..." /></div>
+                <div class="fg" style="margin:0"><label>Facebook</label><input type="text" id="ft-facebook" placeholder="https://facebook.com/..." /></div>
+                <div class="fg" style="margin:0"><label>YouTube</label><input type="text" id="ft-youtube" placeholder="https://youtube.com/..." /></div>
+                <div class="fg" style="margin:0"><label>TikTok</label><input type="text" id="ft-tiktok" placeholder="https://tiktok.com/..." /></div>
+              </div>
+              <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 8px;">Contacto</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+                <div class="fg" style="margin:0"><label>WhatsApp (ej: 51955949404)</label><input type="text" id="ft-whatsapp" placeholder="51955949404" /></div>
+                <div class="fg" style="margin:0"><label>Email</label><input type="text" id="ft-email" placeholder="correo@ejemplo.com" /></div>
+              </div>
+              <div class="fg"><label>Texto de copyright</label><input type="text" id="ft-copyright" placeholder="© 2026 Capachica Turismo..." /></div>
+            </div>
+
+            <div style="display:flex;gap:10px;align-items:center;padding-bottom:24px;">
+              <button class="btn-primary" onclick="saveSiteconfigAdmin()">💾 Guardar cambios</button>
+              <span id="global-msg" style="font-size:13px;color:var(--green);display:none">✓ Guardado — recarga el iframe →</span>
+            </div>
+          </div>
+
+          <!-- RIGHT: iframe preview -->
+          <div style="flex:1;display:flex;flex-direction:column;background:#000;">
+            <div style="height:38px;background:var(--s2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 14px;flex-shrink:0;">
+              <span style="font-size:11px;color:var(--muted);">Vista previa real</span>
+              <span style="font-size:10px;color:var(--dim);">Guarda para ver los cambios</span>
+              <button onclick="document.getElementById('globalPreviewFrame').src=document.getElementById('globalPreviewFrame').src" style="margin-left:auto;padding:4px 10px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;">↺ Actualizar</button>
+            </div>
+            <iframe id="globalPreviewFrame" src="http://localhost:4322/" style="flex:1;border:none;width:100%;height:100%;" title="Vista previa" onload="scheduleGlobalInject(this)"></iframe>
+          </div>
+
+        </div>
+      </div>
+
     </main>
   </div>
 </div>
@@ -686,7 +839,7 @@ const IA_URL  = "http://localhost:5000";
   </div>
   <div class="pe-body">
 
-    <!-- LEFT: metadata + sections list -->
+    <!-- LEFT: metadata + dynamic panel (section list OR form editor) -->
     <div class="pe-left">
       <div>
         <div class="pe-sec-label">Metadatos</div>
@@ -700,19 +853,18 @@ const IA_URL  = "http://localhost:5000";
           </label>
         </div>
       </div>
-
-      <div>
-        <div class="pe-sec-label">Secciones</div>
-        <div id="pe-sections-list"></div>
-        <button class="add-sec-btn" onclick="addSection()">＋ Agregar sección</button>
-      </div>
+      <!-- Dynamic: section list overview OR section form editor -->
+      <div id="pe-left-dynamic"></div>
     </div>
 
-    <!-- RIGHT: section content editor -->
+    <!-- RIGHT: actual page in iframe -->
     <div class="pe-right">
-      <div id="pe-section-editor">
-        <div class="empty" style="margin-top:3rem"><div class="ei">👈</div><p>Selecciona o agrega una sección para editarla</p></div>
+      <div class="pe-canvas-topbar">
+        <span>📄 Vista previa real</span>
+        <span style="margin-left:6px;opacity:.55;font-size:10px;">· Edita a la izquierda → Guardar página → se actualiza aquí</span>
+        <button onclick="reloadPreviewIframe()" style="margin-left:auto;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;cursor:pointer;padding:4px 10px;font-family:inherit;transition:all .12s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">🔄 Actualizar</button>
       </div>
+      <iframe id="pe-preview-iframe" src="about:blank" style="flex:1;width:100%;border:none;display:block;" allow="same-origin"></iframe>
     </div>
 
   </div>
@@ -731,6 +883,9 @@ const IA_URL  = "http://localhost:5000";
       <div class="tipo-opt" onclick="addSectionOfType('cards')"><span class="to-icon">🃏</span><span class="to-label">Tarjetas / Cards</span></div>
       <div class="tipo-opt" onclick="addSectionOfType('galeria')"><span class="to-icon">🖼️</span><span class="to-label">Galería de fotos</span></div>
       <div class="tipo-opt" onclick="addSectionOfType('contacto')"><span class="to-icon">📬</span><span class="to-label">Llamada a acción</span></div>
+      <div class="tipo-opt" onclick="addSectionOfType('stats')"><span class="to-icon">📊</span><span class="to-label">Estadísticas</span></div>
+      <div class="tipo-opt" onclick="addSectionOfType('features')"><span class="to-icon">✨</span><span class="to-label">Características</span></div>
+      <div class="tipo-opt" onclick="addSectionOfType('pasos')"><span class="to-icon">📋</span><span class="to-label">Pasos / Timeline</span></div>
     </div>
   </div>
 </div>
@@ -894,6 +1049,7 @@ const IA_URL  = "http://localhost:5000";
       if (btn.dataset.section === 'widget')   loadWidget();
       if (btn.dataset.section === 'destinos') loadDestinos();
       if (btn.dataset.section === 'paginas')  loadPaginas();
+      if (btn.dataset.section === 'global')   loadSiteconfigAdmin();
     };
   });
 
@@ -1278,26 +1434,137 @@ const IA_URL  = "http://localhost:5000";
         ]}
       ]
     },
-    destinos: { titulo: 'Destinos', descripcion: 'Explora la península de Capachica.', secciones: [{ tipo: 'hero', titulo: 'Destinos Imperdibles', subtitulo: 'Cada rincón de la península guarda una historia y un paisaje único.' }] },
-    actividades: { titulo: 'Actividades', descripcion: 'Actividades en Capachica.', secciones: [{ tipo: 'hero', titulo: 'Actividades', subtitulo: 'Vive la aventura en las orillas del Titicaca.' }, { tipo: 'cards', titulo: 'Qué puedes hacer', items: [] }] },
-    festividades: { titulo: 'Festividades', descripcion: 'Festividades de Capachica.', secciones: [{ tipo: 'hero', titulo: 'Festividades', subtitulo: 'Celebraciones que conectan el pasado con el presente.' }, { tipo: 'cards', titulo: 'Calendario de festividades', items: [] }] },
-    artesania: { titulo: 'Artesanía', descripcion: 'Artesanía de Capachica.', secciones: [{ tipo: 'hero', titulo: 'Artesanía Capachiqueña', subtitulo: 'Tejidos de alpaca, cerámica andina y artesanías centenarias.' }] },
-    'como-llegar': { titulo: 'Cómo Llegar', descripcion: 'Cómo llegar a Capachica.', secciones: [{ tipo: 'hero', titulo: 'Planifica tu Viaje', subtitulo: 'Cuéntanos tu sueño y lo hacemos realidad. Respondemos en 24 horas.' }, { tipo: 'texto', titulo: 'Cómo llegar', contenido: 'Desde Puno tomas un bus hacia Capachica (aprox. 1.5 horas). También hay taxis colectivos.' }] },
-    vivencial: { titulo: 'Turismo Vivencial', descripcion: 'Turismo vivencial en Capachica.', secciones: [{ tipo: 'hero', titulo: 'Turismo Vivencial', subtitulo: 'Más que turismo: una inmersión real en la vida andina de las familias de Capachica.' }] },
-    index: { titulo: 'Inicio', descripcion: 'Capachica Turismo - La joya del Lago Titicaca.', secciones: [{ tipo: 'hero', titulo: 'Capachica', subtitulo: 'La joya del Lago Titicaca' }] },
+    destinos: { titulo: 'Destinos', descripcion: 'Explora la península de Capachica.', secciones: [
+      { tipo: 'hero', titulo: 'Destinos Imperdibles', subtitulo: 'Cada rincón de la península guarda una historia, una tradición y un paisaje que no encontrarás en ningún otro lugar del planeta.' },
+      { tipo: 'stats', items: [{ valor: '8+', label: 'Comunidades' }, { valor: '3820', label: 'msnm' }, { valor: '12', label: 'Islas' }, { valor: '500+', label: 'años historia' }] },
+    ]},
+    actividades: { titulo: 'Actividades', descripcion: 'Actividades en Capachica.', secciones: [
+      { tipo: 'hero', titulo: 'Actividades', subtitulo: 'Vive la aventura en las orillas del Titicaca.' },
+      { tipo: 'cards', titulo: 'Qué puedes hacer', items: [
+        { emoji: '🚣', titulo: 'Kayak en el Titicaca', desc: 'Paddle en las aguas más altas del mundo navegable. Salida al amanecer desde la orilla.', precio: 'S/ 35', precio_unidad: 'persona', color: '#38bdf8' },
+        { emoji: '🧶', titulo: 'Taller de Tejido', desc: 'Aprende técnicas ancestrales de tejido con mujeres artesanas de la comunidad.', precio: 'S/ 25', precio_unidad: 'persona', color: '#34d399' },
+        { emoji: '🐟', titulo: 'Pesca Artesanal', desc: 'Madrugada de pesca al estilo ancestral con redes y botes de totora.', precio: 'S/ 30', precio_unidad: 'persona', color: '#0ea5e9' },
+        { emoji: '🥾', titulo: 'Senderismo Mirador', desc: 'Trekking al mirador Capu con vistas de 360° del lago. Guía local incluido.', precio: 'S/ 20', precio_unidad: 'persona', color: '#f472b6' },
+        { emoji: '🌾', titulo: 'Agricultura Andina', desc: 'Cultivo de papa y quinua junto a las familias. Conoce los ciclos del campo andino.', precio: 'S/ 15', precio_unidad: 'persona', color: '#fbbf24' },
+        { emoji: '🍽️', titulo: 'Cocina Novoandina', desc: 'Taller de cocina con ingredientes del lago y la huerta. Te llevas la receta.', precio: 'S/ 40', precio_unidad: 'persona', color: '#a78bfa' },
+      ]},
+      { tipo: 'contacto', titulo: '¿Quieres combinar actividades?', subtitulo: 'Diseñamos tu itinerario ideal según tus intereses y días disponibles.', boton_texto: 'Consultar itinerario', boton_url: '/' },
+    ]},
+    festividades: { titulo: 'Festividades', descripcion: 'Festividades de Capachica.', secciones: [
+      { tipo: 'hero', titulo: 'Festividades', subtitulo: 'Celebraciones que conectan el pasado andino con el presente vivo de las comunidades.' },
+      { tipo: 'cards', titulo: 'Calendario de festividades', items: [
+        { emoji: '⛪', etiqueta: 'Religiosa', titulo: 'Virgen de la Candelaria', lugar: '1-14 Febrero', desc: 'Una de las festividades más importantes. Misa, procesión por el lago y danzas en honor a la Virgen.', color: '#9333ea' },
+        { emoji: '💃', etiqueta: 'Tradicional', titulo: 'Carnavales de Capachica', lugar: '20-25 Febrero', desc: "Celebración con ch'alla, cortamonte, danzas autóctonas y comparsas.", color: '#FF6B35' },
+        { emoji: '☀️', etiqueta: 'Ceremonial', titulo: 'Inti Raymi', lugar: '21-24 Junio', desc: 'Ceremonia al dios Sol en el solsticio de invierno. Rituales ancestrales agradeciendo al Inti.', color: '#f59e0b' },
+        { emoji: '🌿', etiqueta: 'Ceremonial', titulo: 'Pachamama Raymi', lugar: '1-15 Agosto', desc: 'Ritual de agradecimiento a la Madre Tierra. Ofrendas y ceremonias en los cerros sagrados.', color: '#10b981' },
+        { emoji: '🕯️', etiqueta: 'Tradicional', titulo: 'Día de Todos los Santos', lugar: '1-2 Noviembre', desc: 'Visita al cementerio con ofrendas, flores y velas. Las familias preparan panes tradicionales.', color: '#6366f1' },
+        { emoji: '🎄', etiqueta: 'Religiosa', titulo: 'Navidad en Capachica', lugar: '25 Diciembre', desc: 'Misa de gallo, cena familiar y la alegría del pueblo junto al Lago Titicaca.', color: '#ef4444' },
+      ]},
+    ]},
+    artesania: { titulo: 'Artesanía', descripcion: 'Artesanía capachiqueña tradicional.', secciones: [
+      { tipo: 'hero', titulo: 'Artesanía Capachiqueña', subtitulo: 'Tejidos de alpaca, cerámica andina y artesanías hechas a mano con técnicas centenarias.' },
+      { tipo: 'texto', titulo: '500 años de tradición viva', contenido: 'Las mujeres de Capachica han preservado técnicas ancestrales de tejido por más de 500 años. Cada pieza cuenta una historia a través de patrones geométricos andinos que representan la cosmovisión quechua.\n\nEncontrás textiles de alpaca, bordados, cerámica y joyería directamente de las artesanas. Tu compra apoya directamente a la comunidad.' },
+      { tipo: 'features', titulo: 'Tipos de artesanía', items: [
+        { icono: '🪡', titulo: 'Textiles de Alpaca', desc: 'Mantas, chullos y prendas tejidas con alpaca fina. Cada diseño tiene significado ancestral.' },
+        { icono: '🧵', titulo: 'Bordados', desc: 'Bordados florales y geométricos en tela. Técnica transmitida de generación en generación.' },
+        { icono: '🏺', titulo: 'Cerámica Andina', desc: 'Piezas decorativas y utilitarias inspiradas en la cosmovisión andina.' },
+        { icono: '💍', titulo: 'Joyería', desc: 'Pulseras, aretes y collares con piedras del lago y metales locales.' },
+      ]},
+    ]},
+    'como-llegar': { titulo: 'Cómo Llegar', descripcion: 'Cómo llegar a Capachica desde cualquier punto del Perú.', secciones: [
+      { tipo: 'hero', titulo: 'Planifica tu Viaje', subtitulo: 'Te ayudamos a llegar a Capachica desde cualquier punto del Perú o el mundo.' },
+      { tipo: 'pasos', titulo: 'Rutas para llegar', items: [
+        { icono: '🚌', titulo: 'Por Tierra desde Puno (recomendado)', desc: 'Minibús desde Terminal Zonal Puno · S/. 10-15 · 1.5-2 horas.\nTaxi privado directo a Capachica · S/. 80-120 · 1 hora.\nDentro de Capachica en mototaxi · S/. 3-8 · 15 min.' },
+        { icono: '✈️', titulo: 'Por Aire + Tierra', desc: 'Vuelo Lima–Juliaca con LATAM o Sky Airlines desde $60 · 1h 20min.\nLuego Juliaca–Puno (30 km, 45 min en taxi).\nFinalmente Puno–Capachica en minibús.' },
+        { icono: '🚢', titulo: 'Por Bote desde Puno', desc: 'Hidrofoil o bote turístico desde el Puerto de Puno.\nEscénico y directo a las comunidades del lago.\nDisponible según temporada · Consultar disponibilidad.' },
+        { icono: '🚗', titulo: 'En auto propio', desc: 'Ruta: Puno → Huata → Coata → Capachica · 55 km, 1h 15min.\nCarretera asfaltada en buen estado.\nEstacionamiento disponible en Capachica Centro.' },
+      ]},
+      { tipo: 'features', titulo: 'Transporte dentro de Capachica', items: [
+        { icono: '🛺', titulo: 'Mototaxi', desc: 'S/. 3-8 · 15 minutos a comunidades cercanas.' },
+        { icono: '🚶', titulo: 'A pie', desc: 'Comunidades a 15-30 min caminando desde el centro.' },
+        { icono: '🚲', titulo: 'Bicicleta', desc: 'Alquiler disponible en hostales · S/. 15/día.' },
+        { icono: '📍', titulo: 'GPS / Maps', desc: '"Capachica Centro, Puno" en Google Maps.' },
+      ]},
+      { tipo: 'contacto', titulo: '¿Necesitas coordinación para llegar?', subtitulo: 'Organizamos tu recogida desde Puno con anticipación.', boton_texto: 'Coordinar llegada', boton_url: '/' },
+    ]},
+    vivencial: { titulo: 'Turismo Vivencial', descripcion: 'Turismo vivencial en la comunidad de Capachica.', secciones: [
+      { tipo: 'hero', titulo: 'Turismo Vivencial', subtitulo: 'Más que turismo: una inmersión real en la vida andina de las familias de Capachica, a orillas del Titicaca.' },
+      { tipo: 'cards', titulo: 'Familias Anfitrionas', items: [
+        { emoji: '🎣', etiqueta: 'Pesca artesanal', titulo: 'Familia Quispe', lugar: 'Llachón', precio: 'S/ 120', precio_unidad: 'persona/noche', desc: 'Pescadores artesanales desde generaciones. Pesca al amanecer en el Titicaca.', extra: '🍳 Desayuno\n🍽️ Almuerzo y cena\n🎣 Pesca al amanecer\n🌅 Vista al lago', color: '#0ea5e9' },
+        { emoji: '🧶', etiqueta: 'Tejido ancestral', titulo: 'Familia Mamani', lugar: 'Capachica Centro', precio: 'S/ 120', precio_unidad: 'persona/noche', desc: 'Artesanas de tejidos con la mejor vista al lago Titicaca.', extra: '🍳 Desayuno\n🍽️ Almuerzo y cena\n🧶 Taller de tejido\n🏔️ Vista panorámica', color: '#34d399' },
+        { emoji: '🌾', etiqueta: 'Agricultura andina', titulo: 'Familia Quispe (Taquile)', lugar: 'Taquile', precio: 'S/ 100', precio_unidad: 'persona/noche', desc: 'Convivencia en la isla. Agricultura y textil patrimonio UNESCO.', extra: '🌾 Trabajo en chacra\n🧶 Tejido UNESCO\n🍽️ Comidas\n⛵ Bote incluido', color: '#a78bfa' },
+      ]},
+      { tipo: 'pasos', titulo: 'Un día típico vivencial', items: [
+        { icono: '🌅', titulo: '6:00 AM — Amanecer en el Titicaca', desc: 'Pesca artesanal al amanecer con la familia anfitriona en bote de madera.' },
+        { icono: '☀️', titulo: '8:00 AM — Desayuno andino', desc: 'Desayuno tradicional con productos de la chacra: quinua, chuño, trucha fresca del lago.' },
+        { icono: '🌿', titulo: '10:00 AM — Actividades comunitarias', desc: 'Tejido tradicional, trabajo en la chacra o cerámica según la familia anfitriona.' },
+        { icono: '🍽️', titulo: '12:30 PM — Almuerzo comunitario', desc: 'Cocina novoandina con ingredientes del lago y la huerta familiar.' },
+        { icono: '🚣', titulo: '3:00 PM — Paseo en bote', desc: 'Tour por la bahía, islas flotantes y orillas del Titicaca.' },
+        { icono: '🌙', titulo: '7:00 PM — Noche cultural', desc: 'Música, danza y relatos de la comunidad alrededor del fogón.' },
+      ]},
+      { tipo: 'contacto', titulo: '¿Listo para vivir la experiencia?', subtitulo: 'Reserva tu estadía vivencial con anticipación. Las plazas son limitadas.', boton_texto: 'Reservar vivencial', boton_url: '/#reservar' },
+    ]},
+    index: { titulo: 'Inicio', descripcion: 'Capachica Turismo - La joya del Lago Titicaca.', secciones: [
+      { tipo: 'hero', titulo: 'Descubre Capachica', subtitulo: 'Una península andina a 3,820 msnm donde el lago más alto del mundo navegable se convierte en horizonte y cinco siglos de cultura quechua siguen vivos en cada familia.', boton_texto: 'Explorar destinos →', boton_url: '/destinos', boton2_texto: 'Cómo llegar', boton2_url: '/como-llegar' },
+      { tipo: 'stats', items: [{ valor: '8+', label: 'Comunidades' }, { valor: '3,820', label: 'msnm' }, { valor: '500+', label: 'Años historia' }, { valor: '12', label: 'Islas cercanas' }] },
+      { tipo: 'bienvenida', titulo: 'Capachica', label: '✦ La Joya Escondida del Titicaca', intro: 'En el corazón del altiplano peruano, a orillas del lago más alto del mundo, se esconde una de las experiencias más auténticas del Perú.', parrafo1: 'Capachica es una península quechua ubicada en la región Puno, Perú — a solo 80 km de la ciudad de Puno por carretera. Sus ocho comunidades conservan vivas las tradiciones andinas que preceden incluso al Imperio Inca.', parrafo2: 'Aquí el turismo vivencial no es una escenificación: es la vida real de sus habitantes. Dormirás en casas familiares, aprenderás a tejer con lana de alpaca, pescarás trucha al amanecer y contemplarás atardeceres que transforman el Titicaca en un espejo de oro y plata.', items: [
+        { icono: '🌊', titulo: 'Lago navegable más alto del mundo', desc: 'El Titicaca tiene 8,372 km² de superficie a 3,812 msnm — un océano interior en los Andes.' },
+        { icono: '🌿', titulo: 'Turismo 100% comunitario', desc: 'Los ingresos van directamente a las familias locales. Sin intermediarios, sin cadenas hoteleras.' },
+        { icono: '⭐', titulo: 'Cielos sin contaminación lumínica', desc: 'Noches perfectas para astronomía y fotografía. La Vía Láctea visible a simple vista.' },
+        { icono: '🎨', titulo: 'Cultura viva y auténtica', desc: 'Tradiciones quechuas pre-incaicas, textiles ancestrales y festividades únicas en el mundo.' },
+      ]},
+      { tipo: 'destinos-showcase', titulo: 'imperdibles', label: '✦ Lugares que visitar', intro: 'Cada rincón de Capachica guarda una sorpresa. Estos son los lugares que no puedes dejar de visitar.', items: [
+        { nombre: 'Playa Llachón', subtitulo: 'La única playa del Titicaca', desc: 'Arena blanca y aguas turquesas a 3,820 msnm. Un milagro geológico en el corazón del altiplano peruano.', icono: '🏖️', color: '#2dd4bf' },
+        { nombre: 'Isla Ticonata', subtitulo: 'Isla sagrada de totora', desc: 'A 40 minutos en bote, Ticonata guarda secretos ancestrales y ofrece una vista privilegiada del lago.', icono: '🏝️', color: '#38bdf8' },
+        { nombre: 'Mirador del Amaru', subtitulo: '360° del Lago Titicaca', desc: 'Desde la cima del cerro Amaru, el Titicaca se despliega infinito. El mejor punto para fotografiar los atardeceres.', icono: '🏔️', color: '#a78bfa' },
+        { nombre: 'Comunidad Capachica', subtitulo: 'Corazón de la península', desc: 'Mercados artesanales, iglesia colonial y la calidez de las familias quechuas preservando sus tradiciones por cinco siglos.', icono: '🏘️', color: '#fbbf24' },
+      ]},
+      { tipo: 'info-practica', titulo: 'necesitas saber', label: '✦ Planifica tu viaje', items: [
+        { icono: '🚌', titulo: 'Cómo llegar', color: '#2dd4bf', lista: '✈️ Lima → Juliaca (1h 30min vuelo)\n🚌 Juliaca → Puno (35 min bus)\n🚗 Puno → Capachica (1h 30min)\n⭐ Total: ~3.5h desde Lima', link: '/como-llegar', link_texto: 'Ver ruta completa' },
+        { icono: '📅', titulo: 'Mejor época para visitar', color: '#d4a843', lista: '☀️ Mayo – Octubre: temporada seca\n🌧️ Nov – Abril: lluvias, verde intenso\n🎊 Febrero: Virgen de la Candelaria\n🌅 Todo el año: atardeceres únicos', link: '/festividades', link_texto: 'Ver calendario de festividades' },
+        { icono: '🤝', titulo: 'Turismo responsable', color: '#a78bfa', lista: '💚 100% ingresos a comunidades locales\n♻️ Residuos manejados responsablemente\n🌱 Cultivos orgánicos ancestrales\n📸 Respeto pleno a la cultura local', link: '/vivencial', link_texto: 'Conocer familias anfitrionas' },
+      ]},
+      { tipo: 'experiencias', titulo: 'Capachica', label: '✦ Todo en un lugar', intro: 'Seis experiencias únicas que hacen de la península de Capachica el destino más auténtico del Lago Titicaca.', items: [
+        { emoji: '🏠', etiqueta: 'Vivencial', titulo: 'Vive con familias quechuas', desc: 'Más que turismo: una inmersión real en la vida andina. Cocina con las familias, aprende sobre la cosmovisión andina y duerme bajo las estrellas del Titicaca.', href: '/vivencial', color: '#0ea5e9', tags: 'Familia anfitriona,Cocina andina,Tejido' },
+        { emoji: '🚣', etiqueta: 'Actividades', titulo: 'Aventura en el Titicaca', desc: 'Kayak al amanecer, pesca artesanal con los comuneros, cabalgata entre totorales y escalada en los acantilados con vista panorámica al lago.', href: '/actividades', color: '#34d399', tags: 'Kayak,Pesca,Escalada' },
+        { emoji: '🍽️', etiqueta: 'Gastronomía', titulo: 'Sabores del altiplano', desc: 'Trucha del lago, quinua nativa, chuño ancestral. Los mejores restaurantes de la península sirven una cocina que lleva cinco siglos de historia.', href: '/gastronomia', color: '#fbbf24', tags: 'Trucha,Quinua,Chuño' },
+        { emoji: '🎊', etiqueta: 'Festividades', titulo: 'Fiestas ancestrales', desc: 'Virgen Candelaria, Inti Raymi, Todos los Santos. El calendario festivo de Capachica mezcla cosmovisión andina y devoción católica en explosiones de color.', href: '/festividades', color: '#f472b6', tags: 'Candelaria,Inti Raymi,Danzas' },
+        { emoji: '🧶', etiqueta: 'Artesanía', titulo: 'Textiles con historia', desc: 'Aguayos, chullos y mantas tejidas con técnicas ancestrales que las comunidades han preservado por generaciones. Cada pieza es única e irrepetible.', href: '/artesania', color: '#a78bfa', tags: 'Aguayo,Chullo,Bordado' },
+        { emoji: '🏔️', etiqueta: 'Destinos', titulo: 'Paisajes que quitan el aliento', desc: 'Miradores con vistas del Titicaca, comunidades a orillas del lago, islas flotantes y la magia de los atardeceres más fotogénicos del Perú.', href: '/destinos', color: '#38bdf8', tags: 'Llachón,Taquile,Miradores' },
+      ]},
+      { tipo: 'contacto', titulo: '¿Listo para vivir Capachica?', subtitulo: 'Contacta con nosotros y te ayudamos a diseñar el itinerario perfecto según tus intereses y fechas.', boton_texto: 'Ver actividades', boton_url: '/actividades', boton2_texto: 'Explorar alojamiento', boton2_url: '/alojamiento' },
+    ]},
   };
 
   async function openContenidoEditor(slug, titulo) {
+    const defaults = CONTENIDO_DEFAULTS[slug] || { titulo, descripcion: '', secciones: [{ tipo: 'hero', titulo, subtitulo: '' }] };
     try {
       const res = await fetch(`${IA_URL}/api/admin/contenido/${slug}`);
       const data = await res.json();
-      const existing = data?.secciones?.length ? data : null;
-      const defaults = CONTENIDO_DEFAULTS[slug] || { titulo, descripcion: '', secciones: [{ tipo: 'hero', titulo, subtitulo: '' }] };
-      const content = existing || defaults;
-      openPageEditor(null, null, 'contenido', slug, content);
+      if (!data?.secciones?.length) {
+        openPageEditor(null, null, 'contenido', slug, defaults);
+        setTimeout(() => savePageEditor(), 400);
+        return;
+      }
+      // Merge: if existing is missing sections that defaults define, supplement with defaults
+      const existingTypes = new Set(data.secciones.map(s => s.tipo));
+      const missingFromDefaults = defaults.secciones.some(ds => !existingTypes.has(ds.tipo));
+      let content;
+      if (missingFromDefaults) {
+        const mergedSections = defaults.secciones.map(ds => {
+          return data.secciones.find(es => es.tipo === ds.tipo) || ds;
+        });
+        content = { ...defaults, ...data, secciones: mergedSections };
+        openPageEditor(null, null, 'contenido', slug, content);
+        // Auto-save so iframe reloads with new sections immediately
+        setTimeout(() => savePageEditor(), 400);
+      } else {
+        content = data;
+        openPageEditor(null, null, 'contenido', slug, content);
+      }
     } catch (e) {
-      const defaults = CONTENIDO_DEFAULTS[slug] || { titulo, descripcion: '', secciones: [{ tipo: 'hero', titulo, subtitulo: '' }] };
       openPageEditor(null, null, 'contenido', slug, defaults);
+      setTimeout(() => savePageEditor(), 400);
     }
   }
   window.openContenidoEditor = openContenidoEditor;
@@ -1401,8 +1668,311 @@ const IA_URL  = "http://localhost:5000";
     `;
   }
 
+  /* ─── SITECONFIG (navbar + footer) ─── */
+  let _sitecfg = { navbar: { logo_nombre: '', logo_tagline: '', links: [] }, footer: {} };
+
+  async function loadSiteconfigAdmin() {
+    try {
+      const r = await fetch(`${IA_URL}/api/admin/siteconfig`);
+      _sitecfg = await r.json();
+    } catch {}
+    const nb = _sitecfg.navbar || {};
+    const ft = _sitecfg.footer || {};
+    const gv = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+    gv('nb-logo-nombre',  nb.logo_nombre  || '');
+    gv('nb-logo-tagline', nb.logo_tagline || '');
+    gv('ft-brand-nombre', ft.brand_nombre || '');
+    gv('ft-brand-tagline',ft.brand_tagline|| '');
+    gv('ft-brand-desc',   ft.brand_desc   || '');
+    gv('ft-instagram',    ft.social_instagram || '');
+    gv('ft-facebook',     ft.social_facebook  || '');
+    gv('ft-youtube',      ft.social_youtube   || '');
+    gv('ft-tiktok',       ft.social_tiktok    || '');
+    gv('ft-whatsapp',     ft.contacto_whatsapp|| '');
+    gv('ft-email',        ft.contacto_email   || '');
+    gv('ft-copyright',    ft.copyright        || '');
+    renderNbLinks(nb.links || []);
+    // Re-inject drag behavior if iframe nav isn't ready yet
+    const _gframe = document.getElementById('globalPreviewFrame');
+    if (_gframe) {
+      try {
+        const _fdoc = _gframe.contentDocument || _gframe.contentWindow?.document;
+        const _nd = _fdoc && _fdoc.querySelector('.nav-desktop');
+        if (!_nd || !_nd._dragReady) scheduleGlobalInject(_gframe);
+      } catch { scheduleGlobalInject(_gframe); }
+    }
+  }
+
+  function renderNbLinks(links) {
+    const container = document.getElementById('nb-links-list');
+    if (!container) return;
+    container.innerHTML = links.map((l, i) => `
+      <div style="display:grid;grid-template-columns:auto 1fr 1fr auto auto auto;gap:6px;align-items:center;" data-nb-idx="${i}">
+        <span style="color:var(--dim);font-size:13px;cursor:grab;padding:0 4px;">⠿</span>
+        <input type="text" value="${esc(l.label||'')}" placeholder="Etiqueta" oninput="nbUpdateLink(${i},'label',this.value)" style="margin:0;font-size:13px;" />
+        <input type="text" value="${esc(l.href||'')}" placeholder="/url" oninput="nbUpdateLink(${i},'href',this.value)" style="margin:0;font-size:13px;" />
+        <button onclick="nbMoveLink(${i},-1)" ${i===0?'disabled':''} style="padding:4px 8px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;" title="Subir">↑</button>
+        <button onclick="nbMoveLink(${i},1)" ${i===links.length-1?'disabled':''} style="padding:4px 8px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;" title="Bajar">↓</button>
+        <button onclick="nbRemoveLink(${i})" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(248,113,113,.2);background:transparent;color:var(--red);font-size:12px;cursor:pointer;">✕</button>
+      </div>
+    `).join('');
+  }
+
+  function nbUpdateLink(i, field, val) {
+    if (!_sitecfg.navbar.links[i]) return;
+    _sitecfg.navbar.links[i][field] = val;
+  }
+  function nbMoveLink(i, dir) {
+    const links = _sitecfg.navbar.links;
+    const j = i + dir;
+    if (j < 0 || j >= links.length) return;
+    [links[i], links[j]] = [links[j], links[i]];
+    renderNbLinks(links);
+  }
+  function nbRemoveLink(i) {
+    _sitecfg.navbar.links.splice(i, 1);
+    renderNbLinks(_sitecfg.navbar.links);
+  }
+  function nbAddLink() {
+    if (!_sitecfg.navbar.links) _sitecfg.navbar.links = [];
+    _sitecfg.navbar.links.push({ label: '', href: '/' });
+    renderNbLinks(_sitecfg.navbar.links);
+  }
+  window.nbAddLink    = nbAddLink;
+  window.nbRemoveLink = nbRemoveLink;
+  window.nbUpdateLink = nbUpdateLink;
+  window.nbMoveLink   = nbMoveLink;
+
+  // Wait for React to hydrate the navbar, then inject
+  function scheduleGlobalInject(iframe) {
+    let attempts = 0;
+    function tryInject() {
+      attempts++;
+      try {
+        const doc = iframe.contentDocument || iframe.contentWindow?.document;
+        const nav = doc && doc.querySelector('nav');
+        const links = nav && nav.querySelectorAll('a.nav-link');
+        if (links && links.length > 0) {
+          injectGlobalEditMode(iframe);
+        } else if (attempts < 20) {
+          setTimeout(tryInject, 300);
+        }
+      } catch(e) {
+        if (attempts < 20) setTimeout(tryInject, 300);
+      }
+    }
+    setTimeout(tryInject, 400);
+  }
+  window.scheduleGlobalInject = scheduleGlobalInject;
+
+  // Inject click-to-select overlays + drag-to-reorder into iframe
+  function injectGlobalEditMode(iframe) {
+    try {
+      const doc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (!doc || !doc.body) return;
+      const CYAN = '#2dd4bf';
+
+      // ── Navbar + Footer click-to-select ──
+      const targets = [
+        { el: doc.querySelector('nav'), key: 'navbar', label: '🧭 Navbar — click para editar' },
+        { el: doc.querySelector('footer'), key: 'footer', label: '🏛️ Footer — click para editar' },
+      ];
+      targets.forEach(({ el, key, label }) => {
+        if (!el || el._globalOv) return;
+        el.style.position = 'relative';
+        const ov = doc.createElement('div');
+        ov.style.cssText = `position:absolute;inset:0;border:2px solid transparent;border-radius:4px;pointer-events:none;z-index:9998;transition:border-color .15s,background .15s;`;
+        const tag = doc.createElement('div');
+        tag.style.cssText = `position:absolute;top:6px;left:6px;background:${CYAN};color:#0a1628;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;opacity:0;transition:opacity .15s;font-family:monospace;pointer-events:none;`;
+        tag.textContent = label;
+        ov.appendChild(tag);
+        el.appendChild(ov);
+        el._globalOv = ov;
+        el.addEventListener('mouseenter', () => { ov.style.borderColor = CYAN; ov.style.background = 'rgba(45,212,191,0.05)'; tag.style.opacity = '1'; });
+        el.addEventListener('mouseleave', () => { if (!el._selected) { ov.style.borderColor = 'transparent'; ov.style.background = ''; tag.style.opacity = '0'; } });
+        el.addEventListener('click', (e) => {
+          if (e._fromDrag) return;
+          e.preventDefault(); e.stopPropagation();
+          targets.forEach(t => { if (t.el?._globalOv) { t.el._globalOv.style.background=''; t.el._globalOv.style.borderColor='transparent'; t.el._selected=false; } });
+          ov.style.borderColor = CYAN; ov.style.background = 'rgba(45,212,191,0.10)'; el._selected = true;
+          window.parent.postMessage({ type: 'cms-global-click', element: key }, '*');
+        });
+      });
+
+      // ── Drag-to-reorder navbar links ──
+      const navDesktop = doc.querySelector('.nav-desktop');
+      if (navDesktop && !navDesktop._dragReady) {
+        navDesktop._dragReady = true;
+        navDesktop.style.position = 'relative';
+        let dragSrc = null;
+        let dragTarget = null;
+        let dropBefore = true;
+        let dropIndicator = null;
+
+        function getNavLinks() { return Array.from(navDesktop.querySelectorAll('a.nav-link')); }
+
+        function showIndicator(targetEl, before) {
+          if (!dropIndicator) {
+            dropIndicator = doc.createElement('div');
+            dropIndicator.style.cssText = `position:absolute;width:3px;background:${CYAN};border-radius:2px;height:28px;pointer-events:none;box-shadow:0 0 8px ${CYAN};z-index:9999;`;
+            navDesktop.appendChild(dropIndicator);
+          }
+          const rect = targetEl.getBoundingClientRect();
+          const navRect = navDesktop.getBoundingClientRect();
+          const x = before ? rect.left - navRect.left - 4 : rect.right - navRect.left + 1;
+          dropIndicator.style.left = x + 'px';
+          dropIndicator.style.top = (rect.top - navRect.top + (rect.height - 28) / 2) + 'px';
+          dropIndicator.style.display = 'block';
+        }
+
+        function hideIndicator() { if (dropIndicator) dropIndicator.style.display = 'none'; }
+
+        getNavLinks().forEach((link) => {
+          link.setAttribute('draggable', 'true');
+          link.style.cursor = 'grab';
+
+          link.addEventListener('dragstart', (e) => {
+            dragSrc = link;
+            link._dragging = true;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', link.textContent || '');
+            setTimeout(() => { link.style.opacity = '0.35'; link.style.outline = `2px dashed ${CYAN}`; }, 0);
+          });
+          link.addEventListener('click', (e) => { if (link._dragging) { e.preventDefault(); e.stopPropagation(); } });
+          link.addEventListener('dragend', () => {
+            link.style.opacity = '';
+            link.style.outline = '';
+            link.style.cursor = 'grab';
+            hideIndicator();
+            dragSrc = null;
+            dragTarget = null;
+            setTimeout(() => { link._dragging = false; }, 50);
+          });
+        });
+
+        // Container handles dragover + drop — avoids per-link dragleave gaps
+        navDesktop.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          if (!dragSrc) return;
+          const links = getNavLinks();
+          let hit = null;
+          for (const l of links) {
+            if (l === dragSrc) continue;
+            const r = l.getBoundingClientRect();
+            if (e.clientX >= r.left - 6 && e.clientX <= r.right + 6) { hit = l; break; }
+          }
+          if (!hit) return;
+          const rect = hit.getBoundingClientRect();
+          dropBefore = e.clientX < rect.left + rect.width / 2;
+          dragTarget = hit;
+          showIndicator(hit, dropBefore);
+        });
+
+        navDesktop.addEventListener('dragleave', (e) => {
+          if (!navDesktop.contains(e.relatedTarget)) { hideIndicator(); dragTarget = null; }
+        });
+
+        navDesktop.addEventListener('drop', (e) => {
+          e.preventDefault(); e.stopPropagation();
+          hideIndicator();
+          if (!dragSrc || !dragTarget || dragSrc === dragTarget) return;
+          const allLinks = getNavLinks();
+          const from = allLinks.indexOf(dragSrc);
+          let to = allLinks.indexOf(dragTarget);
+          if (from < 0 || to < 0) return;
+          if (!dropBefore) to += 1;
+          if (from < to) to -= 1;
+          // Move DOM element immediately — visual feedback without reload
+          if (dropBefore) {
+            dragTarget.parentNode.insertBefore(dragSrc, dragTarget);
+          } else {
+            dragTarget.insertAdjacentElement('afterend', dragSrc);
+          }
+          window.parent.postMessage({ type: 'cms-global-reorder', from, to }, '*');
+        });
+      }
+    } catch (e) {}
+  }
+  window.injectGlobalEditMode = injectGlobalEditMode;
+
+  // Listen for global click + reorder messages from iframe
+  window.addEventListener('message', function(e) {
+    if (e.data?.type === 'cms-global-click') {
+      const cardId = e.data.element === 'navbar' ? 'global-card-navbar' : 'global-card-footer';
+      const card = document.getElementById(cardId);
+      if (!card) return;
+      document.querySelectorAll('#sec-global .card').forEach(c => { c.style.borderColor = ''; c.style.boxShadow = ''; });
+      card.style.borderColor = '#2dd4bf';
+      card.style.boxShadow = '0 0 0 2px rgba(45,212,191,0.25)';
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    if (e.data?.type === 'cms-global-reorder') {
+      const { from, to } = e.data;
+      const links = _sitecfg.navbar.links;
+      if (from < 0 || to < 0 || from >= links.length || to >= links.length || from === to) return;
+      const [item] = links.splice(from, 1);
+      links.splice(to, 0, item);
+      renderNbLinks(links);
+    }
+  });
+
+  async function saveSiteconfigAdmin() {
+    const gv = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+    _sitecfg.navbar.logo_nombre  = gv('nb-logo-nombre');
+    _sitecfg.navbar.logo_tagline = gv('nb-logo-tagline');
+    _sitecfg.footer = {
+      brand_nombre:      gv('ft-brand-nombre'),
+      brand_tagline:     gv('ft-brand-tagline'),
+      brand_desc:        gv('ft-brand-desc'),
+      social_instagram:  gv('ft-instagram'),
+      social_facebook:   gv('ft-facebook'),
+      social_youtube:    gv('ft-youtube'),
+      social_tiktok:     gv('ft-tiktok'),
+      contacto_whatsapp: gv('ft-whatsapp'),
+      contacto_email:    gv('ft-email'),
+      copyright:         gv('ft-copyright'),
+    };
+    try {
+      const r = await fetch(`${IA_URL}/api/admin/siteconfig`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(_sitecfg),
+      });
+      if (r.ok) {
+        const msg = document.getElementById('global-msg');
+        if (msg) { msg.style.display = 'inline'; setTimeout(() => msg.style.display = 'none', 3000); }
+        const frame = document.getElementById('globalPreviewFrame');
+        if (frame) {
+          setTimeout(() => {
+            frame.src = frame.src;
+            frame.onload = () => scheduleGlobalInject(frame);
+          }, 300);
+        }
+      }
+    } catch (e) { alert('Error: ' + e.message); }
+  }
+  window.saveSiteconfigAdmin = saveSiteconfigAdmin;
+
   /* ── EDITOR ── */
-  const TYPE_LABELS = { hero: '🦅 Hero', texto: '📝 Texto', cards: '🃏 Cards', galeria: '🖼️ Galería', contacto: '📬 CTA' };
+  const TYPE_LABELS = { hero:'🦅 Hero', texto:'📝 Texto', cards:'🃏 Cards', galeria:'🖼️ Galería', contacto:'📬 CTA', stats:'📊 Stats', features:'✨ Features', pasos:'📋 Pasos', bienvenida:'🌄 Bienvenida', 'destinos-showcase':'🗺️ Destinos', 'info-practica':'🧭 Info Práctica', experiencias:'🎯 Experiencias' };
+  const TYPE_EMOJIS = { hero:'🦅', texto:'📝', cards:'🃏', galeria:'🖼️', contacto:'📬', stats:'📊', features:'✨', pasos:'📋', bienvenida:'🌄', 'destinos-showcase':'🗺️', 'info-practica':'🧭', experiencias:'🎯' };
+  const TYPE_NAMES  = { hero:'Hero', texto:'Texto', cards:'Cards', galeria:'Galería', contacto:'CTA', stats:'Stats', features:'Features', pasos:'Pasos', bienvenida:'Bienvenida', 'destinos-showcase':'Destinos', 'info-practica':'Info Práctica', experiencias:'Experiencias' };
+
+  function getSectionPreview(s) {
+    if (s.tipo === 'hero') return `<div class="prev-hero"><div class="prev-hero-title">${s.titulo || '<em style="opacity:.4">Sin título</em>'}</div>${s.subtitulo ? `<div class="prev-hero-sub">${s.subtitulo.substring(0,140)}${s.subtitulo.length>140?'…':''}</div>` : ''}</div>`;
+    if (s.tipo === 'stats') return `<div class="prev-stats">${(s.items||[]).map(it=>`<div class="prev-stat"><div class="prev-stat-v">${it.valor||'—'}</div><div class="prev-stat-l">${it.label||'?'}</div></div>`).join('')}${!(s.items||[]).length?'<span style="color:var(--dim);font-size:12px">Sin stats</span>':''}</div>`;
+    if (s.tipo === 'cards') return `<div class="prev-cards">${(s.items||[]).slice(0,5).map(c=>`<div class="prev-card-mini">${c.emoji||'📄'} ${c.titulo||'Sin título'}</div>`).join('')}${(s.items||[]).length>5?`<div class="prev-card-mini" style="color:var(--muted)">+${(s.items||[]).length-5}</div>`:''}</div>`;
+    if (s.tipo === 'texto') return `<div class="prev-texto">${s.titulo?`<strong>${s.titulo}</strong><br>`:''}${(s.contenido||'Sin contenido').substring(0,180)}${(s.contenido||'').length>180?'…':''}</div>`;
+    if (s.tipo === 'galeria') return `<div class="prev-simple">🖼️ ${(s.imagenes||[]).length} imagen${(s.imagenes||[]).length===1?'':'es'}</div>`;
+    if (s.tipo === 'contacto') return `<div class="prev-contacto"><div class="prev-contacto-title">${s.titulo||'¿Listo para tu aventura?'}</div>${s.boton_texto?`<span class="prev-btn-sample">${s.boton_texto} →</span>`:''}</div>`;
+    if (s.tipo === 'features') return `<div class="prev-features">${(s.items||[]).slice(0,5).map(f=>`<div class="prev-feature">${f.icono||'✦'} ${f.titulo||'—'}</div>`).join('')}</div>`;
+    if (s.tipo === 'pasos') return `<div class="prev-pasos">${(s.items||[]).slice(0,4).map((p,i)=>`<div class="prev-paso">${p.icono||String(i+1)} ${p.titulo||'—'}</div>`).join('')}${(s.items||[]).length>4?`<div class="prev-paso" style="color:var(--muted)">+${(s.items||[]).length-4} más</div>`:''}</div>`;
+    if (s.tipo === 'bienvenida') return `<div class="prev-texto">${s.intro ? s.intro.substring(0,120)+'…' : 'Sección de introducción con características'}</div>`;
+    if (s.tipo === 'destinos-showcase') return `<div class="prev-cards">${(s.items||[]).slice(0,4).map(d=>`<div class="prev-card-mini">${d.icono||'📍'} ${d.nombre||'—'}</div>`).join('')}</div>`;
+    if (s.tipo === 'info-practica') return `<div class="prev-features">${(s.items||[]).slice(0,3).map(f=>`<div class="prev-feature">${f.icono||'📋'} ${f.titulo||'—'}</div>`).join('')}</div>`;
+    if (s.tipo === 'experiencias') return `<div class="prev-cards">${(s.items||[]).slice(0,4).map(e=>`<div class="prev-card-mini">${e.emoji||'✨'} ${e.etiqueta||'—'}</div>`).join('')}</div>`;
+    return '';
+  }
 
   function openPageEditor(id, _unused = null, mode = 'paginas', contenidoSlug = '', contenidoData = null) {
     peMode = mode;
@@ -1433,10 +2003,114 @@ const IA_URL  = "http://localhost:5000";
     }
 
     peActiveIdx = -1;
-    renderPeSections();
-    renderPeSectionEditor();
+    renderPeLeft();
+
+    // Set iframe to real page URL
+    const iframe = $('pe-preview-iframe');
+    if (iframe) {
+      let previewUrl = 'about:blank';
+      if (mode === 'contenido') {
+        previewUrl = contenidoSlug === 'index' ? '/' : '/' + contenidoSlug;
+      } else if (id) {
+        const p = paginasData.find(x => x.id === id);
+        if (p?.slug) previewUrl = '/pagina/' + p.slug;
+      }
+      if (previewUrl !== 'about:blank') iframe.src = previewUrl;
+    }
+
     $('pageEditor').classList.add('open');
   }
+
+  function reloadPreviewIframe() {
+    const iframe = $('pe-preview-iframe');
+    if (!iframe || !iframe.src || iframe.src === 'about:blank') return;
+    const url = iframe.src;
+    iframe.src = 'about:blank';
+    setTimeout(() => {
+      iframe.src = url;
+      iframe.addEventListener('load', function onLoad() {
+        iframe.removeEventListener('load', onLoad);
+        setTimeout(() => injectEditMode(iframe), 200);
+      });
+    }, 50);
+  }
+  window.reloadPreviewIframe = reloadPreviewIframe;
+
+  // Inject click-to-edit overlays into iframe after load
+  function injectEditMode(iframe) {
+    try {
+      const doc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (!doc || !doc.body) return;
+      // Prevent double injection
+      if (doc.body.dataset.cmsEditInjected) return;
+      doc.body.dataset.cmsEditInjected = '1';
+
+      const script = doc.createElement('script');
+      script.textContent = `(function(){
+        var CYAN = '#2dd4bf';
+        function setup(el, tipo) {
+          if (el._cmsReady) return;
+          el._cmsReady = true;
+          var cs = getComputedStyle(el);
+          if (cs.position === 'static') el.style.position = 'relative';
+          el.style.cursor = 'pointer';
+          var ov = document.createElement('div');
+          ov.style.cssText = 'position:absolute;inset:0;border:2px solid transparent;border-radius:6px;transition:border-color .15s,background .15s;pointer-events:none;z-index:99998;box-sizing:border-box;';
+          el.appendChild(ov);
+          el.addEventListener('mouseenter', function(){ ov.style.borderColor = CYAN; ov.style.background = 'rgba(45,212,191,0.06)'; });
+          el.addEventListener('mouseleave', function(){ ov.style.borderColor = 'transparent'; ov.style.background = ''; });
+          el.addEventListener('click', function(e){
+            e.preventDefault(); e.stopPropagation();
+            document.querySelectorAll('[data-cms-tipo]').forEach(function(x){ if (x._ov) x._ov.style.background=''; });
+            ov.style.borderColor = CYAN; ov.style.background = 'rgba(45,212,191,0.12)';
+            window.parent.postMessage({ type: 'cms-click', tipo: tipo }, '*');
+          });
+          el._ov = ov;
+        }
+        // Mark all data-cms-tipo elements
+        document.querySelectorAll('[data-cms-tipo]').forEach(function(el){
+          setup(el, el.dataset.cmsTipo);
+        });
+        // Also observe future DOM changes (for React hydration)
+        var obs = new MutationObserver(function(){
+          document.querySelectorAll('[data-cms-tipo]:not([data-cms-ready])').forEach(function(el){
+            setup(el, el.dataset.cmsTipo);
+          });
+        });
+        obs.observe(document.body, {childList:true, subtree:true});
+      })();`;
+      doc.body.appendChild(script);
+
+      // Add global style for edit cursor indicator
+      const style = doc.createElement('style');
+      style.textContent = `[data-cms-tipo] { outline-offset: 0; } `;
+      doc.head.appendChild(style);
+    } catch(e) {
+      console.log('editmode inject error:', e);
+    }
+  }
+
+  // Listen for click messages from iframe
+  window.addEventListener('message', function(e) {
+    if (e.data?.type !== 'cms-click') return;
+    const tipo = e.data.tipo;
+    // Find first matching section
+    const idx = peSections.findIndex(s => s.tipo === tipo);
+    if (idx >= 0) {
+      savePeSectionData(peActiveIdx);
+      peActiveIdx = idx;
+      renderPeLeft();
+    }
+  });
+
+  // Wire iframe load event to inject edit mode
+  document.addEventListener('DOMContentLoaded', function() {
+    const iframe = $('pe-preview-iframe');
+    if (!iframe) return;
+    iframe.addEventListener('load', function() {
+      setTimeout(() => injectEditMode(iframe), 200);
+    });
+  });
 
   function closePageEditor() {
     $('pageEditor').classList.remove('open');
@@ -1447,25 +2121,96 @@ const IA_URL  = "http://localhost:5000";
   }
 
   function renderPeSections() {
-    const container = $('pe-sections-list');
+    const container = document.getElementById('pe-sections-list');
+    if (!container) return;
     if (!peSections.length) {
       container.innerHTML = '<div style="font-size:12px;color:var(--dim);padding:6px 0">Sin secciones</div>';
       return;
     }
+    const n = peSections.length;
     container.innerHTML = peSections.map((s, i) => `
-      <div class="sec-chip ${i === peActiveIdx ? 'active' : ''}" onclick="selectPeSection(${i})">
-        <span class="sec-chip-type">${TYPE_LABELS[s.tipo] || s.tipo}</span>
-        <button onclick="event.stopPropagation();removePeSection(${i})" style="background:transparent;border:none;color:var(--red);font-size:12px;cursor:pointer;padding:0 2px;line-height:1">✕</button>
+      <div class="sec-block ${i === peActiveIdx ? 'active' : ''}" onclick="selectPeSection(${i})">
+        <div class="sec-block-main">
+          <div class="sec-block-icon">${TYPE_EMOJIS[s.tipo] || '📄'}</div>
+          <div class="sec-block-info">
+            <div class="sec-block-type">${TYPE_NAMES[s.tipo] || s.tipo}</div>
+            ${s.titulo ? `<div class="sec-block-preview">${s.titulo}</div>` : ''}
+          </div>
+        </div>
+        <div class="sec-block-actions" onclick="event.stopPropagation()">
+          <button onclick="movePeSection(${i},-1)" ${i===0?'disabled':''}>↑</button>
+          <button onclick="movePeSection(${i},1)" ${i===n-1?'disabled':''}>↓</button>
+          <button class="del-btn" onclick="removePeSection(${i})">✕</button>
+        </div>
       </div>
     `).join('');
   }
 
+  function renderPeLeft() {
+    const container = $('pe-left-dynamic');
+    if (peActiveIdx >= 0 && peActiveIdx < peSections.length) {
+      const s = peSections[peActiveIdx];
+      container.innerHTML = `
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+            <button onclick="closeSecEditor()" style="background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--muted);font-size:12px;cursor:pointer;padding:5px 10px;font-family:inherit;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">← Secciones</button>
+            <div style="font-size:13px;font-weight:700;color:var(--cyan);">${TYPE_EMOJIS[s.tipo]} ${TYPE_NAMES[s.tipo]}</div>
+          </div>
+          ${getSectionFormHtml(s)}
+          <button class="btn-primary" onclick="closeSecEditor()" style="width:100%;margin-top:14px;justify-content:center;">✓ Listo</button>
+        </div>
+      `;
+      setTimeout(() => { container.addEventListener('input', updateLivePreview); }, 60);
+    } else {
+      container.innerHTML = `
+        <div>
+          <div class="pe-sec-label">Secciones</div>
+          <div id="pe-sections-list"></div>
+          <button class="add-sec-btn" onclick="addSection()">＋ Agregar sección</button>
+        </div>
+      `;
+      renderPeSections();
+    }
+  }
+
+  function renderPeCanvas() {
+    const container = $('pe-canvas');
+    if (!peSections.length) {
+      container.innerHTML = `<div class="pe-canvas-empty"><div>✨</div><p>Sin secciones. Agrega tu primera sección.</p><button class="btn-primary" onclick="addSection()" style="margin-top:14px;">＋ Primera sección</button></div>`;
+      return;
+    }
+    const n = peSections.length;
+    container.innerHTML = peSections.map((s, i) => {
+      const isActive = i === peActiveIdx;
+      return `
+        <div class="pe-canvas-sec ${isActive?'active':''}" id="pcs-${i}">
+          <div class="pe-canvas-sec-bar">
+            <span class="pe-canvas-sec-badge">${TYPE_EMOJIS[s.tipo]} ${TYPE_NAMES[s.tipo]}</span>
+            ${s.titulo?`<span style="font-size:12px;color:var(--muted);margin-left:6px;">${s.titulo}</span>`:''}
+            <div class="pe-canvas-sec-bar-controls" onclick="event.stopPropagation()">
+              <button onclick="movePeSection(${i},-1)" ${i===0?'disabled':''}>↑</button>
+              <button onclick="movePeSection(${i},1)" ${i===n-1?'disabled':''}>↓</button>
+              <button class="del-btn" onclick="removePeSection(${i})">🗑</button>
+            </div>
+          </div>
+          <div class="pe-canvas-sec-body" id="pcs-body-${i}" onclick="selectPeSection(${i})">
+            ${renderSectionLivePreview(s)}
+            ${!isActive?`<div class="pe-canvas-hover-hint"><span>✎ Editar sección</span></div>`:''}
+          </div>
+        </div>
+      `;
+    }).join('') + `<div style="text-align:center;padding:8px 0;"><button class="add-sec-btn" onclick="addSection()" style="width:auto;padding:10px 24px;">＋ Agregar sección</button></div>`;
+  }
+
   function selectPeSection(idx) {
-    // save current before switching
     savePeSectionData(peActiveIdx);
     peActiveIdx = idx;
-    renderPeSections();
-    renderPeSectionEditor();
+    renderPeLeft();
+    renderPeCanvas();
+    setTimeout(() => {
+      const sec = document.getElementById(`pcs-${idx}`);
+      if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 60);
   }
 
   function addSection() {
@@ -1476,44 +2221,149 @@ const IA_URL  = "http://localhost:5000";
     $('typePicker').classList.remove('open');
     savePeSectionData(peActiveIdx);
     const base = { tipo, id: Date.now() };
-    if (tipo === 'cards') base.items = [];
+    if (tipo === 'cards' || tipo === 'features' || tipo === 'pasos' || tipo === 'stats') base.items = [];
     if (tipo === 'galeria') base.imagenes = [];
     peSections.push(base);
     peActiveIdx = peSections.length - 1;
-    renderPeSections();
-    renderPeSectionEditor();
+    renderPeLeft();
+    renderPeCanvas();
+    setTimeout(() => {
+      const sec = document.getElementById(`pcs-${peActiveIdx}`);
+      if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 80);
   }
 
   function removePeSection(idx) {
     peSections.splice(idx, 1);
     if (peActiveIdx >= peSections.length) peActiveIdx = peSections.length - 1;
-    renderPeSections();
-    renderPeSectionEditor();
+    if (peSections.length === 0) peActiveIdx = -1;
+    renderPeLeft();
+    renderPeCanvas();
   }
 
-  function renderPeSectionEditor() {
-    const container = $('pe-section-editor');
-    if (peActiveIdx < 0 || peActiveIdx >= peSections.length) {
-      container.innerHTML = '<div class="empty" style="margin-top:3rem"><div class="ei">👈</div><p>Selecciona o agrega una sección para editarla</p></div>';
-      return;
+  function renderSectionLivePreview(s) {
+    if (!s) return '';
+    if (s.tipo === 'hero') return `
+      <div style="text-align:center;padding:32px 20px;background:linear-gradient(135deg,var(--s3),var(--s2));border-radius:10px;">
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:2rem;font-weight:800;color:var(--text);line-height:1.1;margin-bottom:10px;">${s.titulo||'<span style="opacity:.3">Título aquí</span>'}</div>
+        ${s.subtitulo?`<div style="font-size:.9rem;color:var(--muted);line-height:1.65;max-width:420px;margin:0 auto 12px;">${s.subtitulo}</div>`:''}
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px;">
+          ${s.boton_texto||'Explorar destinos →'?`<span style="background:var(--cyan);color:#0a1628;padding:6px 14px;border-radius:999px;font-size:11px;font-weight:700;">${s.boton_texto||'Explorar destinos →'}</span>`:''}
+          ${s.boton2_texto||'Cómo llegar'?`<span style="border:1px solid var(--cyan);color:var(--cyan);padding:6px 14px;border-radius:999px;font-size:11px;">${s.boton2_texto||'Cómo llegar'}</span>`:''}
+        </div>
+      </div>`;
+    if (s.tipo === 'stats') return `
+      <div style="padding:8px 0;">
+        ${s.titulo?`<div style="font-size:1rem;font-weight:700;color:var(--text);margin-bottom:14px;">${s.titulo}</div>`:''}
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          ${(s.items||[]).map(it=>`<div style="text-align:center;background:var(--s3);border:1px solid var(--border);border-radius:10px;padding:12px 18px;min-width:72px;"><div style="font-size:1.5rem;font-weight:800;color:var(--cyan);">${it.valor||'—'}</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:3px;">${it.label||'?'}</div></div>`).join('')}
+          ${!(s.items||[]).length?'<div style="color:var(--dim);font-size:12px;padding:10px">Sin stats — agrega uno abajo</div>':''}
+        </div>
+      </div>`;
+    if (s.tipo === 'cards') return `
+      <div style="padding:8px 0;">
+        ${s.titulo?`<div style="font-size:1rem;font-weight:700;color:var(--text);margin-bottom:12px;">${s.titulo}</div>`:''}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;">
+          ${(s.items||[]).slice(0,6).map(c=>`<div style="background:var(--s3);border:1px solid var(--border);border-radius:9px;overflow:hidden;"><div style="height:64px;display:flex;align-items:center;justify-content:center;background:var(--s2);font-size:1.6rem;">${c.imagen?`<img src="${c.imagen}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='📄'">`:c.emoji||'📄'}</div><div style="padding:8px;"><div style="font-size:11px;font-weight:700;color:var(--text);">${c.titulo||'Sin título'}</div>${c.precio?`<div style="font-size:10px;color:var(--cyan);margin-top:2px;">${c.precio}${c.precio_unidad?' / '+c.precio_unidad:''}</div>`:''}</div></div>`).join('')}
+          ${!(s.items||[]).length?'<div style="color:var(--dim);font-size:12px;padding:10px">Sin tarjetas</div>':''}
+        </div>
+      </div>`;
+    if (s.tipo === 'texto') return `
+      <div style="padding:8px 0;">
+        ${s.titulo?`<div style="font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:10px;">${s.titulo}</div>`:''}
+        <div style="font-size:.875rem;color:var(--muted);line-height:1.8;white-space:pre-wrap;">${s.contenido||'<em style="opacity:.4">Sin contenido</em>'}</div>
+      </div>`;
+    if (s.tipo === 'contacto') return `
+      <div style="text-align:center;padding:24px;background:var(--s3);border-radius:10px;border:1px solid var(--border);">
+        <div style="font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:8px;">${s.titulo||'¿Listo para tu aventura?'}</div>
+        ${s.subtitulo?`<div style="font-size:.85rem;color:var(--muted);margin-bottom:14px;">${s.subtitulo}</div>`:''}
+        ${s.boton_texto?`<span style="padding:8px 18px;background:var(--cyan);color:#000;border-radius:8px;font-size:12px;font-weight:700;">${s.boton_texto} →</span>`:''}
+      </div>`;
+    if (s.tipo === 'features') return `
+      <div style="padding:8px 0;">
+        ${s.titulo?`<div style="font-size:1rem;font-weight:700;color:var(--text);margin-bottom:12px;">${s.titulo}</div>`:''}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;">
+          ${(s.items||[]).map(f=>`<div style="background:var(--s3);border:1px solid var(--border);border-radius:9px;padding:12px;text-align:center;"><div style="font-size:1.5rem;margin-bottom:6px;">${f.icono||'✦'}</div><div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">${f.titulo||'—'}</div><div style="font-size:10px;color:var(--muted);">${f.desc||''}</div></div>`).join('')}
+          ${!(s.items||[]).length?'<div style="color:var(--dim);font-size:12px;padding:10px">Sin características</div>':''}
+        </div>
+      </div>`;
+    if (s.tipo === 'pasos') return `
+      <div style="padding:8px 0;">
+        ${s.titulo?`<div style="font-size:1rem;font-weight:700;color:var(--text);margin-bottom:12px;">${s.titulo}</div>`:''}
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          ${(s.items||[]).map((p,i)=>`<div style="display:flex;gap:10px;align-items:flex-start;background:var(--s3);border:1px solid var(--border);border-radius:9px;padding:10px 12px;"><div style="font-size:1.3rem;flex-shrink:0;">${p.icono||String(i+1)}</div><div><div style="font-size:12px;font-weight:700;color:var(--text);">${p.titulo||'—'}</div>${p.desc?`<div style="font-size:11px;color:var(--muted);margin-top:2px;">${p.desc}</div>`:''}</div></div>`).join('')}
+          ${!(s.items||[]).length?'<div style="color:var(--dim);font-size:12px;padding:10px">Sin pasos</div>':''}
+        </div>
+      </div>`;
+    if (s.tipo === 'galeria') return `<div style="font-size:13px;color:var(--muted);">🖼️ ${(s.imagenes||[]).length} imagen${(s.imagenes||[]).length===1?'':'es'}</div>`;
+    if (s.tipo === 'bienvenida') return `
+      <div style="padding:8px 0;">
+        ${s.titulo?`<div style="font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:8px;">Bienvenido a ${s.titulo}</div>`:''}
+        ${s.intro?`<div style="font-size:.85rem;color:var(--muted);margin-bottom:10px;">${s.intro.substring(0,120)}…</div>`:''}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          ${(s.items||[]).map(f=>`<div style="background:var(--s3);border:1px solid var(--border);border-radius:8px;padding:10px;"><div style="font-size:1.2rem;">${f.icono||'✦'}</div><div style="font-size:11px;font-weight:700;color:var(--text);margin-top:4px;">${f.titulo||'—'}</div></div>`).join('')}
+        </div>
+      </div>`;
+    if (s.tipo === 'destinos-showcase') return `
+      <div style="padding:8px 0;">
+        ${s.titulo?`<div style="font-size:1rem;font-weight:700;color:var(--text);margin-bottom:10px;">Destinos ${s.titulo}</div>`:''}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:7px;">
+          ${(s.items||[]).map(d=>`<div style="background:var(--s3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;"><div style="font-size:1.5rem;">${d.icono||'📍'}</div><div style="font-size:11px;font-weight:700;color:var(--text);margin-top:4px;">${d.nombre||'—'}</div><div style="font-size:10px;color:var(--muted);">${d.subtitulo||''}</div></div>`).join('')}
+        </div>
+      </div>`;
+    if (s.tipo === 'info-practica') return `
+      <div style="padding:8px 0;">
+        ${s.titulo?`<div style="font-size:1rem;font-weight:700;color:var(--text);margin-bottom:10px;">Todo lo que ${s.titulo}</div>`:''}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:7px;">
+          ${(s.items||[]).map(f=>`<div style="background:var(--s3);border:1px solid var(--border);border-radius:8px;padding:10px;"><div style="font-size:1.4rem;">${f.icono||'📋'}</div><div style="font-size:11px;font-weight:700;color:var(--text);margin-top:4px;">${f.titulo||'—'}</div></div>`).join('')}
+        </div>
+      </div>`;
+    if (s.tipo === 'experiencias') return `
+      <div style="padding:8px 0;">
+        ${s.titulo?`<div style="font-size:1rem;font-weight:700;color:var(--text);margin-bottom:10px;">Descubre ${s.titulo}</div>`:''}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:7px;">
+          ${(s.items||[]).map(e=>`<div style="background:var(--s3);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;"><div style="font-size:1.5rem;">${e.emoji||'✨'}</div><div style="font-size:11px;font-weight:700;color:var(--text);margin-top:4px;">${e.etiqueta||'—'}</div></div>`).join('')}
+        </div>
+      </div>`;
+    return '';
+  }
+
+  function updateLivePreview() {
+    const idx = peActiveIdx;
+    if (idx < 0 || idx >= peSections.length) return;
+    const s = JSON.parse(JSON.stringify(peSections[idx]));
+    const gv = id => { const el = document.getElementById(id); return el ? el.value : null; };
+    const tv = id => { const el = document.getElementById(id); return el ? el.value : null; };
+    const sv = gv('pe-s-titulo'); if (sv !== null) s.titulo = sv;
+    if (s.tipo === 'hero') { s.subtitulo = tv('pe-s-subtitulo') ?? s.subtitulo; s.boton_texto = gv('pe-s-boton_texto') ?? s.boton_texto; s.boton_url = gv('pe-s-boton_url') ?? s.boton_url; s.boton2_texto = gv('pe-s-boton2_texto') ?? s.boton2_texto; s.boton2_url = gv('pe-s-boton2_url') ?? s.boton2_url; }
+    else if (s.tipo === 'texto') { s.contenido = tv('pe-s-contenido') ?? s.contenido; }
+    else if (s.tipo === 'contacto') { s.subtitulo = tv('pe-s-subtitulo') ?? s.subtitulo; s.boton_texto = gv('pe-s-boton_texto') ?? s.boton_texto; }
+    else if (s.tipo === 'stats') {
+      const rows = document.querySelectorAll('#pe-list-items .card-row');
+      s.items = Array.from(rows).map((row,i)=>{ const fv=f=>{const el=row.querySelector(`[data-list="${i}"][data-field="${f}"]`);return el?el.value:''}; return{valor:fv('valor'),label:fv('label')}; });
+    } else if (s.tipo === 'features') {
+      const rows = document.querySelectorAll('#pe-list-items .card-row');
+      s.items = Array.from(rows).map((row,i)=>{ const fv=f=>{const el=row.querySelector(`[data-list="${i}"][data-field="${f}"]`);return el?el.value:''}; return{icono:fv('icono'),titulo:fv('titulo'),desc:fv('desc')}; });
+    } else if (s.tipo === 'pasos') {
+      const rows = document.querySelectorAll('#pe-list-items .card-row');
+      s.items = Array.from(rows).map((row,i)=>{ const fv=f=>{const el=row.querySelector(`[data-list="${i}"][data-field="${f}"]`);return el?el.value:''}; return{icono:fv('icono'),titulo:fv('titulo'),desc:fv('desc')}; });
+    } else if (s.tipo === 'cards') {
+      const rows = document.querySelectorAll('.card-row');
+      s.items = Array.from(rows).map((row,i)=>{ const fv=f=>{const el=row.querySelector(`[data-card="${i}"][data-field="${f}"]`);return el?el.value:''}; return{titulo:fv('titulo'),emoji:fv('emoji'),imagen:fv('imagen'),precio:fv('precio'),precio_unidad:fv('precio_unidad'),etiqueta:fv('etiqueta'),lugar:fv('lugar'),desc:fv('desc'),extra:fv('extra'),color:fv('color')}; });
     }
-    const s = peSections[peActiveIdx];
+    const div = document.getElementById(`pcs-body-${idx}`);
+    if (div) div.innerHTML = renderSectionLivePreview(s);
+  }
+  window.updateLivePreview = updateLivePreview;
+
+  function getSectionFormHtml(s) {
     const tipo = s.tipo;
-
-    const sharedTitulo = `
-      <div class="fg"><label>Título de sección</label><input type="text" id="pe-s-titulo" value="${esc(s.titulo||'')}" placeholder="Título opcional" /></div>
-    `;
-
+    const sharedTitulo = `<div class="fg"><label>Título de sección</label><input type="text" id="pe-s-titulo" value="${esc(s.titulo||'')}" placeholder="Título opcional" /></div>`;
     let extra = '';
     if (tipo === 'hero') {
-      extra = `
-        <div class="fg"><label>Subtítulo</label><textarea id="pe-s-subtitulo" rows="3" placeholder="Descripción que aparece bajo el título...">${esc(s.subtitulo||'')}</textarea></div>
-        <div class="fg"><label>URL imagen de fondo (opcional)</label><input type="text" id="pe-s-imagen" value="${esc(s.imagen||'')}" placeholder="https://..." /></div>
-      `;
+      extra = `<div class="fg"><label>Subtítulo</label><textarea id="pe-s-subtitulo" rows="3" placeholder="Descripción bajo el título...">${esc(s.subtitulo||'')}</textarea></div><div class="fg"><label>URL imagen de fondo (opcional)</label><input type="text" id="pe-s-imagen" value="${esc(s.imagen||'')}" placeholder="https://..." /></div><div class="form-row2"><div class="fg"><label>Texto botón 1 (principal)</label><input type="text" id="pe-s-boton_texto" value="${esc(s.boton_texto||'Explorar destinos →')}" /></div><div class="fg"><label>URL botón 1</label><input type="text" id="pe-s-boton_url" value="${esc(s.boton_url||'/destinos')}" /></div></div><div class="form-row2"><div class="fg"><label>Texto botón 2 (secundario)</label><input type="text" id="pe-s-boton2_texto" value="${esc(s.boton2_texto||'Cómo llegar')}" /></div><div class="fg"><label>URL botón 2</label><input type="text" id="pe-s-boton2_url" value="${esc(s.boton2_url||'/como-llegar')}" /></div></div>`;
     } else if (tipo === 'texto') {
-      extra = `
-        <div class="fg"><label>Contenido</label><textarea id="pe-s-contenido" rows="10" placeholder="Escribe el texto aquí...">${esc(s.contenido||'')}</textarea></div>
-      `;
+      extra = `<div class="fg"><label>Contenido</label><textarea id="pe-s-contenido" rows="8" placeholder="Escribe el texto aquí...">${esc(s.contenido||'')}</textarea></div>`;
     } else if (tipo === 'cards') {
       const itemsHtml = (s.items || []).map((item, i) => `
         <div class="card-row">
@@ -1528,44 +2378,69 @@ const IA_URL  = "http://localhost:5000";
           </div>
           <div class="form-row2" style="margin-bottom:8px">
             <div class="fg" style="margin:0"><label>Precio</label><input type="text" data-card="${i}" data-field="precio" value="${esc(item.precio||'')}" placeholder="S/ 80" /></div>
-            <div class="fg" style="margin:0"><label>Unidad de precio</label><input type="text" data-card="${i}" data-field="precio_unidad" value="${esc(item.precio_unidad||'')}" placeholder="persona/noche" /></div>
+            <div class="fg" style="margin:0"><label>Unidad</label><input type="text" data-card="${i}" data-field="precio_unidad" value="${esc(item.precio_unidad||'')}" placeholder="persona/noche" /></div>
           </div>
           <div class="fg" style="margin-bottom:8px"><label>Descripción</label><textarea data-card="${i}" data-field="desc" rows="2" placeholder="Descripción corta...">${esc(item.desc||'')}</textarea></div>
-          <div class="fg" style="margin-bottom:8px"><label>Servicios / Amenities (uno por línea)</label><textarea data-card="${i}" data-field="extra" rows="3" placeholder="🍽️ Comidas incluidas&#10;🌅 Vista al lago&#10;🚣 Paseo en bote">${esc(item.extra||'')}</textarea></div>
+          <div class="fg" style="margin-bottom:8px"><label>Servicios / Amenities (uno por línea)</label><textarea data-card="${i}" data-field="extra" rows="3" placeholder="🍽️ Comidas incluidas&#10;🌅 Vista al lago">${esc(item.extra||'')}</textarea></div>
           <div class="form-row2" style="margin-bottom:0">
             <div class="fg" style="margin:0"><label>URL imagen</label><input type="text" data-card="${i}" data-field="imagen" value="${esc(item.imagen||'')}" placeholder="https://..." /></div>
             <div class="fg" style="margin:0"><label>Color (hex)</label><input type="text" data-card="${i}" data-field="color" value="${esc(item.color||'')}" placeholder="#38bdf8" /></div>
           </div>
-        </div>
-      `).join('');
-      extra = `
-        <div id="pe-cards-list">${itemsHtml}</div>
-        <button class="add-sec-btn" onclick="peAddCard()">＋ Agregar tarjeta</button>
-      `;
+        </div>`).join('');
+      extra = `<div id="pe-cards-list">${itemsHtml}</div><button class="add-sec-btn" onclick="peAddCard()">＋ Agregar tarjeta</button>`;
     } else if (tipo === 'galeria') {
-      extra = `
-        <div class="fg"><label>URLs de imágenes (una por línea)</label><textarea id="pe-s-imagenes" rows="8" placeholder="https://foto1.jpg&#10;https://foto2.jpg&#10;...">${(s.imagenes||[]).join('\n')}</textarea></div>
-      `;
+      extra = `<div class="fg"><label>URLs de imágenes (una por línea)</label><textarea id="pe-s-imagenes" rows="6" placeholder="https://foto1.jpg&#10;https://foto2.jpg">${(s.imagenes||[]).join('\n')}</textarea></div>`;
     } else if (tipo === 'contacto') {
-      extra = `
-        <div class="fg"><label>Subtítulo / descripción</label><textarea id="pe-s-subtitulo" rows="3" placeholder="Diseñamos tu itinerario ideal...">${esc(s.subtitulo||'')}</textarea></div>
-        <div class="form-row2">
-          <div class="fg" style="margin:0"><label>Texto del botón</label><input type="text" id="pe-s-boton_texto" value="${esc(s.boton_texto||'')}" placeholder="Reservar ahora" /></div>
-          <div class="fg" style="margin:0"><label>URL del botón</label><input type="text" id="pe-s-boton_url" value="${esc(s.boton_url||'')}" placeholder="/contacto" /></div>
-        </div>
-      `;
+      extra = `<div class="fg"><label>Subtítulo / descripción</label><textarea id="pe-s-subtitulo" rows="2" placeholder="Diseñamos tu itinerario ideal...">${esc(s.subtitulo||'')}</textarea></div><div class="form-row2"><div class="fg" style="margin:0"><label>Texto botón 1 (principal)</label><input type="text" id="pe-s-boton_texto" value="${esc(s.boton_texto||'')}" placeholder="Reservar ahora" /></div><div class="fg" style="margin:0"><label>URL botón 1</label><input type="text" id="pe-s-boton_url" value="${esc(s.boton_url||'')}" placeholder="/contacto" /></div></div><div class="form-row2"><div class="fg" style="margin:0"><label>Texto botón 2 (secundario)</label><input type="text" id="pe-s-boton2_texto" value="${esc(s.boton2_texto||'')}" placeholder="Volver al inicio" /></div><div class="fg" style="margin:0"><label>URL botón 2</label><input type="text" id="pe-s-boton2_url" value="${esc(s.boton2_url||'')}" placeholder="/" /></div></div>`;
+    } else if (tipo === 'stats') {
+      const statsHtml = (s.items||[]).map((item,i)=>`<div class="card-row"><button class="card-row-del" onclick="peRemoveListItem(${i},'stats')">✕</button><div class="form-row2"><div class="fg" style="margin:0"><label>Valor</label><input type="text" data-list="${i}" data-field="valor" value="${esc(item.valor||'')}" placeholder="8+" /></div><div class="fg" style="margin:0"><label>Etiqueta</label><input type="text" data-list="${i}" data-field="label" value="${esc(item.label||'')}" placeholder="Comunidades" /></div></div></div>`).join('');
+      extra = `<div id="pe-list-items">${statsHtml}</div><button class="add-sec-btn" onclick="peAddListItem('stats')">＋ Agregar stat</button>`;
+    } else if (tipo === 'features') {
+      const featHtml = (s.items||[]).map((item,i)=>`<div class="card-row"><button class="card-row-del" onclick="peRemoveListItem(${i},'features')">✕</button><div class="form-row2" style="margin-bottom:8px"><div class="fg" style="margin:0"><label>Ícono</label><input type="text" data-list="${i}" data-field="icono" value="${esc(item.icono||'')}" placeholder="✅" maxlength="4" /></div><div class="fg" style="margin:0"><label>Título</label><input type="text" data-list="${i}" data-field="titulo" value="${esc(item.titulo||'')}" placeholder="Característica" /></div></div><div class="fg" style="margin:0"><label>Descripción</label><textarea data-list="${i}" data-field="desc" rows="2" placeholder="Descripción breve...">${esc(item.desc||'')}</textarea></div></div>`).join('');
+      extra = `<div id="pe-list-items">${featHtml}</div><button class="add-sec-btn" onclick="peAddListItem('features')">＋ Agregar característica</button>`;
+    } else if (tipo === 'pasos') {
+      const pasosHtml = (s.items||[]).map((item,i)=>`<div class="card-row"><button class="card-row-del" onclick="peRemoveListItem(${i},'pasos')">✕</button><div class="form-row2" style="margin-bottom:8px"><div class="fg" style="margin:0"><label>Ícono / #</label><input type="text" data-list="${i}" data-field="icono" value="${esc(item.icono||'')}" placeholder="🚌" maxlength="4" /></div><div class="fg" style="margin:0"><label>Título</label><input type="text" data-list="${i}" data-field="titulo" value="${esc(item.titulo||'')}" placeholder="Paso 1" /></div></div><div class="fg" style="margin:0"><label>Descripción</label><textarea data-list="${i}" data-field="desc" rows="2" placeholder="Detalle del paso...">${esc(item.desc||'')}</textarea></div></div>`).join('');
+      extra = `<div id="pe-list-items">${pasosHtml}</div><button class="add-sec-btn" onclick="peAddListItem('pasos')">＋ Agregar paso</button>`;
+    } else if (tipo === 'bienvenida') {
+      const featHtml = (s.items||[]).map((item,i)=>`<div class="card-row"><button class="card-row-del" onclick="peRemoveListItem(${i},'features')">✕</button><div class="form-row2" style="margin-bottom:8px"><div class="fg" style="margin:0"><label>Ícono</label><input type="text" data-list="${i}" data-field="icono" value="${esc(item.icono||'')}" placeholder="🌊" maxlength="4" /></div><div class="fg" style="margin:0"><label>Título</label><input type="text" data-list="${i}" data-field="titulo" value="${esc(item.titulo||'')}" placeholder="Característica" /></div></div><div class="fg" style="margin:0"><label>Descripción</label><textarea data-list="${i}" data-field="desc" rows="2">${esc(item.desc||'')}</textarea></div></div>`).join('');
+      extra = `<div class="fg"><label>Introducción</label><input type="text" id="pe-s-intro" value="${esc(s.intro||'')}" placeholder="Descripción de sección..." /></div><div class="fg"><label>Párrafo 1</label><textarea id="pe-s-parrafo1" rows="4" placeholder="Primer párrafo...">${esc(s.parrafo1||'')}</textarea></div><div class="fg"><label>Párrafo 2</label><textarea id="pe-s-parrafo2" rows="4" placeholder="Segundo párrafo...">${esc(s.parrafo2||'')}</textarea></div><p style="font-size:11px;color:var(--muted);margin:8px 0 4px;">Características (cuadrícula 2×2):</p><div id="pe-list-items">${featHtml}</div><button class="add-sec-btn" onclick="peAddListItem('features')">＋ Agregar característica</button>`;
+    } else if (tipo === 'destinos-showcase') {
+      const destiHtml = (s.items||[]).map((item,i)=>`<div class="card-row"><button class="card-row-del" onclick="peRemoveListItem(${i},'destinos')">✕</button><div class="form-row2" style="margin-bottom:8px"><div class="fg" style="margin:0"><label>Nombre</label><input type="text" data-list="${i}" data-field="nombre" value="${esc(item.nombre||'')}" placeholder="Playa Llachón" /></div><div class="fg" style="margin:0"><label>Subtítulo</label><input type="text" data-list="${i}" data-field="subtitulo" value="${esc(item.subtitulo||'')}" placeholder="La única playa..." /></div></div><div class="fg" style="margin-bottom:8px"><label>Descripción</label><textarea data-list="${i}" data-field="desc" rows="2">${esc(item.desc||'')}</textarea></div><div class="form-row2"><div class="fg" style="margin:0"><label>Ícono</label><input type="text" data-list="${i}" data-field="icono" value="${esc(item.icono||'')}" placeholder="🏖️" maxlength="4" /></div><div class="fg" style="margin:0"><label>Color</label><input type="text" data-list="${i}" data-field="color" value="${esc(item.color||'')}" placeholder="#2dd4bf" /></div></div></div>`).join('');
+      extra = `<div class="fg"><label>Introducción</label><input type="text" id="pe-s-intro" value="${esc(s.intro||'')}" placeholder="Descripción introductoria..." /></div><div id="pe-list-items">${destiHtml}</div><button class="add-sec-btn" onclick="peAddListItem('destinos')">＋ Agregar destino</button>`;
+    } else if (tipo === 'info-practica') {
+      const infoHtml = (s.items||[]).map((item,i)=>`<div class="card-row"><button class="card-row-del" onclick="peRemoveListItem(${i},'info')">✕</button><div class="form-row2" style="margin-bottom:8px"><div class="fg" style="margin:0"><label>Ícono</label><input type="text" data-list="${i}" data-field="icono" value="${esc(item.icono||'')}" placeholder="🚌" maxlength="4" /></div><div class="fg" style="margin:0"><label>Título</label><input type="text" data-list="${i}" data-field="titulo" value="${esc(item.titulo||'')}" placeholder="Cómo llegar" /></div></div><div class="fg" style="margin-bottom:8px"><label>Lista (una por línea)</label><textarea data-list="${i}" data-field="lista" rows="4">${esc(item.lista||'')}</textarea></div><div class="form-row2"><div class="fg" style="margin:0"><label>URL del enlace</label><input type="text" data-list="${i}" data-field="link" value="${esc(item.link||'')}" placeholder="/como-llegar" /></div><div class="fg" style="margin:0"><label>Texto del enlace</label><input type="text" data-list="${i}" data-field="link_texto" value="${esc(item.link_texto||'')}" placeholder="Ver más" /></div></div><div class="fg" style="margin:0"><label>Color (hex)</label><input type="text" data-list="${i}" data-field="color" value="${esc(item.color||'')}" placeholder="#2dd4bf" /></div></div>`).join('');
+      extra = `<div id="pe-list-items">${infoHtml}</div><button class="add-sec-btn" onclick="peAddListItem('info')">＋ Agregar tarjeta</button>`;
+    } else if (tipo === 'experiencias') {
+      const expHtml = (s.items||[]).map((item,i)=>`<div class="card-row"><button class="card-row-del" onclick="peRemoveCard(${i})">✕</button><div class="form-row2" style="margin-bottom:8px"><div class="fg" style="margin:0"><label>Emoji</label><input type="text" data-card="${i}" data-field="emoji" value="${esc(item.emoji||'')}" placeholder="🏠" maxlength="4" /></div><div class="fg" style="margin:0"><label>Etiqueta</label><input type="text" data-card="${i}" data-field="etiqueta" value="${esc(item.etiqueta||'')}" placeholder="Vivencial" /></div></div><div class="fg" style="margin-bottom:8px"><label>Título</label><input type="text" data-card="${i}" data-field="titulo" value="${esc(item.titulo||'')}" placeholder="Vive con familias..." /></div><div class="fg" style="margin-bottom:8px"><label>Descripción</label><textarea data-card="${i}" data-field="desc" rows="2">${esc(item.desc||'')}</textarea></div><div class="form-row2"><div class="fg" style="margin:0"><label>URL</label><input type="text" data-card="${i}" data-field="href" value="${esc(item.href||'')}" placeholder="/vivencial" /></div><div class="fg" style="margin:0"><label>Color</label><input type="text" data-card="${i}" data-field="color" value="${esc(item.color||'')}" placeholder="#0ea5e9" /></div></div><div class="fg" style="margin:0"><label>Tags (separados por coma)</label><input type="text" data-card="${i}" data-field="tags" value="${esc(item.tags||'')}" placeholder="Kayak,Pesca,Escalada" /></div></div>`).join('');
+      extra = `<div class="fg"><label>Introducción</label><input type="text" id="pe-s-intro" value="${esc(s.intro||'')}" placeholder="Descripción introductoria..." /></div><div id="pe-cards-list">${expHtml}</div><button class="add-sec-btn" onclick="peAddCard()">＋ Agregar experiencia</button>`;
     }
-
-    container.innerHTML = `
-      <div class="sec-editor">
-        <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:18px">
-          ${TYPE_LABELS[tipo] || tipo}
-        </div>
-        ${sharedTitulo}
-        ${extra}
-      </div>
-    `;
+    return `<div class="sec-editor">${sharedTitulo}${extra}</div>`;
   }
+
+  function renderPeSectionEditor() {
+    renderPeLeft();
+    renderPeCanvas();
+  }
+
+  function closeSecEditor() {
+    savePeSectionData(peActiveIdx);
+    peActiveIdx = -1;
+    renderPeLeft();
+    renderPeCanvas();
+  }
+  window.closeSecEditor = closeSecEditor;
+
+  function movePeSection(idx, dir) {
+    savePeSectionData(peActiveIdx);
+    const newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= peSections.length) return;
+    [peSections[idx], peSections[newIdx]] = [peSections[newIdx], peSections[idx]];
+    if (peActiveIdx === idx) peActiveIdx = newIdx;
+    else if (peActiveIdx === newIdx) peActiveIdx = idx;
+    renderPeLeft();
+    renderPeCanvas();
+  }
+  window.movePeSection = movePeSection;
 
   function savePeSectionData(idx) {
     if (idx < 0 || idx >= peSections.length) return;
@@ -1575,8 +2450,12 @@ const IA_URL  = "http://localhost:5000";
     if (titulo !== null) s.titulo = titulo;
 
     if (s.tipo === 'hero') {
-      s.subtitulo = gv('pe-s-subtitulo') ?? s.subtitulo;
-      s.imagen    = gv('pe-s-imagen')    ?? s.imagen;
+      s.subtitulo    = gv('pe-s-subtitulo')    ?? s.subtitulo;
+      s.imagen       = gv('pe-s-imagen')       ?? s.imagen;
+      s.boton_texto  = gv('pe-s-boton_texto')  ?? s.boton_texto;
+      s.boton_url    = gv('pe-s-boton_url')    ?? s.boton_url;
+      s.boton2_texto = gv('pe-s-boton2_texto') ?? s.boton2_texto;
+      s.boton2_url   = gv('pe-s-boton2_url')   ?? s.boton2_url;
     } else if (s.tipo === 'texto') {
       s.contenido = gv('pe-s-contenido') ?? s.contenido;
     } else if (s.tipo === 'cards') {
@@ -1590,27 +2469,89 @@ const IA_URL  = "http://localhost:5000";
           imagen: fv('imagen'), color: fv('color'),
         };
       });
+    } else if (s.tipo === 'stats' || s.tipo === 'features' || s.tipo === 'pasos') {
+      const rows = document.querySelectorAll('#pe-list-items .card-row');
+      s.items = Array.from(rows).map((row, i) => {
+        const fv = f => { const el = row.querySelector(`[data-list="${i}"][data-field="${f}"]`); return el ? el.value : ''; };
+        if (s.tipo === 'stats')    return { valor: fv('valor'), label: fv('label') };
+        if (s.tipo === 'features') return { icono: fv('icono'), titulo: fv('titulo'), desc: fv('desc') };
+        if (s.tipo === 'pasos')    return { icono: fv('icono'), titulo: fv('titulo'), desc: fv('desc') };
+        return {};
+      });
+    } else if (s.tipo === 'bienvenida') {
+      s.intro    = gv('pe-s-intro')    ?? s.intro;
+      s.parrafo1 = gv('pe-s-parrafo1') ?? s.parrafo1;
+      s.parrafo2 = gv('pe-s-parrafo2') ?? s.parrafo2;
+      const rows = document.querySelectorAll('#pe-list-items .card-row');
+      s.items = Array.from(rows).map((row, i) => {
+        const fv = f => { const el = row.querySelector(`[data-list="${i}"][data-field="${f}"]`); return el ? el.value : ''; };
+        return { icono: fv('icono'), titulo: fv('titulo'), desc: fv('desc') };
+      });
+    } else if (s.tipo === 'destinos-showcase') {
+      s.intro = gv('pe-s-intro') ?? s.intro;
+      const rows = document.querySelectorAll('#pe-list-items .card-row');
+      s.items = Array.from(rows).map((row, i) => {
+        const fv = f => { const el = row.querySelector(`[data-list="${i}"][data-field="${f}"]`); return el ? el.value : ''; };
+        return { nombre: fv('nombre'), subtitulo: fv('subtitulo'), desc: fv('desc'), icono: fv('icono'), color: fv('color') };
+      });
+    } else if (s.tipo === 'info-practica') {
+      const rows = document.querySelectorAll('#pe-list-items .card-row');
+      s.items = Array.from(rows).map((row, i) => {
+        const fv = f => { const el = row.querySelector(`[data-list="${i}"][data-field="${f}"]`); return el ? el.value : ''; };
+        return { icono: fv('icono'), titulo: fv('titulo'), lista: fv('lista'), link: fv('link'), link_texto: fv('link_texto'), color: fv('color') };
+      });
+    } else if (s.tipo === 'experiencias') {
+      s.intro = gv('pe-s-intro') ?? s.intro;
+      const rows = document.querySelectorAll('.card-row');
+      s.items = Array.from(rows).map((row, i) => {
+        const fv = f => { const el = row.querySelector(`[data-card="${i}"][data-field="${f}"]`); return el ? el.value : ''; };
+        return { emoji: fv('emoji'), etiqueta: fv('etiqueta'), titulo: fv('titulo'), desc: fv('desc'), href: fv('href'), color: fv('color'), tags: fv('tags') };
+      });
     } else if (s.tipo === 'galeria') {
       const raw = gv('pe-s-imagenes') ?? '';
       s.imagenes = raw.split('\n').map(u => u.trim()).filter(Boolean);
     } else if (s.tipo === 'contacto') {
-      s.subtitulo   = gv('pe-s-subtitulo')   ?? s.subtitulo;
-      s.boton_texto = gv('pe-s-boton_texto') ?? s.boton_texto;
-      s.boton_url   = gv('pe-s-boton_url')   ?? s.boton_url;
+      s.subtitulo    = gv('pe-s-subtitulo')    ?? s.subtitulo;
+      s.boton_texto  = gv('pe-s-boton_texto')  ?? s.boton_texto;
+      s.boton_url    = gv('pe-s-boton_url')    ?? s.boton_url;
+      s.boton2_texto = gv('pe-s-boton2_texto') ?? s.boton2_texto;
+      s.boton2_url   = gv('pe-s-boton2_url')   ?? s.boton2_url;
     }
   }
 
   function peAddCard() {
     savePeSectionData(peActiveIdx);
     peSections[peActiveIdx].items = peSections[peActiveIdx].items || [];
-    peSections[peActiveIdx].items.push({ titulo: '', desc: '', precio: '', imagen: '' });
-    renderPeSectionEditor();
+    const tipo = peSections[peActiveIdx].tipo;
+    if (tipo === 'experiencias') {
+      peSections[peActiveIdx].items.push({ emoji: '✨', etiqueta: '', titulo: '', desc: '', href: '/', color: '#38bdf8', tags: '' });
+    } else {
+      peSections[peActiveIdx].items.push({ titulo: '', desc: '', precio: '', imagen: '' });
+    }
+    renderPeLeft(); renderPeCanvas();
   }
 
   window.peRemoveCard = function(idx) {
     savePeSectionData(peActiveIdx);
     peSections[peActiveIdx].items.splice(idx, 1);
-    renderPeSectionEditor();
+    renderPeLeft(); renderPeCanvas();
+  };
+
+  window.peAddListItem = function(tipo) {
+    savePeSectionData(peActiveIdx);
+    peSections[peActiveIdx].items = peSections[peActiveIdx].items || [];
+    if (tipo === 'stats')    peSections[peActiveIdx].items.push({ valor: '', label: '' });
+    if (tipo === 'features') peSections[peActiveIdx].items.push({ icono: '', titulo: '', desc: '' });
+    if (tipo === 'pasos')    peSections[peActiveIdx].items.push({ icono: '', titulo: '', desc: '' });
+    if (tipo === 'destinos') peSections[peActiveIdx].items.push({ nombre: '', subtitulo: '', desc: '', icono: '📍', color: '#2dd4bf' });
+    if (tipo === 'info')     peSections[peActiveIdx].items.push({ icono: '📋', titulo: '', lista: '', link: '', link_texto: '', color: '#2dd4bf' });
+    renderPeLeft(); renderPeCanvas();
+  };
+
+  window.peRemoveListItem = function(idx, tipo) {
+    savePeSectionData(peActiveIdx);
+    peSections[peActiveIdx].items.splice(idx, 1);
+    renderPeLeft(); renderPeCanvas();
   };
 
   async function savePageEditor() {
@@ -1635,25 +2576,28 @@ const IA_URL  = "http://localhost:5000";
           body: JSON.stringify(body)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        showMsg('Contenido guardado — recarga la página del sitio para ver cambios');
+        showMsg('✓ Guardado — actualizando vista previa...');
+        setTimeout(reloadPreviewIframe, 300);
+        return;
       } else if (peCurrentId) {
         res = await fetch(`${IA_URL}/api/admin/paginas/${peCurrentId}`, {
           method: 'PUT', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        showMsg('Página guardada');
+        showMsg('✓ Página guardada');
         loadPaginas();
+        setTimeout(reloadPreviewIframe, 300);
       } else {
         res = await fetch(`${IA_URL}/api/admin/paginas`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        showMsg('Página creada — visítala en /pagina/' + slug);
+        showMsg('✓ Página creada — /pagina/' + slug);
         loadPaginas();
+        setTimeout(() => { const iframe = $('pe-preview-iframe'); if (iframe) iframe.src = '/pagina/' + slug; }, 300);
       }
-      closePageEditor();
     } catch (e) {
       showMsg('Error al guardar: ' + e.message, 'err');
     }

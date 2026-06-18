@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const navLinks = [
+const DEFAULT_LINKS = [
   { label: "Inicio",       href: "/" },
   { label: "Destinos",     href: "/destinos" },
   { label: "Vivencial",    href: "/vivencial" },
@@ -18,6 +18,7 @@ export default function Navbar() {
   const [scrollPct, setScrollPct] = useState(0);
   const [menuOpen, setMenuOpen]   = useState(false);
   const [path, setPath]           = useState("/");
+  const [cfg, setCfg]             = useState<any>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem("capachica-theme") || localStorage.getItem("theme");
@@ -25,6 +26,11 @@ export default function Navbar() {
     setDark(isDark);
     document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
     setPath(window.location.pathname);
+
+    fetch("http://localhost:5000/api/siteconfig")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setCfg(d); })
+      .catch(() => {});
 
     const onScroll = () => {
       const y = window.scrollY;
@@ -36,6 +42,10 @@ export default function Navbar() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const navLinks = cfg?.navbar?.links?.length ? cfg.navbar.links : DEFAULT_LINKS;
+  const logoNombre  = cfg?.navbar?.logo_nombre  || "Capachica";
+  const logoTagline = cfg?.navbar?.logo_tagline || "Turismo Vivencial";
 
   const toggleTheme = () => {
     const next = !dark;
@@ -122,13 +132,13 @@ export default function Navbar() {
               display: "flex", alignItems: "center", justifyContent: "center",
               color: "#fff", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 17,
               animation: "pulse-glow 3s ease-in-out infinite",
-            }}>C</div>
+            }}>{logoNombre[0] || "C"}</div>
             <div>
               <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "rgba(240,237,232,0.95)", lineHeight: 1 }}>
-                Capachica
+                {logoNombre}
               </div>
               <div style={{ fontSize: 9, color: "rgba(240,237,232,0.50)", letterSpacing: "0.14em", textTransform: "uppercase" }}>
-                Turismo Vivencial
+                {logoTagline}
               </div>
             </div>
           </a>
