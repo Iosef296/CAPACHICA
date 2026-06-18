@@ -1,0 +1,98 @@
+---
+const { secciones = [], skipHero = false } = Astro.props;
+
+function hexToRgb(hex: string) {
+  const m = (hex || '#38bdf8').replace('#', '').match(/.{2}/g);
+  return m ? (m as string[]).map((h: string) => parseInt(h, 16)).join(',') : '56,189,248';
+}
+---
+
+{secciones.map((sec: any) => {
+  if (skipHero && sec.tipo === 'hero') return null;
+
+  if (sec.tipo === 'hero') return (
+    <Fragment>
+      {sec.titulo && <h1 class="section-title" style="font-size:clamp(2.2rem,5vw,3.5rem);margin-bottom:1rem;">{sec.titulo}</h1>}
+      {sec.subtitulo && <p style="font-size:1.05rem;color:var(--text2);line-height:1.75;max-width:560px;margin:0 auto 2rem;">{sec.subtitulo}</p>}
+    </Fragment>
+  );
+
+  if (sec.tipo === 'texto') return (
+    <div class="reveal" style="margin-bottom:3.5rem;">
+      {sec.titulo && <h2 style="font-family:var(--font-display);font-size:1.8rem;font-weight:700;color:var(--text);margin-bottom:1rem;">{sec.titulo}</h2>}
+      <div style="font-size:1rem;color:var(--text2);line-height:1.85;max-width:720px;white-space:pre-wrap;">{sec.contenido}</div>
+    </div>
+  );
+
+  if (sec.tipo === 'cards') return (
+    <div class="reveal" style="margin-bottom:3.5rem;">
+      {sec.titulo && <h2 style="font-family:var(--font-display);font-size:1.8rem;font-weight:700;color:var(--text);margin-bottom:1.5rem;">{sec.titulo}</h2>}
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.4rem;">
+        {(sec.items || []).map((item: any) => {
+          const rgb = item.color ? hexToRgb(item.color) : '56,189,248';
+          const amenities = item.extra ? item.extra.split('\n').filter(Boolean) : [];
+          return (
+            <div class="card" style="padding:0;overflow:hidden;position:relative;">
+              {item.popular && (
+                <div style="position:absolute;top:12px;right:12px;z-index:10;padding:4px 12px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:0.1em;background:linear-gradient(135deg,#fbbf24,#f97316);color:#fff;">★ POPULAR</div>
+              )}
+              {/* Card header */}
+              <div style={`height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:${item.imagen ? `url('${item.imagen}') center/cover` : `linear-gradient(135deg,rgba(6,15,26,0.95),rgba(${rgb},0.12))`};border-bottom:1px solid var(--border);position:relative;overflow:hidden;`}>
+                {item.imagen && <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,rgba(0,0,0,0.55))"></div>}
+                {!item.imagen && item.emoji && <div style="font-size:2.8rem;z-index:1;">{item.emoji}</div>}
+                {item.etiqueta && (
+                  <span style={`${item.imagen ? 'margin-top:auto;margin-bottom:0.75rem;' : 'margin-top:0.6rem;'}padding:3px 11px;border-radius:999px;font-size:10px;font-weight:600;background:rgba(${rgb},0.15);color:${item.color || 'var(--accent)'};border:1px solid rgba(${rgb},0.25);z-index:1;`}>{item.etiqueta}</span>
+                )}
+              </div>
+              {/* Card body */}
+              <div style="padding:1.3rem;">
+                <h3 style="font-family:var(--font-display);font-size:1.05rem;font-weight:700;color:var(--text);margin-bottom:0.4rem;">{item.titulo}</h3>
+                {item.lugar && <div style="font-size:0.75rem;color:var(--accent);margin-bottom:0.6rem;font-weight:500;">📍 {item.lugar}</div>}
+                {item.desc && <p style="font-size:0.85rem;color:var(--text2);line-height:1.65;margin-bottom:0.9rem;">{item.desc}</p>}
+                {amenities.length > 0 && (
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.3rem;margin-bottom:1rem;">
+                    {amenities.map((a: string) => (
+                      <span style="font-size:11px;color:var(--text3);background:rgba(255,255,255,0.04);padding:4px 8px;border-radius:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{a}</span>
+                    ))}
+                  </div>
+                )}
+                {item.precio && (
+                  <div style={`display:flex;align-items:center;justify-content:space-between;${amenities.length ? 'padding-top:0.8rem;border-top:1px solid var(--border);' : ''}`}>
+                    <div>
+                      <span style={`font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:${item.color || 'var(--accent)'};`}>{item.precio}</span>
+                      {item.precio_unidad && <span style="font-size:0.75rem;color:var(--text3);margin-left:4px;">/ {item.precio_unidad}</span>}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  if (sec.tipo === 'galeria') return (
+    <div class="reveal" style="margin-bottom:3.5rem;">
+      {sec.titulo && <h2 style="font-family:var(--font-display);font-size:1.8rem;font-weight:700;color:var(--text);margin-bottom:1.5rem;">{sec.titulo}</h2>}
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0.75rem;">
+        {(sec.imagenes || []).map((url: string) => (
+          <div style={`height:200px;border-radius:12px;overflow:hidden;background:url('${url}') center/cover no-repeat;border:1px solid rgba(255,255,255,0.06);`}></div>
+        ))}
+      </div>
+    </div>
+  );
+
+  if (sec.tipo === 'contacto') return (
+    <div class="reveal" style="border-top:1px solid rgba(45,212,191,0.14);padding:4rem 0;text-align:center;margin-top:2rem;">
+      <h2 class="section-title" style="margin-bottom:1rem;">{sec.titulo || '¿Listo para tu aventura?'}</h2>
+      {sec.subtitulo && <p style="color:var(--text2);margin-bottom:2rem;line-height:1.7;">{sec.subtitulo}</p>}
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+        {sec.boton_texto && sec.boton_url && <a href={sec.boton_url} class="btn-primary">{sec.boton_texto} →</a>}
+        <a href="/" class="btn-outline">Volver al inicio</a>
+      </div>
+    </div>
+  );
+
+  return null;
+})}

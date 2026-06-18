@@ -10,165 +10,856 @@ const IA_URL  = "http://localhost:5000";
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin — Capachica Turismo</title>
   <style is:global>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', sans-serif; background: #071826; color: #f4f7fb; min-height: 100vh; }
-    .page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
-    .card { background: #122f4c; border: 1px solid rgba(83,211,255,0.35); border-radius: 20px; padding: 48px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 0 60px rgba(83,211,255,0.12); }
-    h2 { font-size: 26px; margin-bottom: 6px; }
-    .sub { color: #7f95aa; font-size: 13px; margin-bottom: 28px; }
-    input { width: 100%; padding: 11px 14px; margin-bottom: 12px; background: rgba(11,60,96,0.6); border: 1px solid rgba(83,211,255,0.2); border-radius: 10px; color: #f4f7fb; font-size: 14px; }
-    input:focus { outline: none; border-color: rgba(83,211,255,0.5); }
-    .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; background: linear-gradient(135deg,#1ba6d9,#0b6ea8); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 6px; }
-    .btn:hover { opacity: 0.87; }
-    .hint { color: #7f95aa; font-size: 11px; margin-top: 16px; }
-    .err { color: #f87171; font-size: 13px; margin-bottom: 10px; }
-    /* Panel */
-    .panel { display: none; padding: 40px 24px; max-width: 1100px; margin: 0 auto; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 12px; }
-    .tabs { display: flex; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
-    .tab { padding: 9px 20px; border-radius: 999px; border: 1px solid rgba(83,211,255,0.25); background: transparent; color: #7f95aa; cursor: pointer; font-size: 13px; }
-    .tab.active { background: linear-gradient(135deg,#1ba6d9,#0b6ea8); color: #fff; border-color: transparent; }
-    .section { display: none; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #07111f;
+      --s1:        #0d1e30;
+      --s2:        #111f33;
+      --s3:        #162540;
+      --border:    rgba(255,255,255,0.07);
+      --border2:   rgba(255,255,255,0.13);
+      --text:      #e6edf5;
+      --muted:     #7f95aa;
+      --dim:       #4d6070;
+      --cyan:      #38bdf8;
+      --cyan-dim:  rgba(56,189,248,0.12);
+      --cyan-b:    rgba(56,189,248,0.25);
+      --green:     #34d399;
+      --amber:     #fbbf24;
+      --red:       #f87171;
+      --purple:    #a78bfa;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ───────────────── LOGIN ───────────────── */
+    #loginPage {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(56,189,248,0.08), transparent);
+    }
+
+    .login-card {
+      background: var(--s1);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 44px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(56,189,248,0.07);
+    }
+
+    .login-icon { font-size: 44px; margin-bottom: 18px; }
+
+    .login-card h2 {
+      font-size: 24px; font-weight: 700;
+      color: var(--text); margin-bottom: 5px;
+    }
+
+    .login-card p { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+
+    .inp {
+      width: 100%; padding: 11px 14px; margin-bottom: 10px;
+      background: var(--s2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text); font-size: 14px;
+      outline: none; font-family: inherit;
+      transition: border-color .2s;
+    }
+    .inp:focus { border-color: var(--cyan); }
+    .inp::placeholder { color: var(--dim); }
+
+    #loginErr { color: var(--red); font-size: 13px; margin-bottom: 10px; display: none; }
+
+    .btn-login {
+      width: 100%; padding: 12px;
+      background: linear-gradient(135deg, #38bdf8, #0284c7);
+      border: none; border-radius: 10px;
+      color: #fff; font-size: 15px; font-weight: 600;
+      cursor: pointer; font-family: inherit; margin-top: 4px;
+      transition: filter .2s, transform .15s;
+    }
+    .btn-login:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+    .login-hint { color: var(--dim); font-size: 11px; margin-top: 18px; }
+
+    /* ───────────────── LAYOUT ───────────────── */
+    #adminPanel { display: none; min-height: 100vh; flex-direction: column; }
+
+    /* TOPBAR */
+    .topbar {
+      height: 56px;
+      background: rgba(13,30,48,.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      display: flex; align-items: center; gap: 14px;
+      position: sticky; top: 0; z-index: 100; flex-shrink: 0;
+    }
+
+    .topbar-logo {
+      width: 30px; height: 30px;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+
+    .topbar-title h1  { font-size: 13.5px; font-weight: 700; color: var(--text); }
+    .topbar-title p   { font-size: 11px; color: var(--muted); }
+    .topbar-right     { margin-left: auto; display: flex; gap: 8px; }
+
+    .btn-sm {
+      padding: 6px 14px; border-radius: 8px;
+      border: 1px solid var(--border2);
+      background: transparent; color: var(--muted);
+      font-size: 12px; cursor: pointer; font-family: inherit;
+      transition: all .15s;
+    }
+    .btn-sm:hover { background: var(--s2); color: var(--text); }
+
+    /* BODY AREA */
+    .body-area { display: flex; flex: 1; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 200px; flex-shrink: 0;
+      background: var(--s1);
+      border-right: 1px solid var(--border);
+      padding: 16px 10px;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+
+    .nav-label {
+      font-size: 10px; font-weight: 700; color: var(--dim);
+      text-transform: uppercase; letter-spacing: .08em;
+      padding: 0 8px; margin: 12px 0 4px;
+    }
+    .nav-label:first-child { margin-top: 0; }
+
+    .nav-btn {
+      display: flex; align-items: center; gap: 9px;
+      padding: 9px 11px; border-radius: 8px;
+      border: 1px solid transparent;
+      background: transparent; color: var(--muted);
+      font-size: 13.5px; font-weight: 500;
+      cursor: pointer; font-family: inherit;
+      width: 100%; text-align: left;
+      transition: all .15s;
+    }
+    .nav-btn:hover  { background: var(--s2); color: var(--text); border-color: var(--border); }
+    .nav-btn.active { background: var(--cyan-dim); border-color: var(--cyan-b); color: var(--cyan); }
+
+    .nav-count {
+      margin-left: auto; font-size: 10px; font-weight: 700;
+      background: var(--s3); color: var(--muted);
+      padding: 1px 6px; border-radius: 10px;
+    }
+    .nav-btn.active .nav-count { background: rgba(56,189,248,.2); color: var(--cyan); }
+
+    /* MAIN */
+    .main { flex: 1; padding: 28px 32px; overflow-y: auto; }
+
+    .section { display: none; animation: fadeUp .18s ease; }
     .section.active { display: block; }
-    .ia-card { background: #0d2840; border: 1px solid rgba(83,211,255,0.15); border-radius: 14px; padding: 20px; margin-bottom: 12px; }
-    .ia-entry { display: flex; gap: 12px; align-items: flex-start; }
-    .cat-badge { padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 700; background: rgba(45,212,191,0.1); color: rgba(45,212,191,0.9); border: 1px solid rgba(45,212,191,0.2); flex-shrink: 0; margin-top: 3px; }
-    .ia-q { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
-    .ia-r { color: #7f95aa; font-size: 13px; line-height: 1.5; }
-    .del-btn { background: transparent; border: 1px solid rgba(248,113,113,0.3); color: #f87171; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; flex-shrink: 0; }
-    .form-row { display: grid; grid-template-columns: 1fr 2fr 2fr; gap: 12px; align-items: end; margin-bottom: 14px; }
-    label { font-size: 11px; color: #7f95aa; display: block; margin-bottom: 5px; }
-    select { width: 100%; padding: 11px 14px; background: rgba(11,60,96,0.6); border: 1px solid rgba(83,211,255,0.2); border-radius: 10px; color: #f4f7fb; font-size: 13px; }
-    .msg { padding: 10px 16px; border-radius: 10px; margin-bottom: 18px; font-size: 13px; display: none; }
-    .msg.ok { background: rgba(83,211,255,0.1); border: 1px solid rgba(83,211,255,0.3); color: #53d3ff; }
-    .msg.err { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: #f87171; }
-    .sec-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    h3 { font-size: 20px; }
-    .logout-btn { padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(83,211,255,0.25); background: transparent; color: #7f95aa; cursor: pointer; font-size: 12px; }
-    .search-inp { padding: 9px 14px; background: rgba(11,60,96,0.6); border: 1px solid rgba(83,211,255,0.2); border-radius: 10px; color: #f4f7fb; font-size: 13px; width: 320px; max-width: 100%; margin-bottom: 16px; }
-    textarea { width: 100%; padding: 11px 14px; background: rgba(11,60,96,0.6); border: 1px solid rgba(83,211,255,0.2); border-radius: 10px; color: #f4f7fb; font-size: 13px; resize: vertical; }
-    .ctx-area { margin-bottom: 16px; }
-    .empty { color: #7f95aa; padding: 20px 0; }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+    .page-hdr { margin-bottom: 24px; }
+    .page-hdr h2 { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -.02em; margin-bottom: 3px; }
+    .page-hdr p  { font-size: 13px; color: var(--muted); }
+
+    /* MSG */
+    .msg {
+      display: none; align-items: center; gap: 8px;
+      padding: 10px 15px; border-radius: 9px; margin-bottom: 18px; font-size: 13px;
+    }
+    .msg.ok  { display:flex; background:rgba(52,211,153,.1); border:1px solid rgba(52,211,153,.25); color:#6ee7b7; }
+    .msg.err { display:flex; background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.25); color:var(--red); }
+
+    /* CARD */
+    .card {
+      background: var(--s1);
+      border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px; margin-bottom: 14px;
+    }
+    .card:hover { border-color: var(--border2); }
+
+    /* FORM */
+    .form-row3 { display: grid; grid-template-columns: 1fr 2fr 2fr; gap: 12px; margin-bottom: 14px; }
+    .fg { margin-bottom: 12px; }
+
+    label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 9px 12px;
+      background: var(--s2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text); font-size: 14px; font-family: inherit;
+      outline: none; transition: all .2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--cyan);
+      background: var(--s3);
+      box-shadow: 0 0 0 3px rgba(56,189,248,.07);
+    }
+    input::placeholder, textarea::placeholder { color: var(--dim); }
+    textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+    select option { background: var(--s1); }
+
+    /* BUTTONS */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; border-radius: 8px;
+      background: linear-gradient(135deg, #38bdf8, #0284c7);
+      color: #fff; border: none;
+      font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;
+      transition: filter .15s, transform .15s;
+    }
+    .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(56,189,248,.25); }
+
+    .btn-danger {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 5px 10px; border-radius: 7px;
+      background: transparent; color: var(--red);
+      border: 1px solid rgba(248,113,113,.2);
+      font-size: 12px; cursor: pointer; font-family: inherit;
+      transition: all .15s;
+    }
+    .btn-danger:hover { background: rgba(248,113,113,.1); border-color: rgba(248,113,113,.4); }
+
+    /* SECTION TOP */
+    .sec-top {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px;
+    }
+    .sec-top h3 {
+      font-size: 14px; font-weight: 700; color: var(--text);
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .count-pill {
+      background: var(--s3); color: var(--muted);
+      font-size: 11px; font-weight: 700;
+      padding: 2px 7px; border-radius: 10px;
+    }
+
+    /* SEARCH */
+    .search-wrap { position: relative; margin-bottom: 14px; }
+    .search-wrap::before { content: '🔍'; position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 12px; pointer-events: none; }
+    .search-wrap input { padding-left: 30px; }
+
+    /* IA ITEMS */
+    .ia-item {
+      background: var(--s2);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 13px 15px; margin-bottom: 7px;
+      display: flex; gap: 12px; align-items: flex-start;
+      transition: border-color .15s;
+      animation: fadeUp .18s ease;
+    }
+    .ia-item:hover { border-color: var(--border2); }
+
+    .ia-q { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .ia-r { font-size: 13px; color: var(--muted); line-height: 1.45; }
+
+    /* CATEGORY BADGES */
+    .badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 20px; text-transform: uppercase; letter-spacing: .04em; flex-shrink: 0; margin-top: 2px; }
+
+    /* RESERVA ITEMS */
+    .res-item {
+      background: var(--s2);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px;
+      margin-bottom: 8px;
+      display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+      transition: border-color .15s;
+    }
+    .res-item:hover { border-color: var(--border2); }
+
+    .res-code { font-size: 13px; font-weight: 700; color: var(--cyan); }
+    .res-name { font-size: 15px; font-weight: 600; color: var(--text); margin-top: 4px; }
+    .res-meta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; }
+    .res-chip { font-size: 12px; color: var(--muted); }
+
+    /* ESTADO BADGE */
+    .e-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-left: 8px; }
+
+    /* EMPTY STATE */
+    .empty { text-align: center; padding: 40px 24px; color: var(--muted); }
+    .empty .ei { font-size: 32px; margin-bottom: 10px; opacity: .4; }
+    .empty p { font-size: 13px; }
+
+    /* STATS */
+    .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
+    @media (max-width: 700px) { .stats-row { grid-template-columns: repeat(2,1fr); } }
+
+    .stat-card {
+      background: var(--s1); border: 1px solid var(--border); border-radius: 12px;
+      padding: 16px; text-align: center;
+    }
+    .stat-card .sv { font-size: 26px; font-weight: 700; margin-bottom: 2px; }
+    .stat-card .sl { font-size: 11px; color: var(--muted); }
+
+    /* CTX EDITOR */
+    .ctx-box {
+      background: var(--s2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 18px; margin-bottom: 18px; display: none;
+    }
+
+    /* DESTINO ITEMS */
+    .dest-item {
+      background: var(--s2);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 16px; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 14px;
+      transition: border-color .15s;
+      animation: fadeUp .18s ease;
+    }
+    .dest-item:hover { border-color: var(--border2); }
+    .dest-thumb {
+      width: 54px; height: 54px; border-radius: 10px;
+      object-fit: cover; flex-shrink: 0;
+      border: 1px solid var(--border);
+    }
+    .dest-emoji-box {
+      width: 54px; height: 54px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+      border: 1px solid var(--border);
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(4,10,18,.75); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--s1); border: 1px solid var(--border2);
+      border-radius: 18px; padding: 28px 30px; width: 100%; max-width: 580px;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 0 80px rgba(56,189,248,.08);
+    }
+    .modal-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+    .modal-hdr h3 { font-size: 17px; font-weight: 700; color: var(--text); }
+    .modal-close {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: var(--s3); border: 1px solid var(--border);
+      color: var(--muted); cursor: pointer; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+    }
+    .modal-close:hover { background: rgba(248,113,113,.15); color: var(--red); border-color: rgba(248,113,113,.3); }
+    .form-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .color-row { display: flex; align-items: center; gap: 10px; }
+    .color-row input[type="color"] {
+      width: 40px; height: 36px; padding: 2px; border-radius: 8px; cursor: pointer;
+    }
+    .color-row input[type="text"] { flex: 1; }
+
+    /* PAGE EDITOR OVERLAY */
+    .page-editor {
+      display: none; position: fixed; inset: 0; z-index: 300;
+      background: var(--bg);
+      flex-direction: column;
+    }
+    .page-editor.open { display: flex; }
+
+    .pe-topbar {
+      height: 52px; background: var(--s1); border-bottom: 1px solid var(--border);
+      padding: 0 24px; display: flex; align-items: center; gap: 14px; flex-shrink: 0;
+    }
+    .pe-topbar h2 { font-size: 15px; font-weight: 700; color: var(--text); }
+    .pe-body { display: flex; flex: 1; overflow: hidden; }
+
+    .pe-left {
+      width: 280px; flex-shrink: 0; border-right: 1px solid var(--border);
+      overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .pe-right { flex: 1; overflow-y: auto; padding: 24px 28px; }
+
+    .pe-sec-label {
+      font-size: 10px; font-weight: 700; color: var(--dim);
+      text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px;
+    }
+
+    .sec-chip {
+      background: var(--s2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 9px 12px; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 8px; cursor: pointer;
+      transition: border-color .15s;
+    }
+    .sec-chip:hover { border-color: var(--border2); }
+    .sec-chip.active { border-color: var(--cyan-b); background: var(--cyan-dim); }
+    .sec-chip-type { font-size: 12px; font-weight: 700; color: var(--muted); flex: 1; }
+    .sec-chip.active .sec-chip-type { color: var(--cyan); }
+
+    .add-sec-btn {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 9px; border-radius: 8px;
+      border: 1px dashed var(--border2); background: transparent;
+      color: var(--muted); font-size: 12px; cursor: pointer; font-family: inherit;
+      transition: all .15s; margin-top: 4px;
+    }
+    .add-sec-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    .sec-editor { animation: fadeUp .15s ease; }
+
+    .tipo-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 6px;
+    }
+    .tipo-opt {
+      padding: 10px 8px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--s2); cursor: pointer; text-align: center; transition: all .15s;
+    }
+    .tipo-opt:hover { border-color: var(--cyan-b); background: var(--cyan-dim); }
+    .tipo-opt .to-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+    .tipo-opt .to-label { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+    /* CARDS EDITOR */
+    .card-row {
+      background: var(--s3); border: 1px solid var(--border); border-radius: 8px;
+      padding: 12px; margin-bottom: 8px; position: relative;
+    }
+    .card-row-del {
+      position: absolute; top: 8px; right: 8px;
+      background: transparent; border: none; color: var(--red);
+      font-size: 13px; cursor: pointer; padding: 2px 6px;
+    }
+
+    /* PAGINAS LIST */
+    .pag-item {
+      background: var(--s2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 16px; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 12px; transition: border-color .15s;
+      animation: fadeUp .18s ease;
+    }
+    .pag-item:hover { border-color: var(--border2); }
   </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div class="page" id="loginPage">
-  <div class="card">
-    <div style="font-size:48px;margin-bottom:14px">🔐</div>
+<!-- ─── LOGIN ─── -->
+<div id="loginPage">
+  <div class="login-card">
+    <div class="login-icon">🔐</div>
     <h2>Panel Admin</h2>
-    <p class="sub">Capachica Turismo</p>
-    <div class="err" id="loginErr"></div>
-    <input type="email" id="emailInp" placeholder="Email" />
-    <input type="password" id="passInp" placeholder="Contraseña" />
-    <button class="btn" id="loginBtn">Ingresar</button>
-    <p class="hint">admin@capachica.pe · admin123</p>
+    <p>Capachica Turismo</p>
+    <div id="loginErr"></div>
+    <input class="inp" type="email"    id="emailInp" placeholder="Email" />
+    <input class="inp" type="password" id="passInp"  placeholder="Contraseña" />
+    <button class="btn-login" id="loginBtn">Ingresar</button>
+    <p class="login-hint">admin@capachica.pe · admin123</p>
   </div>
 </div>
 
-<!-- PANEL -->
-<div class="panel" id="adminPanel">
-  <div class="header">
-    <div>
-      <h2>⚙️ Panel de Administración</h2>
-      <p style="color:#7f95aa;font-size:12px;margin-top:4px">Capachica Turismo</p>
+<!-- ─── PANEL ─── -->
+<div id="adminPanel">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-logo">⚙️</div>
+    <div class="topbar-title">
+      <h1>Panel Admin</h1>
+      <p>Capachica Turismo</p>
     </div>
-    <button class="logout-btn" id="logoutBtn">Salir</button>
-  </div>
+    <div class="topbar-right">
+      <button class="btn-sm" id="refreshBtn">↺ Actualizar</button>
+      <button class="btn-sm" id="logoutBtn">Salir</button>
+    </div>
+  </header>
 
-  <div id="globalMsg" class="msg"></div>
+  <div class="body-area">
 
-  <div class="tabs">
-    <button class="tab active" data-tab="ia">🤖 Conocimiento IA</button>
-    <button class="tab" data-tab="reservas">📋 Reservas</button>
-  </div>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="nav-label">IA</div>
+      <button class="nav-btn active" data-section="ia">
+        <span>🤖</span> Conocimiento
+        <span class="nav-count" id="nav-ia-count">—</span>
+      </button>
+      <button class="nav-btn" data-section="contexto">
+        <span>⚙️</span> Personalidad
+      </button>
+      <button class="nav-btn" data-section="widget">
+        <span>💬</span> Widget Chat
+      </button>
+      <div class="nav-label">Gestión</div>
+      <button class="nav-btn" data-section="paginas">
+        <span>📄</span> Páginas
+        <span class="nav-count" id="nav-pag-count">—</span>
+      </button>
+      <button class="nav-btn" data-section="destinos">
+        <span>📍</span> Destinos
+        <span class="nav-count" id="nav-dest-count">—</span>
+      </button>
+      <button class="nav-btn" data-section="reservas">
+        <span>📋</span> Reservas
+        <span class="nav-count" id="nav-res-count">—</span>
+      </button>
+    </aside>
 
-  <!-- IA TAB -->
-  <div class="section active" id="tab-ia">
-    <div class="ia-card" style="margin-bottom:20px">
-      <h3 style="margin-bottom:14px;font-size:16px">+ Agregar conocimiento a Inti</h3>
-      <div class="form-row">
-        <div>
-          <label>Categoría</label>
-          <select id="iaCat">
-            <option value="general">general</option>
-            <option value="precios">precios</option>
-            <option value="actividades">actividades</option>
-            <option value="alojamiento">alojamiento</option>
-            <option value="transporte">transporte</option>
-            <option value="gastronomia">gastronomía</option>
-            <option value="cultura">cultura</option>
-            <option value="clima">clima</option>
-            <option value="reservas">reservas</option>
-          </select>
+    <!-- MAIN -->
+    <main class="main">
+      <div id="globalMsg" class="msg"></div>
+
+      <!-- ─── IA SECTION ─── -->
+      <div class="section active" id="sec-ia">
+        <div class="page-hdr">
+          <h2>Base de Conocimiento</h2>
+          <p>Entradas que usa Inti para responder turistas</p>
         </div>
-        <div>
-          <label>Pregunta *</label>
-          <input type="text" id="iaQ" placeholder="¿Cuánto cuesta el kayak?" />
+
+        <!-- ADD FORM -->
+        <div class="card">
+          <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;">Agregar entrada</div>
+          <div class="form-row3">
+            <div>
+              <label>Categoría</label>
+              <select id="iaCat">
+                <option value="general">General</option>
+                <option value="precios">Precios</option>
+                <option value="actividades">Actividades</option>
+                <option value="alojamiento">Alojamiento</option>
+                <option value="transporte">Transporte</option>
+                <option value="gastronomia">Gastronomía</option>
+                <option value="cultura">Cultura</option>
+                <option value="clima">Clima</option>
+                <option value="reservas">Reservas</option>
+              </select>
+            </div>
+            <div>
+              <label>Pregunta *</label>
+              <input type="text" id="iaQ" placeholder="¿Cuánto cuesta el kayak?" />
+            </div>
+            <div>
+              <label>Respuesta *</label>
+              <input type="text" id="iaR" placeholder="El kayak cuesta S/. 30..." />
+            </div>
+          </div>
+          <button class="btn-primary" id="addIaBtn">✦ Agregar a Inti</button>
         </div>
-        <div>
-          <label>Respuesta *</label>
-          <input type="text" id="iaR" placeholder="El kayak cuesta S/. 30..." />
+
+        <!-- LIST -->
+        <div class="sec-top">
+          <h3>Entradas <span class="count-pill" id="ia-count">0</span></h3>
+        </div>
+        <div class="search-wrap">
+          <input id="iaSearch" placeholder="Buscar por pregunta, categoría o respuesta..." />
+        </div>
+        <div id="iaList"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
+      </div>
+
+      <!-- ─── CONTEXTO SECTION ─── -->
+      <div class="section" id="sec-contexto">
+        <div class="page-hdr">
+          <h2>Personalidad de Inti</h2>
+          <p>Instrucciones globales que la IA siempre sigue</p>
+        </div>
+        <div class="card">
+          <div class="fg">
+            <label>System Prompt (Contexto Base)</label>
+            <textarea id="ctxText" rows="12" placeholder="Eres Inti, un asistente amable especializado en turismo de Capachica..."></textarea>
+          </div>
+          <button class="btn-primary" id="saveCtxBtn">Guardar Configuración</button>
         </div>
       </div>
-      <button class="btn" style="width:auto;padding:10px 24px" id="addIaBtn">+ Agregar a Inti</button>
-    </div>
 
-    <div style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-      <h3>🧠 Base de conocimiento</h3>
-      <button class="tab" id="ctxToggle">✏️ Editar contexto base</button>
-    </div>
+      <!-- ─── PÁGINAS SECTION ─── -->
+      <div class="section" id="sec-paginas">
+        <div class="page-hdr">
+          <h2>Páginas del Sitio</h2>
+          <p>Crea y gestiona páginas personalizadas accesibles en <code style="font-size:11px;color:var(--cyan)">/pagina/[slug]</code></p>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <span class="count-pill" id="pag-count">0 páginas</span>
+          <button class="btn-primary" onclick="openPageEditor(null)">＋ Nueva página</button>
+        </div>
+        <div id="paginasList"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
+      </div>
 
-    <div id="ctxEditor" style="display:none" class="ia-card ctx-area">
-      <label>Contexto base del sistema (instrucciones globales para Inti)</label>
-      <textarea id="ctxText" rows="7"></textarea>
-      <div style="display:flex;gap:10px;margin-top:12px">
-        <button class="btn" style="width:auto;padding:9px 20px" id="saveCtxBtn">💾 Guardar contexto</button>
-        <button class="logout-btn" id="cancelCtxBtn">Cancelar</button>
+      <!-- ─── DESTINOS SECTION ─── -->
+      <div class="section" id="sec-destinos">
+        <div class="page-hdr">
+          <h2>Destinos Turísticos</h2>
+          <p>Gestiona los destinos que se muestran en la página principal</p>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <span class="count-pill" id="dest-count">0 destinos</span>
+          <button class="btn-primary" onclick="openDestinoModal(null)">＋ Nuevo destino</button>
+        </div>
+        <div id="destinosList"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
+      </div>
+
+      <!-- ─── RESERVAS SECTION ─── -->
+      <div class="section" id="sec-reservas">
+        <div class="page-hdr">
+          <h2>Reservas</h2>
+          <p>Solicitudes recibidas · se actualiza cada 30s</p>
+        </div>
+
+        <div class="stats-row" id="statsRow">
+          <div class="stat-card"><div class="sv" style="color:var(--cyan)"  id="st-total">0</div><div class="sl">Total</div></div>
+          <div class="stat-card"><div class="sv" style="color:var(--amber)" id="st-pend">0</div><div class="sl">Pendientes</div></div>
+          <div class="stat-card"><div class="sv" style="color:var(--green)" id="st-conf">0</div><div class="sl">Confirmadas</div></div>
+          <div class="stat-card"><div class="sv" style="color:var(--muted)" id="st-comp">0</div><div class="sl">Completadas</div></div>
+        </div>
+
+        <div class="sec-top">
+          <h3>Listado <span class="count-pill" id="res-count">0</span></h3>
+        </div>
+        <div id="reservasList"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
+      </div>
+
+      <!-- ─── WIDGET SECTION ─── -->
+      <div class="section" id="sec-widget">
+        <div class="page-hdr">
+          <h2>Widget de Chat</h2>
+          <p>Personaliza el chatbot que ven los visitantes</p>
+        </div>
+        <div class="card">
+          <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:18px">Identidad</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div class="fg" style="margin:0">
+              <label>Nombre del bot</label>
+              <input type="text" id="w-name" placeholder="Inti · Asistente IA" />
+            </div>
+            <div class="fg" style="margin:0">
+              <label>Subtítulo</label>
+              <input type="text" id="w-subtitle" placeholder="Capachica Turismo" />
+            </div>
+          </div>
+          <div class="fg">
+            <label>Placeholder del input</label>
+            <input type="text" id="w-placeholder" placeholder="Escribe tu pregunta..." />
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:18px">Mensaje de bienvenida</div>
+          <div class="fg">
+            <label>Primer mensaje que ve el usuario</label>
+            <textarea id="w-welcome" rows="3" placeholder="¡Hola! Soy Inti, tu guía virtual de Capachica 🌊&#10;¿En qué te puedo ayudar?"></textarea>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:18px">Preguntas rápidas</div>
+          <div class="fg">
+            <label>Una por línea (máx. 4-5 recomendado)</label>
+            <textarea id="w-quick" rows="5" placeholder="¿Qué es Capachica?&#10;¿Cómo llegar?&#10;Quiero reservar"></textarea>
+          </div>
+          <p style="font-size:11px;color:var(--dim);margin-top:-4px">Aparecen como botones cuando el chat se abre por primera vez.</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="btn-primary" id="saveWidgetBtn">Guardar Widget</button>
+          <button class="btn-sm" id="previewWidgetBtn" style="padding:9px 18px">Vista previa →</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ─── PAGE EDITOR OVERLAY ─── -->
+<div class="page-editor" id="pageEditor">
+  <div class="pe-topbar">
+    <button class="modal-close" onclick="closePageEditor()">✕</button>
+    <h2 id="pe-title">Nueva página</h2>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <button class="btn-sm" id="pe-preview-btn" style="padding:7px 14px" onclick="previewPage()">👁 Vista previa</button>
+      <button class="btn-primary" id="pe-save-btn" onclick="savePageEditor()">Guardar página</button>
+    </div>
+  </div>
+  <div class="pe-body">
+
+    <!-- LEFT: metadata + sections list -->
+    <div class="pe-left">
+      <div>
+        <div class="pe-sec-label">Metadatos</div>
+        <div class="fg"><label>Título de la página *</label><input type="text" id="pe-titulo" placeholder="Tours y Paquetes" /></div>
+        <div class="fg"><label>Slug (URL) *</label><input type="text" id="pe-slug" placeholder="tours" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')" /></div>
+        <div class="fg"><label>Descripción SEO</label><input type="text" id="pe-desc" placeholder="Descubre los mejores tours..." /></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+          <label style="margin:0;font-size:12px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px">
+            <input type="checkbox" id="pe-publicado" checked style="width:auto;accent-color:var(--cyan)" />
+            Publicada
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <div class="pe-sec-label">Secciones</div>
+        <div id="pe-sections-list"></div>
+        <button class="add-sec-btn" onclick="addSection()">＋ Agregar sección</button>
       </div>
     </div>
 
-    <input class="search-inp" id="iaSearch" placeholder="🔍 Buscar..." />
-    <div id="iaList"><p class="empty">Cargando...</p></div>
-  </div>
+    <!-- RIGHT: section content editor -->
+    <div class="pe-right">
+      <div id="pe-section-editor">
+        <div class="empty" style="margin-top:3rem"><div class="ei">👈</div><p>Selecciona o agrega una sección para editarla</p></div>
+      </div>
+    </div>
 
-  <!-- RESERVAS TAB -->
-  <div class="section" id="tab-reservas">
-    <div id="reservasList"><p class="empty">Cargando...</p></div>
+  </div>
+</div>
+
+<!-- TYPE PICKER MODAL (inside page editor) -->
+<div class="modal-overlay" id="typePicker" style="z-index:400">
+  <div class="modal-box" style="max-width:440px">
+    <div class="modal-hdr">
+      <h3>Tipo de sección</h3>
+      <button class="modal-close" onclick="$('typePicker').classList.remove('open')">✕</button>
+    </div>
+    <div class="tipo-grid">
+      <div class="tipo-opt" onclick="addSectionOfType('hero')"><span class="to-icon">🦅</span><span class="to-label">Hero / Encabezado</span></div>
+      <div class="tipo-opt" onclick="addSectionOfType('texto')"><span class="to-icon">📝</span><span class="to-label">Bloque de texto</span></div>
+      <div class="tipo-opt" onclick="addSectionOfType('cards')"><span class="to-icon">🃏</span><span class="to-label">Tarjetas / Cards</span></div>
+      <div class="tipo-opt" onclick="addSectionOfType('galeria')"><span class="to-icon">🖼️</span><span class="to-label">Galería de fotos</span></div>
+      <div class="tipo-opt" onclick="addSectionOfType('contacto')"><span class="to-icon">📬</span><span class="to-label">Llamada a acción</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── DESTINO MODAL ─── -->
+<div class="modal-overlay" id="destinoModal">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <h3 id="modalTitle">Nuevo destino</h3>
+      <button class="modal-close" onclick="closeDestinoModal()">✕</button>
+    </div>
+    <input type="hidden" id="d-id" value="" />
+
+    <div class="form-row2">
+      <div class="fg" style="margin:0">
+        <label>Nombre *</label>
+        <input type="text" id="d-nombre" placeholder="Llachón" />
+      </div>
+      <div class="fg" style="margin:0">
+        <label>Comunidad / Ubicación *</label>
+        <input type="text" id="d-comunidad" placeholder="Comunidad de Llachón" />
+      </div>
+    </div>
+
+    <div class="fg">
+      <label>Descripción *</label>
+      <textarea id="d-desc" rows="3" placeholder="Breve descripción del destino..."></textarea>
+    </div>
+
+    <div class="fg">
+      <label>URL de foto (deja vacío para usar emoji)</label>
+      <input type="url" id="d-imagen" placeholder="https://..." />
+    </div>
+
+    <div class="form-row2" style="margin-bottom:12px">
+      <div class="fg" style="margin:0">
+        <label>Emoji (si no hay foto)</label>
+        <input type="text" id="d-emoji" placeholder="🏖️" maxlength="4" />
+      </div>
+      <div class="fg" style="margin:0">
+        <label>Texto destacado (badge)</label>
+        <input type="text" id="d-highlight" placeholder="Mejor destino vivencial" />
+      </div>
+    </div>
+
+    <div class="fg">
+      <label>Color del badge (hex)</label>
+      <div class="color-row">
+        <input type="color" id="d-color-picker" value="#0ea5e9" oninput="document.getElementById('d-color').value=this.value" />
+        <input type="text"  id="d-color" value="#0ea5e9" placeholder="#0ea5e9" oninput="document.getElementById('d-color-picker').value=this.value.match(/^#[0-9a-fA-F]{6}$/) ? this.value : this.value" />
+      </div>
+    </div>
+
+    <div class="fg">
+      <label>Etiquetas (separadas por coma)</label>
+      <input type="text" id="d-tags" placeholder="Mirador, Amanecer, Trekking" />
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:6px">
+      <button class="btn-primary" onclick="saveDestinoModal()" style="flex:1">Guardar destino</button>
+      <button class="btn-sm" onclick="closeDestinoModal()" style="padding:9px 18px">Cancelar</button>
+    </div>
   </div>
 </div>
 
 <script define:vars={{ API_URL, IA_URL }}>
   let TOKEN = localStorage.getItem('admin_token') || '';
   let iaData = { conocimiento: [], contexto_base: '' };
+  let resData = [];
 
   const $ = id => document.getElementById(id);
-  const show = (msg, type='ok') => {
-    const el = $('globalMsg');
-    el.textContent = msg;
-    el.className = 'msg ' + type;
-    el.style.display = 'block';
-    setTimeout(() => { el.style.display = 'none'; }, 4000);
+
+  /* ─── CAT COLORS ─── */
+  const CAT = {
+    general:      'rgba(100,116,139,.2);color:#94a3b8;border:1px solid rgba(100,116,139,.3)',
+    alojamiento:  'rgba(139,92,246,.15);color:#a78bfa;border:1px solid rgba(139,92,246,.3)',
+    actividades:  'rgba(56,189,248,.15);color:#7dd3fc;border:1px solid rgba(56,189,248,.3)',
+    gastronomia:  'rgba(249,115,22,.15);color:#fdba74;border:1px solid rgba(249,115,22,.3)',
+    transporte:   'rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(59,130,246,.3)',
+    precios:      'rgba(52,211,153,.15);color:#6ee7b7;border:1px solid rgba(52,211,153,.3)',
+    cultura:      'rgba(217,70,239,.15);color:#e879f9;border:1px solid rgba(217,70,239,.3)',
+    clima:        'rgba(14,165,233,.15);color:#67e8f9;border:1px solid rgba(14,165,233,.3)',
+    reservas:     'rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3)',
+    otro:         'rgba(100,116,139,.12);color:#94a3b8;border:1px solid rgba(100,116,139,.2)',
   };
 
+  const ESTADO = {
+    pendiente:  'rgba(251,191,36,.15);color:#fde68a;border:1px solid rgba(251,191,36,.3)',
+    confirmada: 'rgba(52,211,153,.15);color:#6ee7b7;border:1px solid rgba(52,211,153,.3)',
+    cancelada:  'rgba(248,113,113,.15);color:#fca5a5;border:1px solid rgba(248,113,113,.3)',
+    completada: 'rgba(56,189,248,.15);color:#7dd3fc;border:1px solid rgba(56,189,248,.3)',
+  };
+
+  function catBadge(cat) {
+    const s = CAT[cat] || CAT.otro;
+    return `<span class="badge" style="background:${s}">${cat}</span>`;
+  }
+
+  function estadoBadge(e) {
+    const s = ESTADO[e] || ESTADO.pendiente;
+    return `<span class="e-badge" style="background:${s}">${e}</span>`;
+  }
+
+  /* ─── MSG ─── */
+  function showMsg(text, type = 'ok') {
+    const el = $('globalMsg');
+    el.className = 'msg ' + type;
+    el.innerHTML = (type === 'ok' ? '✓ ' : '✗ ') + text;
+    el.style.display = 'flex';
+    setTimeout(() => el.style.display = 'none', 4000);
+  }
+
+  /* ─── SHOW PANEL ─── */
   function showPanel() {
-    $('loginPage').style.display = 'none';
-    $('adminPanel').style.display = 'block';
+    $('loginPage').style.display  = 'none';
+    $('adminPanel').style.display = 'flex';
     loadIA();
   }
 
   if (TOKEN) showPanel();
 
-  // LOGIN
+  /* ─── LOGIN ─── */
   $('loginBtn').onclick = async () => {
     const email = $('emailInp').value;
-    const pass = $('passInp').value;
-    $('loginErr').textContent = '';
+    const pass  = $('passInp').value;
+    $('loginErr').style.display = 'none';
     try {
-      const res = await fetch(`${API_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res  = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password: pass })
       });
       const data = await res.json();
@@ -183,51 +874,74 @@ const IA_URL  = "http://localhost:5000";
   };
   $('passInp').onkeydown = e => { if (e.key === 'Enter') $('loginBtn').click(); };
 
-  // LOGOUT
+  /* ─── LOGOUT ─── */
   $('logoutBtn').onclick = () => {
     TOKEN = '';
     localStorage.removeItem('admin_token');
     $('adminPanel').style.display = 'none';
-    $('loginPage').style.display = 'flex';
+    $('loginPage').style.display  = 'flex';
   };
 
-  // TABS
-  document.querySelectorAll('.tab[data-tab]').forEach(btn => {
+  /* ─── NAV ─── */
+  document.querySelectorAll('.nav-btn[data-section]').forEach(btn => {
     btn.onclick = () => {
-      document.querySelectorAll('.tab[data-tab]').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
       btn.classList.add('active');
-      $('tab-' + btn.dataset.tab).classList.add('active');
-      if (btn.dataset.tab === 'reservas') loadReservas();
+      $('sec-' + btn.dataset.section).classList.add('active');
+      if (btn.dataset.section === 'reservas') loadReservas();
+      if (btn.dataset.section === 'contexto') loadCtx();
+      if (btn.dataset.section === 'widget')   loadWidget();
+      if (btn.dataset.section === 'destinos') loadDestinos();
+      if (btn.dataset.section === 'paginas')  loadPaginas();
     };
   });
 
-  // IA
+  $('refreshBtn').onclick = () => {
+    const active = document.querySelector('.nav-btn.active');
+    if (!active) return;
+    const sec = active.dataset.section;
+    if (sec === 'ia')       loadIA();
+    if (sec === 'reservas') loadReservas();
+    if (sec === 'contexto') loadCtx();
+    if (sec === 'widget')   loadWidget();
+    if (sec === 'destinos') loadDestinos();
+    if (sec === 'paginas')  loadPaginas();
+  };
+
+  /* ─── IA ─── */
   async function loadIA() {
     try {
-      const res = await fetch(`${IA_URL}/api/admin/conocimiento`);
-      iaData = await res.json();
+      const res  = await fetch(`${IA_URL}/api/admin/conocimiento`);
+      iaData     = await res.json();
+      const n    = (iaData.conocimiento || []).length;
+      $('ia-count').textContent      = n;
+      $('nav-ia-count').textContent  = n;
       renderIA();
-      $('ctxText').value = iaData.contexto_base || '';
-    } catch { show('Error al cargar IA', 'err'); }
+    } catch { showMsg('Error al cargar conocimiento IA', 'err'); }
   }
 
   function renderIA() {
-    const q = $('iaSearch').value.toLowerCase();
+    const q    = ($('iaSearch').value || '').toLowerCase();
     const list = (iaData.conocimiento || []).filter(k =>
-      !q || k.pregunta.toLowerCase().includes(q) || k.respuesta.toLowerCase().includes(q) || k.categoria.toLowerCase().includes(q)
+      !q || k.pregunta.toLowerCase().includes(q) ||
+            k.respuesta.toLowerCase().includes(q) ||
+            k.categoria.toLowerCase().includes(q)
     );
-    if (!list.length) { $('iaList').innerHTML = '<p class="empty">No hay entradas.</p>'; return; }
+    if (!list.length) {
+      $('iaList').innerHTML = '<div class="empty"><div class="ei">🧠</div><p>No hay entradas aún.</p></div>';
+      return;
+    }
     $('iaList').innerHTML = list.map(k => `
-      <div class="ia-card">
-        <div class="ia-entry">
-          <span class="cat-badge">${k.categoria}</span>
-          <div style="flex:1">
-            <div class="ia-q">${k.pregunta}</div>
-            <div class="ia-r">${k.respuesta}</div>
+      <div class="ia-item" id="iai-${k.id}">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap">
+            ${catBadge(k.categoria)}
+            <span style="font-size:14px;font-weight:600;color:#e6edf5">${esc(k.pregunta)}</span>
           </div>
-          <button class="del-btn" onclick="deleteIA(${k.id})">🗑️</button>
+          <div style="font-size:13px;color:#7f95aa;line-height:1.45">${esc(k.respuesta)}</div>
         </div>
+        <button onclick="deleteIA(${k.id})" style="flex-shrink:0;margin-top:2px;padding:5px 10px;border-radius:7px;border:1px solid rgba(248,113,113,.22);background:transparent;color:#f87171;font-size:12px;cursor:pointer;font-family:inherit;transition:background .15s" onmouseover="this.style.background='rgba(248,113,113,.1)'" onmouseout="this.style.background='transparent'">✕</button>
       </div>
     `).join('');
   }
@@ -237,83 +951,744 @@ const IA_URL  = "http://localhost:5000";
   $('addIaBtn').onclick = async () => {
     const q = $('iaQ').value.trim();
     const r = $('iaR').value.trim();
-    if (!q || !r) { show('Pregunta y Respuesta son obligatorias', 'err'); return; }
+    if (!q || !r) { showMsg('Pregunta y Respuesta son obligatorias', 'err'); return; }
     try {
       await fetch(`${IA_URL}/api/admin/conocimiento`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ categoria: $('iaCat').value, pregunta: q, respuesta: r })
       });
       $('iaQ').value = ''; $('iaR').value = '';
-      show('✅ Conocimiento agregado a Inti');
+      showMsg('Conocimiento agregado a Inti');
       loadIA();
-    } catch { show('Error al agregar', 'err'); }
+    } catch { showMsg('Error al agregar', 'err'); }
   };
 
   window.deleteIA = async (id) => {
     if (!confirm('¿Eliminar este conocimiento?')) return;
-    await fetch(`${IA_URL}/api/admin/conocimiento/${id}`, { method: 'DELETE' });
-    show('✅ Eliminado');
-    loadIA();
+    try {
+      await fetch(`${IA_URL}/api/admin/conocimiento/${id}`, { method: 'DELETE' });
+      document.getElementById(`iai-${id}`)?.remove();
+      const n = parseInt($('ia-count').textContent) - 1;
+      $('ia-count').textContent     = n;
+      $('nav-ia-count').textContent = n;
+      showMsg('Entrada eliminada');
+    } catch { showMsg('Error al eliminar', 'err'); }
   };
 
-  $('ctxToggle').onclick = () => {
-    const ed = $('ctxEditor');
-    ed.style.display = ed.style.display === 'none' ? 'block' : 'none';
-  };
+  /* ─── CONTEXTO ─── */
+  async function loadCtx() {
+    try {
+      const res  = await fetch(`${IA_URL}/api/admin/conocimiento`);
+      const data = await res.json();
+      $('ctxText').value = data.contexto_base || '';
+    } catch {}
+  }
 
   $('saveCtxBtn').onclick = async () => {
     try {
       await fetch(`${IA_URL}/api/admin/contexto`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contexto_base: $('ctxText').value })
       });
-      $('ctxEditor').style.display = 'none';
-      show('✅ Contexto actualizado');
-      loadIA();
-    } catch { show('Error al guardar', 'err'); }
+      showMsg('Configuración guardada');
+    } catch { showMsg('Error al guardar', 'err'); }
   };
-  $('cancelCtxBtn').onclick = () => { $('ctxEditor').style.display = 'none'; };
 
-  // RESERVAS
+  /* ─── WIDGET ─── */
+  const WIDGET_DEFAULTS = {
+    bot_name:     'Inti · Asistente IA',
+    bot_subtitle: 'Capachica Turismo',
+    welcome_msg:  '¡Hola! Soy Inti, tu guía virtual de Capachica 🌊\n¿En qué te puedo ayudar?',
+    quick_prompts: ['¿Qué es Capachica?', '¿Cómo llegar?', 'Quiero reservar'],
+    placeholder:  'Escribe tu pregunta...',
+  };
+
+  function fillWidgetForm(data) {
+    $('w-name').value        = data.bot_name      || WIDGET_DEFAULTS.bot_name;
+    $('w-subtitle').value    = data.bot_subtitle   || WIDGET_DEFAULTS.bot_subtitle;
+    $('w-welcome').value     = data.welcome_msg    || WIDGET_DEFAULTS.welcome_msg;
+    $('w-placeholder').value = data.placeholder    || WIDGET_DEFAULTS.placeholder;
+    const qp = Array.isArray(data.quick_prompts) ? data.quick_prompts : WIDGET_DEFAULTS.quick_prompts;
+    $('w-quick').value       = qp.join('\n');
+  }
+
+  async function loadWidget() {
+    try {
+      const res = await fetch(`${IA_URL}/api/widget/config`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      fillWidgetForm(data);
+    } catch (e) {
+      showMsg(`Error cargando widget: ${e.message} — ¿reiniciaste el backend IA?`, 'err');
+      fillWidgetForm(WIDGET_DEFAULTS);
+    }
+  }
+
+  $('saveWidgetBtn').onclick = async () => {
+    const quick = ($('w-quick').value || '').split('\n').map(s => s.trim()).filter(Boolean);
+    if (!quick.length) { showMsg('Agrega al menos una pregunta rápida', 'err'); return; }
+    try {
+      const res = await fetch(`${IA_URL}/api/admin/widget`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bot_name:      $('w-name').value.trim()        || WIDGET_DEFAULTS.bot_name,
+          bot_subtitle:  $('w-subtitle').value.trim()    || WIDGET_DEFAULTS.bot_subtitle,
+          welcome_msg:   $('w-welcome').value.trim()     || WIDGET_DEFAULTS.welcome_msg,
+          quick_prompts: quick,
+          placeholder:   $('w-placeholder').value.trim() || WIDGET_DEFAULTS.placeholder,
+        })
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      showMsg('Widget guardado ✓ — recarga la página principal para ver cambios');
+    } catch (e) {
+      showMsg(`Error al guardar: ${e.message} — ¿reiniciaste el backend IA?`, 'err');
+    }
+  };
+
+  $('previewWidgetBtn').onclick = () => window.open('/', '_blank');
+
+  /* ─── RESERVAS ─── */
+  let resInterval = null;
+
   async function loadReservas() {
     try {
-      const res = await fetch(`${API_URL}/api/reservas`, {
+      const res  = await fetch(`${API_URL}/api/reservas`, {
         headers: { Authorization: `Bearer ${TOKEN}` }
       });
-      const data = await res.json();
-      if (!Array.isArray(data)) { $('reservasList').innerHTML = '<p class="empty">Sin acceso o sin reservas.</p>'; return; }
-      if (!data.length) { $('reservasList').innerHTML = '<p class="empty">No hay reservas.</p>'; return; }
-      $('reservasList').innerHTML = data.map(r => `
-        <div class="ia-card" style="margin-bottom:12px">
-          <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px">
-            <div>
-              <span style="color:#53d3ff;font-weight:700">${r.codigo || r.id}</span>
-              <span style="padding:2px 10px;border-radius:999px;font-size:11px;background:rgba(251,146,60,0.15);color:#fb923c;margin-left:8px">${r.estado?.toUpperCase()}</span>
-              <div style="font-weight:600;margin-top:6px">${r.nombre_huesped || r.nombre}</div>
-              <div style="color:#7f95aa;font-size:12px;margin-top:4px">📅 ${r.fecha_llegada} · 👥 ${r.num_personas || r.personas} personas</div>
+      if (!res.ok) { $('reservasList').innerHTML = '<div class="empty"><div class="ei">🔒</div><p>Sin acceso o sin reservas.</p></div>'; return; }
+      resData = await res.json();
+      if (!Array.isArray(resData)) resData = [];
+
+      const pend = resData.filter(r => r.estado === 'pendiente').length;
+      const conf = resData.filter(r => r.estado === 'confirmada').length;
+      const comp = resData.filter(r => r.estado === 'completada').length;
+      $('st-total').textContent = resData.length;
+      $('st-pend').textContent  = pend;
+      $('st-conf').textContent  = conf;
+      $('st-comp').textContent  = comp;
+      $('res-count').textContent     = resData.length;
+      $('nav-res-count').textContent = resData.length;
+
+      if (!resData.length) {
+        $('reservasList').innerHTML = '<div class="empty"><div class="ei">📭</div><p>No hay reservas aún.</p></div>';
+        return;
+      }
+
+      $('reservasList').innerHTML = [...resData].reverse().map(r => `
+        <div class="res-item" id="res-${r.id}">
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+              <span class="res-code">${esc(r.codigo || r.id)}</span>
+              ${estadoBadge(r.estado)}
+              <span style="color:var(--dim);font-size:11px;margin-left:4px">${r.created_at ? new Date(r.created_at).toLocaleDateString('es-PE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : ''}</span>
             </div>
-            <select onchange="updateEstado('${r.id}', this.value)" style="height:36px;align-self:center">
-              <option ${r.estado==='pendiente'?'selected':''} value="pendiente">⏳ Pendiente</option>
-              <option ${r.estado==='confirmada'?'selected':''} value="confirmada">✅ Confirmada</option>
-              <option ${r.estado==='cancelada'?'selected':''} value="cancelada">❌ Cancelada</option>
-              <option ${r.estado==='completada'?'selected':''} value="completada">🏁 Completada</option>
+            <div class="res-name">${esc(r.nombre_huesped || r.nombre || '')}</div>
+            <div class="res-meta">
+              ${r.email ? `<span class="res-chip">📧 <a href="mailto:${esc(r.email)}" style="color:var(--cyan);text-decoration:none">${esc(r.email)}</a></span>` : ''}
+              ${r.telefono ? `<span class="res-chip">📞 <a href="https://wa.me/${(r.telefono+'').replace(/\D/g,'')}" target="_blank" style="color:#4ade80;text-decoration:none">WhatsApp</a></span>` : ''}
+              ${r.fecha_llegada ? `<span class="res-chip">📅 ${esc(r.fecha_llegada)}${r.fecha_salida ? ' → '+esc(r.fecha_salida) : ''}</span>` : ''}
+              ${r.num_personas || r.personas ? `<span class="res-chip">👥 ${r.num_personas || r.personas} persona(s)</span>` : ''}
+              ${r.familia_nombre ? `<span class="res-chip">🏠 ${esc(r.familia_nombre)}</span>` : ''}
+              ${r.precio_total ? `<span class="res-chip" style="color:var(--cyan);font-weight:700">S/. ${parseFloat(r.precio_total).toLocaleString()}</span>` : ''}
+            </div>
+            ${r.notas ? `<div style="margin-top:8px;padding:7px 11px;background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.15);border-radius:7px;font-size:12px;color:var(--amber)">📝 ${esc(r.notas)}</div>` : ''}
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;min-width:140px">
+            <select onchange="updateEstado('${r.id}', this.value)"
+              style="padding:6px 9px;font-size:12px;border-radius:7px;">
+              <option value="pendiente"  ${r.estado==='pendiente'  ?'selected':''}>⏳ Pendiente</option>
+              <option value="confirmada" ${r.estado==='confirmada' ?'selected':''}>✅ Confirmada</option>
+              <option value="cancelada"  ${r.estado==='cancelada'  ?'selected':''}>❌ Cancelada</option>
+              <option value="completada" ${r.estado==='completada' ?'selected':''}>🏁 Completada</option>
             </select>
+            ${r.telefono ? `<a href="https://wa.me/${(r.telefono+'').replace(/\D/g,'')}?text=Hola ${esc(r.nombre_huesped||r.nombre||'')}, su reserva ${esc(r.codigo||r.id)} en Capachica Turismo está confirmada. ¡Le esperamos!" target="_blank" style="padding:6px;border-radius:7px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);color:#4ade80;font-size:12px;text-align:center;text-decoration:none">💬 WhatsApp</a>` : ''}
           </div>
         </div>
       `).join('');
-    } catch { $('reservasList').innerHTML = '<p class="empty">Error al cargar reservas.</p>'; }
+    } catch { $('reservasList').innerHTML = '<div class="empty"><div class="ei">⚠️</div><p>Error al cargar reservas.</p></div>'; }
   }
 
   window.updateEstado = async (id, estado) => {
-    await fetch(`${API_URL}/api/reservas/${id}/estado`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` },
-      body: JSON.stringify({ estado })
-    });
-    show('✅ Estado actualizado');
+    try {
+      await fetch(`${API_URL}/api/reservas/${id}/estado`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` },
+        body: JSON.stringify({ estado })
+      });
+      showMsg(`Estado → "${estado}"`);
+    } catch { showMsg('Error al actualizar estado', 'err'); }
   };
+
+  function esc(str) {
+    return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ─── DESTINOS ─── */
+  let destinosData = [];
+
+  async function loadDestinos() {
+    try {
+      const res = await fetch(`${IA_URL}/api/destinos`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      destinosData = await res.json();
+      const n = destinosData.length;
+      $('dest-count').textContent    = n + ' destino' + (n !== 1 ? 's' : '');
+      $('nav-dest-count').textContent = n;
+      renderDestinos();
+    } catch (e) {
+      showMsg('Error cargando destinos: ' + e.message + ' — ¿reiniciaste el backend IA?', 'err');
+      $('destinosList').innerHTML = '<div class="empty"><div class="ei">⚠️</div><p>No se pudo cargar. Reinicia el backend IA (puerto 5000).</p></div>';
+    }
+  }
+
+  function renderDestinos() {
+    if (!destinosData.length) {
+      $('destinosList').innerHTML = '<div class="empty"><div class="ei">📍</div><p>No hay destinos. Agrega el primero.</p></div>';
+      return;
+    }
+    $('destinosList').innerHTML = destinosData.map(d => {
+      const thumb = d.imagen
+        ? `<img class="dest-thumb" src="${esc(d.imagen)}" alt="${esc(d.nombre)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="dest-emoji-box" style="display:none;background:rgba(${hexToRgbStr(d.color)},0.12)">${esc(d.emoji||'📍')}</div>`
+        : `<div class="dest-emoji-box" style="background:rgba(${hexToRgbStr(d.color)},0.12)">${esc(d.emoji||'📍')}</div>`;
+      const tagHtml = (d.tags||[]).map(t => `<span style="padding:2px 8px;border-radius:999px;font-size:11px;background:var(--s3);color:var(--muted);border:1px solid var(--border)">${esc(t)}</span>`).join('');
+      return `
+        <div class="dest-item" id="dest-${d.id}">
+          ${thumb}
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+              <span style="font-size:15px;font-weight:700;color:var(--text)">${esc(d.nombre)}</span>
+              <span style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;background:rgba(${hexToRgbStr(d.color)},0.15);color:${esc(d.color)};border:1px solid rgba(${hexToRgbStr(d.color)},0.3)">${esc(d.highlight)}</span>
+            </div>
+            <div style="font-size:12px;color:var(--cyan);margin-bottom:5px">📍 ${esc(d.comunidad)}</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.4;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(d.desc)}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">${tagHtml}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+            <button onclick="openDestinoModal(${d.id})" style="padding:6px 12px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">✎ Editar</button>
+            <button onclick="deleteDestino(${d.id})" style="padding:6px 12px;border-radius:7px;border:1px solid rgba(248,113,113,.22);background:transparent;color:var(--red);font-size:12px;cursor:pointer;font-family:inherit;transition:background .15s" onmouseover="this.style.background='rgba(248,113,113,.1)'" onmouseout="this.style.background='transparent'">✕ Eliminar</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function hexToRgbStr(hex) {
+    const m = (hex||'#38bdf8').replace('#','').match(/.{2}/g);
+    return m ? m.map(h => parseInt(h, 16)).join(',') : '56,189,248';
+  }
+
+  function openDestinoModal(id) {
+    const d = id ? destinosData.find(x => x.id === id) : null;
+    $('modalTitle').textContent = d ? 'Editar destino' : 'Nuevo destino';
+    $('d-id').value         = d ? d.id : '';
+    $('d-nombre').value     = d ? d.nombre    : '';
+    $('d-comunidad').value  = d ? d.comunidad : '';
+    $('d-desc').value       = d ? d.desc      : '';
+    $('d-imagen').value     = d ? d.imagen    : '';
+    $('d-emoji').value      = d ? (d.emoji||'') : '';
+    $('d-highlight').value  = d ? d.highlight : '';
+    const color = (d && d.color) ? d.color : '#0ea5e9';
+    $('d-color').value         = color;
+    $('d-color-picker').value  = color;
+    $('d-tags').value       = d ? (d.tags||[]).join(', ') : '';
+    $('destinoModal').classList.add('open');
+  }
+
+  function closeDestinoModal() {
+    $('destinoModal').classList.remove('open');
+  }
+
+  $('destinoModal').addEventListener('click', e => {
+    if (e.target === $('destinoModal')) closeDestinoModal();
+  });
+
+  async function saveDestinoModal() {
+    const nombre    = $('d-nombre').value.trim();
+    const comunidad = $('d-comunidad').value.trim();
+    const desc      = $('d-desc').value.trim();
+    if (!nombre || !comunidad || !desc) { showMsg('Nombre, comunidad y descripción son obligatorios', 'err'); return; }
+
+    const tags = $('d-tags').value.split(',').map(s => s.trim()).filter(Boolean);
+    const body = {
+      nombre, comunidad, desc,
+      imagen:    $('d-imagen').value.trim(),
+      emoji:     $('d-emoji').value.trim() || '📍',
+      highlight: $('d-highlight').value.trim() || nombre,
+      color:     $('d-color').value.trim() || '#0ea5e9',
+      tags,
+    };
+
+    const id = $('d-id').value;
+    try {
+      let res;
+      if (id) {
+        res = await fetch(`${IA_URL}/api/admin/destinos/${id}`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      } else {
+        res = await fetch(`${IA_URL}/api/admin/destinos`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      }
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      closeDestinoModal();
+      showMsg(id ? 'Destino actualizado' : 'Destino creado');
+      loadDestinos();
+    } catch (e) {
+      showMsg('Error al guardar: ' + e.message, 'err');
+    }
+  }
+
+  window.deleteDestino = async (id) => {
+    if (!confirm('¿Eliminar este destino?')) return;
+    try {
+      const res = await fetch(`${IA_URL}/api/admin/destinos/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      destinosData = destinosData.filter(d => d.id !== id);
+      document.getElementById(`dest-${id}`)?.remove();
+      const n = destinosData.length;
+      $('dest-count').textContent     = n + ' destino' + (n !== 1 ? 's' : '');
+      $('nav-dest-count').textContent = n;
+      showMsg('Destino eliminado');
+    } catch (e) {
+      showMsg('Error al eliminar: ' + e.message, 'err');
+    }
+  };
+
+  window.openDestinoModal = openDestinoModal;
+  window.closeDestinoModal = closeDestinoModal;
+  window.saveDestinoModal = saveDestinoModal;
+
+  /* ─── CONTENIDO (editor modo sistema) ─── */
+  // Default content pre-filled when editing a system page for the first time
+  const CONTENIDO_DEFAULTS = {
+    alojamiento: {
+      titulo: 'Alojamiento', descripcion: 'Hospedaje auténtico en Capachica.',
+      secciones: [
+        { tipo: 'hero', titulo: 'Duerme en Capachica', subtitulo: 'Despierta con el lago en tu ventana. Desde familias anfitrionas auténticas hasta lodges con vistas espectaculares.' },
+        { tipo: 'cards', titulo: 'Opciones de alojamiento', items: [
+          { emoji: '🏡', etiqueta: 'Familia Anfitriona', titulo: 'Familia Quispe', lugar: 'Llachón', precio: 'S/ 80', precio_unidad: 'persona/noche', desc: 'Hospedaje vivencial con desayuno y cena incluidos. Productos del lago y la chacra propia.', extra: '🍽️ Comidas incluidas\n🌅 Vista al lago\n🚣 Paseo en bote\n🌿 Chacra propia', color: '#38bdf8', popular: true },
+          { emoji: '🌿', etiqueta: 'Familia Anfitriona', titulo: 'Familia Mamani', lugar: 'Escallani', precio: 'S/ 70', precio_unidad: 'persona/noche', desc: 'Entre totorales y aves silvestres. La señora Mamani enseña tejido tradicional.', extra: '🎨 Taller de tejido\n🦆 Avistamiento de aves\n🐟 Pesca artesanal\n🌾 Entorno natural', color: '#34d399' },
+          { emoji: '🏘️', etiqueta: 'Familia Anfitriona', titulo: 'Familia Ccama', lugar: 'Bahía de Chifrón', precio: 'S/ 95', precio_unidad: 'persona/noche', desc: 'A orillas de la bahía. Kayak libre incluido y pesca artesanal al amanecer.', extra: '🚣 Kayak libre\n🌅 Pesca al amanecer\n🍽️ Pensión completa\n🏊 Acceso a orilla', color: '#fbbf24' },
+          { emoji: '⛵', etiqueta: 'Lodge', titulo: 'Lodge Titicaca View', lugar: 'Capachica Centro', precio: 'S/ 150', precio_unidad: 'habitación/noche', desc: 'Cabaña privada con baño propio y terraza con vista panorámica al lago.', extra: '🛁 Baño privado\n🏔️ Terraza panorámica\n☕ Desayuno buffet\n🔒 Habitación privada', color: '#a78bfa' },
+          { emoji: '🌄', etiqueta: 'Hostal', titulo: 'Hostal Amanecer Andino', lugar: 'Capachica Centro', precio: 'S/ 45', precio_unidad: 'persona/noche', desc: 'Perfecta base para explorar toda la península. Los guías locales conocen cada sendero.', extra: '🗺️ Guías locales\n🚲 Alquiler de bici\n📶 Wifi\n👥 Hab. compartida o privada', color: '#f472b6' },
+          { emoji: '⭐', etiqueta: 'Casa Rural', titulo: 'Casa Rural Pachamama', lugar: 'Llachón Alta', precio: 'S/ 220', precio_unidad: 'habitación/noche', desc: 'La opción premium. Restaurante con cocina novoandina y spa de medicina ancestral.', extra: '💆 Spa andino\n🍷 Restaurante gourmet\n🌿 Medicina ancestral\n🏔️ Vista 360°', color: '#fb923c' },
+        ]}
+      ]
+    },
+    destinos: { titulo: 'Destinos', descripcion: 'Explora la península de Capachica.', secciones: [{ tipo: 'hero', titulo: 'Destinos Imperdibles', subtitulo: 'Cada rincón de la península guarda una historia y un paisaje único.' }] },
+    actividades: { titulo: 'Actividades', descripcion: 'Actividades en Capachica.', secciones: [{ tipo: 'hero', titulo: 'Actividades', subtitulo: 'Vive la aventura en las orillas del Titicaca.' }, { tipo: 'cards', titulo: 'Qué puedes hacer', items: [] }] },
+    festividades: { titulo: 'Festividades', descripcion: 'Festividades de Capachica.', secciones: [{ tipo: 'hero', titulo: 'Festividades', subtitulo: 'Celebraciones que conectan el pasado con el presente.' }, { tipo: 'cards', titulo: 'Calendario de festividades', items: [] }] },
+    artesania: { titulo: 'Artesanía', descripcion: 'Artesanía de Capachica.', secciones: [{ tipo: 'hero', titulo: 'Artesanía Capachiqueña', subtitulo: 'Tejidos de alpaca, cerámica andina y artesanías centenarias.' }] },
+    'como-llegar': { titulo: 'Cómo Llegar', descripcion: 'Cómo llegar a Capachica.', secciones: [{ tipo: 'hero', titulo: 'Planifica tu Viaje', subtitulo: 'Cuéntanos tu sueño y lo hacemos realidad. Respondemos en 24 horas.' }, { tipo: 'texto', titulo: 'Cómo llegar', contenido: 'Desde Puno tomas un bus hacia Capachica (aprox. 1.5 horas). También hay taxis colectivos.' }] },
+    vivencial: { titulo: 'Turismo Vivencial', descripcion: 'Turismo vivencial en Capachica.', secciones: [{ tipo: 'hero', titulo: 'Turismo Vivencial', subtitulo: 'Más que turismo: una inmersión real en la vida andina de las familias de Capachica.' }] },
+    index: { titulo: 'Inicio', descripcion: 'Capachica Turismo - La joya del Lago Titicaca.', secciones: [{ tipo: 'hero', titulo: 'Capachica', subtitulo: 'La joya del Lago Titicaca' }] },
+  };
+
+  async function openContenidoEditor(slug, titulo) {
+    try {
+      const res = await fetch(`${IA_URL}/api/admin/contenido/${slug}`);
+      const data = await res.json();
+      const existing = data?.secciones?.length ? data : null;
+      const defaults = CONTENIDO_DEFAULTS[slug] || { titulo, descripcion: '', secciones: [{ tipo: 'hero', titulo, subtitulo: '' }] };
+      const content = existing || defaults;
+      openPageEditor(null, null, 'contenido', slug, content);
+    } catch (e) {
+      const defaults = CONTENIDO_DEFAULTS[slug] || { titulo, descripcion: '', secciones: [{ tipo: 'hero', titulo, subtitulo: '' }] };
+      openPageEditor(null, null, 'contenido', slug, defaults);
+    }
+  }
+  window.openContenidoEditor = openContenidoEditor;
+
+  /* ─── PÁGINAS ─── */
+  const STATIC_PAGES = [
+    { url: '/',             titulo: 'Inicio',             icon: '🏠', desc: 'Página principal del sitio' },
+    { url: '/destinos',     titulo: 'Destinos',           icon: '🗺️', desc: 'Destinos turísticos de Capachica' },
+    { url: '/alojamiento',  titulo: 'Alojamiento',        icon: '🏡', desc: 'Familias anfitrionas y hospedaje' },
+    { url: '/actividades',  titulo: 'Actividades',        icon: '🚣', desc: 'Actividades y experiencias' },
+    { url: '/gastronomia',  titulo: 'Gastronomía',        icon: '🍽️', desc: 'Cocina tradicional del lago' },
+    { url: '/festividades', titulo: 'Festividades',       icon: '🎭', desc: 'Fiestas y celebraciones' },
+    { url: '/artesania',    titulo: 'Artesanía',          icon: '🧶', desc: 'Tejidos y artesanías locales' },
+    { url: '/como-llegar',  titulo: 'Cómo Llegar',        icon: '🚌', desc: 'Rutas y transporte' },
+    { url: '/vivencial',    titulo: 'Turismo Vivencial',  icon: '🌿', desc: 'Experiencia comunitaria' },
+    { url: '/privacidad',   titulo: 'Privacidad',         icon: '🔒', desc: 'Política de privacidad' },
+    { url: '/terminos',     titulo: 'Términos',           icon: '📋', desc: 'Términos y condiciones' },
+    { url: '/cancelaciones',titulo: 'Cancelaciones',      icon: '↩️', desc: 'Política de cancelaciones' },
+  ];
+
+  let paginasData = [];
+  let peCurrentId = null;
+  let peSections  = [];
+  let peActiveIdx = -1;
+  let peMode      = 'paginas';   // 'paginas' | 'contenido'
+  let peContenidoSlug = '';
+
+  async function loadPaginas() {
+    try {
+      const res = await fetch(`${IA_URL}/api/admin/paginas`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      paginasData = await res.json();
+    } catch (e) {
+      showMsg('Error cargando páginas dinámicas: ' + e.message + ' — ¿reiniciaste el backend IA?', 'err');
+      paginasData = [];
+    }
+    const total = STATIC_PAGES.length + paginasData.length;
+    $('pag-count').textContent     = total + ' página' + (total !== 1 ? 's' : '');
+    $('nav-pag-count').textContent = total;
+    renderPaginas();
+  }
+
+  function renderPaginas() {
+    const sysStyle = 'background:rgba(56,189,248,.12);color:#7dd3fc;border:1px solid rgba(56,189,248,.25)';
+    const pubStyle = 'background:rgba(52,211,153,.15);color:#6ee7b7;border:1px solid rgba(52,211,153,.3)';
+    const dftStyle = 'background:rgba(100,116,139,.12);color:#94a3b8;border:1px solid rgba(100,116,139,.2)';
+
+    const staticHtml = STATIC_PAGES.map(p => {
+      const slug = p.url === '/' ? 'index' : p.url.replace('/','').replace(/\//g,'-');
+      return `
+        <div class="pag-item">
+          <div style="font-size:22px">${p.icon}</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">
+              <span style="font-size:14px;font-weight:700;color:var(--text)">${esc(p.titulo)}</span>
+              <span class="badge" style="${sysStyle}">sistema</span>
+            </div>
+            <div style="font-size:12px;color:var(--cyan);margin-bottom:2px">${esc(p.url)}</div>
+            <div style="font-size:11px;color:var(--dim)">${esc(p.desc)}</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            <button onclick="openContenidoEditor('${slug}','${esc(p.titulo)}')" style="padding:6px 12px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">✎ Editar</button>
+            <a href="${esc(p.url)}" target="_blank" style="padding:6px 10px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;text-decoration:none;display:inline-flex;align-items:center">👁</a>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const dynHtml = paginasData.length ? paginasData.map(p => {
+      const statusStyle = p.publicado ? pubStyle : dftStyle;
+      const secCount = (p.secciones || []).length;
+      return `
+        <div class="pag-item" id="pag-${p.id}">
+          <div style="font-size:22px">📄</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">
+              <span style="font-size:14px;font-weight:700;color:var(--text)">${esc(p.titulo)}</span>
+              <span class="badge" style="${statusStyle}">${p.publicado ? 'publicada' : 'borrador'}</span>
+            </div>
+            <div style="font-size:12px;color:var(--cyan);margin-bottom:2px">/pagina/${esc(p.slug)}</div>
+            <div style="font-size:11px;color:var(--dim)">${secCount} sección${secCount !== 1 ? 'es' : ''}</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            <a href="/pagina/${esc(p.slug)}" target="_blank" style="padding:6px 10px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;text-decoration:none;display:inline-flex;align-items:center">👁</a>
+            <button onclick="openPageEditor(${p.id})" style="padding:6px 12px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">✎ Editar</button>
+            <button onclick="deletePagina(${p.id})" style="padding:6px 12px;border-radius:7px;border:1px solid rgba(248,113,113,.22);background:transparent;color:var(--red);font-size:12px;cursor:pointer;font-family:inherit" onmouseover="this.style.background='rgba(248,113,113,.1)'" onmouseout="this.style.background='transparent'">✕</button>
+          </div>
+        </div>
+      `;
+    }).join('') : '';
+
+    const dynSection = `
+      <div style="font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;padding:0 2px;margin:18px 0 8px">Páginas personalizadas</div>
+      ${dynHtml || '<div style="font-size:12px;color:var(--dim);padding:8px 2px">Ninguna todavía — pulsa ＋ Nueva página</div>'}
+    `;
+
+    $('paginasList').innerHTML = `
+      <div style="font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;padding:0 2px;margin-bottom:8px">Páginas del sistema</div>
+      ${staticHtml}
+      ${dynSection}
+    `;
+  }
+
+  /* ── EDITOR ── */
+  const TYPE_LABELS = { hero: '🦅 Hero', texto: '📝 Texto', cards: '🃏 Cards', galeria: '🖼️ Galería', contacto: '📬 CTA' };
+
+  function openPageEditor(id, _unused = null, mode = 'paginas', contenidoSlug = '', contenidoData = null) {
+    peMode = mode;
+    peContenidoSlug = contenidoSlug;
+
+    if (mode === 'contenido') {
+      peCurrentId = null;
+      $('pe-title').textContent = 'Editar: ' + (contenidoData?.titulo || contenidoSlug);
+      $('pe-titulo').value      = contenidoData?.titulo || '';
+      $('pe-slug').value        = contenidoSlug;
+      $('pe-desc').value        = contenidoData?.descripcion || '';
+      $('pe-publicado').checked = true;
+      $('pe-slug').readOnly     = true;
+      $('pe-publicado').parentElement.style.display = 'none';
+      peSections = JSON.parse(JSON.stringify(contenidoData?.secciones || []));
+    } else {
+      const p = id ? paginasData.find(x => x.id === id) : null;
+      peCurrentId = p ? p.id : null;
+      $('pe-title').textContent = p ? 'Editar página' : 'Nueva página';
+      $('pe-titulo').value      = p ? p.titulo    : '';
+      $('pe-slug').value        = p ? p.slug      : '';
+      $('pe-desc').value        = p ? (p.descripcion || '') : '';
+      $('pe-publicado').checked = p ? !!p.publicado : true;
+      $('pe-slug').readOnly     = false;
+      $('pe-publicado').parentElement.style.display = 'flex';
+      peSections = p ? JSON.parse(JSON.stringify(p.secciones || [])) : [];
+      $('pe-preview-btn').style.display = id ? 'inline-flex' : 'none';
+    }
+
+    peActiveIdx = -1;
+    renderPeSections();
+    renderPeSectionEditor();
+    $('pageEditor').classList.add('open');
+  }
+
+  function closePageEditor() {
+    $('pageEditor').classList.remove('open');
+    $('pe-slug').readOnly = false;
+    $('pe-publicado').parentElement.style.display = 'flex';
+    peMode = 'paginas';
+    peContenidoSlug = '';
+  }
+
+  function renderPeSections() {
+    const container = $('pe-sections-list');
+    if (!peSections.length) {
+      container.innerHTML = '<div style="font-size:12px;color:var(--dim);padding:6px 0">Sin secciones</div>';
+      return;
+    }
+    container.innerHTML = peSections.map((s, i) => `
+      <div class="sec-chip ${i === peActiveIdx ? 'active' : ''}" onclick="selectPeSection(${i})">
+        <span class="sec-chip-type">${TYPE_LABELS[s.tipo] || s.tipo}</span>
+        <button onclick="event.stopPropagation();removePeSection(${i})" style="background:transparent;border:none;color:var(--red);font-size:12px;cursor:pointer;padding:0 2px;line-height:1">✕</button>
+      </div>
+    `).join('');
+  }
+
+  function selectPeSection(idx) {
+    // save current before switching
+    savePeSectionData(peActiveIdx);
+    peActiveIdx = idx;
+    renderPeSections();
+    renderPeSectionEditor();
+  }
+
+  function addSection() {
+    $('typePicker').classList.add('open');
+  }
+
+  function addSectionOfType(tipo) {
+    $('typePicker').classList.remove('open');
+    savePeSectionData(peActiveIdx);
+    const base = { tipo, id: Date.now() };
+    if (tipo === 'cards') base.items = [];
+    if (tipo === 'galeria') base.imagenes = [];
+    peSections.push(base);
+    peActiveIdx = peSections.length - 1;
+    renderPeSections();
+    renderPeSectionEditor();
+  }
+
+  function removePeSection(idx) {
+    peSections.splice(idx, 1);
+    if (peActiveIdx >= peSections.length) peActiveIdx = peSections.length - 1;
+    renderPeSections();
+    renderPeSectionEditor();
+  }
+
+  function renderPeSectionEditor() {
+    const container = $('pe-section-editor');
+    if (peActiveIdx < 0 || peActiveIdx >= peSections.length) {
+      container.innerHTML = '<div class="empty" style="margin-top:3rem"><div class="ei">👈</div><p>Selecciona o agrega una sección para editarla</p></div>';
+      return;
+    }
+    const s = peSections[peActiveIdx];
+    const tipo = s.tipo;
+
+    const sharedTitulo = `
+      <div class="fg"><label>Título de sección</label><input type="text" id="pe-s-titulo" value="${esc(s.titulo||'')}" placeholder="Título opcional" /></div>
+    `;
+
+    let extra = '';
+    if (tipo === 'hero') {
+      extra = `
+        <div class="fg"><label>Subtítulo</label><textarea id="pe-s-subtitulo" rows="3" placeholder="Descripción que aparece bajo el título...">${esc(s.subtitulo||'')}</textarea></div>
+        <div class="fg"><label>URL imagen de fondo (opcional)</label><input type="text" id="pe-s-imagen" value="${esc(s.imagen||'')}" placeholder="https://..." /></div>
+      `;
+    } else if (tipo === 'texto') {
+      extra = `
+        <div class="fg"><label>Contenido</label><textarea id="pe-s-contenido" rows="10" placeholder="Escribe el texto aquí...">${esc(s.contenido||'')}</textarea></div>
+      `;
+    } else if (tipo === 'cards') {
+      const itemsHtml = (s.items || []).map((item, i) => `
+        <div class="card-row">
+          <button class="card-row-del" onclick="peRemoveCard(${i})">✕</button>
+          <div class="form-row2" style="margin-bottom:8px">
+            <div class="fg" style="margin:0"><label>Título *</label><input type="text" data-card="${i}" data-field="titulo" value="${esc(item.titulo||'')}" placeholder="Familia Quispe" /></div>
+            <div class="fg" style="margin:0"><label>Etiqueta / Tipo</label><input type="text" data-card="${i}" data-field="etiqueta" value="${esc(item.etiqueta||'')}" placeholder="Familia Anfitriona" /></div>
+          </div>
+          <div class="form-row2" style="margin-bottom:8px">
+            <div class="fg" style="margin:0"><label>Emoji (si no hay imagen)</label><input type="text" data-card="${i}" data-field="emoji" value="${esc(item.emoji||'')}" placeholder="🏡" maxlength="4" /></div>
+            <div class="fg" style="margin:0"><label>Ubicación</label><input type="text" data-card="${i}" data-field="lugar" value="${esc(item.lugar||'')}" placeholder="Llachón" /></div>
+          </div>
+          <div class="form-row2" style="margin-bottom:8px">
+            <div class="fg" style="margin:0"><label>Precio</label><input type="text" data-card="${i}" data-field="precio" value="${esc(item.precio||'')}" placeholder="S/ 80" /></div>
+            <div class="fg" style="margin:0"><label>Unidad de precio</label><input type="text" data-card="${i}" data-field="precio_unidad" value="${esc(item.precio_unidad||'')}" placeholder="persona/noche" /></div>
+          </div>
+          <div class="fg" style="margin-bottom:8px"><label>Descripción</label><textarea data-card="${i}" data-field="desc" rows="2" placeholder="Descripción corta...">${esc(item.desc||'')}</textarea></div>
+          <div class="fg" style="margin-bottom:8px"><label>Servicios / Amenities (uno por línea)</label><textarea data-card="${i}" data-field="extra" rows="3" placeholder="🍽️ Comidas incluidas&#10;🌅 Vista al lago&#10;🚣 Paseo en bote">${esc(item.extra||'')}</textarea></div>
+          <div class="form-row2" style="margin-bottom:0">
+            <div class="fg" style="margin:0"><label>URL imagen</label><input type="text" data-card="${i}" data-field="imagen" value="${esc(item.imagen||'')}" placeholder="https://..." /></div>
+            <div class="fg" style="margin:0"><label>Color (hex)</label><input type="text" data-card="${i}" data-field="color" value="${esc(item.color||'')}" placeholder="#38bdf8" /></div>
+          </div>
+        </div>
+      `).join('');
+      extra = `
+        <div id="pe-cards-list">${itemsHtml}</div>
+        <button class="add-sec-btn" onclick="peAddCard()">＋ Agregar tarjeta</button>
+      `;
+    } else if (tipo === 'galeria') {
+      extra = `
+        <div class="fg"><label>URLs de imágenes (una por línea)</label><textarea id="pe-s-imagenes" rows="8" placeholder="https://foto1.jpg&#10;https://foto2.jpg&#10;...">${(s.imagenes||[]).join('\n')}</textarea></div>
+      `;
+    } else if (tipo === 'contacto') {
+      extra = `
+        <div class="fg"><label>Subtítulo / descripción</label><textarea id="pe-s-subtitulo" rows="3" placeholder="Diseñamos tu itinerario ideal...">${esc(s.subtitulo||'')}</textarea></div>
+        <div class="form-row2">
+          <div class="fg" style="margin:0"><label>Texto del botón</label><input type="text" id="pe-s-boton_texto" value="${esc(s.boton_texto||'')}" placeholder="Reservar ahora" /></div>
+          <div class="fg" style="margin:0"><label>URL del botón</label><input type="text" id="pe-s-boton_url" value="${esc(s.boton_url||'')}" placeholder="/contacto" /></div>
+        </div>
+      `;
+    }
+
+    container.innerHTML = `
+      <div class="sec-editor">
+        <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:18px">
+          ${TYPE_LABELS[tipo] || tipo}
+        </div>
+        ${sharedTitulo}
+        ${extra}
+      </div>
+    `;
+  }
+
+  function savePeSectionData(idx) {
+    if (idx < 0 || idx >= peSections.length) return;
+    const s = peSections[idx];
+    const gv = id => { const el = document.getElementById(id); return el ? el.value : null; };
+    const titulo = gv('pe-s-titulo');
+    if (titulo !== null) s.titulo = titulo;
+
+    if (s.tipo === 'hero') {
+      s.subtitulo = gv('pe-s-subtitulo') ?? s.subtitulo;
+      s.imagen    = gv('pe-s-imagen')    ?? s.imagen;
+    } else if (s.tipo === 'texto') {
+      s.contenido = gv('pe-s-contenido') ?? s.contenido;
+    } else if (s.tipo === 'cards') {
+      const rows = document.querySelectorAll('.card-row');
+      s.items = Array.from(rows).map((row, i) => {
+        const fv = f => { const el = row.querySelector(`[data-card="${i}"][data-field="${f}"]`); return el ? el.value : ''; };
+        return {
+          titulo: fv('titulo'), etiqueta: fv('etiqueta'), emoji: fv('emoji'),
+          lugar: fv('lugar'), desc: fv('desc'), precio: fv('precio'),
+          precio_unidad: fv('precio_unidad'), extra: fv('extra'),
+          imagen: fv('imagen'), color: fv('color'),
+        };
+      });
+    } else if (s.tipo === 'galeria') {
+      const raw = gv('pe-s-imagenes') ?? '';
+      s.imagenes = raw.split('\n').map(u => u.trim()).filter(Boolean);
+    } else if (s.tipo === 'contacto') {
+      s.subtitulo   = gv('pe-s-subtitulo')   ?? s.subtitulo;
+      s.boton_texto = gv('pe-s-boton_texto') ?? s.boton_texto;
+      s.boton_url   = gv('pe-s-boton_url')   ?? s.boton_url;
+    }
+  }
+
+  function peAddCard() {
+    savePeSectionData(peActiveIdx);
+    peSections[peActiveIdx].items = peSections[peActiveIdx].items || [];
+    peSections[peActiveIdx].items.push({ titulo: '', desc: '', precio: '', imagen: '' });
+    renderPeSectionEditor();
+  }
+
+  window.peRemoveCard = function(idx) {
+    savePeSectionData(peActiveIdx);
+    peSections[peActiveIdx].items.splice(idx, 1);
+    renderPeSectionEditor();
+  };
+
+  async function savePageEditor() {
+    savePeSectionData(peActiveIdx);
+    const titulo = $('pe-titulo').value.trim();
+    const slug   = $('pe-slug').value.trim();
+    if (!titulo || !slug) { showMsg('Título y slug son obligatorios', 'err'); return; }
+
+    const body = {
+      titulo,
+      slug,
+      descripcion: $('pe-desc').value.trim(),
+      publicado:   $('pe-publicado').checked,
+      secciones:   peSections,
+    };
+
+    try {
+      let res;
+      if (peMode === 'contenido') {
+        res = await fetch(`${IA_URL}/api/admin/contenido/${peContenidoSlug}`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        showMsg('Contenido guardado — recarga la página del sitio para ver cambios');
+      } else if (peCurrentId) {
+        res = await fetch(`${IA_URL}/api/admin/paginas/${peCurrentId}`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        showMsg('Página guardada');
+        loadPaginas();
+      } else {
+        res = await fetch(`${IA_URL}/api/admin/paginas`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        showMsg('Página creada — visítala en /pagina/' + slug);
+        loadPaginas();
+      }
+      closePageEditor();
+    } catch (e) {
+      showMsg('Error al guardar: ' + e.message, 'err');
+    }
+  }
+
+  function previewPage() {
+    const slug = $('pe-slug').value.trim();
+    if (slug) window.open(`/pagina/${slug}`, '_blank');
+  }
+
+  window.deletePagina = async (id) => {
+    if (!confirm('¿Eliminar esta página?')) return;
+    try {
+      const res = await fetch(`${IA_URL}/api/admin/paginas/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      paginasData = paginasData.filter(p => p.id !== id);
+      document.getElementById(`pag-${id}`)?.remove();
+      const n = paginasData.length;
+      $('pag-count').textContent     = n + ' página' + (n !== 1 ? 's' : '');
+      $('nav-pag-count').textContent = n;
+      showMsg('Página eliminada');
+    } catch (e) {
+      showMsg('Error: ' + e.message, 'err');
+    }
+  };
+
+  window.openPageEditor   = openPageEditor;
+  window.closePageEditor  = closePageEditor;
+  window.savePageEditor   = savePageEditor;
+  window.previewPage      = previewPage;
+  window.addSection       = addSection;
+  window.addSectionOfType = addSectionOfType;
+  window.selectPeSection  = selectPeSection;
+  window.removePeSection  = removePeSection;
+  window.peAddCard        = peAddCard;
 </script>
 </body>
 </html>

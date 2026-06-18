@@ -1,18 +1,20 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import ComoLlegar from '../components/ComoLlegar';
+
+const IA_URL = 'http://localhost:5000';
+let cms: any = null;
+try { const r = await fetch(`${IA_URL}/api/contenido/como-llegar`); if (r.ok) cms = await r.json(); } catch {}
+const cmsHero = cms?.secciones?.find((s: any) => s.tipo === 'hero');
 ---
 <Layout title="Cómo Llegar — Capachica">
   <Fragment slot="hero">
     <span class="section-label">CÓMO LLEGAR · CAPACHICA</span>
     <h1 style="font-family:var(--font-display);font-size:clamp(3rem,7vw,5.5rem);line-height:1.05;color:var(--text-main);margin-bottom:0.4rem;">
-      Planifica tu
-    </h1>
-    <h1 style="font-family:var(--font-display);font-size:clamp(2.6rem,6.5vw,5rem);font-style:italic;font-weight:400;color:var(--gold);line-height:1.05;margin-bottom:1.2rem;">
-      Viaje
+      {cmsHero?.titulo || 'Planifica tu Viaje'}
     </h1>
     <p style="font-size:clamp(1rem,2vw,1.1rem);color:var(--text2);max-width:480px;margin:0 auto 2rem;line-height:1.7;">
-      Cuéntanos tu sueño y lo hacemos realidad. Respondemos en 24 horas.
+      {cmsHero?.subtitulo || 'Cuéntanos tu sueño y lo hacemos realidad. Respondemos en 24 horas.'}
     </p>
   </Fragment>
   <ComoLlegar client:load hideHero={true} />

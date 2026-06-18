@@ -13,6 +13,9 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const KNOWLEDGE_PATH     = path.join(__dirname, 'knowledge.json');
 const RESERVACIONES_PATH = path.join(__dirname, 'reservaciones.json');
+const DESTINOS_PATH      = path.join(__dirname, 'destinos.json');
+const PAGINAS_PATH       = path.join(__dirname, 'paginas.json');
+const CONTENIDO_PATH     = path.join(__dirname, 'contenido.json');
 const ADMIN_PHONE        = process.env.ADMIN_PHONE || '';
 
 app.use(cors());
@@ -542,6 +545,180 @@ app.put('/api/admin/contexto', (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Error al actualizar contexto' });
   }
+});
+
+// ── DESTINOS ─────────────────────────────────────────
+function loadDestinos() {
+  try { return JSON.parse(fs.readFileSync(DESTINOS_PATH, 'utf8')); }
+  catch { return []; }
+}
+
+app.get('/api/destinos', (req, res) => {
+  res.json(loadDestinos());
+});
+
+app.post('/api/admin/destinos', (req, res) => {
+  try {
+    const destinos = loadDestinos();
+    const maxId = destinos.reduce((m, d) => Math.max(m, d.id || 0), 0);
+    const nuevo = { id: maxId + 1, emoji: '📍', imagen: '', nombre: '', comunidad: '', desc: '', tags: [], color: '#38bdf8', highlight: '', ...req.body };
+    destinos.push(nuevo);
+    fs.writeFileSync(DESTINOS_PATH, JSON.stringify(destinos, null, 2), 'utf8');
+    res.json(nuevo);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/admin/destinos/:id', (req, res) => {
+  try {
+    const destinos = loadDestinos();
+    const idx = destinos.findIndex(d => d.id === parseInt(req.params.id));
+    if (idx === -1) return res.status(404).json({ error: 'No encontrado' });
+    destinos[idx] = { ...destinos[idx], ...req.body, id: destinos[idx].id };
+    fs.writeFileSync(DESTINOS_PATH, JSON.stringify(destinos, null, 2), 'utf8');
+    res.json(destinos[idx]);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/admin/destinos/:id', (req, res) => {
+  try {
+    let destinos = loadDestinos();
+    const antes = destinos.length;
+    destinos = destinos.filter(d => d.id !== parseInt(req.params.id));
+    if (destinos.length === antes) return res.status(404).json({ error: 'No encontrado' });
+    fs.writeFileSync(DESTINOS_PATH, JSON.stringify(destinos, null, 2), 'utf8');
+    res.json({ mensaje: 'Eliminado' });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── WIDGET: config pública ───────────────────────────
+app.get('/api/widget/config', (req, res) => {
+  try {
+    const knowledge = loadKnowledge();
+    const defaults = {
+      bot_name:     'Inti · Asistente IA',
+      bot_subtitle: 'Capachica Turismo',
+      welcome_msg:  '¡Hola! Soy Inti, tu guía virtual de Capachica 🌊\n¿En qué te puedo ayudar?',
+      quick_prompts: ['¿Qué es Capachica?', '¿Cómo llegar?', 'Quiero reservar'],
+      placeholder:  'Escribe tu pregunta...',
+    };
+    res.json({ ...defaults, ...(knowledge.widget || {}) });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al cargar config' });
+  }
+});
+
+// ── ADMIN: guardar config widget ─────────────────────
+app.put('/api/admin/widget', (req, res) => {
+  try {
+    const knowledge = loadKnowledge();
+    if (!knowledge.widget) knowledge.widget = {};
+    const { bot_name, bot_subtitle, welcome_msg, quick_prompts, placeholder } = req.body;
+    if (bot_name     !== undefined) knowledge.widget.bot_name     = bot_name;
+    if (bot_subtitle !== undefined) knowledge.widget.bot_subtitle = bot_subtitle;
+    if (welcome_msg  !== undefined) knowledge.widget.welcome_msg  = welcome_msg;
+    if (quick_prompts !== undefined) {
+      knowledge.widget.quick_prompts = Array.isArray(quick_prompts)
+        ? quick_prompts
+        : String(quick_prompts).split('\n').map(s => s.trim()).filter(Boolean);
+    }
+    if (placeholder  !== undefined) knowledge.widget.placeholder  = placeholder;
+    fs.writeFileSync(KNOWLEDGE_PATH, JSON.stringify(knowledge, null, 2), 'utf8');
+    res.json({ mensaje: 'Widget actualizado' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al actualizar widget' });
+  }
+});
+
+// ── CONTENIDO: overrides para páginas estáticas ──────
+function loadContenido() {
+  try {
+    if (!fs.existsSync(CONTENIDO_PATH)) { fs.writeFileSync(CONTENIDO_PATH, '{}', 'utf8'); return {}; }
+    return JSON.parse(fs.readFileSync(CONTENIDO_PATH, 'utf8'));
+  } catch { return {}; }
+}
+
+function saveContenido(data) {
+  fs.writeFileSync(CONTENIDO_PATH, JSON.stringify(data, null, 2), 'utf8');
+}
+
+app.get('/api/contenido/:slug', (req, res) => {
+  const c = loadContenido();
+  const page = c[req.params.slug];
+  if (!page) return res.status(404).json({ error: 'Sin contenido' });
+  res.json(page);
+});
+
+app.get('/api/admin/contenido/:slug', (req, res) => {
+  const c = loadContenido();
+  res.json(c[req.params.slug] || { secciones: [] });
+});
+
+app.put('/api/admin/contenido/:slug', (req, res) => {
+  try {
+    const c = loadContenido();
+    c[req.params.slug] = req.body;
+    saveContenido(c);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── PÁGINAS: CRUD ────────────────────────────────────
+function loadPaginas() {
+  try {
+    if (!fs.existsSync(PAGINAS_PATH)) { fs.writeFileSync(PAGINAS_PATH, '[]', 'utf8'); return []; }
+    return JSON.parse(fs.readFileSync(PAGINAS_PATH, 'utf8'));
+  } catch { return []; }
+}
+
+function savePaginas(data) {
+  fs.writeFileSync(PAGINAS_PATH, JSON.stringify(data, null, 2), 'utf8');
+}
+
+app.get('/api/paginas', (req, res) => {
+  res.json(loadPaginas().filter(p => p.publicado));
+});
+
+app.get('/api/paginas/:slug', (req, res) => {
+  const p = loadPaginas().find(x => x.slug === req.params.slug && x.publicado);
+  if (!p) return res.status(404).json({ error: 'No encontrado' });
+  res.json(p);
+});
+
+app.get('/api/admin/paginas', (req, res) => {
+  res.json(loadPaginas());
+});
+
+app.post('/api/admin/paginas', (req, res) => {
+  try {
+    const list = loadPaginas();
+    const maxId = list.reduce((m, p) => Math.max(m, p.id || 0), 0);
+    const nueva = { id: maxId + 1, publicado: true, secciones: [], ...req.body };
+    list.push(nueva);
+    savePaginas(list);
+    res.json(nueva);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/admin/paginas/:id', (req, res) => {
+  try {
+    const list = loadPaginas();
+    const idx = list.findIndex(p => p.id === parseInt(req.params.id));
+    if (idx === -1) return res.status(404).json({ error: 'No encontrado' });
+    list[idx] = { ...list[idx], ...req.body, id: list[idx].id };
+    savePaginas(list);
+    res.json(list[idx]);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/admin/paginas/:id', (req, res) => {
+  try {
+    let list = loadPaginas();
+    const antes = list.length;
+    list = list.filter(p => p.id !== parseInt(req.params.id));
+    if (list.length === antes) return res.status(404).json({ error: 'No encontrado' });
+    savePaginas(list);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ── ADMIN: WhatsApp status / connect / disconnect ──────

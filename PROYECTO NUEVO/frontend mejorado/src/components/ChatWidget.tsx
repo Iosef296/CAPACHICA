@@ -9,13 +9,26 @@ interface Msg {
   mapa_url?: string;
 }
 
-const QUICK = ['¿Qué es Capachica?', '¿Cómo llegar?', 'Quiero reservar'];
+interface WidgetCfg {
+  bot_name:     string;
+  bot_subtitle: string;
+  welcome_msg:  string;
+  quick_prompts: string[];
+  placeholder:  string;
+}
+
+const DEFAULT_CFG: WidgetCfg = {
+  bot_name:     'Inti · Asistente IA',
+  bot_subtitle: 'Capachica Turismo',
+  welcome_msg:  '¡Hola! Soy Inti, tu guía virtual de Capachica 🌊\n¿En qué te puedo ayudar?',
+  quick_prompts: ['¿Qué es Capachica?', '¿Cómo llegar?', 'Quiero reservar'],
+  placeholder:  'Escribe tu pregunta...',
+};
 
 export default function ChatWidget() {
   const [open, setOpen]       = useState(false);
-  const [msgs, setMsgs]       = useState<Msg[]>([
-    { role: 'assistant', content: '¡Hola! Soy Inti, tu guía virtual de Capachica 🌊\n¿En qué te puedo ayudar?' }
-  ]);
+  const [cfg, setCfg]         = useState<WidgetCfg>(DEFAULT_CFG);
+  const [msgs, setMsgs]       = useState<Msg[]>([]);
   const [input, setInput]     = useState('');
   const [loading, setLoading] = useState(false);
   const [stream, setStream]   = useState('');
@@ -23,6 +36,18 @@ export default function ChatWidget() {
   const bottomRef  = useRef<HTMLDivElement>(null);
   const inputRef   = useRef<HTMLInputElement>(null);
   const historyRef = useRef<Msg[]>(msgs);
+
+  useEffect(() => {
+    fetch(`${AI_URL}/api/widget/config`)
+      .then(r => r.json())
+      .then((data: WidgetCfg) => {
+        setCfg({ ...DEFAULT_CFG, ...data });
+        setMsgs([{ role: 'assistant', content: data.welcome_msg || DEFAULT_CFG.welcome_msg }]);
+      })
+      .catch(() => {
+        setMsgs([{ role: 'assistant', content: DEFAULT_CFG.welcome_msg }]);
+      });
+  }, []);
 
   useEffect(() => { historyRef.current = msgs; }, [msgs]);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [msgs, stream]);
@@ -153,8 +178,8 @@ export default function ChatWidget() {
               fontSize: 20, flexShrink: 0,
             }}>🤖</div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ color: '#f0ede8', fontWeight: 700, fontSize: 14 }}>Inti · Asistente IA</div>
-              <div style={{ color: 'rgba(45,212,191,0.75)', fontSize: 11 }}>Capachica Turismo</div>
+              <div style={{ color: '#f0ede8', fontWeight: 700, fontSize: 14 }}>{cfg.bot_name}</div>
+              <div style={{ color: 'rgba(45,212,191,0.75)', fontSize: 11 }}>{cfg.bot_subtitle}</div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#34d399', boxShadow: '0 0 6px #34d399', display: 'inline-block' }}/>
@@ -251,7 +276,7 @@ export default function ChatWidget() {
           {/* Quick prompts — only on first message */}
           {msgs.length === 1 && !loading && (
             <div style={{ padding: '4px 12px 8px', display: 'flex', gap: 6, flexWrap: 'wrap', flexShrink: 0 }}>
-              {QUICK.map(q => (
+              {cfg.quick_prompts.map(q => (
                 <button key={q}
                   onClick={() => sendMsg(q)}
                   style={{
@@ -280,7 +305,7 @@ export default function ChatWidget() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKey}
-              placeholder="Escribe tu pregunta..."
+              placeholder={cfg.placeholder}
               disabled={loading}
               style={{
                 flex: 1, padding: '9px 14px',

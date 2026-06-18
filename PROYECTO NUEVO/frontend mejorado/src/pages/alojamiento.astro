@@ -1,5 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import SectionRenderer from '../components/SectionRenderer.astro';
+
+const IA_URL = 'http://localhost:5000';
+let cms: any = null;
+try {
+  const r = await fetch(`${IA_URL}/api/contenido/alojamiento`);
+  if (r.ok) cms = await r.json();
+} catch {}
+
+const cmsHero = cms?.secciones?.find((s: any) => s.tipo === 'hero');
 
 const opciones = [
   {
@@ -94,19 +104,19 @@ function stars(n: number) {
   <Fragment slot="hero">
     <span class="section-label">🏡 Hospedaje Auténtico</span>
     <h1 class="section-title" style="font-size:clamp(2.2rem,5.5vw,3.8rem);margin-bottom:1rem;">
-      Duerme en <span class="gradient-text">Capachica</span>
+      {cmsHero?.titulo || <Fragment>Duerme en <span class="gradient-text">Capachica</span></Fragment>}
     </h1>
     <p style="font-size:1rem;color:var(--text2);line-height:1.78;max-width:520px;margin:0 auto 2rem;">
-      Despierta con el lago en tu ventana. Desde familias anfitrionas auténticas hasta lodges con vistas espectaculares, hay un alojamiento perfecto para ti.
+      {cmsHero?.subtitulo || 'Despierta con el lago en tu ventana. Desde familias anfitrionas auténticas hasta lodges con vistas espectaculares, hay un alojamiento perfecto para ti.'}
     </p>
-    <div style="display:flex;justify-content:center;gap:0.6rem;flex-wrap:wrap;">
-      {["Todos","Familia Anfitriona","Lodge","Hostal","Casa Rural"].map((f,i) => (
-        <span style={`padding:0.45rem 1.1rem;border-radius:999px;font-size:0.82rem;font-weight:500;cursor:default;${i===0?"background:linear-gradient(135deg,#0ea5e9,#0369a1);color:#fff;box-shadow:0 2px 12px rgba(56,189,248,0.3);":"background:rgba(56,189,248,0.07);border:1px solid rgba(56,189,248,0.2);color:var(--text2);"}`}>{f}</span>
-      ))}
-    </div>
   </Fragment>
 
   <!-- MAR: contenido -->
+  {cms?.secciones ? (
+    <div style="max-width:1200px;margin:0 auto;padding:4rem 1.5rem 4rem;">
+      <SectionRenderer secciones={cms.secciones} skipHero={true} />
+    </div>
+  ) : (
   <div style="max-width:1200px;margin:0 auto;padding:4rem 1.5rem 4rem;">
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.5rem;">
         {opciones.map((o, i) => (
@@ -190,4 +200,5 @@ function stars(n: number) {
         </div>
       </div>
   </div>
+  )}
 </Layout>

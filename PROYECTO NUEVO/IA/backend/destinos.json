@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "emoji": "🏖️",
+    "imagen": "",
+    "nombre": "Llachón",
+    "comunidad": "Comunidad de Llachón",
+    "desc": "Pionera del turismo vivencial en el Titicaca. Los miradores ofrecen vistas del lago que cortan la respiración al amanecer y al atardecer.",
+    "tags": ["Turismo vivencial", "Mirador", "Amanecer"],
+    "color": "#0ea5e9",
+    "highlight": "Mejor destino vivencial"
+  },
+  {
+    "id": 2,
+    "emoji": "🌿",
+    "imagen": "",
+    "nombre": "Escallani",
+    "comunidad": "Comunidad de Escallani",
+    "desc": "Rodeada de totorales y aves acuáticas. La pesca artesanal y el tejido con técnicas quechuas de siglos son el corazón de esta comunidad.",
+    "tags": ["Naturaleza", "Artesanía", "Pesca"],
+    "color": "#34d399",
+    "highlight": "Biodiversidad única"
+  },
+  {
+    "id": 3,
+    "emoji": "🏛️",
+    "imagen": "",
+    "nombre": "Capachica Centro",
+    "comunidad": "Capital del distrito",
+    "desc": "Mercados coloridos, festividades tradicionales que mezclan lo andino y lo católico. La mejor gastronomía lacustre de la región se sirve aquí.",
+    "tags": ["Gastronomía", "Cultura", "Mercado"],
+    "color": "#fbbf24",
+    "highlight": "Corazón cultural"
+  },
+  {
+    "id": 4,
+    "emoji": "⛵",
+    "imagen": "",
+    "nombre": "Isla Taquile",
+    "comunidad": "Patrimonio UNESCO",
+    "desc": "Los tejedores taquileños mantienen viva una tradición textil de más de 500 años. Las vistas del lago desde la plaza principal son incomparables.",
+    "tags": ["Patrimonio", "Textil", "Historia"],
+    "color": "#a78bfa",
+    "highlight": "Patrimonio Inmaterial UNESCO"
+  },
+  {
+    "id": 5,
+    "emoji": "🌅",
+    "imagen": "",
+    "nombre": "Mirador Puesta del Sol",
+    "comunidad": "Cerro Capu",
+    "desc": "El punto más alto de la península. Vistas panorámicas de 360° del lago Titicaca. Los atardeceres son de los más fotografiados del Perú.",
+    "tags": ["Mirador", "Fotografía", "Trekking"],
+    "color": "#f472b6",
+    "highlight": "Atardecer épico"
+  },
+  {
+    "id": 6,
+    "emoji": "🚣",
+    "imagen": "",
+    "nombre": "Bahía de Chifrón",
+    "comunidad": "Aguas tranquilas",
+    "desc": "Aguas calmas perfectas para kayak y paddleboard. La trucha fresca del lago es el mejor desayuno después de una madrugada en el agua.",
+    "tags": ["Kayak", "Paddleboard", "Deportes"],
+    "color": "#38bdf8",
+    "highlight": "Deportes acuáticos"
+  }
+]

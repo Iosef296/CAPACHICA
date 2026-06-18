@@ -3,316 +3,492 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin — Educar IA Capachica</title>
+  <title>Panel Admin — Inti IA</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #0f172a;
-      color: #e2e8f0;
-      min-height: 100vh;
+
+    :root {
+      --bg:           #080e1a;
+      --surface:      #0d1526;
+      --surface2:     #111d35;
+      --surface3:     #162040;
+      --border:       rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --text:         #e2e8f0;
+      --text-muted:   #64748b;
+      --text-dim:     #94a3b8;
+      --cyan:         #06b6d4;
+      --cyan-dim:     rgba(6,182,212,0.12);
+      --cyan-border:  rgba(6,182,212,0.25);
+      --green:        #10b981;
+      --red:          #ef4444;
     }
 
-    header {
-      background: linear-gradient(135deg, #0c4a6e, #1e3a5f);
-      padding: 20px 32px;
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      background: rgba(13,21,38,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      height: 58px;
       display: flex;
       align-items: center;
       gap: 14px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      flex-shrink: 0;
     }
-    header h1 { font-size: 22px; font-weight: 700; color: #f1f5f9; }
-    header p  { font-size: 13px; color: #94a3b8; margin-top: 2px; }
-    .badge {
-      background: rgba(6,182,212,0.15);
-      color: #06b6d4;
-      border: 1px solid rgba(6,182,212,0.3);
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 12px;
+
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; flex-shrink: 0;
+    }
+
+    .logo-text h1 { font-size: 14px; font-weight: 700; color: #f1f5f9; }
+    .logo-text p  { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+    .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+    .status-pill {
+      display: flex; align-items: center; gap: 7px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 5px 13px; border-radius: 20px;
+      font-size: 12px; color: var(--text-dim);
+    }
+
+    .status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--text-muted); transition: all 0.3s;
+    }
+    .status-dot.online  { background: var(--green); box-shadow: 0 0 6px rgba(16,185,129,0.5); animation: pulse 2s infinite; }
+    .status-dot.offline { background: var(--red); }
+
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.4; } }
+
+    /* ── LAYOUT ── */
+    .layout { display: flex; flex: 1; overflow: hidden; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 210px; flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 16px 10px;
+      display: flex; flex-direction: column; gap: 2px;
+      overflow-y: auto;
+    }
+
+    .sidebar-label {
+      font-size: 10px; font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: .08em;
+      padding: 0 8px; margin: 12px 0 4px;
+    }
+    .sidebar-label:first-child { margin-top: 0; }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 9px 11px; border-radius: 8px;
+      border: 1px solid transparent;
+      color: var(--text-dim); font-size: 13.5px; font-weight: 500;
+      cursor: pointer; transition: all .15s;
+      background: transparent; width: 100%; text-align: left;
+    }
+    .nav-item:hover  { background: var(--surface2); color: var(--text); border-color: var(--border); }
+    .nav-item.active { background: var(--cyan-dim); border-color: var(--cyan-border); color: var(--cyan); }
+    .nav-item .icon  { font-size: 14px; flex-shrink: 0; }
+
+    .nav-badge {
       margin-left: auto;
+      background: var(--surface3); color: var(--text-muted);
+      font-size: 10px; font-weight: 600;
+      padding: 1px 6px; border-radius: 10px;
     }
+    .nav-item.active .nav-badge { background: rgba(6,182,212,0.2); color: var(--cyan); }
 
-    .container { max-width: 900px; margin: 0 auto; padding: 32px 24px; }
+    /* ── MAIN ── */
+    .main { flex: 1; padding: 28px 32px; overflow-y: auto; }
 
-    /* ── TABS ── */
-    .tabs { display: flex; gap: 4px; margin-bottom: 28px; }
-    .tab {
-      padding: 10px 20px;
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: transparent;
-      color: #94a3b8;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all 0.2s;
-    }
-    .tab.active {
-      background: rgba(6,182,212,0.15);
-      border-color: rgba(6,182,212,0.4);
-      color: #06b6d4;
-    }
-    .tab-content { display: none; }
+    .tab-content { display: none; animation: slideIn .18s ease; }
     .tab-content.active { display: block; }
 
-    /* ── CARDS ── */
+    @keyframes slideIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── PAGE HEADER ── */
+    .page-header { margin-bottom: 22px; }
+    .page-header h2 { font-size: 20px; font-weight: 700; color: #f1f5f9; letter-spacing: -.02em; margin-bottom: 3px; }
+    .page-header p  { font-size: 13px; color: var(--text-muted); }
+
+    /* ── CARD ── */
     .card {
-      background: #1e293b;
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px;
+      margin-bottom: 14px;
     }
-    .card h2 { font-size: 16px; font-weight: 600; color: #f1f5f9; margin-bottom: 16px; }
 
     /* ── FORM ── */
-    .form-group { margin-bottom: 14px; }
-    label { display: block; font-size: 13px; color: #94a3b8; margin-bottom: 6px; }
+    .form-row { display: grid; grid-template-columns: 190px 1fr; gap: 12px; margin-bottom: 12px; }
+    .form-group { margin-bottom: 12px; }
+
+    label {
+      display: block; font-size: 11px; font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px;
+    }
+
     input, select, textarea {
       width: 100%;
-      background: #273549;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px;
-      padding: 10px 14px;
-      color: #e2e8f0;
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.2s;
-      font-family: inherit;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 9px 12px;
+      color: var(--text); font-size: 14px;
+      outline: none; transition: all .2s; font-family: inherit;
     }
-    input:focus, select:focus, textarea:focus { border-color: #06b6d4; }
-    textarea { resize: vertical; min-height: 80px; }
-    select option { background: #1e293b; }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--cyan);
+      background: var(--surface3);
+      box-shadow: 0 0 0 3px rgba(6,182,212,.07);
+    }
+    input::placeholder, textarea::placeholder { color: var(--text-muted); }
+    textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+    select option { background: var(--surface); }
 
+    .form-footer {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 16px; padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; border-radius: 8px;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; border: 1px solid transparent;
+      transition: all .15s; font-family: inherit;
+    }
     .btn-primary {
       background: linear-gradient(135deg, #06b6d4, #0284c7);
       color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.15s;
     }
-    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(6,182,212,.3); }
 
     .btn-danger {
-      background: rgba(239,68,68,0.15);
-      color: #f87171;
-      border: 1px solid rgba(239,68,68,0.3);
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: background 0.2s;
+      background: transparent; color: #f87171;
+      border-color: rgba(239,68,68,.2);
+      padding: 5px 10px; font-size: 12px; border-radius: 6px;
     }
-    .btn-danger:hover { background: rgba(239,68,68,0.25); }
+    .btn-danger:hover { background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.4); }
 
-    /* ── KNOWLEDGE LIST ── */
+    /* ── SEARCH ── */
+    .search-wrap { position: relative; margin-bottom: 14px; }
+    .search-icon {
+      position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+      color: var(--text-muted); font-size: 13px; pointer-events: none;
+    }
+    .search-wrap input { padding-left: 32px; }
+
+    /* ── KNOWLEDGE ITEMS ── */
     .knowledge-item {
-      background: #273549;
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 10px;
-      padding: 14px 16px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      animation: fadeIn 0.2s ease;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 13px 15px;
+      margin-bottom: 7px;
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 12px;
+      transition: border-color .15s;
+      animation: fadeUp .18s ease;
     }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+    .knowledge-item:hover { border-color: var(--border-hover); }
 
-    .knowledge-item-info { flex: 1; min-width: 0; }
-    .knowledge-item-info .cat {
-      font-size: 11px;
-      color: #06b6d4;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 4px;
+    @keyframes fadeUp { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+
+    .ki-content { flex: 1; min-width: 0; }
+
+    .ki-header {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 5px; flex-wrap: wrap;
     }
-    .knowledge-item-info .pregunta { font-size: 14px; font-weight: 600; color: #f1f5f9; margin-bottom: 4px; }
-    .knowledge-item-info .respuesta { font-size: 13px; color: #94a3b8; line-height: 1.4; }
+
+    .ki-question {
+      font-size: 14px; font-weight: 600; color: #f1f5f9;
+    }
+
+    .ki-answer {
+      font-size: 13px; color: var(--text-muted); line-height: 1.45;
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+
+    /* ── CAT BADGE ── */
+    .cat-badge {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      padding: 2px 8px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: .04em; flex-shrink: 0;
+    }
 
     /* ── ALERT ── */
     .alert {
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      margin-bottom: 16px;
-      display: none;
+      display: none; align-items: center; gap: 8px;
+      padding: 10px 14px; border-radius: 8px;
+      font-size: 13px; margin-bottom: 14px;
     }
-    .alert.success { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); color: #86efac; }
-    .alert.error   { background: rgba(239,68,68,0.15);  border: 1px solid rgba(239,68,68,0.3);  color: #fca5a5; }
+    .alert.success { display:flex; background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.25); color:#6ee7b7; }
+    .alert.error   { display:flex; background:rgba(239,68,68,.1);  border:1px solid rgba(239,68,68,.25);  color:#fca5a5; }
 
-    .loading { color: #64748b; text-align: center; padding: 32px; font-size: 14px; }
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align: center; padding: 44px 24px; color: var(--text-muted); }
+    .empty-state .es-icon { font-size: 34px; margin-bottom: 10px; opacity: .45; }
+    .empty-state p { font-size: 13px; }
+
+    /* ── COUNT BADGE ── */
     .count-badge {
-      background: rgba(6,182,212,0.15);
-      color: #06b6d4;
-      font-size: 12px;
-      padding: 2px 8px;
-      border-radius: 20px;
-      margin-left: 8px;
+      background: var(--surface3); color: var(--text-muted);
+      font-size: 11px; font-weight: 600;
+      padding: 2px 7px; border-radius: 10px;
     }
+
+    /* ── SECTION TOP ── */
+    .section-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .section-top h3 {
+      font-size: 14px; font-weight: 700; color: #f1f5f9;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* ── RESERVA META ── */
+    .reserva-meta { display:flex; flex-wrap:wrap; gap:12px; margin-top:5px; }
+    .reserva-chip { display:flex; align-items:center; gap:4px; font-size:12px; color:var(--text-muted); }
   </style>
 </head>
 <body>
 
-<header>
-  <div>🤖</div>
-  <div>
-    <h1>Panel de Educación — Inti</h1>
-    <p>Agrega conocimiento para que la IA responda mejor</p>
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="logo-icon">🤖</div>
+  <div class="logo-text">
+    <h1>Panel Admin</h1>
+    <p>Capachica Turismo</p>
   </div>
-  <div class="badge" id="status-badge">Conectando...</div>
+  <div class="topbar-right">
+    <div class="status-pill">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text">Conectando...</span>
+    </div>
+  </div>
 </header>
 
-<div class="container">
+<div class="layout">
 
-  <div class="tabs">
-    <button class="tab active" onclick="showTab('agregar')">+ Agregar Conocimiento</button>
-    <button class="tab" onclick="showTab('lista')">📚 Base de Conocimiento</button>
-    <button class="tab" onclick="showTab('reservaciones')">📅 Reservaciones</button>
-    <button class="tab" onclick="showTab('contexto')">⚙️ Configuración IA</button>
-  </div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-label">IA</div>
+    <button class="nav-item active" onclick="showTab('agregar')">
+      <span class="icon">✨</span> Agregar
+    </button>
+    <button class="nav-item" onclick="showTab('lista')">
+      <span class="icon">📚</span> Conocimiento
+      <span class="nav-badge" id="nav-knowledge-count">—</span>
+    </button>
+    <button class="nav-item" onclick="showTab('contexto')">
+      <span class="icon">⚙️</span> Personalidad
+    </button>
+    <div class="sidebar-label">Gestión</div>
+    <button class="nav-item" onclick="showTab('reservaciones')">
+      <span class="icon">📅</span> Reservaciones
+      <span class="nav-badge" id="nav-reserva-count">—</span>
+    </button>
+  </aside>
 
-  <!-- ── TAB: AGREGAR ── -->
-  <div id="tab-agregar" class="tab-content active">
-    <div class="card">
-      <h2>Enseñar nueva respuesta a la IA</h2>
-      <div id="alert-agregar" class="alert"></div>
+  <!-- MAIN -->
+  <main class="main">
 
-      <div class="form-group">
-        <label>Categoría</label>
-        <select id="add-categoria">
-          <option value="general">General</option>
-          <option value="alojamiento">Alojamiento</option>
-          <option value="actividades">Actividades</option>
-          <option value="gastronomia">Gastronomía</option>
-          <option value="transporte">Transporte / Cómo llegar</option>
-          <option value="festividades">Festividades</option>
-          <option value="artesania">Artesanía</option>
-          <option value="precios">Precios</option>
-          <option value="cultura">Cultura y tradiciones</option>
-          <option value="otro">Otro</option>
-        </select>
+    <!-- TAB: AGREGAR -->
+    <div id="tab-agregar" class="tab-content active">
+      <div class="page-header">
+        <h2>Agregar Conocimiento</h2>
+        <p>Enseña nuevas respuestas a la IA Inti</p>
       </div>
-
-      <div class="form-group">
-        <label>Pregunta típica del turista</label>
-        <input type="text" id="add-pregunta" placeholder="Ej: ¿Cuáles son los horarios de atención?" />
+      <div class="card">
+        <div id="alert-agregar" class="alert"></div>
+        <div class="form-row">
+          <div class="form-group" style="margin:0">
+            <label>Categoría</label>
+            <select id="add-categoria">
+              <option value="general">General</option>
+              <option value="alojamiento">Alojamiento</option>
+              <option value="actividades">Actividades</option>
+              <option value="gastronomia">Gastronomía</option>
+              <option value="transporte">Transporte</option>
+              <option value="festividades">Festividades</option>
+              <option value="artesania">Artesanía</option>
+              <option value="precios">Precios</option>
+              <option value="cultura">Cultura</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Pregunta del turista</label>
+            <input type="text" id="add-pregunta" placeholder="¿Cuáles son los horarios de atención?" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Respuesta de la IA</label>
+          <textarea id="add-respuesta" rows="4" placeholder="Escribe la respuesta detallada que usará Inti..."></textarea>
+        </div>
+        <div class="form-footer">
+          <button class="btn btn-primary" onclick="agregarConocimiento()">✦ Agregar a Inti</button>
+        </div>
       </div>
-
-      <div class="form-group">
-        <label>Respuesta que debe dar la IA</label>
-        <textarea id="add-respuesta" placeholder="Escribe aquí la respuesta detallada que quieres que la IA use..."></textarea>
-      </div>
-
-      <button class="btn-primary" onclick="agregarConocimiento()">Agregar a la IA</button>
     </div>
-  </div>
 
-  <!-- ── TAB: LISTA ── -->
-  <div id="tab-lista" class="tab-content">
-    <div class="card">
-      <h2>
-        Conocimiento actual
-        <span class="count-badge" id="knowledge-count">0</span>
-      </h2>
+    <!-- TAB: LISTA -->
+    <div id="tab-lista" class="tab-content">
+      <div class="page-header">
+        <h2>Base de Conocimiento</h2>
+        <p>Todo lo que sabe Inti actualmente</p>
+      </div>
       <div id="alert-lista" class="alert"></div>
+      <div class="section-top">
+        <h3>Entradas <span class="count-badge" id="knowledge-count">0</span></h3>
+      </div>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Buscar por pregunta, respuesta o categoría..." oninput="filterKnowledge()" />
+      </div>
       <div id="knowledge-list">
-        <div class="loading">Cargando base de conocimiento...</div>
+        <div class="empty-state"><div class="es-icon">⏳</div><p>Cargando...</p></div>
       </div>
     </div>
-  </div>
 
-  <!-- ── TAB: RESERVACIONES ── -->
-  <div id="tab-reservaciones" class="tab-content">
-    <div class="card">
-      <h2>
-        Reservaciones recibidas
-        <span class="count-badge" id="reserva-count">0</span>
-      </h2>
+    <!-- TAB: RESERVACIONES -->
+    <div id="tab-reservaciones" class="tab-content">
+      <div class="page-header">
+        <h2>Reservaciones</h2>
+        <p>Solicitudes recibidas por Inti</p>
+      </div>
       <div id="alert-reservaciones" class="alert"></div>
+      <div class="section-top">
+        <h3>Total <span class="count-badge" id="reserva-count">0</span></h3>
+      </div>
       <div id="reservaciones-list">
-        <div class="loading">Cargando reservaciones...</div>
+        <div class="empty-state"><div class="es-icon">⏳</div><p>Cargando...</p></div>
       </div>
     </div>
-  </div>
 
-  <!-- ── TAB: CONTEXTO ── -->
-  <div id="tab-contexto" class="tab-content">
-    <div class="card">
-      <h2>Personalidad de la IA</h2>
-      <div id="alert-contexto" class="alert"></div>
-
-      <div class="form-group">
-        <label>Nombre de la IA</label>
-        <input type="text" id="ctx-nombre" placeholder="Ej: Inti" />
+    <!-- TAB: CONTEXTO -->
+    <div id="tab-contexto" class="tab-content">
+      <div class="page-header">
+        <h2>Personalidad de Inti</h2>
+        <p>Configura cómo se comporta y responde la IA</p>
       </div>
-
-      <div class="form-group">
-        <label>Descripción</label>
-        <input type="text" id="ctx-descripcion" placeholder="Ej: Asistente virtual de Capachica Turismo" />
+      <div class="card">
+        <div id="alert-contexto" class="alert"></div>
+        <div class="form-row">
+          <div class="form-group" style="margin:0">
+            <label>Nombre de la IA</label>
+            <input type="text" id="ctx-nombre" placeholder="Inti" />
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Descripción</label>
+            <input type="text" id="ctx-descripcion" placeholder="Asistente virtual de Capachica Turismo" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Instrucciones (System Prompt)</label>
+          <textarea id="ctx-contexto" rows="8" placeholder="Eres un asistente amable especializado en turismo de Capachica..."></textarea>
+        </div>
+        <div class="form-footer">
+          <button class="btn btn-primary" onclick="actualizarContexto()">Guardar Configuración</button>
+        </div>
       </div>
-
-      <div class="form-group">
-        <label>Instrucciones de comportamiento (System Prompt)</label>
-        <textarea id="ctx-contexto" rows="6"
-          placeholder="Ej: Eres un asistente amable especializado en turismo de Capachica..."></textarea>
-      </div>
-
-      <button class="btn-primary" onclick="actualizarContexto()">Guardar Configuración</button>
     </div>
-  </div>
 
+  </main>
 </div>
 
 <script>
   const API = 'http://localhost:5000';
+  let allKnowledge = [];
 
-  // ── HEALTH CHECK ──────────────────────────────────────
+  /* ── CATEGORY COLORS ── */
+  const CAT = {
+    general:      { bg:'rgba(100,116,139,.18)', color:'#94a3b8', border:'rgba(100,116,139,.3)' },
+    alojamiento:  { bg:'rgba(139,92,246,.15)',  color:'#a78bfa', border:'rgba(139,92,246,.3)'  },
+    actividades:  { bg:'rgba(6,182,212,.15)',   color:'#67e8f9', border:'rgba(6,182,212,.3)'   },
+    gastronomia:  { bg:'rgba(249,115,22,.15)',  color:'#fdba74', border:'rgba(249,115,22,.3)'  },
+    transporte:   { bg:'rgba(59,130,246,.15)',  color:'#93c5fd', border:'rgba(59,130,246,.3)'  },
+    festividades: { bg:'rgba(236,72,153,.15)',  color:'#f9a8d4', border:'rgba(236,72,153,.3)'  },
+    artesania:    { bg:'rgba(245,158,11,.15)',  color:'#fcd34d', border:'rgba(245,158,11,.3)'  },
+    precios:      { bg:'rgba(16,185,129,.15)',  color:'#6ee7b7', border:'rgba(16,185,129,.3)'  },
+    cultura:      { bg:'rgba(217,70,239,.15)',  color:'#e879f9', border:'rgba(217,70,239,.3)'  },
+    otro:         { bg:'rgba(100,116,139,.12)', color:'#94a3b8', border:'rgba(100,116,139,.25)'},
+  };
+
+  const ESTADO_C = {
+    pendiente:  { bg:'rgba(245,158,11,.15)', color:'#fcd34d', border:'rgba(245,158,11,.3)' },
+    confirmada: { bg:'rgba(16,185,129,.15)', color:'#6ee7b7', border:'rgba(16,185,129,.3)' },
+    cancelada:  { bg:'rgba(239,68,68,.15)',  color:'#fca5a5', border:'rgba(239,68,68,.3)'  },
+  };
+
+  function badgeStyle(map, key) {
+    const c = map[key] || map.otro || map.pendiente;
+    return `background:${c.bg};color:${c.color};border:1px solid ${c.border};border-radius:20px;padding:2px 9px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;`;
+  }
+
+  /* ── HEALTH ── */
   async function checkHealth() {
     try {
-      const res = await fetch(`${API}/api/health`);
-      const data = await res.json();
-      const badge = document.getElementById('status-badge');
-      badge.textContent = `✓ Conectado — ${data.modelo}`;
-      badge.style.background = 'rgba(34,197,94,0.15)';
-      badge.style.borderColor = 'rgba(34,197,94,0.3)';
-      badge.style.color = '#86efac';
+      const d = await (await fetch(`${API}/api/health`)).json();
+      document.getElementById('status-dot').className  = 'status-dot online';
+      document.getElementById('status-text').textContent = `Conectado · ${d.modelo}`;
     } catch {
-      const badge = document.getElementById('status-badge');
-      badge.textContent = '✗ Backend offline';
-      badge.style.background = 'rgba(239,68,68,0.15)';
-      badge.style.borderColor = 'rgba(239,68,68,0.3)';
-      badge.style.color = '#fca5a5';
+      document.getElementById('status-dot').className  = 'status-dot offline';
+      document.getElementById('status-text').textContent = 'Backend offline';
     }
   }
 
-  // ── TABS ─────────────────────────────────────────────
+  /* ── TABS ── */
+  const NAV_MAP = ['agregar','lista','contexto','reservaciones'];
+
   function showTab(name) {
-    document.querySelectorAll('.tab').forEach((t, i) => {
-      t.classList.toggle('active', ['agregar','lista','reservaciones','contexto'][i] === name);
+    document.querySelectorAll('.nav-item').forEach((el, i) => {
+      el.classList.toggle('active', NAV_MAP[i] === name);
     });
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.getElementById(`tab-${name}`).classList.add('active');
-    if (name === 'lista')          loadKnowledge();
-    if (name === 'reservaciones')  loadReservaciones();
-    if (name === 'contexto')       loadContexto();
+    if (name === 'lista')         loadKnowledge();
+    if (name === 'reservaciones') loadReservaciones();
+    if (name === 'contexto')      loadContexto();
   }
 
-  // ── ALERT ────────────────────────────────────────────
+  /* ── ALERT ── */
   function showAlert(id, type, msg) {
     const el = document.getElementById(id);
     el.className = `alert ${type}`;
-    el.textContent = msg;
-    el.style.display = 'block';
+    el.innerHTML = (type === 'success' ? '✓ ' : '✗ ') + msg;
+    el.style.display = 'flex';
     setTimeout(() => el.style.display = 'none', 4000);
   }
 
-  // ── AGREGAR CONOCIMIENTO ──────────────────────────────
+  /* ── AGREGAR ── */
   async function agregarConocimiento() {
     const categoria = document.getElementById('add-categoria').value;
     const pregunta  = document.getElementById('add-pregunta').value.trim();
@@ -322,18 +498,16 @@
       showAlert('alert-agregar', 'error', 'Completa la pregunta y la respuesta.');
       return;
     }
-
     try {
-      const res = await fetch(`${API}/api/admin/conocimiento`, {
+      const res  = await fetch(`${API}/api/admin/conocimiento`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ categoria, pregunta, respuesta })
       });
       const data = await res.json();
-
       if (res.ok) {
-        showAlert('alert-agregar', 'success', `✓ Conocimiento agregado (ID: ${data.id})`);
-        document.getElementById('add-pregunta').value = '';
+        showAlert('alert-agregar', 'success', `Conocimiento agregado (ID: ${data.id})`);
+        document.getElementById('add-pregunta').value  = '';
         document.getElementById('add-respuesta').value = '';
       } else {
         showAlert('alert-agregar', 'error', data.error || 'Error al agregar');
@@ -343,52 +517,63 @@
     }
   }
 
-  // ── LISTAR CONOCIMIENTO ───────────────────────────────
+  /* ── KNOWLEDGE ── */
   async function loadKnowledge() {
     const list = document.getElementById('knowledge-list');
-    list.innerHTML = '<div class="loading">Cargando...</div>';
-
+    list.innerHTML = '<div class="empty-state"><div class="es-icon">⏳</div><p>Cargando...</p></div>';
     try {
-      const res  = await fetch(`${API}/api/admin/conocimiento`);
-      const data = await res.json();
-      const items = data.conocimiento;
-
-      document.getElementById('knowledge-count').textContent = items.length;
-
-      if (items.length === 0) {
-        list.innerHTML = '<div class="loading">No hay conocimiento guardado aún.</div>';
-        return;
-      }
-
-      list.innerHTML = items.map(item => `
-        <div class="knowledge-item" id="item-${item.id}">
-          <div class="knowledge-item-info">
-            <div class="cat">${item.categoria}</div>
-            <div class="pregunta">${escapeHtml(item.pregunta)}</div>
-            <div class="respuesta">${escapeHtml(item.respuesta)}</div>
-          </div>
-          <button class="btn-danger" onclick="eliminar(${item.id})">Eliminar</button>
-        </div>
-      `).join('');
-
+      const data = await (await fetch(`${API}/api/admin/conocimiento`)).json();
+      allKnowledge = data.conocimiento;
+      const n = allKnowledge.length;
+      document.getElementById('knowledge-count').textContent     = n;
+      document.getElementById('nav-knowledge-count').textContent = n;
+      renderKnowledge(allKnowledge);
     } catch {
-      list.innerHTML = '<div class="loading">Error al cargar. ¿Está el backend corriendo?</div>';
+      list.innerHTML = '<div class="empty-state"><div class="es-icon">⚠️</div><p>Error al cargar. ¿Está el backend corriendo?</p></div>';
     }
   }
 
-  // ── ELIMINAR ──────────────────────────────────────────
+  function renderKnowledge(items) {
+    const list = document.getElementById('knowledge-list');
+    if (!items.length) {
+      list.innerHTML = '<div class="empty-state"><div class="es-icon">🧠</div><p>No hay conocimiento guardado aún.</p></div>';
+      return;
+    }
+    list.innerHTML = items.map(item => `
+      <div class="knowledge-item" id="item-${item.id}">
+        <div class="ki-content">
+          <div class="ki-header">
+            <span style="${badgeStyle(CAT, item.categoria)}">${item.categoria}</span>
+            <span class="ki-question">${escapeHtml(item.pregunta)}</span>
+          </div>
+          <div class="ki-answer">${escapeHtml(item.respuesta)}</div>
+        </div>
+        <button class="btn btn-danger" onclick="eliminar(${item.id})">✕</button>
+      </div>
+    `).join('');
+  }
+
+  function filterKnowledge() {
+    const q = document.getElementById('search-input').value.toLowerCase();
+    renderKnowledge(allKnowledge.filter(i =>
+      i.pregunta.toLowerCase().includes(q) ||
+      i.respuesta.toLowerCase().includes(q) ||
+      i.categoria.toLowerCase().includes(q)
+    ));
+  }
+
   async function eliminar(id) {
     if (!confirm(`¿Eliminar entrada ID ${id}?`)) return;
-
     try {
-      const res = await fetch(`${API}/api/admin/conocimiento/${id}`, { method: 'DELETE' });
+      const res  = await fetch(`${API}/api/admin/conocimiento/${id}`, { method: 'DELETE' });
       const data = await res.json();
-
       if (res.ok) {
+        allKnowledge = allKnowledge.filter(i => i.id !== id);
         document.getElementById(`item-${id}`)?.remove();
-        const badge = document.getElementById('knowledge-count');
-        badge.textContent = parseInt(badge.textContent) - 1;
-        showAlert('alert-lista', 'success', '✓ Entrada eliminada');
+        const n = allKnowledge.length;
+        document.getElementById('knowledge-count').textContent     = n;
+        document.getElementById('nav-knowledge-count').textContent = n;
+        showAlert('alert-lista', 'success', 'Entrada eliminada');
       } else {
         showAlert('alert-lista', 'error', data.error);
       }
@@ -397,25 +582,22 @@
     }
   }
 
-  // ── CARGAR CONTEXTO ───────────────────────────────────
+  /* ── CONTEXTO ── */
   async function loadContexto() {
     try {
-      const res  = await fetch(`${API}/api/admin/conocimiento`);
-      const data = await res.json();
-      document.getElementById('ctx-nombre').value      = data.nombre_ia || '';
-      document.getElementById('ctx-descripcion').value = data.descripcion || '';
+      const data = await (await fetch(`${API}/api/admin/conocimiento`)).json();
+      document.getElementById('ctx-nombre').value      = data.nombre_ia    || '';
+      document.getElementById('ctx-descripcion').value = data.descripcion   || '';
       document.getElementById('ctx-contexto').value    = data.contexto_base || '';
     } catch {}
   }
 
-  // ── ACTUALIZAR CONTEXTO ───────────────────────────────
   async function actualizarContexto() {
     const body = {
-      nombre_ia:    document.getElementById('ctx-nombre').value.trim(),
-      descripcion:  document.getElementById('ctx-descripcion').value.trim(),
+      nombre_ia:     document.getElementById('ctx-nombre').value.trim(),
+      descripcion:   document.getElementById('ctx-descripcion').value.trim(),
       contexto_base: document.getElementById('ctx-contexto').value.trim()
     };
-
     try {
       const res  = await fetch(`${API}/api/admin/contexto`, {
         method: 'PUT',
@@ -423,62 +605,57 @@
         body: JSON.stringify(body)
       });
       const data = await res.json();
-
-      if (res.ok) showAlert('alert-contexto', 'success', '✓ Configuración guardada');
+      if (res.ok) showAlert('alert-contexto', 'success', 'Configuración guardada');
       else        showAlert('alert-contexto', 'error', data.error);
     } catch {
       showAlert('alert-contexto', 'error', 'Error al guardar');
     }
   }
 
-  // ── RESERVACIONES ─────────────────────────────────────
-  const ESTADO_COLORS = {
-    pendiente:  '#f59e0b',
-    confirmada: '#22c55e',
-    cancelada:  '#ef4444'
-  };
-
+  /* ── RESERVACIONES ── */
   async function loadReservaciones() {
     const list = document.getElementById('reservaciones-list');
-    list.innerHTML = '<div class="loading">Cargando...</div>';
-
+    list.innerHTML = '<div class="empty-state"><div class="es-icon">⏳</div><p>Cargando...</p></div>';
     try {
-      const res  = await fetch(`${API}/api/admin/reservaciones`);
-      const data = await res.json();
+      const data = await (await fetch(`${API}/api/admin/reservaciones`)).json();
+      const n = data.length;
+      document.getElementById('reserva-count').textContent     = n;
+      document.getElementById('nav-reserva-count').textContent = n;
 
-      document.getElementById('reserva-count').textContent = data.length;
-
-      if (data.length === 0) {
-        list.innerHTML = '<div class="loading">No hay reservaciones aún.</div>';
+      if (!n) {
+        list.innerHTML = '<div class="empty-state"><div class="es-icon">📭</div><p>No hay reservaciones aún.</p></div>';
         return;
       }
 
       list.innerHTML = data.reverse().map(r => `
         <div class="knowledge-item" id="reserva-${r.id}">
-          <div class="knowledge-item-info">
-            <div class="cat" style="color:${ESTADO_COLORS[r.estado] || '#94a3b8'}">${r.estado.toUpperCase()}</div>
-            <div class="pregunta">${escapeHtml(r.nombre)} — ${escapeHtml(r.hospedaje || r.tipo || '')}</div>
-            <div class="respuesta">
-              📞 ${escapeHtml(r.contacto)} &nbsp;|&nbsp;
-              📅 ${escapeHtml(r.fecha_llegada || r.fecha)} &nbsp;|&nbsp;
-              👥 ${r.personas} persona(s)
-              ${r.dias_estancia ? `&nbsp;|&nbsp; 🌙 ${r.dias_estancia} día(s)` : ''}
-              ${r.idioma && r.idioma !== 'es' ? `&nbsp;|&nbsp; 🌐 ${r.idioma.toUpperCase()}` : ''}
-              ${r.origen ? `<br>📍 Origen: ${r.origen}` : ''}
+          <div class="ki-content">
+            <div class="ki-header">
+              <span style="${badgeStyle(ESTADO_C, r.estado)}">${r.estado}</span>
+              <span class="ki-question">${escapeHtml(r.nombre)}</span>
+              ${r.hospedaje || r.tipo ? `<span style="color:var(--text-muted);font-size:12px;">· ${escapeHtml(r.hospedaje || r.tipo)}</span>` : ''}
+            </div>
+            <div class="reserva-meta">
+              <span class="reserva-chip">📞 ${escapeHtml(r.contacto)}</span>
+              <span class="reserva-chip">📅 ${escapeHtml(r.fecha_llegada || r.fecha || '')}</span>
+              <span class="reserva-chip">👥 ${r.personas} persona(s)</span>
+              ${r.dias_estancia ? `<span class="reserva-chip">🌙 ${r.dias_estancia} día(s)</span>` : ''}
+              ${r.origen ? `<span class="reserva-chip">📍 ${escapeHtml(r.origen)}</span>` : ''}
             </div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
-            <select onchange="cambiarEstado(${r.id}, this.value)" style="background:#1e293b;border:1px solid rgba(255,255,255,0.1);color:#e2e8f0;padding:4px 8px;border-radius:6px;font-size:12px;cursor:pointer;">
+          <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;align-items:flex-end;">
+            <select onchange="cambiarEstado(${r.id}, this.value)"
+              style="background:var(--surface3);border:1px solid var(--border);color:var(--text-dim);padding:5px 8px;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit;outline:none;">
               <option value="pendiente"  ${r.estado==='pendiente'  ? 'selected':''}>Pendiente</option>
               <option value="confirmada" ${r.estado==='confirmada' ? 'selected':''}>Confirmada</option>
               <option value="cancelada"  ${r.estado==='cancelada'  ? 'selected':''}>Cancelada</option>
             </select>
-            <button class="btn-danger" onclick="eliminarReserva(${r.id})">Eliminar</button>
+            <button class="btn btn-danger" onclick="eliminarReserva(${r.id})">✕ Eliminar</button>
           </div>
         </div>
       `).join('');
     } catch {
-      list.innerHTML = '<div class="loading">Error al cargar.</div>';
+      list.innerHTML = '<div class="empty-state"><div class="es-icon">⚠️</div><p>Error al cargar.</p></div>';
     }
   }
 
@@ -489,7 +666,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado })
       });
-      showAlert('alert-reservaciones', 'success', `✓ Estado actualizado a "${estado}"`);
+      showAlert('alert-reservaciones', 'success', `Estado actualizado a "${estado}"`);
     } catch {
       showAlert('alert-reservaciones', 'error', 'Error al actualizar');
     }
@@ -501,9 +678,10 @@
       const res = await fetch(`${API}/api/admin/reservaciones/${id}`, { method: 'DELETE' });
       if (res.ok) {
         document.getElementById(`reserva-${id}`)?.remove();
-        const badge = document.getElementById('reserva-count');
-        badge.textContent = parseInt(badge.textContent) - 1;
-        showAlert('alert-reservaciones', 'success', '✓ Reservación eliminada');
+        const n = parseInt(document.getElementById('reserva-count').textContent) - 1;
+        document.getElementById('reserva-count').textContent     = n;
+        document.getElementById('nav-reserva-count').textContent = n;
+        showAlert('alert-reservaciones', 'success', 'Reservación eliminada');
       }
     } catch {
       showAlert('alert-reservaciones', 'error', 'Error al eliminar');

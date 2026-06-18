@@ -1,0 +1,16 @@
+{
+  "destinos": {
+    "titulo": "Destinos",
+    "slug": "destinos",
+    "descripcion": "Explora la península de Capachica.",
+    "publicado": true,
+    "secciones": [
+      {
+        "tipo": "hero",
+        "titulo": "Destinos Imperdibles",
+        "subtitulo": "Cada rincón de la península guarda una historia y un paisaje único. asdasdasdasd",
+        "imagen": ""
+      }
+    ]
+  }
+}

@@ -3,18 +3,20 @@ import Layout from '../layouts/Layout.astro';
 import VivencialTimeline from '../components/VivencialTimeline';
 import FamiliasGrid from '../components/FamiliasGrid';
 import ReservaForm from '../components/ReservaForm';
+
+const IA_URL = 'http://localhost:5000';
+let cms: any = null;
+try { const r = await fetch(`${IA_URL}/api/contenido/vivencial`); if (r.ok) cms = await r.json(); } catch {}
+const cmsHero = cms?.secciones?.find((s: any) => s.tipo === 'hero');
 ---
 <Layout title="Turismo Vivencial — Capachica">
   <Fragment slot="hero">
     <span class="section-label">VIVENCIAL · CAPACHICA · 3,820 MSNM</span>
     <h1 style="font-family:var(--font-display);font-size:clamp(3rem,7vw,5.5rem);line-height:1.05;color:var(--text-main);margin-bottom:0.4rem;">
-      Turismo
-    </h1>
-    <h1 style="font-family:var(--font-display);font-size:clamp(2.6rem,6.5vw,5rem);font-style:italic;font-weight:400;color:var(--gold);line-height:1.05;margin-bottom:1.2rem;">
-      Vivencial
+      {cmsHero?.titulo || 'Turismo Vivencial'}
     </h1>
     <p style="font-size:clamp(1rem,2vw,1.15rem);color:var(--text2);max-width:480px;margin:0 auto 2rem;line-height:1.7;">
-      Más que turismo: una inmersión real en la vida andina de las familias de Capachica, a orillas del Titicaca.
+      {cmsHero?.subtitulo || 'Más que turismo: una inmersión real en la vida andina de las familias de Capachica, a orillas del Titicaca.'}
     </p>
     <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
       <a href="#familias" class="btn-primary">Ver familias →</a>
