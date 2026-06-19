@@ -1005,7 +1005,7 @@ const IA_URL  = "http://localhost:5000";
     loadIA();
   }
 
-  if (TOKEN) showPanel();
+  showPanel(); // TEMPORAL: sin login
 
   /* ─── LOGIN ─── */
   $('loginBtn').onclick = async () => {
@@ -1019,7 +1019,8 @@ const IA_URL  = "http://localhost:5000";
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Error al iniciar sesión');
-      TOKEN = data.token;
+      if (data.usuario?.rol !== 'admin') throw new Error('Acceso denegado: se requiere rol admin');
+      TOKEN = data.accessToken;
       localStorage.setItem('admin_token', TOKEN);
       showPanel();
     } catch (e) {
