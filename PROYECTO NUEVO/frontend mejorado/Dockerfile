@@ -2,13 +2,11 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-RUN npm install -g pnpm
-
-COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install --no-frozen-lockfile
+COPY package.json ./
+RUN npm install --legacy-peer-deps
 
 COPY . .
-RUN pnpm build
+RUN npm run build
 
 EXPOSE 4322
 ENV HOST=0.0.0.0
