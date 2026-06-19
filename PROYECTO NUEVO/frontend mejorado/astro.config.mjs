@@ -1,7 +1,10 @@
 import { defineConfig } from "astro/config";
 import react from "@astrojs/react";
 import node from "@astrojs/node";
+import vercel from "@astrojs/vercel";
 import tailwind from "@astrojs/tailwind";
+
+const isVercel = process.env.VERCEL === "1";
 
 export default defineConfig({
   integrations: [
@@ -9,6 +12,6 @@ export default defineConfig({
     tailwind({ applyBaseStyles: false }),
   ],
   output: "server",
-  adapter: node({ mode: "standalone" }),
+  adapter: isVercel ? vercel() : node({ mode: "standalone" }),
   server: { port: 4322 },
 });

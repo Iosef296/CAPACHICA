@@ -1,1 +1,4 @@
 ..capachica-*/
+**/node_modules/
+**/dist/
+**/.env
