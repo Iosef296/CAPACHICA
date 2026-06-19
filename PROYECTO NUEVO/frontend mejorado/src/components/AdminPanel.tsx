@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 
-const API_URL = "http://localhost:3000";
-const IA_URL  = "http://localhost:5000";
+const API_URL = import.meta.env.PUBLIC_BACKEND_URL || "http://localhost:3000";
+const IA_URL  = import.meta.env.PUBLIC_IA_URL || "http://localhost:5000";
 
 interface Familia {
   id: string;

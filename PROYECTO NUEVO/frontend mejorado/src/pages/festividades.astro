@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import ArenaFooter from '../components/ArenaFooter.astro';
 let festividades = [];
 try {
-  const res = await fetch('http://localhost:3000/api/festividades');
+  const res = await fetch(`${import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api'}/festividades`);
   if (res.ok) festividades = await res.json();
 } catch {}
 

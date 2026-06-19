@@ -11,14 +11,15 @@ const Receta = require('../modelos/gastronomia/receta.modelo');
 
 const AppDataSource = new DataSource({
     type: 'postgres',
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 5432,
-    username: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || 'root123456',
-    database: process.env.DB_NAME || 'turismo_capachica',
+    host:     process.env.DB_HOST     || 'localhost',
+    port:     parseInt(process.env.DB_PORT) || 5432,
+    username: process.env.DB_USER     || 'postgres',
+    password: process.env.DB_PASSWORD || process.env.DB_PASS,
+    database: process.env.DB_NAME     || 'postgres',
     entities: [Usuario, Restaurante, Plato, Taller, Receta],
-    synchronize: process.env.NODE_ENV !== 'production',
-    logging: process.env.NODE_ENV === 'development',
+    synchronize: true,
+    logging: false,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
     migrations: ['src/migrations/**/*.js'],
     subscribers: ['src/subscribers/**/*.js'],
 });

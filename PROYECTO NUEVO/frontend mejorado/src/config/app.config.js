@@ -7,5 +7,5 @@ export const APP_CONFIG = {
     // Ruta del panel de administración después de login
     adminPanelUrl: 'http://localhost:4200/restaurantes',
     // URL del Backend para cargar las imágenes
-    backendUrl: 'http://localhost:3000'
+    backendUrl: import.meta.env.PUBLIC_BACKEND_URL || 'http://localhost:3000'
 };

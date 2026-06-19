@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 
-const AI_URL = 'http://localhost:5000';
+const AI_URL = import.meta.env.PUBLIC_IA_URL || 'http://localhost:5000';
 
 interface Msg {
   role: 'user' | 'assistant';

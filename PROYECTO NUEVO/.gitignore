@@ -1,0 +1,31 @@
+# Env files
+.env
+.env.local
+.env.production
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Builds
+dist/
+.astro/
+
+# Uploads locales (fotos van a Cloudinary en prod)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# WhatsApp session
+IA/backend/wa_auth/
+
+# Python
+__pycache__/
+*.pyc

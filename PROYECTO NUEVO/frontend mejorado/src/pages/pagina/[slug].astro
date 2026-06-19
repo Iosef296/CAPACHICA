@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import SectionRenderer from '../../components/SectionRenderer.astro';
 
 const { slug } = Astro.params;
-const IA_URL = 'http://localhost:5000';
+const IA_URL = import.meta.env.PUBLIC_IA_URL || 'http://localhost:5000';
 
 let page: any = null;
 try {

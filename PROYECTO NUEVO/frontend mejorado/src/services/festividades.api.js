@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api';
 
 export async function getFestividades() {
   const res = await fetch(`${API_URL}/festividades`);

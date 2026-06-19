@@ -27,7 +27,7 @@ export default function Navbar() {
     document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
     setPath(window.location.pathname);
 
-    fetch("http://localhost:5000/api/siteconfig")
+    fetch(`${import.meta.env.PUBLIC_IA_URL || 'http://localhost:5000'}/api/siteconfig`)
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d) setCfg(d); })
       .catch(() => {});

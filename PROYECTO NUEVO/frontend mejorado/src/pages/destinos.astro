@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import DestinosGrid from '../components/DestinosGrid';
 
-const IA_URL = 'http://localhost:5000';
+const IA_URL = import.meta.env.PUBLIC_IA_URL || 'http://localhost:5000';
 let cms: any = null;
 try {
   const r = await fetch(`${IA_URL}/api/contenido/destinos`);

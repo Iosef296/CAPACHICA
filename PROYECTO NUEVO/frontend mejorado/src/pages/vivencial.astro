@@ -5,7 +5,7 @@ import FamiliasGrid from '../components/FamiliasGrid';
 import ReservaForm from '../components/ReservaForm';
 import SectionRenderer from '../components/SectionRenderer.astro';
 
-const IA_URL = 'http://localhost:5000';
+const IA_URL = import.meta.env.PUBLIC_IA_URL || 'http://localhost:5000';
 let cms: any = null;
 try { const r = await fetch(`${IA_URL}/api/contenido/vivencial`); if (r.ok) cms = await r.json(); } catch {}
 const cmsHero = cms?.secciones?.find((s: any) => s.tipo === 'hero');

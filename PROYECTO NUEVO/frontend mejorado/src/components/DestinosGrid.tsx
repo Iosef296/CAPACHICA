@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const IA_URL = 'http://localhost:5000';
+const IA_URL = import.meta.env.PUBLIC_IA_URL || 'http://localhost:5000';
 
 interface Destino {
   id: number;

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const IA = 'http://localhost:5000';
+const IA = import.meta.env.PUBLIC_IA_URL || 'http://localhost:5000';
 
 interface Entry { id: number; categoria: string; pregunta: string; respuesta: string; }
 interface Knowledge { conocimiento: Entry[]; contexto_base: string; nombre_ia: string; descripcion: string; }

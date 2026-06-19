@@ -25,6 +25,9 @@ const adminRoutes        = require('./rutas/actividades/admin.rutas');
 // Rutas — Festividades
 const festividadesRoutes = require('./rutas/festividades/festividades.rutas');
 
+// Rutas — Upload
+const uploadRoutes = require('./rutas/upload.rutas');
+
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
@@ -57,6 +60,9 @@ app.use('/api/admin',        adminRoutes);
 
 // ── Festividades ───────────────────────────────────
 app.use('/api/festividades', festividadesRoutes);
+
+// ── Upload ─────────────────────────────────────────
+app.use('/api/upload', uploadRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {
