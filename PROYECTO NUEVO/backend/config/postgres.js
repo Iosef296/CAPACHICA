@@ -8,6 +8,7 @@ const pool = new Pool({
     user:     process.env.DB_USER     || 'postgres',
     password: process.env.DB_PASS     || process.env.DB_PASSWORD,
     ssl:      process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    family:   4,
     max: 10,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 10000,

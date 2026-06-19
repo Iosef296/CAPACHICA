@@ -20,6 +20,7 @@ const AppDataSource = new DataSource({
     synchronize: true,
     logging: false,
     ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    extra: { family: 4 },
     migrations: ['src/migrations/**/*.js'],
     subscribers: ['src/subscribers/**/*.js'],
 });
