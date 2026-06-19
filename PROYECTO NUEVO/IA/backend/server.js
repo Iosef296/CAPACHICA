@@ -361,14 +361,14 @@ app.get('/api/destinos', async (_req, res) => {
 app.post('/api/admin/destinos', async (req, res) => {
   try {
     const { nombre='',comunidad='',desc='',imagen='',emoji='📍',highlight='',color='#38bdf8',tags=[] } = req.body;
-    const r = await query('INSERT INTO ia_destinos (nombre,comunidad,desc,imagen,emoji,highlight,color,tags) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *', [nombre,comunidad,desc,imagen,emoji,highlight,color,JSON.stringify(tags)]);
+    const r = await query('INSERT INTO ia_destinos (nombre,comunidad,"desc",imagen,emoji,highlight,color,tags) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *', [nombre,comunidad,desc,imagen,emoji,highlight,color,JSON.stringify(tags)]);
     res.json({ ...r.rows[0], tags: r.rows[0].tags||[] });
   } catch(err) { res.status(500).json({ error:err.message }); }
 });
 app.put('/api/admin/destinos/:id', async (req, res) => {
   try {
     const { nombre,comunidad,desc,imagen,emoji,highlight,color,tags } = req.body;
-    const r = await query('UPDATE ia_destinos SET nombre=$1,comunidad=$2,desc=$3,imagen=$4,emoji=$5,highlight=$6,color=$7,tags=$8 WHERE id=$9 RETURNING *', [nombre,comunidad,desc,imagen,emoji||'📍',highlight,color||'#38bdf8',JSON.stringify(tags||[]),parseInt(req.params.id)]);
+    const r = await query('UPDATE ia_destinos SET nombre=$1,comunidad=$2,"desc"=$3,imagen=$4,emoji=$5,highlight=$6,color=$7,tags=$8 WHERE id=$9 RETURNING *', [nombre,comunidad,desc,imagen,emoji||'📍',highlight,color||'#38bdf8',JSON.stringify(tags||[]),parseInt(req.params.id)]);
     if (!r.rows.length) return res.status(404).json({ error:'No encontrado' });
     res.json({ ...r.rows[0], tags:r.rows[0].tags||[] });
   } catch(err) { res.status(500).json({ error:err.message }); }
