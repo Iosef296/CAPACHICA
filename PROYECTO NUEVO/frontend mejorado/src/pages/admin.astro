@@ -1986,33 +1986,47 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
   };
 
   function renderFtColCards() {
-    const container = document.getElementById('ft-col-cards');
-    if (!container) return;
+    const card = document.getElementById('global-card-footer');
+    if (!card) return;
     if (!_sitecfg.footer) _sitecfg.footer = {};
-    const order = _sitecfg.footer.column_order || ['brand','destinos','experiencias','newsletter'];
-    const n = order.length;
-    container.innerHTML = order.map((key, i) => {
-      const meta = FT_COL_META[key] || { icon: '▣', label: key, editBody: () => '' };
-      const isActive = key === ftColActiveKey;
-      return `<div class="pe-sec-card ${isActive ? 'active' : ''}" id="ftcc-${key}">
-        <div class="pe-sec-card-hdr">
+
+    if (ftColActiveKey) {
+      const meta = FT_COL_META[ftColActiveKey];
+      if (!meta) { ftColActiveKey = null; renderFtColCards(); return; }
+      card.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;">
+          <button onclick="ftColToggle(null)" style="background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--muted);font-size:12px;cursor:pointer;padding:5px 10px;font-family:inherit;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">← Columnas</button>
           <div class="pe-sec-card-badge">${meta.icon} ${meta.label}</div>
-          <div class="pe-sec-card-actions">
-            <button onclick="ftColMove('${key}',-1)" ${i===0?'disabled':''}>↑</button>
-            <button onclick="ftColMove('${key}',1)" ${i===n-1?'disabled':''}>↓</button>
-            <button class="${isActive?'btn-done':'btn-edit'}" onclick="ftColToggle('${key}')">${isActive?'✓ Listo':'✏️ Editar'}</button>
-          </div>
         </div>
-        ${isActive ? meta.editBody() : ''}
-      </div>`;
-    }).join('');
-    // Fill link lists for expanded columns
-    if (ftColActiveKey === 'destinos') {
-      renderFtSection('destinos', _sitecfg.footer.destinos_links || []);
-    }
-    if (ftColActiveKey === 'experiencias') {
-      renderFtSection('experiencias', _sitecfg.footer.experiencias_links || []);
-      renderFtSection('info',         _sitecfg.footer.links              || []);
+        ${meta.editBody()}
+      `;
+      const ft = _sitecfg.footer;
+      if (ftColActiveKey === 'destinos') renderFtSection('destinos', ft.destinos_links || []);
+      if (ftColActiveKey === 'experiencias') {
+        renderFtSection('experiencias', ft.experiencias_links || []);
+        renderFtSection('info',         ft.links              || []);
+      }
+    } else {
+      const order = _sitecfg.footer.column_order || ['brand','destinos','experiencias','newsletter'];
+      const n = order.length;
+      card.innerHTML = `
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">🏛️ Footer — Columnas</div>
+        <div id="ft-col-cards" style="display:flex;flex-direction:column;gap:8px;">
+          ${order.map((key, i) => {
+            const meta = FT_COL_META[key] || { icon: '', label: key };
+            return `<div class="pe-sec-card" id="ftcc-${key}">
+              <div class="pe-sec-card-hdr">
+                <div class="pe-sec-card-badge">${meta.icon} ${meta.label}</div>
+                <div class="pe-sec-card-actions">
+                  <button onclick="ftColMove('${key}',-1)" ${i===0?'disabled':''}>↑</button>
+                  <button onclick="ftColMove('${key}',1)" ${i===n-1?'disabled':''}>↓</button>
+                  <button class="btn-edit" onclick="ftColToggle('${key}')">&#x270F;&#xFE0F; Editar</button>
+                </div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      `;
     }
   }
 
@@ -2039,7 +2053,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
   }
 
   function ftColToggle(key) {
-    ftColActiveKey = (ftColActiveKey === key) ? null : key;
+    ftColActiveKey = (key === ftColActiveKey) ? null : (key || null);
     renderFtColCards();
     _ftColHighlight(ftColActiveKey);
   }
