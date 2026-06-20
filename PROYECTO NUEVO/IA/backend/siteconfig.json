@@ -45,6 +45,7 @@
       { "label": "Gastronomía",  "href": "/gastronomia" },
       { "label": "Festividades", "href": "/festividades" },
       { "label": "Artesanía",    "href": "/artesania" }
-    ]
+    ],
+    "column_order": ["brand", "destinos", "experiencias", "newsletter"]
   }
 }

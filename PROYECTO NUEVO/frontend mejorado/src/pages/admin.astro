@@ -2204,6 +2204,56 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
           window.parent.postMessage({ type: 'cms-global-footer-reorder', section: sectionKey, from, to }, '*');
         });
       });
+
+      // ── Hide URL tooltip on footer links (drag is on <li>, pointer falls to parent) ──
+      if (!doc._ftLinkStyleInjected) {
+        doc._ftLinkStyleInjected = true;
+        var _ftStyle = doc.createElement('style');
+        _ftStyle.textContent = '[data-footer-section] a { pointer-events: none !important; }';
+        (doc.head || doc.body).appendChild(_ftStyle);
+      }
+
+      // ── Drag-to-reorder footer columns ──
+      var ftColDragSrc = null;
+      doc.querySelectorAll('[data-footer-col]').forEach(function(col) {
+        if (col._colDragReady) return;
+        col._colDragReady = true;
+        col.setAttribute('draggable', 'true');
+        col.style.cursor = 'grab';
+        col.addEventListener('dragstart', function(e) {
+          if (e.target !== col) return; // ignore child drags (li items)
+          ftColDragSrc = col;
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', col.getAttribute('data-footer-col') || '');
+          e.stopPropagation();
+          setTimeout(function() { col.style.opacity = '0.4'; col.style.outline = '2px dashed ' + CYAN; }, 0);
+        });
+        col.addEventListener('dragend', function() {
+          col.style.opacity = ''; col.style.outline = '';
+          doc.querySelectorAll('[data-footer-col]').forEach(function(c) { c.style.boxShadow = ''; });
+          ftColDragSrc = null;
+        });
+        col.addEventListener('dragover', function(e) {
+          if (!ftColDragSrc) return;
+          e.preventDefault(); e.stopPropagation();
+          e.dataTransfer.dropEffect = 'move';
+          if (col !== ftColDragSrc) col.style.boxShadow = '0 0 0 2px ' + CYAN + ', 0 0 14px rgba(45,212,191,0.25)';
+        });
+        col.addEventListener('dragleave', function() { col.style.boxShadow = ''; });
+        col.addEventListener('drop', function(e) {
+          if (!ftColDragSrc || ftColDragSrc === col) return;
+          e.preventDefault(); e.stopPropagation();
+          col.style.boxShadow = '';
+          var grid = col.parentNode;
+          var cRect = col.getBoundingClientRect();
+          var before = e.clientX < cRect.left + cRect.width / 2;
+          if (before) { grid.insertBefore(ftColDragSrc, col); }
+          else { col.insertAdjacentElement('afterend', ftColDragSrc); }
+          ftColDragSrc.style.opacity = ''; ftColDragSrc.style.outline = '';
+          var newOrder = Array.from(grid.querySelectorAll('[data-footer-col]')).map(function(c) { return c.getAttribute('data-footer-col'); });
+          window.parent.postMessage({ type: 'cms-footer-col-reorder', order: newOrder }, '*');
+        });
+      });
     } catch (e) {}
   }
   window.injectGlobalEditMode = injectGlobalEditMode;
@@ -2236,6 +2286,10 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       links.splice(to, 0, item);
       renderFtSection(sec, links);
     }
+    if (e.data?.type === 'cms-footer-col-reorder') {
+      if (!_sitecfg.footer) _sitecfg.footer = {};
+      _sitecfg.footer.column_order = e.data.order;
+    }
   });
 
   async function saveSiteconfigAdmin() {
@@ -2256,6 +2310,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       links:             _sitecfg.footer?.links              || [],
       destinos_links:    _sitecfg.footer?.destinos_links     || [],
       experiencias_links:_sitecfg.footer?.experiencias_links || [],
+      column_order:      _sitecfg.footer?.column_order       || ['brand','destinos','experiencias','newsletter'],
     };
     try {
       const r = await fetch(`${IA_URL}/api/admin/siteconfig`, {
