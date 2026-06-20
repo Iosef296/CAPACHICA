@@ -769,11 +769,11 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
                 <div class="fg" style="margin:0">
                   <label>Nombre del logo</label>
-                  <input type="text" id="nb-logo-nombre" placeholder="Capachica" />
+                  <input type="text" id="nb-logo-nombre" placeholder="Capachica" oninput="liveUpdate('navbar.logo_nombre',this.value)" />
                 </div>
                 <div class="fg" style="margin:0">
                   <label>Tagline del logo</label>
-                  <input type="text" id="nb-logo-tagline" placeholder="Turismo Vivencial" />
+                  <input type="text" id="nb-logo-tagline" placeholder="Turismo Vivencial" oninput="liveUpdate('navbar.logo_tagline',this.value)" />
                 </div>
               </div>
               <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Links del menú</div>
@@ -1846,6 +1846,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
   function nbUpdateLink(i, field, val) {
     if (!_sitecfg.navbar.links[i]) return;
     _sitecfg.navbar.links[i][field] = val;
+    _liveNavLinks();
   }
   function nbMoveLink(i, dir) {
     const links = _sitecfg.navbar.links;
@@ -1853,15 +1854,18 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     if (j < 0 || j >= links.length) return;
     [links[i], links[j]] = [links[j], links[i]];
     renderNbLinks(links);
+    _liveNavLinks();
   }
   function nbRemoveLink(i) {
     _sitecfg.navbar.links.splice(i, 1);
     renderNbLinks(_sitecfg.navbar.links);
+    _liveNavLinks();
   }
   function nbAddLink() {
     if (!_sitecfg.navbar.links) _sitecfg.navbar.links = [];
     _sitecfg.navbar.links.push({ label: '', href: '/' });
     renderNbLinks(_sitecfg.navbar.links);
+    _liveNavLinks();
   }
   window.nbAddLink    = nbAddLink;
   window.nbRemoveLink = nbRemoveLink;
@@ -1898,6 +1902,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
   function ftSectionUpdate(section, i, field, val) {
     const links = ftSectionLinks(section);
     if (links[i]) links[i][field] = val;
+    _liveFtSection(section);
   }
   function ftSectionMove(section, i, dir) {
     const links = ftSectionLinks(section);
@@ -1905,16 +1910,19 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     if (j < 0 || j >= links.length) return;
     [links[i], links[j]] = [links[j], links[i]];
     renderFtSection(section, links);
+    _liveFtSection(section);
   }
   function ftSectionRemove(section, i) {
     const links = ftSectionLinks(section);
     links.splice(i, 1);
     renderFtSection(section, links);
+    _liveFtSection(section);
   }
   function ftSectionAdd(section) {
     const links = ftSectionLinks(section);
     links.push({ label: '', href: '/' });
     renderFtSection(section, links);
+    _liveFtSection(section);
   }
   window.ftSectionUpdate = ftSectionUpdate;
   window.ftSectionMove   = ftSectionMove;
@@ -1934,18 +1942,18 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         const esc = v => (v||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');
         return `<div style="padding:16px;display:flex;flex-direction:column;gap:10px;border-top:2px solid var(--cyan-b);">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            <div class="fg" style="margin:0"><label>Nombre</label><input type="text" value="${esc(ft.brand_nombre)}" placeholder="Capachica" oninput="if(!_sitecfg.footer)_sitecfg.footer={};_sitecfg.footer.brand_nombre=this.value" /></div>
-            <div class="fg" style="margin:0"><label>Tagline</label><input type="text" value="${esc(ft.brand_tagline)}" placeholder="TURISMO VIVENCIAL" oninput="if(!_sitecfg.footer)_sitecfg.footer={};_sitecfg.footer.brand_tagline=this.value" /></div>
+            <div class="fg" style="margin:0"><label>Nombre</label><input type="text" value="${esc(ft.brand_nombre)}" placeholder="Capachica" oninput="liveUpdate('footer.brand_nombre',this.value)" /></div>
+            <div class="fg" style="margin:0"><label>Tagline</label><input type="text" value="${esc(ft.brand_tagline)}" placeholder="TURISMO VIVENCIAL" oninput="liveUpdate('footer.brand_tagline',this.value)" /></div>
           </div>
-          <div class="fg" style="margin:0"><label>Descripción</label><input type="text" value="${esc(ft.brand_desc)}" placeholder="La joya escondida..." oninput="if(!_sitecfg.footer)_sitecfg.footer={};_sitecfg.footer.brand_desc=this.value" /></div>
+          <div class="fg" style="margin:0"><label>Descripción</label><input type="text" value="${esc(ft.brand_desc)}" placeholder="La joya escondida..." oninput="liveUpdate('footer.brand_desc',this.value)" /></div>
           <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Redes sociales</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            <div class="fg" style="margin:0"><label>Instagram</label><input type="text" value="${esc(ft.social_instagram)}" oninput="if(!_sitecfg.footer)_sitecfg.footer={};_sitecfg.footer.social_instagram=this.value" /></div>
-            <div class="fg" style="margin:0"><label>Facebook</label><input type="text" value="${esc(ft.social_facebook)}" oninput="if(!_sitecfg.footer)_sitecfg.footer={};_sitecfg.footer.social_facebook=this.value" /></div>
-            <div class="fg" style="margin:0"><label>YouTube</label><input type="text" value="${esc(ft.social_youtube)}" oninput="if(!_sitecfg.footer)_sitecfg.footer={};_sitecfg.footer.social_youtube=this.value" /></div>
-            <div class="fg" style="margin:0"><label>TikTok</label><input type="text" value="${esc(ft.social_tiktok)}" oninput="if(!_sitecfg.footer)_sitecfg.footer={};_sitecfg.footer.social_tiktok=this.value" /></div>
+            <div class="fg" style="margin:0"><label>Instagram</label><input type="text" value="${esc(ft.social_instagram)}" oninput="liveUpdate('footer.social_instagram',this.value)" /></div>
+            <div class="fg" style="margin:0"><label>Facebook</label><input type="text" value="${esc(ft.social_facebook)}" oninput="liveUpdate('footer.social_facebook',this.value)" /></div>
+            <div class="fg" style="margin:0"><label>YouTube</label><input type="text" value="${esc(ft.social_youtube)}" oninput="liveUpdate('footer.social_youtube',this.value)" /></div>
+            <div class="fg" style="margin:0"><label>TikTok</label><input type="text" value="${esc(ft.social_tiktok)}" oninput="liveUpdate('footer.social_tiktok',this.value)" /></div>
           </div>
-          <div class="fg" style="margin:0"><label>Copyright</label><input type="text" value="${esc(ft.copyright)}" placeholder="© 2026 Capachica Turismo..." oninput="if(!_sitecfg.footer)_sitecfg.footer={};_sitecfg.footer.copyright=this.value" /></div>
+          <div class="fg" style="margin:0"><label>Copyright</label><input type="text" value="${esc(ft.copyright)}" placeholder="© 2026 Capachica Turismo..." oninput="liveUpdate('footer.copyright',this.value)" /></div>
         </div>`;
       }
     },
@@ -1985,14 +1993,14 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         const ft = _sitecfg?.footer || {};
         const esc = v => (v||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');
         return `<div style="padding:16px;display:flex;flex-direction:column;gap:10px;border-top:2px solid var(--cyan-b);">
-          <div class="fg" style="margin:0"><label>Descripción corta</label><input type="text" value="${esc(ft.newsletter_desc)}" placeholder="Novedades y ofertas exclusivas · 1 email/semana" oninput="if(!_sitecfg.footer)_sitecfg.footer={};_sitecfg.footer.newsletter_desc=this.value" /></div>
-          <div class="fg" style="margin:0"><label>Texto anti-spam</label><input type="text" value="${esc(ft.newsletter_spam_text)}" placeholder="Sin spam, prometido" oninput="if(!_sitecfg.footer)_sitecfg.footer={};_sitecfg.footer.newsletter_spam_text=this.value" /></div>
+          <div class="fg" style="margin:0"><label>Descripción corta</label><input type="text" value="${esc(ft.newsletter_desc)}" placeholder="Novedades y ofertas exclusivas · 1 email/semana" oninput="liveUpdate('footer.newsletter_desc',this.value)" /></div>
+          <div class="fg" style="margin:0"><label>Texto anti-spam</label><input type="text" value="${esc(ft.newsletter_spam_text)}" placeholder="Sin spam, prometido" oninput="liveUpdate('footer.newsletter_spam_text',this.value)" /></div>
           <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Contacto</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            <div class="fg" style="margin:0"><label>WhatsApp</label><input type="text" value="${esc(ft.contacto_whatsapp)}" placeholder="51955949404" oninput="if(!_sitecfg.footer)_sitecfg.footer={};_sitecfg.footer.contacto_whatsapp=this.value" /></div>
-            <div class="fg" style="margin:0"><label>Email</label><input type="text" value="${esc(ft.contacto_email)}" placeholder="correo@ejemplo.com" oninput="if(!_sitecfg.footer)_sitecfg.footer={};_sitecfg.footer.contacto_email=this.value" /></div>
+            <div class="fg" style="margin:0"><label>WhatsApp</label><input type="text" value="${esc(ft.contacto_whatsapp)}" placeholder="51955949404" oninput="liveUpdate('footer.contacto_whatsapp',this.value)" /></div>
+            <div class="fg" style="margin:0"><label>Email</label><input type="text" value="${esc(ft.contacto_email)}" placeholder="correo@ejemplo.com" oninput="liveUpdate('footer.contacto_email',this.value)" /></div>
           </div>
-          <div class="fg" style="margin:0"><label>Copyright</label><input type="text" value="${esc(ft.copyright)}" placeholder="© 2026 Capachica Turismo..." oninput="if(!_sitecfg.footer)_sitecfg.footer={};_sitecfg.footer.copyright=this.value" /></div>
+          <div class="fg" style="margin:0"><label>Copyright</label><input type="text" value="${esc(ft.copyright)}" placeholder="© 2026 Capachica Turismo..." oninput="liveUpdate('footer.copyright',this.value)" /></div>
         </div>`;
       }
     }
@@ -2466,9 +2474,139 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
           window.parent.postMessage({ type: 'cms-footer-col-click', key: key }, '*');
         });
       });
+
+      // ── Live preview: listen for cms-live-field from admin ──
+      var win = iframe.contentWindow;
+      if (win && !win._liveFieldReady) {
+        win._liveFieldReady = true;
+        win.addEventListener('message', function(ev) {
+          if (!ev.data || ev.data.type !== 'cms-live-field') return;
+          var path  = ev.data.path;
+          var value = ev.data.value;
+          var d = win.document;
+          var qs = function(s) { return d.querySelector(s); };
+          try {
+            if (path === 'footer.brand_nombre') {
+              var e1 = qs('.arena-brand-name');    if (e1) e1.textContent = value || 'Capachica';
+              var e2 = qs('.arena-logo-circle');   if (e2) e2.textContent = (value || 'C')[0];
+            } else if (path === 'footer.brand_tagline') {
+              var e1 = qs('.arena-brand-tagline'); if (e1) e1.textContent = value || 'TURISMO VIVENCIAL';
+            } else if (path === 'footer.brand_desc') {
+              var e1 = qs('.arena-brand-desc');    if (e1) e1.textContent = value || '';
+            } else if (path === 'footer.copyright') {
+              var e1 = qs('.arena-bottom-bar p');  if (e1) e1.textContent = value || '';
+            } else if (path === 'footer.social_instagram') {
+              var e1 = qs('.arena-social-btn[aria-label="Instagram"]'); if (e1) e1.href = value;
+            } else if (path === 'footer.social_facebook') {
+              var e1 = qs('.arena-social-btn[aria-label="Facebook"]');  if (e1) e1.href = value;
+            } else if (path === 'footer.social_youtube') {
+              var e1 = qs('.arena-social-btn[aria-label="YouTube"]');   if (e1) e1.href = value;
+            } else if (path === 'footer.social_tiktok') {
+              var e1 = qs('.arena-social-btn[aria-label="TikTok"]');    if (e1) e1.href = value;
+            } else if (path === 'footer.contacto_whatsapp') {
+              var items = d.querySelectorAll('.arena-contact-row .arena-contact-item');
+              if (items[0]) {
+                items[0].href = 'https://wa.me/' + (value || '51955949404');
+                var sp = items[0].querySelector('span');
+                if (sp) sp.textContent = '+' + (value || '51 955 949 404');
+              }
+            } else if (path === 'footer.contacto_email') {
+              var items = d.querySelectorAll('.arena-contact-row .arena-contact-item');
+              if (items[1]) {
+                items[1].href = 'mailto:' + (value || 'torresdeissy56@gmail.com');
+                var sp = items[1].querySelector('span');
+                if (sp) sp.textContent = value || 'torresdeissy56@gmail.com';
+              }
+            } else if (path === 'footer.newsletter_desc') {
+              var form = qs('.arena-newsletter-form');
+              if (form) {
+                var parent = form.closest('[data-footer-col]') || form.parentElement;
+                var p = parent && parent.querySelector('p.arena-text');
+                if (p) p.textContent = value || 'Novedades y ofertas exclusivas · 1 email/semana';
+              }
+            } else if (path === 'footer.newsletter_spam_text') {
+              var e1 = qs('.arena-newsletter-form .arena-text');
+              if (e1) e1.textContent = value || 'Sin spam, prometido';
+            } else if (path === 'footer.destinos_links') {
+              var ul = qs('[data-footer-section="destinos"]');
+              if (ul) ul.innerHTML = (value||[]).map(function(l) {
+                return '<li><a href="' + l.href + '" class="arena-link footer-link">' + l.label + '</a></li>';
+              }).join('');
+            } else if (path === 'footer.experiencias_links') {
+              var ul = qs('[data-footer-section="experiencias"]');
+              if (ul) ul.innerHTML = (value||[]).map(function(l) {
+                return '<li><a href="' + l.href + '" class="arena-link footer-link">' + l.label + '</a></li>';
+              }).join('');
+            } else if (path === 'footer.links') {
+              var ul = qs('[data-footer-section="info"]');
+              if (ul) ul.innerHTML = (value||[]).map(function(l) {
+                return '<li><a href="' + l.href + '" class="arena-link footer-link">' + l.label + '</a></li>';
+              }).join('');
+            } else if (path === 'navbar.logo_nombre') {
+              var lnk = qs('nav a[href="/"]');
+              if (lnk) {
+                var circle = lnk.querySelector('div:first-child');
+                if (circle) circle.textContent = (value || 'C')[0];
+                var nm = lnk.querySelector('div:last-child > div:first-child');
+                if (nm) nm.textContent = value || 'Capachica';
+              }
+            } else if (path === 'navbar.logo_tagline') {
+              var lnk = qs('nav a[href="/"]');
+              if (lnk) {
+                var tg = lnk.querySelector('div:last-child > div:last-child');
+                if (tg) tg.textContent = value || 'Turismo Vivencial';
+              }
+            } else if (path === 'navbar.links') {
+              var nd = qs('.nav-desktop');
+              if (nd) nd.innerHTML = (value||[]).map(function(l) {
+                return '<a href="' + l.href + '" class="nav-link">' + l.label + '</a>';
+              }).join('');
+              var mm = qs('.mobile-menu');
+              if (mm) mm.innerHTML = (value||[]).map(function(l) {
+                return '<a href="' + l.href + '">' + l.label + '</a>';
+              }).join('');
+            }
+          } catch(ex) {}
+        });
+      }
     } catch (e) {}
   }
   window.injectGlobalEditMode = injectGlobalEditMode;
+
+  // ── Live preview helpers ──
+  function liveUpdate(path, value) {
+    // Update _sitecfg
+    if (!_sitecfg) _sitecfg = {};
+    var parts = path.split('.');
+    var obj = _sitecfg;
+    for (var _i = 0; _i < parts.length - 1; _i++) {
+      if (!obj[parts[_i]]) obj[parts[_i]] = {};
+      obj = obj[parts[_i]];
+    }
+    obj[parts[parts.length - 1]] = value;
+    // Send to iframe
+    var frame = document.getElementById('globalPreviewFrame');
+    if (frame && frame.contentWindow) {
+      try { frame.contentWindow.postMessage({ type: 'cms-live-field', path: path, value: value }, '*'); } catch(ex) {}
+    }
+  }
+  function _liveNavLinks() {
+    var links = _sitecfg && _sitecfg.navbar && _sitecfg.navbar.links ? _sitecfg.navbar.links : [];
+    var frame = document.getElementById('globalPreviewFrame');
+    if (frame && frame.contentWindow) {
+      try { frame.contentWindow.postMessage({ type: 'cms-live-field', path: 'navbar.links', value: links }, '*'); } catch(ex) {}
+    }
+  }
+  function _liveFtSection(section) {
+    var { key } = FT_SECTION_MAP[section] || {};
+    if (!key) return;
+    var links = _sitecfg && _sitecfg.footer ? (_sitecfg.footer[key] || []) : [];
+    var frame = document.getElementById('globalPreviewFrame');
+    if (frame && frame.contentWindow) {
+      try { frame.contentWindow.postMessage({ type: 'cms-live-field', path: 'footer.' + key, value: links }, '*'); } catch(ex) {}
+    }
+  }
+  window.liveUpdate = liveUpdate;
 
   // Listen for global click + reorder messages from iframe
   window.addEventListener('message', function(e) {
