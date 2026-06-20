@@ -769,7 +769,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         <div style="display:flex;height:calc(100vh - 56px);">
 
           <!-- LEFT: forms -->
-          <div style="width:460px;flex-shrink:0;overflow-y:auto;padding:28px 24px;border-right:1px solid var(--border);background:var(--s1);">
+          <div id="global-edit-panel" style="width:460px;flex-shrink:0;overflow-y:auto;padding:28px 24px;border-right:1px solid var(--border);background:var(--s1);">
             <div class="page-hdr">
               <h2>Navbar &amp; Footer</h2>
               <p>Configura el menú y el pie de página</p>
@@ -811,6 +811,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
               <span style="font-size:11px;color:var(--muted);">Vista previa real</span>
               <span style="font-size:10px;color:var(--dim);">Guarda para ver los cambios</span>
               <button onclick="document.getElementById('globalPreviewFrame').src=document.getElementById('globalPreviewFrame').src" style="margin-left:auto;padding:4px 10px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;">↺ Actualizar</button>
+              <button id="preview-fullscreen-btn" onclick="togglePreviewFullscreen()" style="padding:4px 10px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;" title="Pantalla completa">⛶ Pantalla completa</button>
             </div>
             <iframe id="globalPreviewFrame" src={import.meta.env.PUBLIC_SITE_URL || "http://localhost:4322/"} style="flex:1;border:none;width:100%;height:100%;" title="Vista previa" onload="scheduleGlobalInject(this)"></iframe>
           </div>
@@ -1030,6 +1031,42 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     }, 250);
   }
   window.toggleSidebar = toggleSidebar;
+
+  var _previewFullscreen = false;
+  function togglePreviewFullscreen() {
+    _previewFullscreen = !_previewFullscreen;
+    const editPanel = document.getElementById('global-edit-panel');
+    const sidebar   = document.getElementById('mainSidebar');
+    const btn       = document.getElementById('preview-fullscreen-btn');
+    const iframe    = document.getElementById('globalPreviewFrame');
+    if (_previewFullscreen) {
+      editPanel.style.display = 'none';
+      sidebar.style.display   = 'none';
+      btn.textContent = '⊠ Salir pantalla completa';
+      // Remove zoom so page renders at real size
+      try {
+        const zs = iframe.contentDocument && iframe.contentDocument.getElementById('admin-preview-zoom');
+        if (zs) zs.textContent = '';
+        iframe.contentWindow.scrollTo(0, 0);
+      } catch(e) {}
+    } else {
+      editPanel.style.display = '';
+      sidebar.style.display   = '';
+      btn.textContent = '⛶ Pantalla completa';
+      // Re-apply zoom
+      try {
+        const doc = iframe.contentDocument;
+        const targetW = 1440;
+        const iframeW = iframe.getBoundingClientRect().width || 900;
+        const ratio = Math.min(1, iframeW / targetW);
+        var zs = doc && doc.getElementById('admin-preview-zoom');
+        if (!zs && doc) { zs = doc.createElement('style'); zs.id='admin-preview-zoom'; doc.head.appendChild(zs); }
+        if (zs) zs.textContent = 'html { zoom: ' + ratio.toFixed(4) + '; }';
+        iframe.contentWindow.scrollTo(0, 0);
+      } catch(e) {}
+    }
+  }
+  window.togglePreviewFullscreen = togglePreviewFullscreen;
 
   if (TOKEN) showPanel();
 
