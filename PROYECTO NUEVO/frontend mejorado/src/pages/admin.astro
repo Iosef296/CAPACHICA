@@ -2016,9 +2016,32 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     }
   }
 
+  function _ftColHighlight(activeKey) {
+    const frame = document.getElementById('globalPreviewFrame');
+    if (!frame) return;
+    try {
+      const doc = frame.contentDocument || frame.contentWindow?.document;
+      if (!doc) return;
+      doc.querySelectorAll('[data-footer-col]').forEach(c => {
+        c.style.outline = '';
+        c.style.boxShadow = '';
+        c.style.transition = 'outline .15s, box-shadow .15s';
+      });
+      if (activeKey) {
+        const col = doc.querySelector(`[data-footer-col="${activeKey}"]`);
+        if (col) {
+          col.style.outline = '2px solid #2dd4bf';
+          col.style.boxShadow = '0 0 0 4px rgba(45,212,191,0.18)';
+          col.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+    } catch(e) {}
+  }
+
   function ftColToggle(key) {
     ftColActiveKey = (ftColActiveKey === key) ? null : key;
     renderFtColCards();
+    _ftColHighlight(ftColActiveKey);
   }
 
   function ftColMove(key, dir) {
@@ -2030,6 +2053,20 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     [order[i], order[j]] = [order[j], order[i]];
     _sitecfg.footer.column_order = order;
     renderFtColCards();
+    _ftColHighlight(ftColActiveKey);
+    // Sync iframe DOM immediately
+    const frame = document.getElementById('globalPreviewFrame');
+    if (!frame) return;
+    try {
+      const doc = frame.contentDocument || frame.contentWindow?.document;
+      const grid = doc?.querySelector('.arena-footer-grid');
+      if (!grid) return;
+      const colKey   = grid.querySelector(`[data-footer-col="${key}"]`);
+      const colOther = grid.querySelector(`[data-footer-col="${order[i]}"]`);
+      if (!colKey || !colOther) return;
+      if (dir > 0) { colOther.insertAdjacentElement('afterend', colKey); }
+      else         { grid.insertBefore(colKey, colOther); }
+    } catch(e) {}
   }
 
   window.ftColToggle = ftColToggle;
