@@ -15,7 +15,7 @@
     ]
   },
   "footer": {
-    "footer_gif": "/campfire.png",
+    "footer_gifs": ["/campfire.png", "/campfire.png"],
     "brand_nombre": "Capachica",
     "brand_tagline": "TURISMO VIVENCIAL",
     "brand_desc": "La joya escondida del lago Titicaca. Turismo comunitario auténtico a 3,820 msnm.",

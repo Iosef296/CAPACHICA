@@ -1954,31 +1954,10 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
             <div class="fg" style="margin:0"><label>TikTok</label><input type="text" value="${esc(ft.social_tiktok)}" oninput="liveUpdate('footer.social_tiktok',this.value)" /></div>
           </div>
           <div class="fg" style="margin:0"><label>Copyright</label><input type="text" value="${esc(ft.copyright)}" placeholder="© 2026 Capachica Turismo..." oninput="liveUpdate('footer.copyright',this.value)" /></div>
-          <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px;">Imagen decorativa (GIF/PNG)</div>
-          <div style="display:flex;gap:8px;align-items:flex-start;margin-top:6px;">
-            <div style="flex-shrink:0;width:64px;height:64px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
-              <img id="ft-gif-preview" src="${esc(ft.footer_gif||'/campfire.png')}" style="max-width:64px;max-height:64px;object-fit:contain;" />
-            </div>
-            <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
-              <input type="text" id="ft-gif-url" value="${esc(ft.footer_gif||'')}" placeholder="/campfire.png o https://..." style="margin:0;font-size:12px;" oninput="liveUpdate('footer.footer_gif',this.value||null);var p=document.getElementById('ft-gif-preview');if(p)p.src=this.value||'\/campfire.png';" />
-              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
-                <div style="background:var(--border);border:1px solid var(--border2);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap;">📁 Subir archivo</div>
-                <input type="file" accept="image/*,.gif" style="display:none;" onchange="(function(inp){
-                  var f=inp.files[0]; if(!f)return;
-                  if(f.size>500*1024){alert('El archivo es grande (>'+Math.round(f.size/1024)+'KB). Usa una URL externa para GIFs grandes.');}
-                  var r=new FileReader(); r.onload=function(ev){
-                    var url=ev.target.result;
-                    var urlInp=document.getElementById('ft-gif-url');
-                    var prev=document.getElementById('ft-gif-preview');
-                    if(urlInp)urlInp.value=url;
-                    if(prev)prev.src=url;
-                    liveUpdate('footer.footer_gif',url);
-                  }; r.readAsDataURL(f);
-})(this)" />
-              </label>
-              <span style="font-size:10px;color:var(--dim);">Aparece a ambos lados del footer en modo oscuro</span>
-            </div>
-          </div>
+          <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px;">Imágenes decorativas (GIF/PNG)</div>
+          <div id="ft-gif-list" style="display:flex;flex-direction:column;gap:8px;margin-top:6px;"></div>
+          <button class="btn-sm" onclick="ftGifAdd()" style="margin-top:6px;padding:5px 12px;font-size:11px;">+ Agregar imagen</button>
+          <span style="font-size:10px;color:var(--dim);display:block;margin-top:4px;">Aparecen en el footer en modo oscuro. Alterna: 1ª=derecha, 2ª=izquierda, etc.</span>
         </div>`;
       }
     },
@@ -2056,6 +2035,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       if (ftColActiveKey === 'destinos') renderFtSection('destinos', ft.destinos_links || []);
       if (ftColActiveKey === 'experiencias') renderFtSection('experiencias', ft.experiencias_links || []);
       if (ftColActiveKey === 'info') renderFtSection('info', ft.links || []);
+      if (ftColActiveKey === 'brand') renderFtGifList();
     } else {
       // LIST VIEW
       const order = getNormOrder();
@@ -2167,6 +2147,76 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
   window.ftColMoveGroup = ftColMoveGroup;
   window.ftColSplit     = ftColSplit;
   window.ftColMerge     = ftColMerge;
+
+  function _ftGifs() {
+    if (!_sitecfg.footer) _sitecfg.footer = {};
+    const def = ['/campfire.png', '/campfire.png'];
+    if (!Array.isArray(_sitecfg.footer.footer_gifs)) {
+      _sitecfg.footer.footer_gifs = _sitecfg.footer.footer_gif
+        ? [_sitecfg.footer.footer_gif, _sitecfg.footer.footer_gif]
+        : [...def];
+    }
+    return _sitecfg.footer.footer_gifs;
+  }
+
+  function renderFtGifList() {
+    const container = document.getElementById('ft-gif-list');
+    if (!container) return;
+    const gifs = _ftGifs();
+    const sides = ['derecha', 'izquierda', 'derecha (2)', 'izquierda (2)'];
+    container.innerHTML = gifs.map(function(src, i) {
+      const side = sides[i] || (i % 2 === 0 ? 'derecha' : 'izquierda');
+      const safeVal = (src||'').replace(/"/g,'&quot;');
+      return `<div style="display:flex;gap:8px;align-items:flex-start;padding:8px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;">
+        <div style="flex-shrink:0;width:48px;height:48px;background:rgba(255,255,255,0.05);border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+          <img id="ft-gif-prev-${i}" src="${safeVal||'/campfire.png'}" style="max-width:48px;max-height:48px;object-fit:contain;" />
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+          <span style="font-size:10px;color:var(--muted);">${side}</span>
+          <input type="text" value="${safeVal}" placeholder="/campfire.png o URL" style="margin:0;font-size:12px;"
+            oninput="ftGifUpdate(${i},this.value)" />
+          <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+            <div style="background:var(--border);border:1px solid var(--border2);border-radius:5px;padding:3px 8px;font-size:10px;color:var(--muted);cursor:pointer;">📁 Subir</div>
+            <input type="file" accept="image/*,.gif" style="display:none;"
+              onchange="(function(inp,idx){var f=inp.files[0];if(!f)return;if(f.size>500*1024){alert('El archivo es grande (>'+Math.round(f.size/1024)+'KB). Usa URL externa para GIFs grandes.');}var r=new FileReader();r.onload=function(ev){ftGifUpdate(idx,ev.target.result);};r.readAsDataURL(f);})(this,${i})" />
+          </label>
+        </div>
+        <button onclick="ftGifRemove(${i})" style="flex-shrink:0;padding:4px 8px;border-radius:6px;border:1px solid rgba(248,113,113,.25);background:transparent;color:var(--red);font-size:13px;cursor:pointer;align-self:flex-start;">✕</button>
+      </div>`;
+    }).join('');
+  }
+
+  function ftGifUpdate(i, val) {
+    const gifs = _ftGifs();
+    gifs[i] = val || '/campfire.png';
+    // update preview
+    const prev = document.getElementById('ft-gif-prev-' + i);
+    if (prev) prev.src = val || '/campfire.png';
+    const inp = document.querySelectorAll('#ft-gif-list input[type=text]')[i];
+    if (inp && inp.value !== val) inp.value = val || '';
+    liveUpdate('footer.footer_gifs', gifs.slice());
+  }
+
+  function ftGifRemove(i) {
+    const gifs = _ftGifs();
+    gifs.splice(i, 1);
+    _sitecfg.footer.footer_gifs = gifs;
+    renderFtGifList();
+    liveUpdate('footer.footer_gifs', gifs.slice());
+  }
+
+  function ftGifAdd() {
+    const gifs = _ftGifs();
+    gifs.push('/campfire.png');
+    _sitecfg.footer.footer_gifs = gifs;
+    renderFtGifList();
+    liveUpdate('footer.footer_gifs', gifs.slice());
+  }
+
+  window.renderFtGifList = renderFtGifList;
+  window.ftGifUpdate = ftGifUpdate;
+  window.ftGifRemove = ftGifRemove;
+  window.ftGifAdd    = ftGifAdd;
 
   function ftColMove(key, dir) {
     if (!_sitecfg.footer) _sitecfg.footer = {};
@@ -2542,10 +2592,32 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
                 var sp = items[1].querySelector('span');
                 if (sp) sp.textContent = value || 'torresdeissy56@gmail.com';
               }
-            } else if (path === 'footer.footer_gif') {
-              d.querySelectorAll('.footer-gif-img').forEach(function(img) {
-                img.src = value || '/campfire.png';
-              });
+            } else if (path === 'footer.footer_gifs') {
+              // Remove old deco elements
+              d.querySelectorAll('.illo-campfire,.illo-campfire2,.illo-campfire-extra').forEach(function(el){el.remove();});
+              var ftEl = d.querySelector('footer.arena-footer');
+              if (ftEl && value && value.length) {
+                var clsMap = ['illo-campfire','illo-campfire2'];
+                value.forEach(function(src, i) {
+                  var div = d.createElement('div');
+                  if (i < 2) {
+                    div.className = clsMap[i];
+                  } else {
+                    div.className = 'illo-campfire-extra';
+                    var pair = Math.floor(i/2);
+                    var offset = (pair-1)*340;
+                    var isLeft = i%2===1;
+                    div.style.cssText = 'position:absolute;bottom:0;' + (isLeft ? 'left:'+(40+offset)+'px;transform:scaleX(-1);' : 'right:'+(40+offset)+'px;') + 'width:300px;height:300px;z-index:5;pointer-events:none;animation:campfireFlicker 2.2s ease-in-out infinite;';
+                  }
+                  var img = d.createElement('img');
+                  img.src = src || '/campfire.png';
+                  img.className = 'footer-gif-img';
+                  img.setAttribute('aria-hidden','true');
+                  img.style.cssText = 'width:100%;height:100%;display:block;image-rendering:pixelated;';
+                  div.appendChild(img);
+                  ftEl.insertBefore(div, ftEl.firstChild);
+                });
+              }
             } else if (path === 'footer.newsletter_desc') {
               var form = qs('.arena-newsletter-form');
               if (form) {
@@ -2693,6 +2765,13 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     _sitecfg.navbar.logo_tagline = gv('nb-logo-tagline');
     if (!_sitecfg.footer) _sitecfg.footer = {};
     if (!_sitecfg.footer.column_order) _sitecfg.footer.column_order = [['brand'],['destinos'],['experiencias'],['info'],['newsletter']];
+    // Normalize gif field
+    if (!Array.isArray(_sitecfg.footer.footer_gifs)) {
+      _sitecfg.footer.footer_gifs = _sitecfg.footer.footer_gif
+        ? [_sitecfg.footer.footer_gif, _sitecfg.footer.footer_gif]
+        : ['/campfire.png', '/campfire.png'];
+    }
+    delete _sitecfg.footer.footer_gif;
     try {
       const r = await fetch(`${IA_URL}/api/admin/siteconfig`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },

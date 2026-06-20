@@ -8,6 +8,10 @@ const columnOrder: string[][] = rawColOrder.map((c: any) => Array.isArray(c) ? c
 const nb = sitecfg.navbar || {};
 const logoNombre  = nb.logo_nombre  || 'Capachica';
 const logoTagline = nb.logo_tagline || 'TURISMO VIVENCIAL';
+const decoGifs: string[] = Array.isArray(ft.footer_gifs) && ft.footer_gifs.length
+  ? ft.footer_gifs
+  : ft.footer_gif ? [ft.footer_gif, ft.footer_gif] : ['/campfire.png', '/campfire.png'];
+const gifClasses = ['illo-campfire', 'illo-campfire2'];
 ---
 
 <!-- ═══════════ BOTTOM WAVE ═══════════ -->
@@ -17,13 +21,21 @@ const logoTagline = nb.logo_tagline || 'TURISMO VIVENCIAL';
 
 <!-- ═══════════ ARENA FOOTER ═══════════ -->
 <footer class="arena-footer">
-  <!-- Campfires (dark mode) -->
-  <div class="illo-campfire">
-    <img src={ft.footer_gif || '/campfire.png'} alt="" aria-hidden="true" class="footer-gif-img" />
-  </div>
-  <div class="illo-campfire2">
-    <img src={ft.footer_gif || '/campfire.png'} alt="" aria-hidden="true" class="footer-gif-img" />
-  </div>
+  <!-- Campfires / decorative images (dark mode) -->
+  {decoGifs.map((src: string, i: number) => {
+    const cls = gifClasses[i] || 'illo-campfire-extra';
+    const pair = Math.floor(i / 2);
+    const isLeft = i % 2 === 1;
+    const offset = (pair - 1) * 340;
+    const extraStyle = i >= 2
+      ? (isLeft ? `position:absolute;bottom:0;left:${40+offset}px;width:300px;height:300px;z-index:5;pointer-events:none;transform:scaleX(-1);` : `position:absolute;bottom:0;right:${40+offset}px;width:300px;height:300px;z-index:5;pointer-events:none;`)
+      : undefined;
+    return (
+      <div class={cls} style={extraStyle}>
+        <img src={src} alt="" aria-hidden="true" class="footer-gif-img" />
+      </div>
+    );
+  })}
 
   <!-- Beach balls (light mode) -->
   <div class="beach-ball-wrap" style="bottom:22px;right:65px;">
