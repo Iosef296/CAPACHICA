@@ -1,20 +1,19 @@
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinaryLib = require('cloudinary');
+const cloudinaryStorage = require('multer-storage-cloudinary');
 const multer = require('multer');
 
-cloudinary.config({
+cloudinaryLib.v2.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key:    process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const storage = new CloudinaryStorage({
-    cloudinary,
-    params: {
-        folder: 'capachica',
-        allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
-        transformation: [{ width: 1200, crop: 'limit', quality: 'auto' }],
-    },
+// multer-storage-cloudinary v2 exports a factory function and expects the base cloudinary module
+const storage = cloudinaryStorage({
+    cloudinary: cloudinaryLib,
+    folder: 'capachica',
+    allowedFormats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
+    transformation: [{ width: 1200, crop: 'limit', quality: 'auto' }],
 });
 
 const upload = multer({

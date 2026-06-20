@@ -802,6 +802,9 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
                 <div class="fg" style="margin:0"><label>Email</label><input type="text" id="ft-email" placeholder="correo@ejemplo.com" /></div>
               </div>
               <div class="fg"><label>Texto de copyright</label><input type="text" id="ft-copyright" placeholder="© 2026 Capachica Turismo..." /></div>
+              <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 8px;">Links del footer</div>
+              <div id="ft-links-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+              <button class="btn-sm" onclick="ftAddLink()" style="padding:6px 12px;font-size:12px;">+ Agregar link</button>
             </div>
 
             <div style="display:flex;gap:10px;align-items:center;padding-bottom:24px;">
@@ -1843,6 +1846,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     gv('ft-email',        ft.contacto_email   || '');
     gv('ft-copyright',    ft.copyright        || '');
     renderNbLinks(nb.links || []);
+    renderFtLinks(ft.links || []);
     // Re-inject drag behavior if iframe nav isn't ready yet
     const _gframe = document.getElementById('globalPreviewFrame');
     if (_gframe) {
@@ -1893,6 +1897,48 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
   window.nbRemoveLink = nbRemoveLink;
   window.nbUpdateLink = nbUpdateLink;
   window.nbMoveLink   = nbMoveLink;
+
+  function renderFtLinks(links) {
+    const container = document.getElementById('ft-links-list');
+    if (!container) return;
+    container.innerHTML = links.map((l, i) => `
+      <div style="display:grid;grid-template-columns:auto 1fr 1fr auto auto auto;gap:6px;align-items:center;" data-ft-idx="${i}">
+        <span style="color:var(--dim);font-size:13px;cursor:grab;padding:0 4px;">⠿</span>
+        <input type="text" value="${esc(l.label||'')}" placeholder="Etiqueta" oninput="ftUpdateLink(${i},'label',this.value)" style="margin:0;font-size:13px;" />
+        <input type="text" value="${esc(l.href||'')}" placeholder="/url" oninput="ftUpdateLink(${i},'href',this.value)" style="margin:0;font-size:13px;" />
+        <button onclick="ftMoveLink(${i},-1)" ${i===0?'disabled':''} style="padding:4px 8px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;" title="Subir">↑</button>
+        <button onclick="ftMoveLink(${i},1)" ${i===links.length-1?'disabled':''} style="padding:4px 8px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;" title="Bajar">↓</button>
+        <button onclick="ftRemoveLink(${i})" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(248,113,113,.2);background:transparent;color:var(--red);font-size:12px;cursor:pointer;">✕</button>
+      </div>
+    `).join('');
+  }
+  function ftUpdateLink(i, field, val) {
+    if (!_sitecfg.footer.links) _sitecfg.footer.links = [];
+    if (!_sitecfg.footer.links[i]) return;
+    _sitecfg.footer.links[i][field] = val;
+  }
+  function ftMoveLink(i, dir) {
+    if (!_sitecfg.footer.links) return;
+    const links = _sitecfg.footer.links;
+    const j = i + dir;
+    if (j < 0 || j >= links.length) return;
+    [links[i], links[j]] = [links[j], links[i]];
+    renderFtLinks(links);
+  }
+  function ftRemoveLink(i) {
+    if (!_sitecfg.footer.links) return;
+    _sitecfg.footer.links.splice(i, 1);
+    renderFtLinks(_sitecfg.footer.links);
+  }
+  function ftAddLink() {
+    if (!_sitecfg.footer.links) _sitecfg.footer.links = [];
+    _sitecfg.footer.links.push({ label: '', href: '/' });
+    renderFtLinks(_sitecfg.footer.links);
+  }
+  window.ftAddLink    = ftAddLink;
+  window.ftRemoveLink = ftRemoveLink;
+  window.ftUpdateLink = ftUpdateLink;
+  window.ftMoveLink   = ftMoveLink;
 
   // Wait for React to hydrate the navbar, then inject
   function scheduleGlobalInject(iframe) {
@@ -2042,6 +2088,90 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
           }
           window.parent.postMessage({ type: 'cms-global-reorder', from, to }, '*');
         });
+      // ── Drag-to-reorder footer links ──
+      const ftContainer = doc.querySelector('[data-footer-links]');
+      if (ftContainer && !ftContainer._dragReady) {
+        ftContainer._dragReady = true;
+        ftContainer.style.position = 'relative';
+        let ftDragSrc = null, ftDragTarget = null, ftDropBefore = true, ftDropIndicator = null;
+
+        function getFtLinks() { return Array.from(ftContainer.querySelectorAll('a.footer-link')); }
+
+        function showFtIndicator(targetEl, before) {
+          if (!ftDropIndicator) {
+            ftDropIndicator = doc.createElement('div');
+            ftDropIndicator.style.cssText = `position:absolute;height:3px;background:${CYAN};border-radius:2px;left:0;right:0;pointer-events:none;box-shadow:0 0 8px ${CYAN};z-index:9999;`;
+            ftContainer.appendChild(ftDropIndicator);
+          }
+          const rect = targetEl.getBoundingClientRect();
+          const cRect = ftContainer.getBoundingClientRect();
+          const y = before ? rect.top - cRect.top - 4 : rect.bottom - cRect.top + 1;
+          ftDropIndicator.style.top = y + 'px';
+          ftDropIndicator.style.display = 'block';
+        }
+        function hideFtIndicator() { if (ftDropIndicator) ftDropIndicator.style.display = 'none'; }
+
+        getFtLinks().forEach(link => {
+          link.setAttribute('draggable', 'true');
+          link.style.cursor = 'grab';
+          link.addEventListener('dragstart', e => {
+            ftDragSrc = link;
+            link._dragging = true;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', link.textContent || '');
+            setTimeout(() => { link.style.opacity = '0.35'; link.style.outline = `2px dashed ${CYAN}`; }, 0);
+          });
+          link.addEventListener('click', e => { if (link._dragging) { e.preventDefault(); e.stopPropagation(); } });
+          link.addEventListener('dragend', () => {
+            link.style.opacity = '';
+            link.style.outline = '';
+            link.style.cursor = 'grab';
+            hideFtIndicator();
+            ftDragSrc = null;
+            ftDragTarget = null;
+            setTimeout(() => { link._dragging = false; }, 50);
+          });
+        });
+
+        ftContainer.addEventListener('dragover', e => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          if (!ftDragSrc) return;
+          const links = getFtLinks();
+          let hit = null;
+          for (const l of links) {
+            if (l === ftDragSrc) continue;
+            const r = l.getBoundingClientRect();
+            if (e.clientY >= r.top - 6 && e.clientY <= r.bottom + 6) { hit = l; break; }
+          }
+          if (!hit) return;
+          const rect = hit.getBoundingClientRect();
+          ftDropBefore = e.clientY < rect.top + rect.height / 2;
+          ftDragTarget = hit;
+          showFtIndicator(hit, ftDropBefore);
+        });
+
+        ftContainer.addEventListener('dragleave', e => {
+          if (!ftContainer.contains(e.relatedTarget)) { hideFtIndicator(); ftDragTarget = null; }
+        });
+
+        ftContainer.addEventListener('drop', e => {
+          e.preventDefault(); e.stopPropagation();
+          hideFtIndicator();
+          if (!ftDragSrc || !ftDragTarget || ftDragSrc === ftDragTarget) return;
+          const allLinks = getFtLinks();
+          const from = allLinks.indexOf(ftDragSrc);
+          let to = allLinks.indexOf(ftDragTarget);
+          if (from < 0 || to < 0) return;
+          if (!ftDropBefore) to += 1;
+          if (from < to) to -= 1;
+          if (ftDropBefore) {
+            ftDragTarget.parentNode.insertBefore(ftDragSrc, ftDragTarget);
+          } else {
+            ftDragTarget.insertAdjacentElement('afterend', ftDragSrc);
+          }
+          window.parent.postMessage({ type: 'cms-global-footer-reorder', from, to }, '*');
+        });
       }
     } catch (e) {}
   }
@@ -2066,6 +2196,15 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       links.splice(to, 0, item);
       renderNbLinks(links);
     }
+    if (e.data?.type === 'cms-global-footer-reorder') {
+      const { from, to } = e.data;
+      if (!_sitecfg.footer.links) return;
+      const links = _sitecfg.footer.links;
+      if (from < 0 || to < 0 || from >= links.length || to >= links.length || from === to) return;
+      const [item] = links.splice(from, 1);
+      links.splice(to, 0, item);
+      renderFtLinks(links);
+    }
   });
 
   async function saveSiteconfigAdmin() {
@@ -2083,6 +2222,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       contacto_whatsapp: gv('ft-whatsapp'),
       contacto_email:    gv('ft-email'),
       copyright:         gv('ft-copyright'),
+      links:             _sitecfg.footer?.links || [],
     };
     try {
       const r = await fetch(`${IA_URL}/api/admin/siteconfig`, {

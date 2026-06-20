@@ -1,4 +1,25 @@
+const DEFAULT_FOOTER_LINKS = [
+  { label: "Alojamiento",   href: "/alojamiento" },
+  { label: "Cómo Llegar",   href: "/como-llegar" },
+  { label: "Términos",      href: "/terminos" },
+  { label: "Privacidad",    href: "/privacidad" },
+  { label: "Cancelaciones", href: "/cancelaciones" },
+];
+
+import { useState, useEffect } from "react";
+
 export default function Footer() {
+  const [cfg, setCfg] = useState<any>(null);
+
+  useEffect(() => {
+    fetch(`${import.meta.env.PUBLIC_IA_URL || 'http://localhost:5000'}/api/siteconfig`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setCfg(d); })
+      .catch(() => {});
+  }, []);
+
+  const footerLinks = cfg?.footer?.links?.length ? cfg.footer.links : DEFAULT_FOOTER_LINKS;
+
   const sections = [
     {
       title: "Destinos",
@@ -8,6 +29,7 @@ export default function Footer() {
         { label: "Isla Taquile",   href: "/destinos" },
         { label: "Bahía de Chifrón", href: "/destinos" },
       ],
+      dynamic: false,
     },
     {
       title: "Experiencias",
@@ -18,16 +40,12 @@ export default function Footer() {
         { label: "Festividades",      href: "/festividades" },
         { label: "Artesanía",         href: "/artesania" },
       ],
+      dynamic: false,
     },
     {
       title: "Planifica",
-      links: [
-        { label: "Alojamiento",   href: "/alojamiento" },
-        { label: "Cómo Llegar",   href: "/como-llegar" },
-        { label: "Términos",      href: "/terminos" },
-        { label: "Privacidad",    href: "/privacidad" },
-        { label: "Cancelaciones", href: "/cancelaciones" },
-      ],
+      links: footerLinks,
+      dynamic: true,
     },
   ];
 
@@ -97,17 +115,21 @@ export default function Footer() {
               }}>
                 {sec.title}
               </div>
-              {sec.links.map(l => (
-                <a key={l.label} href={l.href} style={{
-                  display: "block", fontSize: 13.5, color: "rgba(240,237,232,0.52)",
-                  textDecoration: "none", marginBottom: 9, transition: "color 0.2s",
-                  lineHeight: 1.5, fontFamily: "'Crimson Pro',Georgia,serif",
-                }}
-                onMouseEnter={e => (e.currentTarget.style.color = "rgba(240,237,232,0.95)")}
-                onMouseLeave={e => (e.currentTarget.style.color = "rgba(240,237,232,0.52)")}>
-                  {l.label}
-                </a>
-              ))}
+              <div {...(sec.dynamic ? { 'data-footer-links': 'true' } : {})}>
+                {sec.links.map(l => (
+                  <a key={l.label} href={l.href}
+                    {...(sec.dynamic ? { className: 'footer-link' } : {})}
+                    style={{
+                      display: "block", fontSize: 13.5, color: "rgba(240,237,232,0.52)",
+                      textDecoration: "none", marginBottom: 9, transition: "color 0.2s",
+                      lineHeight: 1.5, fontFamily: "'Crimson Pro',Georgia,serif",
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.color = "rgba(240,237,232,0.95)")}
+                    onMouseLeave={e => (e.currentTarget.style.color = "rgba(240,237,232,0.52)")}>
+                    {l.label}
+                  </a>
+                ))}
+              </div>
             </div>
           ))}
         </div>

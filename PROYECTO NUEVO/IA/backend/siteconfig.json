@@ -24,6 +24,13 @@
     "social_tiktok": "https://tiktok.com",
     "contacto_whatsapp": "51955949404",
     "contacto_email": "torresdeissy56@gmail.com",
-    "copyright": "© 2026 Capachica Turismo · Hecho con ❤️ a las orillas del lago Titicaca"
+    "copyright": "© 2026 Capachica Turismo · Hecho con ❤️ a las orillas del lago Titicaca",
+    "links": [
+      { "label": "Alojamiento",   "href": "/alojamiento" },
+      { "label": "Cómo Llegar",   "href": "/como-llegar" },
+      { "label": "Términos",      "href": "/terminos" },
+      { "label": "Privacidad",    "href": "/privacidad" },
+      { "label": "Cancelaciones", "href": "/cancelaciones" }
+    ]
   }
 }
