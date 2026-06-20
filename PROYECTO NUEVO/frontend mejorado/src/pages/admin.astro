@@ -2376,19 +2376,18 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     try {
       const doc = iframe.contentDocument || iframe.contentWindow?.document;
       if (!doc || !doc.body) return;
-      // Scroll to top + dynamic zoom to match real page proportions
-      iframe.contentWindow.scrollTo(0, 0);
-      const targetW = 1440;
-      const iframeW = iframe.offsetWidth || iframe.clientWidth || 1000;
-      const zoomRatio = Math.min(1, iframeW / targetW);
-      if (!doc.getElementById('admin-preview-zoom')) {
-        const zs = doc.createElement('style');
-        zs.id = 'admin-preview-zoom';
-        zs.textContent = 'html { zoom: ' + zoomRatio.toFixed(3) + '; }';
-        doc.head.appendChild(zs);
-      } else {
-        doc.getElementById('admin-preview-zoom').textContent = 'html { zoom: ' + zoomRatio.toFixed(3) + '; }';
+      // Apply zoom + scroll after layout is stable
+      function applyPreviewZoom() {
+        const targetW = 1440;
+        const iframeW = iframe.getBoundingClientRect().width || iframe.offsetWidth || 900;
+        const ratio = Math.min(1, iframeW / targetW);
+        var zs = doc.getElementById('admin-preview-zoom');
+        if (!zs) { zs = doc.createElement('style'); zs.id = 'admin-preview-zoom'; doc.head.appendChild(zs); }
+        zs.textContent = 'html { zoom: ' + ratio.toFixed(4) + '; }';
+        iframe.contentWindow.scrollTo(0, 0);
       }
+      applyPreviewZoom();
+      setTimeout(applyPreviewZoom, 300);
       const CYAN = '#2dd4bf';
 
       // ── Navbar + Footer click-to-select ──
@@ -2849,6 +2848,8 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         });
       }
     } catch (e) {}
+    // Final scroll to top after all handlers injected
+    try { setTimeout(function(){ iframe.contentWindow.scrollTo(0,0); }, 200); } catch(e2) {}
   }
   window.injectGlobalEditMode = injectGlobalEditMode;
 
