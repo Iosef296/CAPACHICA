@@ -134,20 +134,24 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
 
     /* SIDEBAR */
     .sidebar {
-      width: 52px; flex-shrink: 0;
+      width: 200px; flex-shrink: 0;
       background: var(--s1);
       border-right: 1px solid var(--border);
-      padding: 12px 6px;
+      padding: 16px 10px;
       display: flex; flex-direction: column; gap: 2px;
       transition: width .22s, padding .22s, opacity .15s;
       overflow: hidden;
     }
-    .sidebar.collapsed { width: 0; padding: 0; opacity: 0; border-right: none; }
-    .sidebar .nav-label { display: none; }
-    .sidebar .nav-count { display: none; }
-    .sidebar .nav-btn-text { display: none; }
+    .sidebar.collapsed {
+      width: 52px; padding: 12px 6px;
+    }
+    .sidebar.collapsed .nav-label { display: none; }
+    .sidebar.collapsed .nav-count { display: none; }
+    .sidebar.collapsed .nav-btn-text { display: none; }
+    .sidebar.collapsed .nav-btn { justify-content: center; padding: 8px 4px; font-size: 18px; }
+    .sidebar.hidden-full { width: 0; padding: 0; opacity: 0; border-right: none; }
     #sidebar-toggle {
-      position: fixed; left: 52px; top: 50%; transform: translateY(-50%);
+      position: fixed; left: 200px; top: 50%; transform: translateY(-50%);
       z-index: 200; width: 14px; height: 36px;
       background: var(--s2); border: 1px solid var(--border2);
       border-left: none; border-radius: 0 5px 5px 0;
@@ -165,11 +169,11 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     .nav-label:first-child { margin-top: 0; }
 
     .nav-btn {
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-      padding: 8px 6px; border-radius: 8px;
+      display: flex; align-items: center; gap: 9px;
+      padding: 9px 11px; border-radius: 8px;
       border: 1px solid transparent;
       background: transparent; color: var(--muted);
-      font-size: 18px; font-weight: 500;
+      font-size: 13.5px; font-weight: 500;
       cursor: pointer; font-family: inherit;
       width: 100%; text-align: left;
       transition: all .15s;
@@ -1014,9 +1018,23 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
   function toggleSidebar() {
     const sb = document.getElementById('mainSidebar');
     const btn = document.getElementById('sidebar-toggle');
-    const collapsed = sb.classList.toggle('collapsed');
-    btn.innerHTML = collapsed ? '&#x25B6;' : '&#x25C0;';
-    btn.style.left = collapsed ? '0' : '52px';
+    if (!sb.classList.contains('collapsed') && !sb.classList.contains('hidden-full')) {
+      // full -> icon-only
+      sb.classList.add('collapsed');
+      btn.innerHTML = '&#x25B6;';
+      btn.style.left = '52px';
+    } else if (sb.classList.contains('collapsed')) {
+      // icon-only -> hidden
+      sb.classList.remove('collapsed');
+      sb.classList.add('hidden-full');
+      btn.innerHTML = '&#x25B6;';
+      btn.style.left = '0';
+    } else {
+      // hidden -> full
+      sb.classList.remove('hidden-full');
+      btn.innerHTML = '&#x25C0;';
+      btn.style.left = '200px';
+    }
   }
   window.toggleSidebar = toggleSidebar;
 
