@@ -1965,13 +1965,20 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       }
     },
     experiencias: {
-      icon: '🌟', label: 'Experiencias & Info',
+      icon: '🌟', label: 'Experiencias',
       editBody() {
         return `<div style="padding:14px 16px;border-top:2px solid var(--cyan-b);">
-          <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Links — Experiencias</div>
+          <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Links</div>
           <div id="ft-experiencias-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
-          <button class="btn-sm" onclick="ftSectionAdd('experiencias')" style="padding:6px 12px;font-size:12px;margin-bottom:12px;">+ Agregar link</button>
-          <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Links — Info</div>
+          <button class="btn-sm" onclick="ftSectionAdd('experiencias')" style="padding:6px 12px;font-size:12px;">+ Agregar link</button>
+        </div>`;
+      }
+    },
+    info: {
+      icon: 'ℹ️', label: 'Info',
+      editBody() {
+        return `<div style="padding:14px 16px;border-top:2px solid var(--cyan-b);">
+          <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Links</div>
           <div id="ft-links-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
           <button class="btn-sm" onclick="ftSectionAdd('info')" style="padding:6px 12px;font-size:12px;">+ Agregar link</button>
         </div>`;
@@ -1985,12 +1992,18 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     }
   };
 
+  function getNormOrder() {
+    const raw = _sitecfg.footer?.column_order || [['brand'],['destinos'],['experiencias'],['info'],['newsletter']];
+    return raw.map(function(c) { return Array.isArray(c) ? c : [c]; });
+  }
+
   function renderFtColCards() {
     const card = document.getElementById('global-card-footer');
     if (!card) return;
     if (!_sitecfg.footer) _sitecfg.footer = {};
 
     if (ftColActiveKey) {
+      // DETAIL VIEW
       const meta = FT_COL_META[ftColActiveKey];
       if (!meta) { ftColActiveKey = null; renderFtColCards(); return; }
       card.innerHTML = `
@@ -2002,25 +2015,31 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       `;
       const ft = _sitecfg.footer;
       if (ftColActiveKey === 'destinos') renderFtSection('destinos', ft.destinos_links || []);
-      if (ftColActiveKey === 'experiencias') {
-        renderFtSection('experiencias', ft.experiencias_links || []);
-        renderFtSection('info',         ft.links              || []);
-      }
+      if (ftColActiveKey === 'experiencias') renderFtSection('experiencias', ft.experiencias_links || []);
+      if (ftColActiveKey === 'info') renderFtSection('info', ft.links || []);
     } else {
-      const order = _sitecfg.footer.column_order || ['brand','destinos','experiencias','newsletter'];
+      // LIST VIEW
+      const order = getNormOrder();
       const n = order.length;
       card.innerHTML = `
         <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">🏛️ Footer — Columnas</div>
         <div id="ft-col-cards" style="display:flex;flex-direction:column;gap:8px;">
-          ${order.map((key, i) => {
-            const meta = FT_COL_META[key] || { icon: '', label: key };
-            return `<div class="pe-sec-card" id="ftcc-${key}">
+          ${order.map((keys, i) => {
+            const colId = keys.join('-');
+            const isCombo = keys.length > 1;
+            const badges = keys.map(k => { const m = FT_COL_META[k]; return m ? m.icon + ' ' + m.label : k; }).join(' <span style="opacity:.4">+</span> ');
+            const editBtns = keys.map(k => {
+              const m = FT_COL_META[k];
+              return `<button class="btn-edit" onclick="ftColToggle('${k}')" title="Editar ${m?.label||k}">${m?.icon||''} ${m?.label||k}</button>`;
+            }).join('');
+            return `<div class="pe-sec-card" id="ftcc-${colId}">
               <div class="pe-sec-card-hdr">
-                <div class="pe-sec-card-badge">${meta.icon} ${meta.label}</div>
-                <div class="pe-sec-card-actions">
-                  <button onclick="ftColMove('${key}',-1)" ${i===0?'disabled':''}>↑</button>
-                  <button onclick="ftColMove('${key}',1)" ${i===n-1?'disabled':''}>↓</button>
-                  <button class="btn-edit" onclick="ftColToggle('${key}')">&#x270F;&#xFE0F; Editar</button>
+                <div class="pe-sec-card-badge" style="flex:1;min-width:0;">${badges}</div>
+                <div class="pe-sec-card-actions" style="flex-shrink:0;">
+                  <button onclick="ftColMoveGroup(${i},-1)" ${i===0?'disabled':''}>↑</button>
+                  <button onclick="ftColMoveGroup(${i},1)" ${i===n-1?'disabled':''}>↓</button>
+                  ${isCombo ? `<button onclick="ftColSplit(${i})" title="Separar en columnas independientes">✂ Separar</button>` : (i < n-1 ? `<button onclick="ftColMerge(${i})" title="Combinar con columna siguiente">⊕ Combinar ↓</button>` : '')}
+                  ${editBtns}
                 </div>
               </div>
             </div>`;
@@ -2042,7 +2061,10 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         c.style.transition = 'outline .15s, box-shadow .15s';
       });
       if (activeKey) {
-        const col = doc.querySelector(`[data-footer-col="${activeKey}"]`);
+        // find column that contains this section key (supports compound keys like 'experiencias-info')
+        const col = Array.from(doc.querySelectorAll('[data-footer-col]')).find(function(c) {
+          return c.getAttribute('data-footer-col').split('-').includes(activeKey);
+        });
         if (col) {
           col.style.outline = '2px solid #2dd4bf';
           col.style.boxShadow = '0 0 0 4px rgba(45,212,191,0.18)';
@@ -2057,6 +2079,55 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     renderFtColCards();
     _ftColHighlight(ftColActiveKey);
   }
+
+  function ftColMoveGroup(idx, dir) {
+    if (!_sitecfg.footer) _sitecfg.footer = {};
+    const order = getNormOrder();
+    const j = idx + dir;
+    if (j < 0 || j >= order.length) return;
+    const tmp = order[idx]; order[idx] = order[j]; order[j] = tmp;
+    _sitecfg.footer.column_order = order;
+    renderFtColCards();
+    _ftColHighlight(ftColActiveKey);
+    // Sync iframe
+    const frame = document.getElementById('globalPreviewFrame');
+    if (!frame) return;
+    try {
+      const doc = frame.contentDocument || frame.contentWindow?.document;
+      const grid = doc?.querySelector('.arena-footer-grid');
+      if (!grid) return;
+      const cols = Array.from(grid.querySelectorAll('[data-footer-col]'));
+      const colA = cols[idx];
+      const colB = cols[j];
+      if (!colA || !colB) return;
+      if (dir > 0) { colB.insertAdjacentElement('afterend', colA); }
+      else { grid.insertBefore(colA, colB); }
+    } catch(e) {}
+  }
+
+  function ftColSplit(idx) {
+    if (!_sitecfg.footer) _sitecfg.footer = {};
+    const order = getNormOrder();
+    const keys = order[idx];
+    if (keys.length <= 1) return;
+    const newOrder = [...order.slice(0, idx), ...keys.map(function(k) { return [k]; }), ...order.slice(idx+1)];
+    _sitecfg.footer.column_order = newOrder;
+    renderFtColCards();
+  }
+
+  function ftColMerge(idx) {
+    if (!_sitecfg.footer) _sitecfg.footer = {};
+    const order = getNormOrder();
+    if (idx >= order.length - 1) return;
+    const merged = [...order[idx], ...order[idx+1]];
+    const newOrder = [...order.slice(0, idx), merged, ...order.slice(idx+2)];
+    _sitecfg.footer.column_order = newOrder;
+    renderFtColCards();
+  }
+
+  window.ftColMoveGroup = ftColMoveGroup;
+  window.ftColSplit     = ftColSplit;
+  window.ftColMerge     = ftColMerge;
 
   function ftColMove(key, dir) {
     if (!_sitecfg.footer) _sitecfg.footer = {};
@@ -2084,7 +2155,6 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
   }
 
   window.ftColToggle = ftColToggle;
-  window.ftColMove   = ftColMove;
 
   // Wait for React to hydrate the navbar, then inject
   function scheduleGlobalInject(iframe) {
@@ -2424,16 +2494,17 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     }
     if (e.data?.type === 'cms-footer-col-reorder') {
       if (!_sitecfg.footer) _sitecfg.footer = {};
-      _sitecfg.footer.column_order = e.data.order;
+      // compound keys like 'experiencias-info' → ['experiencias','info']
+      _sitecfg.footer.column_order = e.data.order.map(function(k) { return k.split('-'); });
     }
     if (e.data?.type === 'cms-footer-col-click') {
-      const key = e.data.key;
-      // Switch to Navbar & Footer section if needed
+      // colId may be compound like 'experiencias-info'; open detail for first section
+      const key = (e.data.key || '').split('-')[0];
+      if (!key) return;
       const globalBtn = document.querySelector('.nav-btn[data-section="global"]');
       if (globalBtn && !globalBtn.classList.contains('active')) {
         globalBtn.click();
-        // loadSiteconfigAdmin is triggered by globalBtn.click(), wait for it then open detail
-        setTimeout(() => { ftColActiveKey = null; ftColToggle(key); }, 350);
+        setTimeout(function() { ftColActiveKey = null; ftColToggle(key); }, 350);
       } else {
         ftColToggle(key);
       }
@@ -2448,7 +2519,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     _sitecfg.navbar.logo_nombre  = gv('nb-logo-nombre');
     _sitecfg.navbar.logo_tagline = gv('nb-logo-tagline');
     if (!_sitecfg.footer) _sitecfg.footer = {};
-    if (!_sitecfg.footer.column_order) _sitecfg.footer.column_order = ['brand','destinos','experiencias','newsletter'];
+    if (!_sitecfg.footer.column_order) _sitecfg.footer.column_order = [['brand'],['destinos'],['experiencias'],['info'],['newsletter']];
     try {
       const r = await fetch(`${IA_URL}/api/admin/siteconfig`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
