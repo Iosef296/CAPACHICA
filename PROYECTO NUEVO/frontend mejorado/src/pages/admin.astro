@@ -2088,6 +2088,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
           }
           window.parent.postMessage({ type: 'cms-global-reorder', from, to }, '*');
         });
+      }
       // ── Drag-to-reorder footer links ──
       const ftContainer = doc.querySelector('[data-footer-links]');
       if (ftContainer && !ftContainer._dragReady) {
