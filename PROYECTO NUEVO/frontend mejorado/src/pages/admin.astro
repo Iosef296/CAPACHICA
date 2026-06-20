@@ -151,13 +151,13 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     .sidebar.collapsed .nav-btn { justify-content: center; padding: 8px 4px; font-size: 18px; }
     .sidebar.hidden-full { width: 0; padding: 0; opacity: 0; border-right: none; }
     #sidebar-toggle {
-      position: fixed; left: 200px; top: 50%; transform: translateY(-50%);
-      z-index: 200; width: 14px; height: 36px;
+      position: fixed; left: 200px; top: 14px;
+      z-index: 200; width: 32px; height: 32px;
       background: var(--s2); border: 1px solid var(--border2);
-      border-left: none; border-radius: 0 5px 5px 0;
-      color: var(--muted); font-size: 10px; cursor: pointer;
+      border-radius: 8px;
+      color: var(--muted); font-size: 15px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      transition: left .22s;
+      transition: left .22s, background .15s;
     }
     #sidebar-toggle:hover { background: var(--s3); color: var(--text); }
 
@@ -584,7 +584,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
 
   <div class="body-area">
 
-    <button id="sidebar-toggle" onclick="toggleSidebar()" title="Ocultar/mostrar menú">&#x25C0;</button>
+    <button id="sidebar-toggle" onclick="toggleSidebar()" title="Ocultar/mostrar menú">&#x2630;</button>
     <!-- SIDEBAR -->
     <aside class="sidebar" id="mainSidebar">
       <div class="nav-label">IA</div>
@@ -1019,22 +1019,27 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     const sb = document.getElementById('mainSidebar');
     const btn = document.getElementById('sidebar-toggle');
     if (!sb.classList.contains('collapsed') && !sb.classList.contains('hidden-full')) {
-      // full -> icon-only
       sb.classList.add('collapsed');
-      btn.innerHTML = '&#x25B6;';
       btn.style.left = '52px';
     } else if (sb.classList.contains('collapsed')) {
-      // icon-only -> hidden
       sb.classList.remove('collapsed');
       sb.classList.add('hidden-full');
-      btn.innerHTML = '&#x25B6;';
       btn.style.left = '0';
     } else {
-      // hidden -> full
       sb.classList.remove('hidden-full');
-      btn.innerHTML = '&#x25C0;';
       btn.style.left = '200px';
     }
+    // Re-calculate zoom after sidebar transition
+    setTimeout(function() {
+      const iframe = document.getElementById('globalPreviewFrame');
+      if (iframe && iframe.contentDocument) {
+        const targetW = 1440;
+        const iframeW = iframe.offsetWidth || 1000;
+        const zoomRatio = Math.min(1, iframeW / targetW);
+        const zs = iframe.contentDocument.getElementById('admin-preview-zoom');
+        if (zs) zs.textContent = 'html { zoom: ' + zoomRatio.toFixed(3) + '; }';
+      }
+    }, 250);
   }
   window.toggleSidebar = toggleSidebar;
 
@@ -2383,8 +2388,19 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     try {
       const doc = iframe.contentDocument || iframe.contentWindow?.document;
       if (!doc || !doc.body) return;
-      // Scroll to top
+      // Scroll to top + dynamic zoom to match real page proportions
       iframe.contentWindow.scrollTo(0, 0);
+      const targetW = 1440;
+      const iframeW = iframe.offsetWidth || iframe.clientWidth || 1000;
+      const zoomRatio = Math.min(1, iframeW / targetW);
+      if (!doc.getElementById('admin-preview-zoom')) {
+        const zs = doc.createElement('style');
+        zs.id = 'admin-preview-zoom';
+        zs.textContent = 'html { zoom: ' + zoomRatio.toFixed(3) + '; }';
+        doc.head.appendChild(zs);
+      } else {
+        doc.getElementById('admin-preview-zoom').textContent = 'html { zoom: ' + zoomRatio.toFixed(3) + '; }';
+      }
       const CYAN = '#2dd4bf';
 
       // ── Navbar + Footer click-to-select ──
