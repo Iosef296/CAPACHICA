@@ -802,9 +802,15 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
                 <div class="fg" style="margin:0"><label>Email</label><input type="text" id="ft-email" placeholder="correo@ejemplo.com" /></div>
               </div>
               <div class="fg"><label>Texto de copyright</label><input type="text" id="ft-copyright" placeholder="© 2026 Capachica Turismo..." /></div>
-              <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 8px;">Links del footer</div>
+              <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 8px;">Links — Destinos</div>
+              <div id="ft-destinos-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+              <button class="btn-sm" onclick="ftSectionAdd('destinos')" style="padding:6px 12px;font-size:12px;margin-bottom:12px;">+ Agregar link</button>
+              <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Links — Experiencias</div>
+              <div id="ft-experiencias-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+              <button class="btn-sm" onclick="ftSectionAdd('experiencias')" style="padding:6px 12px;font-size:12px;margin-bottom:12px;">+ Agregar link</button>
+              <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Links — Info</div>
               <div id="ft-links-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
-              <button class="btn-sm" onclick="ftAddLink()" style="padding:6px 12px;font-size:12px;">+ Agregar link</button>
+              <button class="btn-sm" onclick="ftSectionAdd('info')" style="padding:6px 12px;font-size:12px;">+ Agregar link</button>
             </div>
 
             <div style="display:flex;gap:10px;align-items:center;padding-bottom:24px;">
@@ -1846,7 +1852,9 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     gv('ft-email',        ft.contacto_email   || '');
     gv('ft-copyright',    ft.copyright        || '');
     renderNbLinks(nb.links || []);
-    renderFtLinks(ft.links || []);
+    renderFtSection('destinos',     ft.destinos_links     || []);
+    renderFtSection('experiencias', ft.experiencias_links || []);
+    renderFtSection('info',         ft.links              || []);
     // Re-inject drag behavior if iframe nav isn't ready yet
     const _gframe = document.getElementById('globalPreviewFrame');
     if (_gframe) {
@@ -1898,47 +1906,61 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
   window.nbUpdateLink = nbUpdateLink;
   window.nbMoveLink   = nbMoveLink;
 
-  function renderFtLinks(links) {
-    const container = document.getElementById('ft-links-list');
+  const FT_SECTION_MAP = {
+    destinos:     { key: 'destinos_links',    containerId: 'ft-destinos-list' },
+    experiencias: { key: 'experiencias_links', containerId: 'ft-experiencias-list' },
+    info:         { key: 'links',              containerId: 'ft-links-list' },
+  };
+
+  function renderFtSection(section, links) {
+    const { containerId } = FT_SECTION_MAP[section] || {};
+    const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = links.map((l, i) => `
-      <div style="display:grid;grid-template-columns:auto 1fr 1fr auto auto auto;gap:6px;align-items:center;" data-ft-idx="${i}">
+      <div style="display:grid;grid-template-columns:auto 1fr 1fr auto auto auto;gap:6px;align-items:center;">
         <span style="color:var(--dim);font-size:13px;cursor:grab;padding:0 4px;">⠿</span>
-        <input type="text" value="${esc(l.label||'')}" placeholder="Etiqueta" oninput="ftUpdateLink(${i},'label',this.value)" style="margin:0;font-size:13px;" />
-        <input type="text" value="${esc(l.href||'')}" placeholder="/url" oninput="ftUpdateLink(${i},'href',this.value)" style="margin:0;font-size:13px;" />
-        <button onclick="ftMoveLink(${i},-1)" ${i===0?'disabled':''} style="padding:4px 8px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;" title="Subir">↑</button>
-        <button onclick="ftMoveLink(${i},1)" ${i===links.length-1?'disabled':''} style="padding:4px 8px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;" title="Bajar">↓</button>
-        <button onclick="ftRemoveLink(${i})" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(248,113,113,.2);background:transparent;color:var(--red);font-size:12px;cursor:pointer;">✕</button>
+        <input type="text" value="${esc(l.label||'')}" placeholder="Etiqueta" oninput="ftSectionUpdate('${section}',${i},'label',this.value)" style="margin:0;font-size:13px;" />
+        <input type="text" value="${esc(l.href||'')}" placeholder="/url" oninput="ftSectionUpdate('${section}',${i},'href',this.value)" style="margin:0;font-size:13px;" />
+        <button onclick="ftSectionMove('${section}',${i},-1)" ${i===0?'disabled':''} style="padding:4px 8px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;" title="Subir">↑</button>
+        <button onclick="ftSectionMove('${section}',${i},1)" ${i===links.length-1?'disabled':''} style="padding:4px 8px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;" title="Bajar">↓</button>
+        <button onclick="ftSectionRemove('${section}',${i})" style="padding:4px 8px;border-radius:6px;border:1px solid rgba(248,113,113,.2);background:transparent;color:var(--red);font-size:12px;cursor:pointer;">✕</button>
       </div>
     `).join('');
   }
-  function ftUpdateLink(i, field, val) {
-    if (!_sitecfg.footer.links) _sitecfg.footer.links = [];
-    if (!_sitecfg.footer.links[i]) return;
-    _sitecfg.footer.links[i][field] = val;
+  function ftSectionLinks(section) {
+    const { key } = FT_SECTION_MAP[section] || {};
+    if (!key) return [];
+    if (!_sitecfg.footer[key]) _sitecfg.footer[key] = [];
+    return _sitecfg.footer[key];
   }
-  function ftMoveLink(i, dir) {
-    if (!_sitecfg.footer.links) return;
-    const links = _sitecfg.footer.links;
+  function ftSectionUpdate(section, i, field, val) {
+    const links = ftSectionLinks(section);
+    if (links[i]) links[i][field] = val;
+  }
+  function ftSectionMove(section, i, dir) {
+    const links = ftSectionLinks(section);
     const j = i + dir;
     if (j < 0 || j >= links.length) return;
     [links[i], links[j]] = [links[j], links[i]];
-    renderFtLinks(links);
+    renderFtSection(section, links);
   }
-  function ftRemoveLink(i) {
-    if (!_sitecfg.footer.links) return;
-    _sitecfg.footer.links.splice(i, 1);
-    renderFtLinks(_sitecfg.footer.links);
+  function ftSectionRemove(section, i) {
+    const links = ftSectionLinks(section);
+    links.splice(i, 1);
+    renderFtSection(section, links);
   }
-  function ftAddLink() {
-    if (!_sitecfg.footer.links) _sitecfg.footer.links = [];
-    _sitecfg.footer.links.push({ label: '', href: '/' });
-    renderFtLinks(_sitecfg.footer.links);
+  function ftSectionAdd(section) {
+    const links = ftSectionLinks(section);
+    links.push({ label: '', href: '/' });
+    renderFtSection(section, links);
   }
-  window.ftAddLink    = ftAddLink;
-  window.ftRemoveLink = ftRemoveLink;
-  window.ftUpdateLink = ftUpdateLink;
-  window.ftMoveLink   = ftMoveLink;
+  window.ftSectionUpdate = ftSectionUpdate;
+  window.ftSectionMove   = ftSectionMove;
+  window.ftSectionRemove = ftSectionRemove;
+  window.ftSectionAdd    = ftSectionAdd;
+
+  // Keep old names for backward compat
+  function renderFtLinks(links) { renderFtSection('info', links); }
 
   // Wait for React to hydrate the navbar, then inject
   function scheduleGlobalInject(iframe) {
@@ -1957,7 +1979,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
             ftAttempts++;
             try {
               const d = iframe.contentDocument || iframe.contentWindow?.document;
-              const ft = d && d.querySelector('[data-footer-links]');
+              const ft = d && d.querySelector('[data-footer-section]');
               if (ft && !ft._dragReady) {
                 injectGlobalEditMode(iframe);
               } else if (!ft && ftAttempts < 10) {
@@ -2104,14 +2126,14 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
           window.parent.postMessage({ type: 'cms-global-reorder', from, to }, '*');
         });
       }
-      // ── Drag-to-reorder footer links ──
-      const ftContainer = doc.querySelector('[data-footer-links]');
-      if (ftContainer && !ftContainer._dragReady) {
+      // ── Drag-to-reorder footer sections (all [data-footer-section] lists) ──
+      doc.querySelectorAll('[data-footer-section]').forEach(function(ftContainer) {
+        if (ftContainer._dragReady) return;
         ftContainer._dragReady = true;
         ftContainer.style.position = 'relative';
+        const sectionKey = ftContainer.getAttribute('data-footer-section');
         let ftDragSrc = null, ftDragTarget = null, ftDropBefore = true, ftDropIndicator = null;
 
-        // Drag operates on <li> elements so insertBefore works on the <ul> parent
         function getFtItems() { return Array.from(ftContainer.querySelectorAll('li')); }
 
         function showFtIndicator(targetEl, before) {
@@ -2140,19 +2162,14 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
           });
           li.addEventListener('click', e => { if (li._dragging) { e.preventDefault(); e.stopPropagation(); } });
           li.addEventListener('dragend', () => {
-            li.style.opacity = '';
-            li.style.outline = '';
-            li.style.cursor = 'grab';
-            hideFtIndicator();
-            ftDragSrc = null;
-            ftDragTarget = null;
+            li.style.opacity = ''; li.style.outline = ''; li.style.cursor = 'grab';
+            hideFtIndicator(); ftDragSrc = null; ftDragTarget = null;
             setTimeout(() => { li._dragging = false; }, 50);
           });
         });
 
         ftContainer.addEventListener('dragover', e => {
-          e.preventDefault();
-          e.dataTransfer.dropEffect = 'move';
+          e.preventDefault(); e.dataTransfer.dropEffect = 'move';
           if (!ftDragSrc) return;
           const items = getFtItems();
           let hit = null;
@@ -2182,14 +2199,11 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
           if (from < 0 || to < 0) return;
           if (!ftDropBefore) to += 1;
           if (from < to) to -= 1;
-          if (ftDropBefore) {
-            ftContainer.insertBefore(ftDragSrc, ftDragTarget);
-          } else {
-            ftDragTarget.insertAdjacentElement('afterend', ftDragSrc);
-          }
-          window.parent.postMessage({ type: 'cms-global-footer-reorder', from, to }, '*');
+          if (ftDropBefore) { ftContainer.insertBefore(ftDragSrc, ftDragTarget); }
+          else { ftDragTarget.insertAdjacentElement('afterend', ftDragSrc); }
+          window.parent.postMessage({ type: 'cms-global-footer-reorder', section: sectionKey, from, to }, '*');
         });
-      }
+      });
     } catch (e) {}
   }
   window.injectGlobalEditMode = injectGlobalEditMode;
@@ -2214,13 +2228,13 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       renderNbLinks(links);
     }
     if (e.data?.type === 'cms-global-footer-reorder') {
-      const { from, to } = e.data;
-      if (!_sitecfg.footer.links) return;
-      const links = _sitecfg.footer.links;
+      const { section, from, to } = e.data;
+      const sec = section || 'info';
+      const links = ftSectionLinks(sec);
       if (from < 0 || to < 0 || from >= links.length || to >= links.length || from === to) return;
       const [item] = links.splice(from, 1);
       links.splice(to, 0, item);
-      renderFtLinks(links);
+      renderFtSection(sec, links);
     }
   });
 
@@ -2239,7 +2253,9 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       contacto_whatsapp: gv('ft-whatsapp'),
       contacto_email:    gv('ft-email'),
       copyright:         gv('ft-copyright'),
-      links:             _sitecfg.footer?.links || [],
+      links:             _sitecfg.footer?.links              || [],
+      destinos_links:    _sitecfg.footer?.destinos_links     || [],
+      experiencias_links:_sitecfg.footer?.experiencias_links || [],
     };
     try {
       const r = await fetch(`${IA_URL}/api/admin/siteconfig`, {

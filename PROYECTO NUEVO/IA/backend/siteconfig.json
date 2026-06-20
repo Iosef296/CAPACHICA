@@ -31,6 +31,20 @@
       { "label": "Términos",      "href": "/terminos" },
       { "label": "Privacidad",    "href": "/privacidad" },
       { "label": "Cancelaciones", "href": "/cancelaciones" }
+    ],
+    "destinos_links": [
+      { "label": "Playa Llachón",       "href": "/destinos" },
+      { "label": "Mirador del Amaru",   "href": "/destinos" },
+      { "label": "Isla Ticonata",       "href": "/destinos" },
+      { "label": "Comunidad Capachica", "href": "/destinos" },
+      { "label": "Ver todos →",         "href": "/destinos" }
+    ],
+    "experiencias_links": [
+      { "label": "Vivencial",    "href": "/vivencial" },
+      { "label": "Actividades",  "href": "/actividades" },
+      { "label": "Gastronomía",  "href": "/gastronomia" },
+      { "label": "Festividades", "href": "/festividades" },
+      { "label": "Artesanía",    "href": "/artesania" }
     ]
   }
 }

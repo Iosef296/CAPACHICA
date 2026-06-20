@@ -66,27 +66,35 @@ const logoTagline = nb.logo_tagline || 'TURISMO VIVENCIAL';
       <!-- Destinos -->
       <div>
         <div class="arena-heading">Destinos</div>
-        <ul class="arena-link-list">
-          <li><a href="/destinos" class="arena-link">Playa Llachón</a></li>
-          <li><a href="/destinos" class="arena-link">Mirador del Amaru</a></li>
-          <li><a href="/destinos" class="arena-link">Isla Ticonata</a></li>
-          <li><a href="/destinos" class="arena-link">Comunidad Capachica</a></li>
-          <li><a href="/destinos" class="arena-link">Ver todos →</a></li>
+        <ul class="arena-link-list" data-footer-section="destinos">
+          {(ft.destinos_links?.length ? ft.destinos_links : [
+            { label: 'Playa Llachón',       href: '/destinos' },
+            { label: 'Mirador del Amaru',   href: '/destinos' },
+            { label: 'Isla Ticonata',       href: '/destinos' },
+            { label: 'Comunidad Capachica', href: '/destinos' },
+            { label: 'Ver todos →',         href: '/destinos' },
+          ]).map((l: any) => (
+            <li><a href={l.href} class="arena-link footer-link">{l.label}</a></li>
+          ))}
         </ul>
       </div>
 
       <!-- Experiencias + Info -->
       <div>
         <div class="arena-heading">Experiencias</div>
-        <ul class="arena-link-list">
-          <li><a href="/vivencial"    class="arena-link">Vivencial</a></li>
-          <li><a href="/actividades"  class="arena-link">Actividades</a></li>
-          <li><a href="/gastronomia"  class="arena-link">Gastronomía</a></li>
-          <li><a href="/festividades" class="arena-link">Festividades</a></li>
-          <li><a href="/artesania"    class="arena-link">Artesanía</a></li>
+        <ul class="arena-link-list" data-footer-section="experiencias">
+          {(ft.experiencias_links?.length ? ft.experiencias_links : [
+            { label: 'Vivencial',    href: '/vivencial' },
+            { label: 'Actividades',  href: '/actividades' },
+            { label: 'Gastronomía',  href: '/gastronomia' },
+            { label: 'Festividades', href: '/festividades' },
+            { label: 'Artesanía',    href: '/artesania' },
+          ]).map((l: any) => (
+            <li><a href={l.href} class="arena-link footer-link">{l.label}</a></li>
+          ))}
         </ul>
         <div class="arena-heading" style="margin-top:1.25rem;">Info</div>
-        <ul class="arena-link-list" data-footer-links>
+        <ul class="arena-link-list" data-footer-section="info">
           {(ft.links?.length ? ft.links : [
             { label: 'Alojamiento',   href: '/alojamiento' },
             { label: 'Cómo llegar',   href: '/como-llegar' },
