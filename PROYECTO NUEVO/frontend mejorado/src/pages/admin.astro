@@ -139,7 +139,20 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       border-right: 1px solid var(--border);
       padding: 16px 10px;
       display: flex; flex-direction: column; gap: 2px;
+      transition: width .2s, padding .2s, opacity .15s;
+      overflow: hidden;
     }
+    .sidebar.collapsed { width: 0; padding: 0; opacity: 0; border-right: none; }
+    #sidebar-toggle {
+      position: fixed; left: 200px; top: 50%; transform: translateY(-50%);
+      z-index: 200; width: 18px; height: 42px;
+      background: var(--s2); border: 1px solid var(--border2);
+      border-left: none; border-radius: 0 6px 6px 0;
+      color: var(--muted); font-size: 11px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: left .2s;
+    }
+    #sidebar-toggle:hover { background: var(--s3); color: var(--text); }
 
     .nav-label {
       font-size: 10px; font-weight: 700; color: var(--dim);
@@ -564,8 +577,9 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
 
   <div class="body-area">
 
+    <button id="sidebar-toggle" onclick="toggleSidebar()" title="Ocultar/mostrar menú">&#x25C0;</button>
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="mainSidebar">
       <div class="nav-label">IA</div>
       <button class="nav-btn active" data-section="ia">
         <span>🤖</span> Conocimiento
@@ -993,6 +1007,15 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     $('adminPanel').style.display = 'flex';
     loadIA();
   }
+
+  function toggleSidebar() {
+    const sb = document.getElementById('mainSidebar');
+    const btn = document.getElementById('sidebar-toggle');
+    const collapsed = sb.classList.toggle('collapsed');
+    btn.innerHTML = collapsed ? '&#x25B6;' : '&#x25C0;';
+    btn.style.left = collapsed ? '0' : '200px';
+  }
+  window.toggleSidebar = toggleSidebar;
 
   if (TOKEN) showPanel();
 
