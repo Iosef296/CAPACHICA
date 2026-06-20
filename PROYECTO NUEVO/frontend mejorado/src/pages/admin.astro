@@ -2148,14 +2148,19 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
   window.ftColSplit     = ftColSplit;
   window.ftColMerge     = ftColMerge;
 
+  function _ftGifDefault(i) {
+    return { src: '/campfire.png', side: i%2===0?'right':'left', offset: 40, bottom: 0, width: 300, flip: i%2===1 };
+  }
   function _ftGifs() {
     if (!_sitecfg.footer) _sitecfg.footer = {};
-    const def = ['/campfire.png', '/campfire.png'];
-    if (!Array.isArray(_sitecfg.footer.footer_gifs)) {
-      _sitecfg.footer.footer_gifs = _sitecfg.footer.footer_gif
-        ? [_sitecfg.footer.footer_gif, _sitecfg.footer.footer_gif]
-        : [...def];
+    if (!Array.isArray(_sitecfg.footer.footer_gifs) || !_sitecfg.footer.footer_gifs.length) {
+      const src = _sitecfg.footer.footer_gif || '/campfire.png';
+      _sitecfg.footer.footer_gifs = [0,1].map(function(i){ return Object.assign(_ftGifDefault(i),{src:src}); });
     }
+    // normalize string entries
+    _sitecfg.footer.footer_gifs = _sitecfg.footer.footer_gifs.map(function(g,i){
+      return (typeof g === 'string') ? Object.assign(_ftGifDefault(i),{src:g}) : g;
+    });
     return _sitecfg.footer.footer_gifs;
   }
 
@@ -2163,40 +2168,63 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     const container = document.getElementById('ft-gif-list');
     if (!container) return;
     const gifs = _ftGifs();
-    const sides = ['derecha', 'izquierda', 'derecha (2)', 'izquierda (2)'];
-    container.innerHTML = gifs.map(function(src, i) {
-      const side = sides[i] || (i % 2 === 0 ? 'derecha' : 'izquierda');
-      const safeVal = (src||'').replace(/"/g,'&quot;');
-      return `<div style="display:flex;gap:8px;align-items:flex-start;padding:8px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;">
-        <div style="flex-shrink:0;width:48px;height:48px;background:rgba(255,255,255,0.05);border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
-          <img id="ft-gif-prev-${i}" src="${safeVal||'/campfire.png'}" style="max-width:48px;max-height:48px;object-fit:contain;" />
-        </div>
-        <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
-          <span style="font-size:10px;color:var(--muted);">${side}</span>
-          <input type="text" value="${safeVal}" placeholder="/campfire.png o URL" style="margin:0;font-size:12px;"
-            oninput="ftGifUpdate(${i},this.value)" />
-          <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
-            <div style="background:var(--border);border:1px solid var(--border2);border-radius:5px;padding:3px 8px;font-size:10px;color:var(--muted);cursor:pointer;">📁 Subir</div>
-            <input type="file" accept="image/*,.gif" style="display:none;"
-              onchange="(function(inp,idx){var f=inp.files[0];if(!f)return;if(f.size>500*1024){alert('El archivo es grande (>'+Math.round(f.size/1024)+'KB). Usa URL externa para GIFs grandes.');}var r=new FileReader();r.onload=function(ev){ftGifUpdate(idx,ev.target.result);};r.readAsDataURL(f);})(this,${i})" />
-          </label>
-        </div>
-        <button onclick="ftGifRemove(${i})" style="flex-shrink:0;padding:4px 8px;border-radius:6px;border:1px solid rgba(248,113,113,.25);background:transparent;color:var(--red);font-size:13px;cursor:pointer;align-self:flex-start;">✕</button>
-      </div>`;
+    container.innerHTML = gifs.map(function(g, i) {
+      const src    = g.src    || '/campfire.png';
+      const side   = g.side   || (i%2===0?'right':'left');
+      const offset = g.offset ?? 40;
+      const bottom = g.bottom ?? 0;
+      const width  = g.width  ?? 300;
+      const sv = src.replace(/"/g,'&quot;');
+      return '<div style="display:flex;flex-direction:column;gap:8px;padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;">'
+        + '<div style="display:flex;gap:8px;align-items:center;">'
+          + '<div style="flex-shrink:0;width:48px;height:48px;background:rgba(255,255,255,0.05);border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;">'
+            + '<img id="ft-gif-prev-'+i+'" src="'+sv+'" style="max-width:48px;max-height:48px;object-fit:contain;" />'
+          + '</div>'
+          + '<div style="flex:1;display:flex;flex-direction:column;gap:5px;">'
+            + '<input type="text" value="'+sv+'" placeholder="/campfire.png o URL" style="margin:0;font-size:12px;" oninput="ftGifField('+i+','src',this.value)" />'
+            + '<label style="display:flex;align-items:center;gap:5px;cursor:pointer;">'
+              + '<div style="background:var(--border);border:1px solid var(--border2);border-radius:5px;padding:3px 8px;font-size:10px;color:var(--muted);cursor:pointer;">Subir archivo</div>'
+              + '<input type="file" accept="image/*,.gif" style="display:none;" onchange="(function(inp,i){var f=inp.files[0];if(!f)return;if(f.size>500*1024){alert('>'+Math.round(f.size/1024)+'KB, usa URL externa.');}var r=new FileReader();r.onload=function(ev){ftGifField(i,'src',ev.target.result);};r.readAsDataURL(f);})(this,'+i+')" />'
+            + '</label>'
+          + '</div>'
+          + '<button onclick="ftGifRemove('+i+')" style="flex-shrink:0;padding:4px 8px;border-radius:6px;border:1px solid rgba(248,113,113,.25);background:transparent;color:var(--red);font-size:13px;cursor:pointer;align-self:flex-start;">X</button>'
+        + '</div>'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;color:var(--muted);">'
+          + '<label style="display:flex;flex-direction:column;gap:3px;">Lado'
+            + '<select oninput="ftGifField('+i+','side',this.value)" style="font-size:11px;padding:3px 6px;border-radius:5px;background:var(--s2);border:1px solid var(--border);color:var(--text);">'
+              + '<option value="right"'+(side==='right'?' selected':'')+'>Derecha</option>'
+              + '<option value="left"'+(side==='left'?' selected':'')+'>Izquierda</option>'
+            + '</select>'
+          + '</label>'
+          + '<label style="display:flex;flex-direction:column;gap:3px;">Espejo'
+            + '<select oninput="ftGifField('+i+','flip',this.value==='true')" style="font-size:11px;padding:3px 6px;border-radius:5px;background:var(--s2);border:1px solid var(--border);color:var(--text);">'
+              + '<option value="false"'+(!g.flip?' selected':'')+'>Normal</option>'
+              + '<option value="true"'+(g.flip?' selected':'')+'>Espejado</option>'
+            + '</select>'
+          + '</label>'
+          + '<label style="display:flex;flex-direction:column;gap:3px;">Desde el borde <span id="ft-gif-off-lbl-'+i+'">'+offset+'px</span>'
+            + '<input type="range" min="0" max="600" value="'+offset+'" oninput="ftGifField('+i+','offset',+this.value);document.getElementById('ft-gif-off-lbl-'+i+'').textContent=this.value+'px';" style="margin:0;" />'
+          + '</label>'
+          + '<label style="display:flex;flex-direction:column;gap:3px;">Desde abajo <span id="ft-gif-bot-lbl-'+i+'">'+bottom+'px</span>'
+            + '<input type="range" min="-100" max="400" value="'+bottom+'" oninput="ftGifField('+i+','bottom',+this.value);document.getElementById('ft-gif-bot-lbl-'+i+'').textContent=this.value+'px';" style="margin:0;" />'
+          + '</label>'
+          + '<label style="display:flex;flex-direction:column;gap:3px;grid-column:1/-1;">Tamano <span id="ft-gif-sz-lbl-'+i+'">'+width+'px</span>'
+            + '<input type="range" min="50" max="600" value="'+width+'" oninput="ftGifField('+i+','width',+this.value);document.getElementById('ft-gif-sz-lbl-'+i+'').textContent=this.value+'px';" style="margin:0;" />'
+          + '</label>'
+        + '</div>'
+      + '</div>';
     }).join('');
   }
-
-  function ftGifUpdate(i, val) {
+  function ftGifField(i, field, val) {
     const gifs = _ftGifs();
-    gifs[i] = val || '/campfire.png';
-    // update preview
-    const prev = document.getElementById('ft-gif-prev-' + i);
-    if (prev) prev.src = val || '/campfire.png';
-    const inp = document.querySelectorAll('#ft-gif-list input[type=text]')[i];
-    if (inp && inp.value !== val) inp.value = val || '';
+    if (!gifs[i]) return;
+    gifs[i][field] = val;
+    if (field === 'src') {
+      const prev = document.getElementById('ft-gif-prev-' + i);
+      if (prev) prev.src = val || '/campfire.png';
+    }
     liveUpdate('footer.footer_gifs', gifs.slice());
   }
-
   function ftGifRemove(i) {
     const gifs = _ftGifs();
     gifs.splice(i, 1);
@@ -2204,17 +2232,15 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     renderFtGifList();
     liveUpdate('footer.footer_gifs', gifs.slice());
   }
-
   function ftGifAdd() {
     const gifs = _ftGifs();
-    gifs.push('/campfire.png');
+    gifs.push(_ftGifDefault(gifs.length));
     _sitecfg.footer.footer_gifs = gifs;
     renderFtGifList();
     liveUpdate('footer.footer_gifs', gifs.slice());
   }
-
   window.renderFtGifList = renderFtGifList;
-  window.ftGifUpdate = ftGifUpdate;
+  window.ftGifField  = ftGifField;
   window.ftGifRemove = ftGifRemove;
   window.ftGifAdd    = ftGifAdd;
 
@@ -2550,6 +2576,85 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         });
       });
 
+      // ── Drag + resize footer deco images ──
+      doc.querySelectorAll('.footer-deco-item').forEach(function(el) {
+        if (el._decoReady) return;
+        el._decoReady = true;
+        var idx = parseInt(el.getAttribute('data-deco-idx') || '0');
+        el.style.pointerEvents = 'all';
+        el.style.cursor = 'grab';
+        el.style.outline = '1px dashed rgba(45,212,191,0.35)';
+
+        var resizeH = doc.createElement('div');
+        resizeH.style.cssText = 'position:absolute;bottom:4px;right:4px;width:14px;height:14px;background:#2dd4bf;border-radius:2px;cursor:se-resize;z-index:20;opacity:.75;';
+        resizeH.title = 'Redimensionar';
+        el.appendChild(resizeH);
+
+        var lbl = doc.createElement('div');
+        lbl.style.cssText = 'position:absolute;top:4px;left:4px;background:#2dd4bf;color:#0a1628;font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px;opacity:0;transition:opacity .15s;pointer-events:none;font-family:monospace;white-space:nowrap;';
+        lbl.textContent = 'Img '+(idx+1)+' — arrastrar';
+        el.appendChild(lbl);
+
+        el.addEventListener('mouseenter', function(){ lbl.style.opacity='1'; el.style.outline='2px solid #2dd4bf'; });
+        el.addEventListener('mouseleave', function(){ if(!el._dragging){lbl.style.opacity='0'; el.style.outline='1px dashed rgba(45,212,191,0.35)';} });
+
+        var footer = el.closest('footer.arena-footer') || el.parentElement;
+
+        // DRAG
+        var isDragging=false, dragStartX, dragStartY, elStartL, elStartB;
+        el.addEventListener('mousedown', function(e) {
+          if (e.target === resizeH) return;
+          isDragging = true; el._dragging = true;
+          el.style.cursor = 'grabbing';
+          var fr = footer.getBoundingClientRect();
+          var er = el.getBoundingClientRect();
+          elStartL = er.left - fr.left;
+          elStartB = fr.bottom - er.bottom;
+          dragStartX = e.clientX; dragStartY = e.clientY;
+          e.preventDefault();
+        });
+        doc.addEventListener('mousemove', function(e) {
+          if (!isDragging) return;
+          var fr = footer.getBoundingClientRect();
+          var w  = el.offsetWidth || 300;
+          var newL = Math.max(-w/2, Math.min(fr.width - w/2, elStartL + (e.clientX - dragStartX)));
+          var newB = Math.max(-100, elStartB - (e.clientY - dragStartY));
+          el.style.left   = newL + 'px';
+          el.style.bottom = newB + 'px';
+          el.style.right  = '';
+        });
+        doc.addEventListener('mouseup', function() {
+          if (!isDragging) return;
+          isDragging = false; el._dragging = false;
+          el.style.cursor = 'grab'; lbl.style.opacity='0';
+          el.style.outline = '1px dashed rgba(45,212,191,0.35)';
+          var fr = footer.getBoundingClientRect();
+          var er = el.getBoundingClientRect();
+          var fromLeft  = er.left - fr.left;
+          var fromRight = fr.right - er.right;
+          var newBottom = fr.bottom - er.bottom;
+          var useRight  = fromRight < fromLeft;
+          win.parent.postMessage({ type:'cms-gif-move', idx:idx, side: useRight?'right':'left', offset: Math.round(useRight?fromRight:fromLeft), bottom: Math.round(newBottom) }, '*');
+        });
+
+        // RESIZE
+        var isResizing=false, resStartX, resStartW;
+        resizeH.addEventListener('mousedown', function(e) {
+          isResizing=true; resStartX=e.clientX; resStartW=el.offsetWidth;
+          e.preventDefault(); e.stopPropagation();
+        });
+        doc.addEventListener('mousemove', function(e) {
+          if (!isResizing) return;
+          var nw = Math.max(50, Math.min(600, resStartW + (e.clientX - resStartX)));
+          el.style.width = nw+'px'; el.style.height = nw+'px';
+        });
+        doc.addEventListener('mouseup', function() {
+          if (!isResizing) return;
+          isResizing = false;
+          win.parent.postMessage({ type:'cms-gif-resize', idx:idx, width: el.offsetWidth }, '*');
+        });
+      });
+
       // ── Live preview: listen for cms-live-field from admin ──
       var win = iframe.contentWindow;
       if (win && !win._liveFieldReady) {
@@ -2593,24 +2698,21 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
                 if (sp) sp.textContent = value || 'torresdeissy56@gmail.com';
               }
             } else if (path === 'footer.footer_gifs') {
-              // Remove old deco elements
-              d.querySelectorAll('.illo-campfire,.illo-campfire2,.illo-campfire-extra').forEach(function(el){el.remove();});
+              d.querySelectorAll('.footer-deco-item').forEach(function(el){el.remove();});
               var ftEl = d.querySelector('footer.arena-footer');
               if (ftEl && value && value.length) {
-                var clsMap = ['illo-campfire','illo-campfire2'];
-                value.forEach(function(src, i) {
+                value.forEach(function(g, i) {
+                  if (typeof g === 'string') g = { src: g, side: i%2===0?'right':'left', offset:40, bottom:0, width:300 };
+                  var side   = g.side === 'left' ? 'left' : 'right';
+                  var offset = g.offset != null ? g.offset : 40;
+                  var bottom = g.bottom != null ? g.bottom : 0;
+                  var width  = g.width  != null ? g.width  : 300;
                   var div = d.createElement('div');
-                  if (i < 2) {
-                    div.className = clsMap[i];
-                  } else {
-                    div.className = 'illo-campfire-extra';
-                    var pair = Math.floor(i/2);
-                    var offset = (pair-1)*340;
-                    var isLeft = i%2===1;
-                    div.style.cssText = 'position:absolute;bottom:0;' + (isLeft ? 'left:'+(40+offset)+'px;transform:scaleX(-1);' : 'right:'+(40+offset)+'px;') + 'width:300px;height:300px;z-index:5;pointer-events:none;animation:campfireFlicker 2.2s ease-in-out infinite;';
-                  }
+                  div.className = 'footer-deco-item';
+                  div.setAttribute('data-deco-idx', String(i));
+                  div.style.cssText = 'position:absolute;'+side+':'+offset+'px;bottom:'+bottom+'px;width:'+width+'px;height:'+width+'px;z-index:5;pointer-events:none;animation:campfireFlicker '+(2+i*0.4)+'s ease-in-out infinite '+(i*0.35)+'s;'+(g.flip?'transform:scaleX(-1);':'');
                   var img = d.createElement('img');
-                  img.src = src || '/campfire.png';
+                  img.src = g.src || '/campfire.png';
                   img.className = 'footer-gif-img';
                   img.setAttribute('aria-hidden','true');
                   img.style.cssText = 'width:100%;height:100%;display:block;image-rendering:pixelated;';
@@ -2736,6 +2838,20 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       const [item] = links.splice(from, 1);
       links.splice(to, 0, item);
       renderFtSection(sec, links);
+    }
+    if (e.data?.type === 'cms-gif-move') {
+      const gifs = _ftGifs();
+      const g = gifs[e.data.idx];
+      if (g) { g.side = e.data.side; g.offset = e.data.offset; g.bottom = e.data.bottom; }
+      _sitecfg.footer.footer_gifs = gifs;
+      if (ftColActiveKey === 'brand') renderFtGifList();
+    }
+    if (e.data?.type === 'cms-gif-resize') {
+      const gifs = _ftGifs();
+      const g = gifs[e.data.idx];
+      if (g) { g.width = e.data.width; }
+      _sitecfg.footer.footer_gifs = gifs;
+      if (ftColActiveKey === 'brand') renderFtGifList();
     }
     if (e.data?.type === 'cms-footer-col-reorder') {
       if (!_sitecfg.footer) _sitecfg.footer = {};

@@ -8,10 +8,20 @@ const columnOrder: string[][] = rawColOrder.map((c: any) => Array.isArray(c) ? c
 const nb = sitecfg.navbar || {};
 const logoNombre  = nb.logo_nombre  || 'Capachica';
 const logoTagline = nb.logo_tagline || 'TURISMO VIVENCIAL';
-const decoGifs: string[] = Array.isArray(ft.footer_gifs) && ft.footer_gifs.length
-  ? ft.footer_gifs
-  : ft.footer_gif ? [ft.footer_gif, ft.footer_gif] : ['/campfire.png', '/campfire.png'];
-const gifClasses = ['illo-campfire', 'illo-campfire2'];
+type DecoGif = { src: string; side?: string; offset?: number; bottom?: number; width?: number; flip?: boolean };
+const defaultGifs: DecoGif[] = [
+  { src: '/campfire.png', side: 'right', offset: 40, bottom: 0, width: 300 },
+  { src: '/campfire.png', side: 'left',  offset: 40, bottom: 0, width: 300, flip: true },
+];
+const decoGifs: DecoGif[] = Array.isArray(ft.footer_gifs) && ft.footer_gifs.length
+  ? ft.footer_gifs.map((g: any, i: number) =>
+      typeof g === 'string'
+        ? { src: g, side: i%2===0?'right':'left', offset: 40, bottom: 0, width: 300, flip: i%2===1 }
+        : g)
+  : (ft.footer_gif ? [
+      { src: ft.footer_gif, side: 'right', offset: 40, bottom: 0, width: 300 },
+      { src: ft.footer_gif, side: 'left',  offset: 40, bottom: 0, width: 300, flip: true },
+    ] : defaultGifs);
 ---
 
 <!-- ═══════════ BOTTOM WAVE ═══════════ -->
@@ -22,17 +32,17 @@ const gifClasses = ['illo-campfire', 'illo-campfire2'];
 <!-- ═══════════ ARENA FOOTER ═══════════ -->
 <footer class="arena-footer">
   <!-- Campfires / decorative images (dark mode) -->
-  {decoGifs.map((src: string, i: number) => {
-    const cls = gifClasses[i] || 'illo-campfire-extra';
-    const pair = Math.floor(i / 2);
-    const isLeft = i % 2 === 1;
-    const offset = (pair - 1) * 340;
-    const extraStyle = i >= 2
-      ? (isLeft ? `position:absolute;bottom:0;left:${40+offset}px;width:300px;height:300px;z-index:5;pointer-events:none;transform:scaleX(-1);` : `position:absolute;bottom:0;right:${40+offset}px;width:300px;height:300px;z-index:5;pointer-events:none;`)
-      : undefined;
+  {decoGifs.map((g: DecoGif, i: number) => {
+    const side   = g.side === 'left' ? 'left' : 'right';
+    const offset = g.offset ?? 40;
+    const bottom = g.bottom ?? 0;
+    const width  = g.width  ?? 300;
+    const flip   = g.flip   ? 'scaleX(-1)' : '';
+    const anim   = `campfireFlicker ${2.0 + i*0.4}s ease-in-out infinite ${(i*0.35).toFixed(2)}s`;
+    const style  = `position:absolute;${side}:${offset}px;bottom:${bottom}px;width:${width}px;height:${width}px;z-index:5;pointer-events:none;animation:${anim};${flip ? `transform:${flip};` : ''}`;
     return (
-      <div class={cls} style={extraStyle}>
-        <img src={src} alt="" aria-hidden="true" class="footer-gif-img" />
+      <div class="footer-deco-item" style={style} data-deco-idx={String(i)}>
+        <img src={g.src || '/campfire.png'} alt="" aria-hidden="true" class="footer-gif-img" style="width:100%;height:100%;display:block;image-rendering:pixelated;" />
       </div>
     );
   })}
@@ -175,6 +185,10 @@ const gifClasses = ['illo-campfire', 'illo-campfire2'];
   [data-theme="light"] .arena-link-list li::before { background: rgba(90,55,5,0.55) !important; }
   [data-theme="light"] .arena-footer-grid { border-bottom-color: rgba(90,55,5,0.22) !important; }
   [data-theme="light"] .arena-bottom-bar { border-top-color: rgba(90,55,5,0.22) !important; }
+  [data-theme="light"] .footer-deco-item { display: none !important; }
+  .footer-deco-item img { width:100%;height:100%;display:block;image-rendering:pixelated; }
+  @media(max-width:900px){ .footer-deco-item{opacity:.75;} }
+  @media(max-width:768px){ .footer-deco-item{opacity:.5;transform:scale(.55)!important;transform-origin:bottom center;} }
 </style>
 
 <script is:inline>
