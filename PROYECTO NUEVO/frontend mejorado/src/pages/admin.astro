@@ -2111,7 +2111,8 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         ftContainer.style.position = 'relative';
         let ftDragSrc = null, ftDragTarget = null, ftDropBefore = true, ftDropIndicator = null;
 
-        function getFtLinks() { return Array.from(ftContainer.querySelectorAll('a.footer-link')); }
+        // Drag operates on <li> elements so insertBefore works on the <ul> parent
+        function getFtItems() { return Array.from(ftContainer.querySelectorAll('li')); }
 
         function showFtIndicator(targetEl, before) {
           if (!ftDropIndicator) {
@@ -2127,25 +2128,25 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         }
         function hideFtIndicator() { if (ftDropIndicator) ftDropIndicator.style.display = 'none'; }
 
-        getFtLinks().forEach(link => {
-          link.setAttribute('draggable', 'true');
-          link.style.cursor = 'grab';
-          link.addEventListener('dragstart', e => {
-            ftDragSrc = link;
-            link._dragging = true;
+        getFtItems().forEach(li => {
+          li.setAttribute('draggable', 'true');
+          li.style.cursor = 'grab';
+          li.addEventListener('dragstart', e => {
+            ftDragSrc = li;
+            li._dragging = true;
             e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', link.textContent || '');
-            setTimeout(() => { link.style.opacity = '0.35'; link.style.outline = `2px dashed ${CYAN}`; }, 0);
+            e.dataTransfer.setData('text/plain', li.textContent || '');
+            setTimeout(() => { li.style.opacity = '0.35'; li.style.outline = `2px dashed ${CYAN}`; }, 0);
           });
-          link.addEventListener('click', e => { if (link._dragging) { e.preventDefault(); e.stopPropagation(); } });
-          link.addEventListener('dragend', () => {
-            link.style.opacity = '';
-            link.style.outline = '';
-            link.style.cursor = 'grab';
+          li.addEventListener('click', e => { if (li._dragging) { e.preventDefault(); e.stopPropagation(); } });
+          li.addEventListener('dragend', () => {
+            li.style.opacity = '';
+            li.style.outline = '';
+            li.style.cursor = 'grab';
             hideFtIndicator();
             ftDragSrc = null;
             ftDragTarget = null;
-            setTimeout(() => { link._dragging = false; }, 50);
+            setTimeout(() => { li._dragging = false; }, 50);
           });
         });
 
@@ -2153,12 +2154,12 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
           e.preventDefault();
           e.dataTransfer.dropEffect = 'move';
           if (!ftDragSrc) return;
-          const links = getFtLinks();
+          const items = getFtItems();
           let hit = null;
-          for (const l of links) {
-            if (l === ftDragSrc) continue;
-            const r = l.getBoundingClientRect();
-            if (e.clientY >= r.top - 6 && e.clientY <= r.bottom + 6) { hit = l; break; }
+          for (const li of items) {
+            if (li === ftDragSrc) continue;
+            const r = li.getBoundingClientRect();
+            if (e.clientY >= r.top - 6 && e.clientY <= r.bottom + 6) { hit = li; break; }
           }
           if (!hit) return;
           const rect = hit.getBoundingClientRect();
@@ -2175,14 +2176,14 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
           e.preventDefault(); e.stopPropagation();
           hideFtIndicator();
           if (!ftDragSrc || !ftDragTarget || ftDragSrc === ftDragTarget) return;
-          const allLinks = getFtLinks();
-          const from = allLinks.indexOf(ftDragSrc);
-          let to = allLinks.indexOf(ftDragTarget);
+          const allItems = getFtItems();
+          const from = allItems.indexOf(ftDragSrc);
+          let to = allItems.indexOf(ftDragTarget);
           if (from < 0 || to < 0) return;
           if (!ftDropBefore) to += 1;
           if (from < to) to -= 1;
           if (ftDropBefore) {
-            ftDragTarget.parentNode.insertBefore(ftDragSrc, ftDragTarget);
+            ftContainer.insertBefore(ftDragSrc, ftDragTarget);
           } else {
             ftDragTarget.insertAdjacentElement('afterend', ftDragSrc);
           }
