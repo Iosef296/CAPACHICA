@@ -71,6 +71,35 @@ app.get('/api/health', (_req, res) => {
     res.json({ status: 'OK', mensaje: 'Capachica API unificada', timestamp: new Date() });
 });
 
+// One-time admin seed — protected by secret header
+app.post('/api/seed-admin', async (req, res) => {
+    if (req.headers['x-seed-secret'] !== 'capachica-seed-2026') {
+        return res.status(403).json({ error: 'Forbidden' });
+    }
+    try {
+        const { AppDataSource } = require('./config/base-de-datos');
+        const Usuario = require('./modelos/auth/usuario.modelo');
+        const bcrypt = require('bcryptjs');
+        if (!AppDataSource.isInitialized) await AppDataSource.initialize();
+        const repo = AppDataSource.getRepository(Usuario);
+        const email = 'admin@capachica.pe';
+        const hash = await bcrypt.hash('admin123', 10);
+        let user = await repo.findOne({ where: { email } });
+        if (user) {
+            user.password_hash = hash;
+            user.rol = 'admin';
+            user.activo = true;
+            await repo.save(user);
+            return res.json({ ok: true, action: 'updated', email });
+        }
+        const nuevo = repo.create({ nombre: 'Admin Capachica', email, password_hash: hash, rol: 'admin', activo: true });
+        await repo.save(nuevo);
+        res.json({ ok: true, action: 'created', email });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
 app.use((_req, res) => res.status(404).json({ error: 'Ruta no encontrada' }));
 app.use(errorHandler);
 
