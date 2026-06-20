@@ -1014,7 +1014,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     loadIA();
   }
 
-  showPanel(); // TEMPORAL: sin login
+  if (TOKEN) showPanel();
 
   /* ─── LOGIN ─── */
   $('loginBtn').onclick = async () => {
