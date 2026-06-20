@@ -1987,7 +1987,17 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     newsletter: {
       icon: '📧', label: 'Newsletter',
       editBody() {
-        return `<div style="padding:14px 16px;border-top:2px solid var(--cyan-b);"><p style="font-size:12px;color:var(--muted);line-height:1.5;">El formulario de suscripción es fijo. Edita el contacto y copyright en la columna Marca.</p></div>`;
+        const ft = _sitecfg?.footer || {};
+        const esc = v => (v||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+        return `<div style="padding:16px;display:flex;flex-direction:column;gap:10px;border-top:2px solid var(--cyan-b);">
+          <div class="fg" style="margin:0"><label>Descripción corta</label><input type="text" value="${esc(ft.newsletter_desc)}" placeholder="Novedades y ofertas exclusivas · 1 email/semana" oninput="if(!_sitecfg.footer)_sitecfg.footer={};_sitecfg.footer.newsletter_desc=this.value" /></div>
+          <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Contacto</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div class="fg" style="margin:0"><label>WhatsApp</label><input type="text" value="${esc(ft.contacto_whatsapp)}" placeholder="51955949404" oninput="if(!_sitecfg.footer)_sitecfg.footer={};_sitecfg.footer.contacto_whatsapp=this.value" /></div>
+            <div class="fg" style="margin:0"><label>Email</label><input type="text" value="${esc(ft.contacto_email)}" placeholder="correo@ejemplo.com" oninput="if(!_sitecfg.footer)_sitecfg.footer={};_sitecfg.footer.contacto_email=this.value" /></div>
+          </div>
+          <div class="fg" style="margin:0"><label>Copyright</label><input type="text" value="${esc(ft.copyright)}" placeholder="© 2026 Capachica Turismo..." oninput="if(!_sitecfg.footer)_sitecfg.footer={};_sitecfg.footer.copyright=this.value" /></div>
+        </div>`;
       }
     }
   };
@@ -2034,14 +2044,15 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
             }).join('');
             return `<div class="pe-sec-card" id="ftcc-${colId}">
               <div class="pe-sec-card-hdr">
-                <div class="pe-sec-card-badge" style="flex:1;min-width:0;">${badges}</div>
+                <div class="pe-sec-card-badge" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${badges}</div>
                 <div class="pe-sec-card-actions" style="flex-shrink:0;">
                   <button onclick="ftColMoveGroup(${i},-1)" ${i===0?'disabled':''}>↑</button>
                   <button onclick="ftColMoveGroup(${i},1)" ${i===n-1?'disabled':''}>↓</button>
-                  ${isCombo ? `<button onclick="ftColSplit(${i})" title="Separar en columnas independientes">✂ Separar</button>` : (i < n-1 ? `<button onclick="ftColMerge(${i})" title="Combinar con columna siguiente">⊕ Combinar ↓</button>` : '')}
-                  ${editBtns}
+                  ${isCombo ? `<button onclick="ftColSplit(${i})" title="Separar en columnas independientes" style="font-size:11px;">✂ Separar</button>` : (i < n-1 ? `<button onclick="ftColMerge(${i})" title="Combinar con columna siguiente" style="font-size:11px;">⊕+</button>` : '')}
+                  ${!isCombo ? editBtns : ''}
                 </div>
               </div>
+              ${isCombo ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">${editBtns}</div>` : ''}
             </div>`;
           }).join('')}
         </div>

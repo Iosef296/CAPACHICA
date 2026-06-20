@@ -105,7 +105,7 @@ const logoTagline = nb.logo_tagline || 'TURISMO VIVENCIAL';
               if (key === 'newsletter') return (
                 <>
                   <div class="arena-heading">Newsletter</div>
-                  <p class="arena-text" style="font-size:12px;margin-bottom:0.8rem;line-height:1.55;">Novedades y ofertas exclusivas · 1 email/semana</p>
+                  <p class="arena-text" style="font-size:12px;margin-bottom:0.8rem;line-height:1.55;">{ft.newsletter_desc || 'Novedades y ofertas exclusivas · 1 email/semana'}</p>
                   <div class="arena-newsletter-form" id="arenaNewsletterForm">
                     <input type="email" id="arenaEmailInput" class="arena-newsletter-input" placeholder="tu@email.com" autocomplete="email" />
                     <button class="arena-subscribe-btn" id="arenaSubscribeBtn" type="button">Suscribirme</button>
