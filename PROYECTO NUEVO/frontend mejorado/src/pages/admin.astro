@@ -2164,55 +2164,81 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     return _sitecfg.footer.footer_gifs;
   }
 
+  function ftGifInput(el) {
+    var i = +el.dataset.gi;
+    var field = el.dataset.field;
+    var raw = el.value;
+    var val = el.dataset.num === '1' ? +raw : (el.dataset.bool === '1' ? raw === 'true' : raw);
+    ftGifField(i, field, val);
+    var lbl = document.getElementById('ft-gif-lbl-' + i + '-' + field);
+    if (lbl) lbl.textContent = (+raw) + 'px';
+    if (field === 'src') {
+      var prev = document.getElementById('ft-gif-prev-' + i);
+      if (prev) prev.src = raw || '/campfire.png';
+    }
+  }
+
+  function ftGifFile(inp) {
+    var i = +inp.dataset.gi;
+    var f = inp.files[0];
+    if (!f) return;
+    if (f.size > 500 * 1024) { alert('>' + Math.round(f.size / 1024) + 'KB, usa URL externa.'); return; }
+    var r = new FileReader();
+    r.onload = function(ev) { ftGifField(i, 'src', ev.target.result); };
+    r.readAsDataURL(f);
+  }
+
   function renderFtGifList() {
-    const container = document.getElementById('ft-gif-list');
+    var container = document.getElementById('ft-gif-list');
     if (!container) return;
-    const gifs = _ftGifs();
+    var gifs = _ftGifs();
     container.innerHTML = gifs.map(function(g, i) {
-      const src    = g.src    || '/campfire.png';
-      const side   = g.side   || (i%2===0?'right':'left');
-      const offset = g.offset ?? 40;
-      const bottom = g.bottom ?? 0;
-      const width  = g.width  ?? 300;
-      const sv = src.replace(/"/g,'&quot;');
-      return '<div style="display:flex;flex-direction:column;gap:8px;padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;">'
+      var src    = g.src    || '/campfire.png';
+      var side   = g.side   || (i % 2 === 0 ? 'right' : 'left');
+      var offset = g.offset != null ? g.offset : 40;
+      var bottom = g.bottom != null ? g.bottom : 0;
+      var width  = g.width  != null ? g.width  : 300;
+      var sv = src.replace(/"/g, '&quot;');
+      return (
+        '<div style="display:flex;flex-direction:column;gap:8px;padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;">'
         + '<div style="display:flex;gap:8px;align-items:center;">'
           + '<div style="flex-shrink:0;width:48px;height:48px;background:rgba(255,255,255,0.05);border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;">'
-            + '<img id="ft-gif-prev-'+i+'" src="'+sv+'" style="max-width:48px;max-height:48px;object-fit:contain;" />'
+            + '<img id="ft-gif-prev-' + i + '" src="' + sv + '" style="max-width:48px;max-height:48px;object-fit:contain;" />'
           + '</div>'
           + '<div style="flex:1;display:flex;flex-direction:column;gap:5px;">'
-            + '<input type="text" value="'+sv+'" placeholder="/campfire.png o URL" style="margin:0;font-size:12px;" oninput="ftGifField('+i+','src',this.value)" />'
+            + '<input type="text" value="' + sv + '" placeholder="/campfire.png o URL" style="margin:0;font-size:12px;" data-gi="' + i + '" data-field="src" oninput="ftGifInput(this)" />'
             + '<label style="display:flex;align-items:center;gap:5px;cursor:pointer;">'
               + '<div style="background:var(--border);border:1px solid var(--border2);border-radius:5px;padding:3px 8px;font-size:10px;color:var(--muted);cursor:pointer;">Subir archivo</div>'
-              + '<input type="file" accept="image/*,.gif" style="display:none;" onchange="(function(inp,i){var f=inp.files[0];if(!f)return;if(f.size>500*1024){alert('>'+Math.round(f.size/1024)+'KB, usa URL externa.');}var r=new FileReader();r.onload=function(ev){ftGifField(i,'src',ev.target.result);};r.readAsDataURL(f);})(this,'+i+')" />'
+              + '<input type="file" accept="image/*,.gif" style="display:none;" data-gi="' + i + '" onchange="ftGifFile(this)" />'
             + '</label>'
           + '</div>'
-          + '<button onclick="ftGifRemove('+i+')" style="flex-shrink:0;padding:4px 8px;border-radius:6px;border:1px solid rgba(248,113,113,.25);background:transparent;color:var(--red);font-size:13px;cursor:pointer;align-self:flex-start;">X</button>'
+          + '<button onclick="ftGifRemove(' + i + ')" style="flex-shrink:0;padding:4px 8px;border-radius:6px;border:1px solid rgba(248,113,113,.25);background:transparent;color:var(--red);font-size:13px;cursor:pointer;align-self:flex-start;">X</button>'
         + '</div>'
         + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;color:var(--muted);">'
           + '<label style="display:flex;flex-direction:column;gap:3px;">Lado'
-            + '<select oninput="ftGifField('+i+','side',this.value)" style="font-size:11px;padding:3px 6px;border-radius:5px;background:var(--s2);border:1px solid var(--border);color:var(--text);">'
-              + '<option value="right"'+(side==='right'?' selected':'')+'>Derecha</option>'
-              + '<option value="left"'+(side==='left'?' selected':'')+'>Izquierda</option>'
+            + '<select data-gi="' + i + '" data-field="side" oninput="ftGifInput(this)" style="font-size:11px;padding:3px 6px;border-radius:5px;background:var(--s2);border:1px solid var(--border);color:var(--text);">'
+              + '<option value="right"' + (side === 'right' ? ' selected' : '') + '>Derecha</option>'
+              + '<option value="left"'  + (side === 'left'  ? ' selected' : '') + '>Izquierda</option>'
             + '</select>'
           + '</label>'
           + '<label style="display:flex;flex-direction:column;gap:3px;">Espejo'
-            + '<select oninput="ftGifField('+i+','flip',this.value==='true')" style="font-size:11px;padding:3px 6px;border-radius:5px;background:var(--s2);border:1px solid var(--border);color:var(--text);">'
-              + '<option value="false"'+(!g.flip?' selected':'')+'>Normal</option>'
-              + '<option value="true"'+(g.flip?' selected':'')+'>Espejado</option>'
+            + '<select data-gi="' + i + '" data-field="flip" data-bool="1" oninput="ftGifInput(this)" style="font-size:11px;padding:3px 6px;border-radius:5px;background:var(--s2);border:1px solid var(--border);color:var(--text);">'
+              + '<option value="false"' + (!g.flip ? ' selected' : '') + '>Normal</option>'
+              + '<option value="true"'  + (g.flip  ? ' selected' : '') + '>Espejado</option>'
             + '</select>'
           + '</label>'
-          + '<label style="display:flex;flex-direction:column;gap:3px;">Desde el borde <span id="ft-gif-off-lbl-'+i+'">'+offset+'px</span>'
-            + '<input type="range" min="0" max="600" value="'+offset+'" oninput="ftGifField('+i+','offset',+this.value);document.getElementById('ft-gif-off-lbl-'+i+'').textContent=this.value+'px';" style="margin:0;" />'
+          + '<label style="display:flex;flex-direction:column;gap:3px;">Desde el borde <span id="ft-gif-lbl-' + i + '-offset">' + offset + 'px</span>'
+            + '<input type="range" min="0" max="600" value="' + offset + '" data-gi="' + i + '" data-field="offset" data-num="1" oninput="ftGifInput(this)" style="margin:0;" />'
           + '</label>'
-          + '<label style="display:flex;flex-direction:column;gap:3px;">Desde abajo <span id="ft-gif-bot-lbl-'+i+'">'+bottom+'px</span>'
-            + '<input type="range" min="-100" max="400" value="'+bottom+'" oninput="ftGifField('+i+','bottom',+this.value);document.getElementById('ft-gif-bot-lbl-'+i+'').textContent=this.value+'px';" style="margin:0;" />'
+          + '<label style="display:flex;flex-direction:column;gap:3px;">Desde abajo <span id="ft-gif-lbl-' + i + '-bottom">' + bottom + 'px</span>'
+            + '<input type="range" min="-100" max="400" value="' + bottom + '" data-gi="' + i + '" data-field="bottom" data-num="1" oninput="ftGifInput(this)" style="margin:0;" />'
           + '</label>'
-          + '<label style="display:flex;flex-direction:column;gap:3px;grid-column:1/-1;">Tamano <span id="ft-gif-sz-lbl-'+i+'">'+width+'px</span>'
-            + '<input type="range" min="50" max="600" value="'+width+'" oninput="ftGifField('+i+','width',+this.value);document.getElementById('ft-gif-sz-lbl-'+i+'').textContent=this.value+'px';" style="margin:0;" />'
+          + '<label style="display:flex;flex-direction:column;gap:3px;grid-column:1/-1;">Tamano <span id="ft-gif-lbl-' + i + '-width">' + width + 'px</span>'
+            + '<input type="range" min="50" max="600" value="' + width + '" data-gi="' + i + '" data-field="width" data-num="1" oninput="ftGifInput(this)" style="margin:0;" />'
           + '</label>'
         + '</div>'
-      + '</div>';
+        + '</div>'
+      );
     }).join('');
   }
   function ftGifField(i, field, val) {
