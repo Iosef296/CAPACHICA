@@ -1954,6 +1954,31 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
             <div class="fg" style="margin:0"><label>TikTok</label><input type="text" value="${esc(ft.social_tiktok)}" oninput="liveUpdate('footer.social_tiktok',this.value)" /></div>
           </div>
           <div class="fg" style="margin:0"><label>Copyright</label><input type="text" value="${esc(ft.copyright)}" placeholder="© 2026 Capachica Turismo..." oninput="liveUpdate('footer.copyright',this.value)" /></div>
+          <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px;">Imagen decorativa (GIF/PNG)</div>
+          <div style="display:flex;gap:8px;align-items:flex-start;margin-top:6px;">
+            <div style="flex-shrink:0;width:64px;height:64px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+              <img id="ft-gif-preview" src="${esc(ft.footer_gif||'/campfire.png')}" style="max-width:64px;max-height:64px;object-fit:contain;" />
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+              <input type="text" id="ft-gif-url" value="${esc(ft.footer_gif||'')}" placeholder="/campfire.png o https://..." style="margin:0;font-size:12px;" oninput="liveUpdate('footer.footer_gif',this.value||null);var p=document.getElementById('ft-gif-preview');if(p)p.src=this.value||'\/campfire.png';" />
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                <div style="background:var(--border);border:1px solid var(--border2);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap;">📁 Subir archivo</div>
+                <input type="file" accept="image/*,.gif" style="display:none;" onchange="(function(inp){
+                  var f=inp.files[0]; if(!f)return;
+                  if(f.size>500*1024){alert('El archivo es grande (>'+Math.round(f.size/1024)+'KB). Usa una URL externa para GIFs grandes.');}
+                  var r=new FileReader(); r.onload=function(ev){
+                    var url=ev.target.result;
+                    var urlInp=document.getElementById('ft-gif-url');
+                    var prev=document.getElementById('ft-gif-preview');
+                    if(urlInp)urlInp.value=url;
+                    if(prev)prev.src=url;
+                    liveUpdate('footer.footer_gif',url);
+                  }; r.readAsDataURL(f);
+})(this)" />
+              </label>
+              <span style="font-size:10px;color:var(--dim);">Aparece a ambos lados del footer en modo oscuro</span>
+            </div>
+          </div>
         </div>`;
       }
     },
@@ -2517,6 +2542,10 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
                 var sp = items[1].querySelector('span');
                 if (sp) sp.textContent = value || 'torresdeissy56@gmail.com';
               }
+            } else if (path === 'footer.footer_gif') {
+              d.querySelectorAll('.footer-gif-img').forEach(function(img) {
+                img.src = value || '/campfire.png';
+              });
             } else if (path === 'footer.newsletter_desc') {
               var form = qs('.arena-newsletter-form');
               if (form) {
