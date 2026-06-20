@@ -86,10 +86,16 @@ const logoTagline = nb.logo_tagline || 'TURISMO VIVENCIAL';
           <li><a href="/artesania"    class="arena-link">Artesanía</a></li>
         </ul>
         <div class="arena-heading" style="margin-top:1.25rem;">Info</div>
-        <ul class="arena-link-list">
-          <li><a href="/alojamiento"  class="arena-link">Alojamiento</a></li>
-          <li><a href="/como-llegar"  class="arena-link">Cómo llegar</a></li>
-          <li><a href="/contacto"     class="arena-link">Contacto</a></li>
+        <ul class="arena-link-list" data-footer-links>
+          {(ft.links?.length ? ft.links : [
+            { label: 'Alojamiento',   href: '/alojamiento' },
+            { label: 'Cómo llegar',   href: '/como-llegar' },
+            { label: 'Términos',      href: '/terminos' },
+            { label: 'Privacidad',    href: '/privacidad' },
+            { label: 'Cancelaciones', href: '/cancelaciones' },
+          ]).map((l: any) => (
+            <li><a href={l.href} class="arena-link footer-link">{l.label}</a></li>
+          ))}
         </ul>
       </div>
 
