@@ -2339,6 +2339,14 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     try {
       const doc = iframe.contentDocument || iframe.contentWindow?.document;
       if (!doc || !doc.body) return;
+      // Scroll to top and apply preview zoom
+      iframe.contentWindow.scrollTo(0, 0);
+      if (!doc.getElementById('admin-preview-zoom')) {
+        const zs = doc.createElement('style');
+        zs.id = 'admin-preview-zoom';
+        zs.textContent = 'html { zoom: 0.75; }';
+        doc.head.appendChild(zs);
+      }
       const CYAN = '#2dd4bf';
 
       // ── Navbar + Footer click-to-select ──
