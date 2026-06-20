@@ -1113,7 +1113,22 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       if (btn.dataset.section === 'widget')   loadWidget();
       if (btn.dataset.section === 'destinos') loadDestinos();
       if (btn.dataset.section === 'paginas')  loadPaginas();
-      if (btn.dataset.section === 'global')   loadSiteconfigAdmin();
+      if (btn.dataset.section === 'global') {
+        loadSiteconfigAdmin();
+        // Apply zoom now that sec-global is visible and iframe has real width
+        setTimeout(function() {
+          var iframe = document.getElementById('globalPreviewFrame');
+          if (!iframe || !iframe.contentDocument) return;
+          var targetW = 1440;
+          var iframeW = iframe.getBoundingClientRect().width;
+          if (iframeW < 50) return;
+          var ratio = Math.min(1, iframeW / targetW);
+          var zs = iframe.contentDocument.getElementById('admin-preview-zoom');
+          if (!zs) { zs = iframe.contentDocument.createElement('style'); zs.id = 'admin-preview-zoom'; iframe.contentDocument.head.appendChild(zs); }
+          zs.textContent = 'html { zoom: ' + ratio.toFixed(4) + '; }';
+          iframe.contentWindow.scrollTo(0, 0);
+        }, 50);
+      }
     };
   });
 
@@ -2416,7 +2431,8 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       // Apply zoom + scroll after layout is stable
       function applyPreviewZoom() {
         const targetW = 1440;
-        const iframeW = iframe.getBoundingClientRect().width || iframe.offsetWidth || 900;
+        const iframeW = iframe.getBoundingClientRect().width || iframe.offsetWidth || 0;
+        if (iframeW < 50) { setTimeout(applyPreviewZoom, 200); return; }
         const ratio = Math.min(1, iframeW / targetW);
         var zs = doc.getElementById('admin-preview-zoom');
         if (!zs) { zs = doc.createElement('style'); zs.id = 'admin-preview-zoom'; doc.head.appendChild(zs); }
@@ -2424,7 +2440,6 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         iframe.contentWindow.scrollTo(0, 0);
       }
       applyPreviewZoom();
-      setTimeout(applyPreviewZoom, 300);
       const CYAN = '#2dd4bf';
 
       // ── Navbar + Footer click-to-select ──
