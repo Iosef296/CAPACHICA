@@ -2378,6 +2378,18 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
           window.parent.postMessage({ type: 'cms-footer-col-reorder', order: newOrder }, '*');
         });
       });
+
+      // ── Click column in iframe → open detail view in admin ──
+      doc.querySelectorAll('[data-footer-col]').forEach(function(col) {
+        if (col._clickReady) return;
+        col._clickReady = true;
+        col.addEventListener('click', function(e) {
+          if (e._fromDrag || ftColDragSrc) return;
+          e.stopPropagation();
+          var key = col.getAttribute('data-footer-col');
+          window.parent.postMessage({ type: 'cms-footer-col-click', key: key }, '*');
+        });
+      });
     } catch (e) {}
   }
   window.injectGlobalEditMode = injectGlobalEditMode;
@@ -2413,6 +2425,20 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     if (e.data?.type === 'cms-footer-col-reorder') {
       if (!_sitecfg.footer) _sitecfg.footer = {};
       _sitecfg.footer.column_order = e.data.order;
+    }
+    if (e.data?.type === 'cms-footer-col-click') {
+      const key = e.data.key;
+      // Switch to Navbar & Footer section if needed
+      const globalBtn = document.querySelector('.nav-btn[data-section="global"]');
+      if (globalBtn && !globalBtn.classList.contains('active')) {
+        globalBtn.click();
+        // loadSiteconfigAdmin is triggered by globalBtn.click(), wait for it then open detail
+        setTimeout(() => { ftColActiveKey = null; ftColToggle(key); }, 350);
+      } else {
+        ftColToggle(key);
+      }
+      const card = document.getElementById('global-card-footer');
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   });
 
