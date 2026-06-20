@@ -1951,6 +1951,21 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         const links = nav && nav.querySelectorAll('a.nav-link');
         if (links && links.length > 0) {
           injectGlobalEditMode(iframe);
+          // Retry footer drag separately in case footer wasn't ready yet
+          let ftAttempts = 0;
+          function tryFtInject() {
+            ftAttempts++;
+            try {
+              const d = iframe.contentDocument || iframe.contentWindow?.document;
+              const ft = d && d.querySelector('[data-footer-links]');
+              if (ft && !ft._dragReady) {
+                injectGlobalEditMode(iframe);
+              } else if (!ft && ftAttempts < 10) {
+                setTimeout(tryFtInject, 400);
+              }
+            } catch(e) { if (ftAttempts < 10) setTimeout(tryFtInject, 400); }
+          }
+          setTimeout(tryFtInject, 600);
         } else if (attempts < 20) {
           setTimeout(tryInject, 300);
         }
