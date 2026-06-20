@@ -813,7 +813,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
               <button onclick="document.getElementById('globalPreviewFrame').src=document.getElementById('globalPreviewFrame').src" style="margin-left:auto;padding:4px 10px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;">↺ Actualizar</button>
               <button id="preview-fullscreen-btn" onclick="togglePreviewFullscreen()" style="padding:4px 10px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:11px;cursor:pointer;" title="Pantalla completa">⛶ Pantalla completa</button>
             </div>
-            <iframe id="globalPreviewFrame" src={import.meta.env.PUBLIC_SITE_URL || "http://localhost:4322/"} style="flex:1;border:none;width:100%;height:100%;" title="Vista previa" onload="scheduleGlobalInject(this)"></iframe>
+            <div id="preview-scaler-wrap" style="flex:1;overflow:hidden;position:relative;min-height:0;"><iframe id="globalPreviewFrame" src={import.meta.env.PUBLIC_SITE_URL || "http://localhost:4322/"} style="position:absolute;top:0;left:0;width:1440px;border:none;transform-origin:0 0;" title="Vista previa" onload="scheduleGlobalInject(this)"></iframe></div>
           </div>
 
         </div>
@@ -1018,19 +1018,26 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     } else {
       sb.classList.remove('hidden-full');
     }
-    // Re-calculate zoom after sidebar transition
-    setTimeout(function() {
-      const iframe = document.getElementById('globalPreviewFrame');
-      if (iframe && iframe.contentDocument) {
-        const targetW = 1440;
-        const iframeW = iframe.offsetWidth || 1000;
-        const zoomRatio = Math.min(1, iframeW / targetW);
-        const zs = iframe.contentDocument.getElementById('admin-preview-zoom');
-        if (zs) zs.textContent = 'html { zoom: ' + zoomRatio.toFixed(3) + '; }';
-      }
-    }, 250);
+    // Re-scale iframe after sidebar transition completes
+    setTimeout(updateIframeScale, 250);
   }
   window.toggleSidebar = toggleSidebar;
+
+  function updateIframeScale() {
+    var wrap = document.getElementById('preview-scaler-wrap');
+    var iframe = document.getElementById('globalPreviewFrame');
+    if (!wrap || !iframe || _previewFullscreen) return;
+    var rect = wrap.getBoundingClientRect();
+    var wW = rect.width;
+    var wH = rect.height;
+    if (wW < 10) return;
+    var ratio = Math.min(1, wW / 1440);
+    iframe.style.transform = 'scale(' + ratio.toFixed(4) + ')';
+    iframe.style.width = '1440px';
+    iframe.style.height = ratio < 1 ? (wH / ratio) + 'px' : '100%';
+  }
+  window.addEventListener('resize', function() { setTimeout(updateIframeScale, 100); });
+  window.updateIframeScale = updateIframeScale;
 
   var _previewFullscreen = false;
   function togglePreviewFullscreen() {
@@ -1043,27 +1050,19 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       editPanel.style.display = 'none';
       sidebar.style.display   = 'none';
       btn.textContent = '⊠ Salir pantalla completa';
-      // Remove zoom so page renders at real size
-      try {
-        const zs = iframe.contentDocument && iframe.contentDocument.getElementById('admin-preview-zoom');
-        if (zs) zs.textContent = '';
-        iframe.contentWindow.scrollTo(0, 0);
-      } catch(e) {}
+      // Fill full width with no scale
+      iframe.style.width = '100%';
+      iframe.style.transform = 'none';
+      iframe.style.height = '100%';
+      try { iframe.contentWindow.scrollTo(0, 0); } catch(e) {}
     } else {
       editPanel.style.display = '';
       sidebar.style.display   = '';
       btn.textContent = '⛶ Pantalla completa';
-      // Re-apply zoom
-      try {
-        const doc = iframe.contentDocument;
-        const targetW = 1440;
-        const iframeW = iframe.getBoundingClientRect().width || 900;
-        const ratio = Math.min(1, iframeW / targetW);
-        var zs = doc && doc.getElementById('admin-preview-zoom');
-        if (!zs && doc) { zs = doc.createElement('style'); zs.id='admin-preview-zoom'; doc.head.appendChild(zs); }
-        if (zs) zs.textContent = 'html { zoom: ' + ratio.toFixed(4) + '; }';
-        iframe.contentWindow.scrollTo(0, 0);
-      } catch(e) {}
+      // Restore scaled preview
+      iframe.style.width = '1440px';
+      iframe.style.height = '';
+      setTimeout(updateIframeScale, 50);
     }
   }
   window.togglePreviewFullscreen = togglePreviewFullscreen;
@@ -1115,19 +1114,8 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       if (btn.dataset.section === 'paginas')  loadPaginas();
       if (btn.dataset.section === 'global') {
         loadSiteconfigAdmin();
-        // Apply zoom now that sec-global is visible and iframe has real width
-        setTimeout(function() {
-          var iframe = document.getElementById('globalPreviewFrame');
-          if (!iframe || !iframe.contentDocument) return;
-          var targetW = 1440;
-          var iframeW = iframe.getBoundingClientRect().width;
-          if (iframeW < 50) return;
-          var ratio = Math.min(1, iframeW / targetW);
-          var zs = iframe.contentDocument.getElementById('admin-preview-zoom');
-          if (!zs) { zs = iframe.contentDocument.createElement('style'); zs.id = 'admin-preview-zoom'; iframe.contentDocument.head.appendChild(zs); }
-          zs.textContent = 'html { zoom: ' + ratio.toFixed(4) + '; }';
-          iframe.contentWindow.scrollTo(0, 0);
-        }, 50);
+        // Re-scale iframe now that section is visible
+        setTimeout(updateIframeScale, 100);
       }
     };
   });
@@ -2428,18 +2416,9 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     try {
       const doc = iframe.contentDocument || iframe.contentWindow?.document;
       if (!doc || !doc.body) return;
-      // Apply zoom + scroll after layout is stable
-      function applyPreviewZoom() {
-        const targetW = 1440;
-        const iframeW = iframe.getBoundingClientRect().width || iframe.offsetWidth || 0;
-        if (iframeW < 50) { setTimeout(applyPreviewZoom, 200); return; }
-        const ratio = Math.min(1, iframeW / targetW);
-        var zs = doc.getElementById('admin-preview-zoom');
-        if (!zs) { zs = doc.createElement('style'); zs.id = 'admin-preview-zoom'; doc.head.appendChild(zs); }
-        zs.textContent = 'html { zoom: ' + ratio.toFixed(4) + '; }';
-        iframe.contentWindow.scrollTo(0, 0);
-      }
-      applyPreviewZoom();
+      // Scale iframe to fill preview panel at desktop width
+      updateIframeScale();
+      try { iframe.contentWindow.scrollTo(0, 0); } catch(e) {}
       const CYAN = '#2dd4bf';
 
       // ── Navbar + Footer click-to-select ──
