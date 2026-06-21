@@ -1,0 +1,258 @@
+---
+import Layout from '../layouts/Layout.astro';
+import HomeSections from '../components/HomeSections';
+import SectionRenderer from '../components/SectionRenderer.astro';
+
+const IA_URL = import.meta.env.PUBLIC_IA_URL || 'http://localhost:5000';
+let cms: any = null;
+try { const r = await fetch(`${IA_URL}/api/contenido/index`); if (r.ok) cms = await r.json(); } catch {}
+const cmsHero  = cms?.secciones?.find((s: any) => s.tipo === 'hero');
+const cmsStats = cms?.secciones?.find((s: any) => s.tipo === 'stats');
+const bodySecciones = (cms?.secciones ?? []).filter((s: any) => s.tipo !== 'hero' && s.tipo !== 'stats');
+const hasBody = bodySecciones.length > 0;
+
+const statsData = cmsStats?.items || [
+  { valor: '8+',    label: 'Comunidades' },
+  { valor: '3,820', label: 'msnm' },
+  { valor: '500+',  label: 'Años historia' },
+  { valor: '12',    label: 'Islas cercanas' },
+];
+---
+
+<Layout
+  title="Capachica Turismo — La joya del Lago Titicaca"
+  description="Descubre la península de Capachica: turismo vivencial, gastronomía andina, festividades ancestrales y los atardeceres más bellos del Titicaca."
+>
+  <!-- HERO CONTENT -->
+  <Fragment slot="hero">
+    <div class="idx-badge">Puno · Perú · Lago Titicaca</div>
+    <h1 class="idx-title">
+      {cmsHero?.titulo ? cmsHero.titulo : <Fragment>Descubre <em>Capachica</em></Fragment>}
+    </h1>
+    <p class="idx-desc">
+      {cmsHero?.subtitulo || 'Una península andina a 3,820 msnm donde el lago más alto del mundo navegable se convierte en horizonte y cinco siglos de cultura quechua siguen vivos en cada familia.'}
+    </p>
+    <div class="idx-ctas">
+      <a href={cmsHero?.boton_url || '/destinos'} class="btn-primary">{cmsHero?.boton_texto || 'Explorar destinos →'}</a>
+      <a href={cmsHero?.boton2_url || '/como-llegar'} class="btn-outline">{cmsHero?.boton2_texto || 'Cómo llegar'}</a>
+    </div>
+    <div class="idx-stats">
+      {statsData.map((st: any) => (
+        <div class="idx-stat-item">
+          <div class="idx-stat-val">{st.valor}</div>
+          <div class="idx-stat-lbl">{st.label}</div>
+        </div>
+      ))}
+    </div>
+    <nav class="idx-quicknav" aria-label="Secciones principales">
+      <a href="/vivencial">🏡 Vivencial</a>
+      <a href="/actividades">🏔️ Actividades</a>
+      <a href="/gastronomia">🍽️ Gastronomía</a>
+      <a href="/festividades">🎊 Festividades</a>
+      <a href="/artesania">🧶 Artesanía</a>
+      <a href="/destinos">🗺️ Destinos</a>
+    </nav>
+  </Fragment>
+
+  <!-- PHOTO CARDS (hero-overlay = absolute inside .layout-hero, outside content div) -->
+  <Fragment slot="hero-overlay">
+    <div class="hpc hpc-left" id="hpc1" style="top:18%" onclick="toggleHPC(this)">
+      <div class="hpc-thumb"><img src="/foto-lago.jpg" alt="Lago Titicaca" loading="lazy"/><span class="hpc-arrow">›</span></div>
+      <div class="hpc-body"><span class="hpc-tag">Destinos</span><h4 class="hpc-title">Lago Titicaca</h4><p class="hpc-desc">El lago navegable más alto del mundo a 3,820 msnm. Aguas azul profundo, cielos inmensos y cinco siglos de historia vivos en cada orilla.</p></div>
+    </div>
+    <div class="hpc hpc-left" id="hpc2" style="top:52%" onclick="toggleHPC(this)">
+      <div class="hpc-thumb"><img src="/foto-vivencial.jpg" alt="Turismo vivencial" loading="lazy"/><span class="hpc-arrow">›</span></div>
+      <div class="hpc-body"><span class="hpc-tag">Vivencial</span><h4 class="hpc-title">Vida en Comunidad</h4><p class="hpc-desc">Convive con familias quechuas, aprende tejido en telar, pesca ancestral y cocina andina en las comunidades de Capachica.</p></div>
+    </div>
+    <div class="hpc hpc-right" id="hpc3" style="top:18%" onclick="toggleHPC(this)">
+      <div class="hpc-thumb"><img src="/foto-actividades.jpg" alt="Actividades" loading="lazy"/><span class="hpc-arrow">‹</span></div>
+      <div class="hpc-body"><span class="hpc-tag">Actividades</span><h4 class="hpc-title">Aventura en el Lago</h4><p class="hpc-desc">Kayak, pesca tradicional, senderismo entre cactus gigantes y vistas panorámicas del Titicaca desde los miradores de la península.</p></div>
+    </div>
+    <div class="hpc hpc-right" id="hpc4" style="top:52%" onclick="toggleHPC(this)">
+      <div class="hpc-thumb"><img src="/foto-festividades.jpg" alt="Festividades" loading="lazy"/><span class="hpc-arrow">‹</span></div>
+      <div class="hpc-body"><span class="hpc-tag">Festividades</span><h4 class="hpc-title">Fiestas Ancestrales</h4><p class="hpc-desc">Danzas, música y rituales milenarios que mantienen viva la herencia cultural quechua del altiplano a orillas del Titicaca.</p></div>
+    </div>
+  </Fragment>
+
+  <!-- MAIN BODY -->
+  {hasBody ? (
+    <SectionRenderer secciones={bodySecciones} />
+  ) : (
+    <HomeSections client:load />
+  )}
+</Layout>
+
+<style is:global>
+/* ─── INDEX HERO ELEMENTS ─── */
+.idx-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 16px; border-radius: 100px;
+  border: 1px solid rgba(212,168,67,0.45);
+  background: rgba(212,168,67,0.10);
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px;
+  color: var(--gold); text-transform: uppercase;
+  margin-bottom: 1.2rem; animation: fadeUp 0.8s ease both;
+}
+.idx-badge::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gold); animation: idx-blink 2s ease-in-out infinite;
+}
+@keyframes idx-blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.idx-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 6rem); line-height: 1.05;
+  color: var(--text-main); animation: fadeUp 0.8s 0.1s ease both; margin-bottom: 0.3rem;
+}
+.idx-title em { display: block; font-style: italic; color: var(--gold); }
+
+.idx-desc {
+  font-size: clamp(0.95rem, 2vw, 1.2rem); color: var(--text-muted);
+  max-width: 540px; margin: 0.8rem auto 0; line-height: 1.75;
+  text-align: center;
+  animation: fadeUp 0.8s 0.2s ease both;
+}
+
+.idx-ctas {
+  display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+  margin-top: 2rem; animation: fadeUp 0.8s 0.3s ease both;
+}
+
+.idx-stats {
+  display: flex; gap: 0;
+  background: rgba(10,22,40,0.7); border: 1px solid rgba(45,212,191,0.2);
+  border-radius: 12px; backdrop-filter: blur(12px); overflow: hidden;
+  margin-top: 2rem; animation: fadeUp 0.8s 0.4s ease both; flex-wrap: wrap;
+}
+.idx-stat-item {
+  padding: 12px 22px; text-align: center;
+  border-right: 1px solid rgba(45,212,191,0.12);
+  flex: 1; min-width: 80px;
+}
+.idx-stat-item:last-child { border-right: none; }
+.idx-stat-val {
+  font-family: var(--font-display); font-size: 1.4rem; font-weight: 700;
+  color: var(--gold); line-height: 1;
+}
+.idx-stat-lbl {
+  font-size: 0.68rem; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 1px; margin-top: 3px;
+}
+
+.idx-quicknav {
+  display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;
+  margin-top: 1.6rem; animation: fadeUp 0.8s 0.45s ease both;
+}
+.idx-quicknav a {
+  padding: 5px 13px; border-radius: 100px; font-size: 11px; font-weight: 600;
+  border: 1px solid rgba(240,237,232,0.15); color: rgba(240,237,232,0.65);
+  background: rgba(255,255,255,0.05); text-decoration: none; letter-spacing: 0.04em;
+  transition: all 0.25s ease;
+}
+.idx-quicknav a:hover {
+  border-color: rgba(212,168,67,0.5); color: var(--gold); background: rgba(212,168,67,0.08);
+}
+
+/* light mode */
+[data-theme="light"] .idx-badge { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.18); color: #fff; }
+[data-theme="light"] .idx-badge::before { background: #fff; }
+[data-theme="light"] .idx-title { color: #fff !important; }
+[data-theme="light"] .idx-stats { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.32); }
+[data-theme="light"] .idx-stat-val { color: #ffd060; }
+[data-theme="light"] .idx-stat-lbl { color: rgba(255,255,255,0.7); }
+[data-theme="light"] .idx-quicknav a { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.1); }
+[data-theme="light"] .idx-quicknav a:hover { border-color: rgba(255,255,255,0.8); color: #fff; background: rgba(255,255,255,0.22); }
+
+/* ─── HERO PHOTO CARDS ─── */
+.hpc {
+  position: absolute; z-index: 4;
+  width: 64px; height: 190px;
+  background: rgba(8,18,36,0.92);
+  border: 3px solid #7a4a1e;
+  border-radius: 10px; overflow: hidden; cursor: pointer;
+  transition: width 0.42s cubic-bezier(0.4,0,0.2,1),
+              height 0.42s cubic-bezier(0.4,0,0.2,1),
+              top 0.42s cubic-bezier(0.4,0,0.2,1),
+              border-color 0.42s ease, box-shadow 0.42s ease;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.45), 0 8px 32px rgba(0,0,0,0.60);
+}
+.hpc.hpc-left  { left: 6px; }
+.hpc.hpc-right { right: 6px; }
+
+.hpc.expanded {
+  width: 85vw; height: calc(100vh - 80px - 130px);
+  top: 80px !important; z-index: 8;
+  border-width: 0;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.65), 0 0 0 2px rgba(120,72,20,0.45), 0 24px 80px rgba(0,0,0,0.85);
+}
+.hpc.hpc-left.expanded  { left: 50%; transform: translateX(-50%); }
+.hpc.hpc-right.expanded { right: auto; left: 50%; transform: translateX(-50%); }
+
+.hpc-thumb { position: relative; width: 100%; height: 100%; overflow: hidden; }
+.hpc-thumb img { width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.52s ease,object-position 0.52s ease; }
+.hpc-left  .hpc-thumb img { object-position: left center; }
+.hpc-right .hpc-thumb img { object-position: right center; }
+.hpc.expanded .hpc-thumb img { transform: scale(1.03); object-position: center center; }
+.hpc-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  font-size: 1.8rem; font-weight: 300; color: rgba(255,255,255,0.9);
+  line-height: 1; pointer-events: none; transition: opacity 0.3s;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+}
+.hpc-left  .hpc-arrow { right: 6px; }
+.hpc-right .hpc-arrow { left: 6px; }
+.hpc.expanded .hpc-arrow { opacity: 0; }
+
+.hpc-body {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  max-height: 0; overflow: hidden; padding: 0 22px;
+  background: linear-gradient(to top, rgba(4,9,20,0.97) 0%, rgba(4,9,20,0.88) 55%, transparent 100%);
+  transition: max-height 0.42s cubic-bezier(0.4,0,0.2,1), padding 0.3s ease;
+}
+.hpc.expanded .hpc-body { max-height: 180px; padding: 32px 22px 20px; }
+.hpc-tag {
+  display: inline-block; margin-bottom: 7px; padding: 2px 9px; border-radius: 100px;
+  background: rgba(34,197,94,0.13); border: 1px solid rgba(34,197,94,0.38);
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 1.5px;
+  text-transform: uppercase; color: #4ade80;
+}
+.hpc-title { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: #f0ede8; margin-bottom: 6px; line-height: 1.2; }
+.hpc-desc  { font-size: 13px; color: rgba(240,237,232,0.62); line-height: 1.6; }
+
+/* mobile: hide photo cards */
+@media (max-width: 900px) { .hpc { display: none; } }
+
+/* ─── INDEX RESPONSIVE ─── */
+@media (max-width: 768px) {
+  .idx-title { font-size: clamp(2.4rem, 10vw, 3.8rem); }
+  .idx-desc { font-size: 1rem; max-width: 100%; text-align: center; }
+  .idx-ctas { flex-direction: column; align-items: center; gap: 0.75rem; }
+  .idx-ctas .btn-primary,
+  .idx-ctas .btn-outline { width: min(100%, 280px); justify-content: center; text-align: center; }
+  .idx-stats { width: 100%; border-radius: 8px; }
+  .idx-stat-item { padding: 10px 14px; }
+  .idx-stat-val { font-size: 1.2rem; }
+  .idx-stat-lbl { font-size: 0.62rem; }
+  .idx-quicknav { gap: 0.3rem; }
+  .idx-quicknav a { font-size: 9px; padding: 4px 8px; letter-spacing: 0.02em; }
+}
+@media (max-width: 480px) {
+  .idx-stats { border-radius: 0; margin-left: -1rem; margin-right: -1rem; }
+  .idx-stat-item { padding: 8px 10px; }
+  .idx-quicknav a { padding: 4px 6px; font-size: 8.5px; }
+}
+</style>
+
+<script is:inline>
+function toggleHPC(el) {
+  if (!el) return;
+  var wasExpanded = el.classList.contains('expanded');
+  document.querySelectorAll('.hpc').forEach(function(c) { c.classList.remove('expanded'); });
+  if (!wasExpanded) el.classList.add('expanded');
+}
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.hpc')) {
+    document.querySelectorAll('.hpc.expanded').forEach(function(c) { c.classList.remove('expanded'); });
+  }
+});
+</script>
