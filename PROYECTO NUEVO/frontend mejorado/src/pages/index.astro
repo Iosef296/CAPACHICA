@@ -664,7 +664,17 @@ const hasBody = bodySecciones.length > 0;
     }
     .hpc-title { font-family:'Playfair Display',serif; font-size:16px; font-weight:700; color:#f0ede8; margin-bottom:6px; line-height:1.2; }
     .hpc-desc  { font-size:13px; color:rgba(240,237,232,0.62); line-height:1.6; }
-    @media(max-width:1100px) { .hero-photo-card { display:none !important; } }
+    @media(max-width:1100px) {
+      .hero-photo-card { width:52px; height:165px; }
+    }
+    @media(max-width:768px) {
+      .hero-photo-card { width:44px; height:145px; }
+      .hpc-arrow { width:22px; font-size:1rem; }
+    }
+    @media(max-width:480px) {
+      .hero-photo-card { width:36px; height:120px; }
+      .hpc-arrow { width:18px; font-size:0.85rem; }
+    }
   </style>
 </head>
 <body>
