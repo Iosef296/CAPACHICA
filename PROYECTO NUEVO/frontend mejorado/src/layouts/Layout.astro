@@ -1,7 +1,6 @@
 ---
 import '../styles/global.css';
 import Navbar from '../components/Navbar';
-import BottomNav from '../components/BottomNav';
 import ArenaFooter from '../components/ArenaFooter.astro';
 import ChatWidget from '../components/ChatWidget';
 
@@ -407,7 +406,86 @@ const hasHero = Astro.slots.has('hero');
     </main>
 
     <ArenaFooter />
-    <BottomNav client:only="react" />
+
+    <!-- ═══ BOTTOM NAV (mobile ≤768px) — pure HTML, no React ═══ -->
+    <nav class="bnav" aria-label="Navegación principal">
+      <a href="/" class="bnav-tab" data-href="/">
+        <div class="bnav-pip">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+        </div>
+        <span class="bnav-label">Inicio</span>
+      </a>
+      <a href="/destinos" class="bnav-tab" data-href="/destinos">
+        <div class="bnav-pip">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <span class="bnav-label">Destinos</span>
+      </a>
+      <a href="/gastronomia" class="bnav-tab" data-href="/gastronomia">
+        <div class="bnav-pip">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 00-5 5v6c0 .55.45 1 1 1h4v6"/></svg>
+        </div>
+        <span class="bnav-label">Gastronomía</span>
+      </a>
+      <a href="/festividades" class="bnav-tab" data-href="/festividades">
+        <div class="bnav-pip">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <span class="bnav-label">Festivid.</span>
+      </a>
+      <button class="bnav-tab" id="bnavMoreBtn" aria-label="Más páginas">
+        <div class="bnav-pip">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        </div>
+        <span class="bnav-label">Más</span>
+      </button>
+    </nav>
+
+    <!-- Sheet "Más" -->
+    <div class="bnav-backdrop" id="bnavBackdrop" style="display:none"></div>
+    <div class="bnav-sheet" id="bnavSheet" style="display:none">
+      <div class="bnav-handle"></div>
+      <div class="bnav-sheet-title">Explorar</div>
+      <div class="bnav-grid">
+        <a href="/vivencial"   class="bnav-more-item"><span>🌿</span><span>Vivencial</span></a>
+        <a href="/actividades" class="bnav-more-item"><span>🏔️</span><span>Actividades</span></a>
+        <a href="/artesania"   class="bnav-more-item"><span>🎨</span><span>Artesanía</span></a>
+        <a href="/alojamiento" class="bnav-more-item"><span>🏡</span><span>Alojamiento</span></a>
+        <a href="/como-llegar" class="bnav-more-item"><span>🗺️</span><span>Cómo Llegar</span></a>
+      </div>
+    </div>
+
+    <script is:inline>
+      (function() {
+        // Active tab detection
+        var path = window.location.pathname;
+        document.querySelectorAll('.bnav-tab[data-href]').forEach(function(tab) {
+          var href = tab.getAttribute('data-href');
+          var active = href === '/' ? path === '/' : path.startsWith(href);
+          if (active) tab.classList.add('bnav-active');
+        });
+        // More sheet toggle
+        var btn = document.getElementById('bnavMoreBtn');
+        var backdrop = document.getElementById('bnavBackdrop');
+        var sheet = document.getElementById('bnavSheet');
+        function openSheet() {
+          backdrop.style.display = 'block';
+          sheet.style.display = 'block';
+          btn.classList.add('bnav-active');
+        }
+        function closeSheet() {
+          backdrop.style.display = 'none';
+          sheet.style.display = 'none';
+          btn.classList.remove('bnav-active');
+        }
+        if (btn) btn.addEventListener('click', function() {
+          sheet.style.display === 'none' ? openSheet() : closeSheet();
+        });
+        if (backdrop) backdrop.addEventListener('click', closeSheet);
+        document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeSheet(); });
+      })();
+    </script>
+
     <ChatWidget client:load />
 
     <style is:global>
