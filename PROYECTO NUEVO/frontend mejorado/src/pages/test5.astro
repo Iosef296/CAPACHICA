@@ -1,0 +1,307 @@
+---
+import Layout from '../layouts/Layout.astro';
+import HomeSections from '../components/HomeSections';
+
+const IA_URL = import.meta.env.PUBLIC_IA_URL || 'http://localhost:5000';
+let cms: any = null;
+try { const r = await fetch(`${IA_URL}/api/contenido/index`); if (r.ok) cms = await r.json(); } catch {}
+const cmsHero = cms?.secciones?.find((s: any) => s.tipo === 'hero');
+const cmsStats = cms?.secciones?.find((s: any) => s.tipo === 'stats');
+const statsData = cmsStats?.items || [
+  { valor: '8+', label: 'Comunidades' },
+  { valor: '3,820', label: 'msnm' },
+  { valor: '500+', label: 'Años historia' },
+  { valor: '12', label: 'Islas cercanas' },
+];
+
+const photos = [
+  { src:'/foto-lago.jpg',        alt:'Lago Titicaca',     tag:'Destinos',     title:'Lago Titicaca',       desc:'El lago navegable más alto del mundo a 3,820 msnm.' },
+  { src:'/foto-vivencial.jpg',   alt:'Turismo vivencial', tag:'Vivencial',    title:'Vida en Comunidad',   desc:'Convive con familias quechuas y aprende la cultura andina.' },
+  { src:'/foto-actividades.jpg', alt:'Actividades',       tag:'Actividades',  title:'Aventura en el Lago', desc:'Kayak, senderismo y vistas panorámicas del Titicaca.' },
+  { src:'/foto-festividades.jpg',alt:'Festividades',      tag:'Festividades', title:'Fiestas Ancestrales', desc:'Danzas y rituales milenarios de la herencia quechua.' },
+];
+---
+
+<Layout
+  title="Test5 — Galería flotante 2×2"
+  description="Test: floating gallery button → 2×2 photo grid modal"
+>
+  <Fragment slot="hero">
+    <div class="idx-badge">Puno · Perú · Lago Titicaca</div>
+    <h1 class="t5-title">
+      {cmsHero?.titulo ? cmsHero.titulo : <Fragment>Descubre <em>Capachica</em></Fragment>}
+    </h1>
+    <p class="t5-desc">
+      {cmsHero?.subtitulo || 'Una península andina a 3,820 msnm donde el lago más alto del mundo navegable se convierte en horizonte y cinco siglos de cultura quechua siguen vivos en cada familia.'}
+    </p>
+    <div class="t5-ctas">
+      <a href="/destinos" class="btn-primary">Explorar destinos →</a>
+      <a href="/como-llegar" class="btn-outline">Cómo llegar</a>
+    </div>
+    <div class="t5-stats">
+      {statsData.map((st: any) => (
+        <div class="t5-stat">
+          <div class="t5-stat-val">{st.valor}</div>
+          <div class="t5-stat-lbl">{st.label}</div>
+        </div>
+      ))}
+    </div>
+    <nav class="t5-quicknav">
+      <a href="/vivencial">🏡 Vivencial</a>
+      <a href="/actividades">🏔️ Actividades</a>
+      <a href="/gastronomia">🍽️ Gastronomía</a>
+      <a href="/festividades">🎊 Festividades</a>
+      <a href="/artesania">🧶 Artesanía</a>
+      <a href="/destinos">🗺️ Destinos</a>
+    </nav>
+  </Fragment>
+
+  <Fragment slot="hero-overlay">
+    <!-- Desktop: side cards (classic) -->
+    {photos.map((p, i) => (
+      <div class={`t5-side t5-${i < 2 ? 'left' : 'right'} desktop-only`} style={`top:${i % 2 === 0 ? 18 : 52}%`} onclick={`openGallery(${i})`}>
+        <div class="t5-side-thumb">
+          <img src={p.src} alt={p.alt} loading="lazy" />
+          <span class="t5-side-arrow">{i < 2 ? '›' : '‹'}</span>
+        </div>
+      </div>
+    ))}
+
+    <!-- Mobile: gallery trigger button -->
+    <button class="t5-gallery-btn mobile-only" onclick="openGallery(0)" aria-label="Ver galería de fotos">
+      <span class="t5-gallery-grid">
+        {photos.map((p) => (
+          <span class="t5-mini-thumb"><img src={p.src} alt={p.alt} loading="lazy" /></span>
+        ))}
+      </span>
+      <span class="t5-gallery-label">📷 Ver galería</span>
+    </button>
+
+    <!-- Gallery modal -->
+    <div class="t5-gallery-modal" id="t5GalleryModal">
+      <div class="t5-modal-backdrop" onclick="closeGallery()"></div>
+      <div class="t5-modal-box">
+        <!-- Grid view -->
+        <div class="t5-grid-view" id="t5GridView">
+          <div class="t5-modal-header">
+            <h3>Galería</h3>
+            <button onclick="closeGallery()" class="t5-modal-close">✕</button>
+          </div>
+          <div class="t5-photo-grid">
+            {photos.map((p, i) => (
+              <div class="t5-grid-item" onclick={`openFullscreen(${i})`}>
+                <img src={p.src} alt={p.alt} loading="lazy" />
+                <div class="t5-grid-overlay">
+                  <span class="t5-g-tag">{p.tag}</span>
+                  <span class="t5-g-title">{p.title}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <!-- Fullscreen view -->
+        <div class="t5-full-view" id="t5FullView" style="display:none">
+          <div class="t5-full-header">
+            <button onclick="backToGrid()" class="t5-back-btn">← Galería</button>
+            <button onclick="closeGallery()" class="t5-modal-close">✕</button>
+          </div>
+          <div class="t5-full-img-wrap">
+            <img id="t5FullImg" src="" alt="" />
+          </div>
+          <div class="t5-full-info">
+            <span class="t5-f-tag" id="t5FTag"></span>
+            <h3 class="t5-f-title" id="t5FTitle"></h3>
+            <p class="t5-f-desc" id="t5FDesc"></p>
+          </div>
+          <div class="t5-full-nav">
+            <button onclick="stepFull(-1)">‹</button>
+            <span id="t5FCounter"></span>
+            <button onclick="stepFull(1)">›</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Fragment>
+
+  <HomeSections client:load />
+</Layout>
+
+<style is:global>
+.idx-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 16px; border-radius:100px;
+  border:1px solid rgba(212,168,67,0.45); background:rgba(212,168,67,0.10);
+  font-family:var(--font-mono); font-size:10px; letter-spacing:2px;
+  color:var(--gold); text-transform:uppercase;
+  margin-bottom:1.2rem; animation:fadeUp 0.8s ease both;
+}
+.idx-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--gold); animation:t5blink 2s ease-in-out infinite; }
+@keyframes t5blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* CONTENT */
+.t5-title {
+  font-family:var(--font-display); font-size:clamp(3rem,8vw,6rem);
+  line-height:1.05; color:var(--text-main); animation:fadeUp 0.8s 0.1s ease both;
+}
+.t5-title em { display:block; font-style:italic; color:var(--gold); }
+.t5-desc { font-size:clamp(0.95rem,2vw,1.2rem); color:var(--text-muted); max-width:500px; margin:0.8rem auto 0; line-height:1.75; text-align:center; animation:fadeUp 0.8s 0.2s ease both; }
+.t5-ctas { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-top:2rem; animation:fadeUp 0.8s 0.3s ease both; }
+.t5-stats { display:flex; background:rgba(10,22,40,0.7); border:1px solid rgba(45,212,191,0.2); border-radius:12px; backdrop-filter:blur(12px); overflow:hidden; margin-top:2rem; animation:fadeUp 0.8s 0.4s ease both; flex-wrap:wrap; }
+.t5-stat { padding:12px 20px; text-align:center; border-right:1px solid rgba(45,212,191,0.12); flex:1; min-width:70px; }
+.t5-stat:last-child { border-right:none; }
+.t5-stat-val { font-family:var(--font-display); font-size:1.4rem; font-weight:700; color:var(--gold); line-height:1; }
+.t5-stat-lbl { font-size:0.68rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-top:3px; }
+.t5-quicknav { display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; margin-top:1.6rem; animation:fadeUp 0.8s 0.45s ease both; }
+.t5-quicknav a { padding:5px 13px; border-radius:100px; font-size:11px; font-weight:600; border:1px solid rgba(240,237,232,0.15); color:rgba(240,237,232,0.65); background:rgba(255,255,255,0.05); text-decoration:none; transition:all 0.25s; }
+.t5-quicknav a:hover { border-color:rgba(212,168,67,0.5); color:var(--gold); background:rgba(212,168,67,0.08); }
+
+/* SIDE CARDS (desktop) */
+.t5-side {
+  position:absolute; z-index:4; width:64px; height:190px;
+  background:rgba(8,18,36,0.92); border:3px solid #7a4a1e;
+  border-radius:10px; overflow:hidden; cursor:pointer;
+  box-shadow:0 2px 12px rgba(0,0,0,0.45), 0 8px 32px rgba(0,0,0,0.6);
+  transition:all 0.35s ease;
+}
+.t5-left  { left:6px; }
+.t5-right { right:6px; }
+.t5-side-thumb { position:relative; width:100%; height:100%; overflow:hidden; }
+.t5-side-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+.t5-left  .t5-side-thumb img { object-position:left center; }
+.t5-right .t5-side-thumb img { object-position:right center; }
+.t5-side-arrow {
+  position:absolute; top:50%; transform:translateY(-50%);
+  font-size:1.8rem; color:rgba(255,255,255,0.9);
+  text-shadow:0 1px 6px rgba(0,0,0,0.6); pointer-events:none;
+}
+.t5-left  .t5-side-arrow { right:6px; }
+.t5-right .t5-side-arrow { left:6px; }
+
+/* GALLERY BUTTON (mobile) */
+.t5-gallery-btn {
+  position:absolute; bottom:200px; left:50%; transform:translateX(-50%);
+  background:rgba(10,22,40,0.85); border:1px solid rgba(212,168,67,0.4);
+  border-radius:14px; padding:8px 14px; cursor:pointer;
+  display:flex; align-items:center; gap:10px; z-index:6;
+  box-shadow:0 4px 20px rgba(0,0,0,0.45); backdrop-filter:blur(12px);
+  transition:all 0.25s ease;
+}
+.t5-gallery-btn:hover { border-color:rgba(212,168,67,0.7); background:rgba(10,22,40,0.95); }
+.t5-gallery-grid { display:grid; grid-template-columns:1fr 1fr; gap:3px; width:48px; height:48px; border-radius:8px; overflow:hidden; }
+.t5-mini-thumb { overflow:hidden; }
+.t5-mini-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+.t5-gallery-label { font-family:var(--font-mono); font-size:11px; letter-spacing:1.5px; color:var(--gold); white-space:nowrap; }
+
+/* GALLERY MODAL */
+.t5-gallery-modal {
+  display:none; position:fixed; inset:0; z-index:300;
+  align-items:flex-end; justify-content:center;
+}
+.t5-gallery-modal.open { display:flex; }
+.t5-modal-backdrop { position:absolute; inset:0; background:rgba(0,0,0,0.75); }
+.t5-modal-box {
+  position:relative; z-index:1; width:100%; max-width:520px;
+  max-height:92vh; background:#07101e;
+  border-radius:20px 20px 0 0; overflow:hidden;
+  box-shadow:0 -8px 40px rgba(0,0,0,0.6);
+  border-top:1px solid rgba(212,168,67,0.2);
+  display:flex; flex-direction:column;
+}
+.t5-modal-header { display:flex; align-items:center; justify-content:space-between; padding:16px 18px 12px; border-bottom:1px solid rgba(45,212,191,0.12); }
+.t5-modal-header h3 { font-family:var(--font-display); font-size:18px; color:#f0ede8; }
+.t5-modal-close { background:rgba(240,237,232,0.08); border:none; color:rgba(240,237,232,0.6); border-radius:50%; width:32px; height:32px; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.t5-photo-grid { display:grid; grid-template-columns:1fr 1fr; gap:3px; padding:3px; overflow-y:auto; }
+.t5-grid-item { position:relative; aspect-ratio:1; overflow:hidden; cursor:pointer; }
+.t5-grid-item img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.3s ease; }
+.t5-grid-item:hover img { transform:scale(1.05); }
+.t5-grid-overlay {
+  position:absolute; inset:0; padding:8px;
+  background:linear-gradient(to top, rgba(4,9,20,0.9) 0%, transparent 55%);
+  display:flex; flex-direction:column; justify-content:flex-end;
+  opacity:0; transition:opacity 0.25s;
+}
+.t5-grid-item:hover .t5-grid-overlay { opacity:1; }
+.t5-g-tag { font-family:var(--font-mono); font-size:8px; letter-spacing:1.2px; text-transform:uppercase; color:#4ade80; }
+.t5-g-title { font-size:12px; font-weight:600; color:#f0ede8; }
+
+/* Fullscreen within modal */
+.t5-full-view { display:flex; flex-direction:column; height:100%; }
+.t5-full-header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid rgba(45,212,191,0.12); }
+.t5-back-btn { background:none; border:none; color:var(--gold); font-size:14px; cursor:pointer; font-family:var(--font-body); }
+.t5-full-img-wrap { flex:1; overflow:hidden; min-height:0; }
+.t5-full-img-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
+.t5-full-info { padding:12px 16px 6px; }
+.t5-f-tag { display:inline-block; padding:2px 9px; border-radius:100px; background:rgba(34,197,94,0.13); border:1px solid rgba(34,197,94,0.38); font-family:var(--font-mono); font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:#4ade80; margin-bottom:5px; }
+.t5-f-title { font-family:var(--font-display); font-size:18px; color:#f0ede8; margin-bottom:4px; }
+.t5-f-desc { font-size:13px; color:rgba(240,237,232,0.65); line-height:1.55; }
+.t5-full-nav { display:flex; align-items:center; justify-content:space-between; padding:8px 16px 14px; }
+.t5-full-nav button { background:rgba(212,168,67,0.1); border:1px solid rgba(212,168,67,0.3); color:var(--gold); border-radius:8px; padding:8px 24px; font-size:1.2rem; cursor:pointer; transition:background 0.2s; }
+.t5-full-nav button:hover { background:rgba(212,168,67,0.22); }
+.t5-full-nav span { font-family:var(--font-mono); font-size:11px; color:rgba(240,237,232,0.5); }
+
+/* VISIBILITY HELPERS */
+.desktop-only { display:block; }
+.mobile-only  { display:none; }
+
+/* RESPONSIVE */
+@media(max-width:900px) {
+  .desktop-only { display:none !important; }
+  .mobile-only  { display:flex !important; }
+}
+@media(max-width:768px) {
+  .t5-title { font-size:clamp(2.4rem,10vw,4rem) !important; }
+  .t5-ctas { flex-direction:column; align-items:center; gap:0.75rem; }
+  .t5-ctas .btn-primary, .t5-ctas .btn-outline { width:min(100%,280px); text-align:center; justify-content:center; }
+  .t5-stats { width:100%; flex-wrap:wrap; border-radius:8px; }
+  .t5-stat { flex:1; min-width:70px; padding:10px 12px; }
+  .t5-quicknav a { font-size:9px; padding:4px 8px; }
+  .t5-gallery-btn { bottom:180px; }
+}
+@media(max-width:480px) {
+  .t5-stats { border-radius:0; margin-left:-1rem; margin-right:-1rem; }
+  .t5-gallery-btn { bottom:150px; }
+}
+</style>
+
+<script is:inline>
+const T5_DATA = [
+  { src:'/foto-lago.jpg',        tag:'Destinos',     title:'Lago Titicaca',       desc:'El lago navegable más alto del mundo a 3,820 msnm. Aguas azul profundo y cinco siglos de historia.' },
+  { src:'/foto-vivencial.jpg',   tag:'Vivencial',    title:'Vida en Comunidad',   desc:'Convive con familias quechuas, aprende tejido en telar, pesca ancestral y cocina andina.' },
+  { src:'/foto-actividades.jpg', tag:'Actividades',  title:'Aventura en el Lago', desc:'Kayak, pesca tradicional, senderismo entre cactus gigantes y vistas panorámicas del Titicaca.' },
+  { src:'/foto-festividades.jpg',tag:'Festividades', title:'Fiestas Ancestrales', desc:'Danzas, música y rituales milenarios que mantienen viva la herencia cultural quechua.' },
+];
+var t5FullIdx = 0;
+
+function openGallery(i) {
+  t5FullIdx = i;
+  var modal = document.getElementById('t5GalleryModal');
+  modal.classList.add('open');
+  if (window.innerWidth <= 900) {
+    showGrid();
+  } else {
+    openFullscreen(i);
+  }
+}
+function closeGallery() { document.getElementById('t5GalleryModal').classList.remove('open'); showGrid(); }
+function showGrid() {
+  document.getElementById('t5GridView').style.display = '';
+  document.getElementById('t5FullView').style.display = 'none';
+}
+function backToGrid() { showGrid(); }
+function openFullscreen(i) {
+  t5FullIdx = i;
+  renderFull();
+  document.getElementById('t5GridView').style.display = 'none';
+  document.getElementById('t5FullView').style.display = 'flex';
+}
+function stepFull(d) { t5FullIdx = (t5FullIdx + d + T5_DATA.length) % T5_DATA.length; renderFull(); }
+function renderFull() {
+  var p = T5_DATA[t5FullIdx];
+  document.getElementById('t5FullImg').src = p.src;
+  document.getElementById('t5FullImg').alt = p.title;
+  document.getElementById('t5FTag').textContent = p.tag;
+  document.getElementById('t5FTitle').textContent = p.title;
+  document.getElementById('t5FDesc').textContent = p.desc;
+  document.getElementById('t5FCounter').textContent = (t5FullIdx + 1) + ' / ' + T5_DATA.length;
+}
+</script>
