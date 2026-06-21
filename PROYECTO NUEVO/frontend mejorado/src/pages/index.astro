@@ -667,14 +667,112 @@ const hasBody = bodySecciones.length > 0;
     @media(max-width:1100px) {
       .hero-photo-card { width:58px; height:170px; }
     }
+    /* ≤900px: ocultar side cards → mostrar gallery FAB */
+    @media(max-width:900px) {
+      .hero-photo-card { display:none !important; }
+      .gallery-fab { display:flex !important; }
+    }
     @media(max-width:768px) {
-      .hero-photo-card { width:72px; height:180px; }
-      .hero-photo-card.hpc-left  { left:0 !important; border-radius:0 12px 12px 0 !important; }
-      .hero-photo-card.hpc-right { right:0 !important; border-radius:12px 0 0 12px !important; }
+      .hero-content { padding-left:1.5rem !important; padding-right:1.5rem !important; }
+      .gallery-fab { bottom:195px; }
     }
     @media(max-width:480px) {
-      .hero-photo-card { width:60px; height:155px; }
+      .hero-content { padding-left:1rem !important; padding-right:1rem !important; }
+      .gallery-fab { bottom:160px; }
+      .gallery-fab-thumbs { width:40px; height:40px; }
     }
+
+    /* ─── GALLERY FAB ─── */
+    .gallery-fab {
+      display:none; /* hidden on desktop, shown via @media(max-width:900px) */
+      position:absolute; bottom:225px; left:50%; transform:translateX(-50%);
+      z-index:7; align-items:center; gap:12px;
+      background:rgba(6,14,30,0.82); border:1px solid rgba(212,168,67,0.42);
+      border-radius:16px; padding:10px 18px 10px 10px;
+      cursor:pointer; backdrop-filter:blur(18px);
+      box-shadow:0 6px 28px rgba(0,0,0,0.5), 0 0 0 1px rgba(212,168,67,0.1);
+      transition:all 0.25s ease; white-space:nowrap;
+      animation:fadeUp 0.8s 0.5s ease both;
+    }
+    .gallery-fab:hover {
+      background:rgba(6,14,30,0.96); border-color:rgba(212,168,67,0.72);
+      box-shadow:0 10px 40px rgba(0,0,0,0.65), 0 0 0 1px rgba(212,168,67,0.3);
+      transform:translateX(-50%) translateY(-2px);
+    }
+    .gallery-fab-thumbs {
+      display:grid; grid-template-columns:1fr 1fr; gap:2px;
+      width:48px; height:48px; border-radius:10px; overflow:hidden;
+      flex-shrink:0;
+    }
+    .gallery-fab-thumbs img { width:100%; height:100%; object-fit:cover; display:block; }
+    .gallery-fab-text { display:flex; flex-direction:column; gap:2px; }
+    .gallery-fab-label { font-family:var(--font-mono); font-size:10px; letter-spacing:1.8px; color:var(--gold); text-transform:uppercase; }
+    .gallery-fab-sub { font-size:11.5px; color:rgba(240,237,232,0.5); font-family:'Crimson Pro',serif; }
+
+    /* ─── GALLERY MODAL (bottom sheet) ─── */
+    .gallery-modal { display:none; position:fixed; inset:0; z-index:500; }
+    .gallery-modal.open { display:block; }
+    .gallery-backdrop {
+      position:absolute; inset:0; background:rgba(2,5,16,0.88);
+      animation:gBack 0.3s ease both;
+    }
+    @keyframes gBack { from{opacity:0} to{opacity:1} }
+    .gallery-sheet {
+      position:absolute; bottom:0; left:0; right:0; max-height:92vh;
+      background:linear-gradient(180deg,#0a1628 0%,#07101e 100%);
+      border-radius:22px 22px 0 0; overflow:hidden;
+      box-shadow:0 -16px 64px rgba(0,0,0,0.75);
+      border-top:1px solid rgba(212,168,67,0.2);
+      display:flex; flex-direction:column;
+      animation:gSheet 0.38s cubic-bezier(0.32,0.72,0,1) both;
+    }
+    @keyframes gSheet { from{transform:translateY(100%)} to{transform:translateY(0)} }
+    .gallery-sheet-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:18px 20px 14px; border-bottom:1px solid rgba(45,212,191,0.1); flex-shrink:0;
+    }
+    .gallery-sheet-title { font-family:'Playfair Display',serif; font-size:22px; color:#f0ede8; }
+    .gallery-sheet-sub { font-size:11px; color:rgba(212,168,67,0.6); font-family:'Space Mono',monospace; letter-spacing:1.5px; margin-top:2px; }
+    .gallery-close-btn {
+      width:36px; height:36px; border-radius:50%;
+      background:rgba(240,237,232,0.08); border:1px solid rgba(240,237,232,0.12);
+      color:rgba(240,237,232,0.65); font-size:15px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; transition:all 0.2s;
+    }
+    .gallery-close-btn:hover { background:rgba(240,237,232,0.18); color:#fff; }
+    /* Views */
+    .gallery-grid-view, .gallery-full-view { display:none; flex-direction:column; flex:1; min-height:0; overflow:hidden; }
+    .gallery-grid-view.active, .gallery-full-view.active { display:flex; }
+    /* Grid */
+    .gallery-grid { display:grid; grid-template-columns:1fr 1fr; gap:3px; padding:3px; overflow-y:auto; flex:1; }
+    .gallery-grid-item { position:relative; aspect-ratio:1; overflow:hidden; cursor:pointer; }
+    .gallery-grid-item img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.35s ease; }
+    .gallery-grid-item:active img { transform:scale(0.95); }
+    .gallery-grid-overlay {
+      position:absolute; inset:0; padding:10px;
+      background:linear-gradient(to top, rgba(4,9,20,0.92) 0%, rgba(4,9,20,0) 55%);
+      display:flex; flex-direction:column; justify-content:flex-end;
+      transition:opacity 0.25s;
+    }
+    .g-tag { font-family:'Space Mono',monospace; font-size:7.5px; letter-spacing:1.2px; text-transform:uppercase; color:#4ade80; }
+    .g-title { font-size:13px; font-weight:700; color:#f0ede8; line-height:1.2; margin-top:2px; }
+    /* Fullscreen */
+    .gallery-full-view { background:#07101f; }
+    .gallery-full-header { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; flex-shrink:0; border-bottom:1px solid rgba(45,212,191,0.08); }
+    .gallery-back-btn { background:none; border:none; color:var(--gold); font-size:13px; cursor:pointer; font-family:'Crimson Pro',serif; display:flex; align-items:center; gap:4px; }
+    .gallery-counter { font-family:'Space Mono',monospace; font-size:11px; color:rgba(240,237,232,0.4); }
+    .gallery-full-img { flex:1; min-height:0; overflow:hidden; }
+    .gallery-full-img img { width:100%; height:100%; object-fit:cover; display:block; transition:opacity 0.2s; }
+    .gallery-full-info { padding:14px 18px 6px; flex-shrink:0; }
+    .gallery-full-tag { display:inline-block; padding:2px 10px; border-radius:100px; background:rgba(34,197,94,0.13); border:1px solid rgba(34,197,94,0.38); font-family:'Space Mono',monospace; font-size:8.5px; letter-spacing:1.5px; text-transform:uppercase; color:#4ade80; margin-bottom:6px; }
+    .gallery-full-title { font-family:'Playfair Display',serif; font-size:20px; color:#f0ede8; margin-bottom:4px; }
+    .gallery-full-desc { font-size:13px; color:rgba(240,237,232,0.6); line-height:1.6; }
+    .gallery-full-nav { display:flex; align-items:center; gap:10px; padding:10px 18px 16px; flex-shrink:0; }
+    .gallery-nav-btn { flex:1; background:rgba(212,168,67,0.1); border:1px solid rgba(212,168,67,0.25); color:var(--gold); border-radius:10px; padding:12px; font-size:1.3rem; cursor:pointer; transition:all 0.2s; }
+    .gallery-nav-btn:hover { background:rgba(212,168,67,0.22); border-color:rgba(212,168,67,0.5); }
+    .gallery-dots { display:flex; gap:6px; justify-content:center; align-items:center; }
+    .gallery-dot { width:6px; height:6px; border-radius:50%; background:rgba(240,237,232,0.2); transition:all 0.25s; flex-shrink:0; }
+    .gallery-dot.active { background:var(--gold); width:20px; border-radius:3px; }
   </style>
 </head>
 <body>
@@ -776,6 +874,20 @@ const hasBody = bodySecciones.length > 0;
     </div>
   </div>
 
+  <!-- Gallery FAB: mobile only, shown when side cards hidden -->
+  <button class="gallery-fab" onclick="openGallery(0)" aria-label="Ver galería de fotos">
+    <div class="gallery-fab-thumbs">
+      <img src="/foto-lago.jpg" alt="" />
+      <img src="/foto-actividades.jpg" alt="" />
+      <img src="/foto-vivencial.jpg" alt="" />
+      <img src="/foto-festividades.jpg" alt="" />
+    </div>
+    <div class="gallery-fab-text">
+      <span class="gallery-fab-label">Galería</span>
+      <span class="gallery-fab-sub">4 fotos · Explorar</span>
+    </div>
+  </button>
+
   <!-- Wave layers -->
   <div class="hero-waves">
     <div class="wave wave-sand"></div>
@@ -792,6 +904,41 @@ const hasBody = bodySecciones.length > 0;
   )}
 </main>
 
+<!-- ─── GALLERY MODAL ─── -->
+<div class="gallery-modal" id="galleryModal">
+  <div class="gallery-backdrop" onclick="closeGallery()"></div>
+  <div class="gallery-sheet">
+    <div class="gallery-sheet-header">
+      <div>
+        <div class="gallery-sheet-title">Galería</div>
+        <div class="gallery-sheet-sub">CAPACHICA · PERÚ · TITICACA</div>
+      </div>
+      <button class="gallery-close-btn" onclick="closeGallery()">✕</button>
+    </div>
+    <div class="gallery-grid-view active" id="gGridView">
+      <div class="gallery-grid" id="gGrid"></div>
+    </div>
+    <div class="gallery-full-view" id="gFullView">
+      <div class="gallery-full-header">
+        <button class="gallery-back-btn" onclick="gBackToGrid()">← Galería</button>
+        <span class="gallery-counter" id="gCounter"></span>
+        <button class="gallery-close-btn" onclick="closeGallery()">✕</button>
+      </div>
+      <div class="gallery-full-img"><img id="gFullImg" src="" alt="" /></div>
+      <div class="gallery-full-info">
+        <span class="gallery-full-tag" id="gFullTag"></span>
+        <h3 class="gallery-full-title" id="gFullTitle"></h3>
+        <p class="gallery-full-desc" id="gFullDesc"></p>
+      </div>
+      <div class="gallery-full-nav">
+        <button class="gallery-nav-btn" onclick="gStep(-1)">‹</button>
+        <div class="gallery-dots" id="gDots"></div>
+        <button class="gallery-nav-btn" onclick="gStep(1)">›</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <ChatWidget client:load />
 
 <ArenaFooter />
@@ -803,6 +950,99 @@ const hasBody = bodySecciones.length > 0;
     if (saved) document.documentElement.setAttribute('data-theme', saved);
   })();
 
+
+  /* ── GALLERY ── */
+  var G_DATA = [
+    { src:'/foto-lago.jpg',         tag:'Destinos',     title:'Lago Titicaca',       desc:'El lago navegable más alto del mundo a 3,820 msnm. Aguas azul profundo, cielos inmensos y cinco siglos de historia.' },
+    { src:'/foto-vivencial.jpg',    tag:'Vivencial',    title:'Vida en Comunidad',   desc:'Convive con familias quechuas, aprende tejido en telar, pesca ancestral y cocina andina en Capachica.' },
+    { src:'/foto-actividades.jpg',  tag:'Actividades',  title:'Aventura en el Lago', desc:'Kayak, pesca tradicional, senderismo entre cactus gigantes y vistas panorámicas desde los miradores.' },
+    { src:'/foto-festividades.jpg', tag:'Festividades', title:'Fiestas Ancestrales', desc:'Danzas, música y rituales milenarios que mantienen viva la herencia cultural quechua del altiplano.' },
+  ];
+  var gIdx = 0;
+
+  (function buildGrid() {
+    var grid = document.getElementById('gGrid');
+    if (!grid) return;
+    G_DATA.forEach(function(p, i) {
+      var el = document.createElement('div');
+      el.className = 'gallery-grid-item';
+      el.innerHTML = '<img src="' + p.src + '" alt="' + p.title + '" loading="lazy" />'
+        + '<div class="gallery-grid-overlay">'
+        + '<span class="g-tag">' + p.tag + '</span>'
+        + '<span class="g-title">' + p.title + '</span>'
+        + '</div>';
+      el.addEventListener('click', function() { gOpenFull(i); });
+      grid.appendChild(el);
+    });
+    buildDots();
+  })();
+
+  function buildDots() {
+    var wrap = document.getElementById('gDots');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    G_DATA.forEach(function(_, i) {
+      var d = document.createElement('span');
+      d.className = 'gallery-dot' + (i === 0 ? ' active' : '');
+      d.addEventListener('click', function() { gOpenFull(i); });
+      wrap.appendChild(d);
+    });
+  }
+
+  function openGallery(i) {
+    gIdx = i;
+    document.getElementById('galleryModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    gShowGrid();
+  }
+  function closeGallery() {
+    document.getElementById('galleryModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function gShowGrid() {
+    document.getElementById('gGridView').classList.add('active');
+    document.getElementById('gFullView').classList.remove('active');
+  }
+  function gBackToGrid() { gShowGrid(); }
+  function gOpenFull(i) {
+    gIdx = i;
+    gRenderFull();
+    document.getElementById('gGridView').classList.remove('active');
+    document.getElementById('gFullView').classList.add('active');
+  }
+  function gStep(d) {
+    gIdx = (gIdx + d + G_DATA.length) % G_DATA.length;
+    gRenderFull();
+  }
+  function gRenderFull() {
+    var p = G_DATA[gIdx];
+    var img = document.getElementById('gFullImg');
+    img.style.opacity = '0';
+    img.src = p.src; img.alt = p.title;
+    img.onload = function() { img.style.opacity = '1'; };
+    document.getElementById('gFullTag').textContent = p.tag;
+    document.getElementById('gFullTitle').textContent = p.title;
+    document.getElementById('gFullDesc').textContent = p.desc;
+    document.getElementById('gCounter').textContent = (gIdx + 1) + ' / ' + G_DATA.length;
+    document.querySelectorAll('.gallery-dot').forEach(function(d, i) {
+      d.classList.toggle('active', i === gIdx);
+    });
+  }
+  /* Swipe support */
+  (function() {
+    var startX = 0;
+    var full = document.getElementById('gFullView');
+    if (!full) return;
+    full.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; }, { passive:true });
+    full.addEventListener('touchend', function(e) {
+      var dx = e.changedTouches[0].clientX - startX;
+      if (Math.abs(dx) > 50) gStep(dx < 0 ? 1 : -1);
+    }, { passive:true });
+  })();
+  /* Close on Escape */
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeGallery();
+  });
 
   /* -- HERO PHOTO CARDS -- */
   function toggleHPC(card) {
