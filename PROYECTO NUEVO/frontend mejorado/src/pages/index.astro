@@ -109,6 +109,7 @@ const statsData = cmsStats?.items || [
 .idx-desc {
   font-size: clamp(0.95rem, 2vw, 1.2rem); color: var(--text-muted);
   max-width: 540px; margin: 0.8rem auto 0; line-height: 1.75;
+  text-align: center;
   animation: fadeUp 0.8s 0.2s ease both;
 }
 
@@ -224,7 +225,7 @@ const statsData = cmsStats?.items || [
 /* ─── INDEX RESPONSIVE ─── */
 @media (max-width: 768px) {
   .idx-title { font-size: clamp(2.4rem, 10vw, 3.8rem); }
-  .idx-desc { font-size: 1rem; max-width: 100%; }
+  .idx-desc { font-size: 1rem; max-width: 100%; text-align: center; }
   .idx-ctas { flex-direction: column; align-items: center; gap: 0.75rem; }
   .idx-ctas .btn-primary,
   .idx-ctas .btn-outline { width: min(100%, 280px); justify-content: center; text-align: center; }
@@ -232,13 +233,13 @@ const statsData = cmsStats?.items || [
   .idx-stat-item { padding: 10px 14px; }
   .idx-stat-val { font-size: 1.2rem; }
   .idx-stat-lbl { font-size: 0.62rem; }
-  .idx-quicknav { gap: 0.4rem; }
-  .idx-quicknav a { font-size: 10px; padding: 5px 10px; }
+  .idx-quicknav { gap: 0.3rem; }
+  .idx-quicknav a { font-size: 9px; padding: 4px 8px; letter-spacing: 0.02em; }
 }
 @media (max-width: 480px) {
   .idx-stats { border-radius: 0; margin-left: -1rem; margin-right: -1rem; }
   .idx-stat-item { padding: 8px 10px; }
-  .idx-quicknav a { padding: 5px 8px; font-size: 9px; }
+  .idx-quicknav a { padding: 4px 6px; font-size: 8.5px; }
 }
 </style>
 
