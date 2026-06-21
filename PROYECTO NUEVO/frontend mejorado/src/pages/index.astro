@@ -559,14 +559,14 @@ const hasBody = bodySecciones.length > 0;
       position:absolute; z-index:4;
       background:rgba(8,18,36,0.92); border:1.5px solid rgba(34,197,94,0.35);
       overflow:hidden; cursor:pointer;
-      width:200px;
-      transition:width 0.52s cubic-bezier(0.4,0,0.2,1),box-shadow 0.3s,opacity 0.3s ease;
+      width:200px; height:190px;
+      transition:width 0.52s cubic-bezier(0.4,0,0.2,1),height 0.52s cubic-bezier(0.4,0,0.2,1),top 0.52s cubic-bezier(0.4,0,0.2,1),box-shadow 0.3s,opacity 0.3s ease;
       backdrop-filter:blur(14px); box-shadow:0 8px 32px rgba(0,0,0,0.55);
     }
     .hero-photo-card.hpc-left  { left:0;  border-radius:0 14px 14px 0; border-left:none; }
     .hero-photo-card.hpc-right { right:0; border-radius:14px 0 0 14px; border-right:none; }
-    .hero-photo-card.expanded  { width:75vw; z-index:8; box-shadow:0 16px 64px rgba(0,0,0,0.72),0 0 48px rgba(34,197,94,0.12); }
-    .hpc-thumb { position:relative; width:100%; height:190px; overflow:hidden; }
+    .hero-photo-card.expanded  { width:75vw; height:calc(100vh - 56px - 180px); top:0 !important; z-index:8; box-shadow:0 16px 64px rgba(0,0,0,0.72),0 0 48px rgba(34,197,94,0.12); }
+    .hpc-thumb { position:relative; width:100%; height:100%; overflow:hidden; }
     .hpc-thumb img { width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.52s ease,object-position 0.52s ease; }
     .hpc-left  .hpc-thumb img { object-position:left center; }
     .hpc-right .hpc-thumb img { object-position:right center; }
@@ -587,11 +587,13 @@ const hasBody = bodySecciones.length > 0;
     .hpc-right.expanded .hpc-arrow { transform:translateY(-50%); }
     /* body */
     .hpc-body {
+      position:absolute; bottom:0; left:0; right:0;
       max-height:0; overflow:hidden;
       transition:max-height 0.52s cubic-bezier(0.4,0,0.2,1),padding 0.35s;
-      padding:0 16px; background:rgba(8,18,36,0.97);
+      padding:0 22px;
+      background:linear-gradient(to top, rgba(4,9,20,0.97) 0%, rgba(4,9,20,0.88) 55%, transparent 100%);
     }
-    .hero-photo-card.expanded .hpc-body { max-height:160px; padding:14px 22px 16px; }
+    .hero-photo-card.expanded .hpc-body { max-height:180px; padding:32px 22px 20px; }
     .hpc-tag {
       display:inline-block; margin-bottom:7px; padding:2px 9px; border-radius:100px;
       background:rgba(34,197,94,0.13); border:1px solid rgba(34,197,94,0.38);
