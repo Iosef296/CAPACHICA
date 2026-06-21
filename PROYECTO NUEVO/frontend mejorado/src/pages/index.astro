@@ -557,15 +557,28 @@ const hasBody = bodySecciones.length > 0;
     /* ─── HERO PHOTO CARDS ─── */
     .hero-photo-card {
       position:absolute; z-index:4;
-      background:rgba(8,18,36,0.92); border:1.5px solid rgba(34,197,94,0.35);
+      background:rgba(8,18,36,0.92);
+      border:3px solid #7a4a1e;
       overflow:hidden; cursor:pointer;
       width:200px; height:190px;
+      border-radius:8px;
       transition:width 0.52s cubic-bezier(0.4,0,0.2,1),height 0.52s cubic-bezier(0.4,0,0.2,1),top 0.52s cubic-bezier(0.4,0,0.2,1),box-shadow 0.3s,opacity 0.3s ease;
-      backdrop-filter:blur(14px); box-shadow:0 8px 32px rgba(0,0,0,0.55);
+      backdrop-filter:blur(14px);
+      box-shadow:
+        0 0 0 1px #1e0c02,
+        inset 0 0 0 1px rgba(180,100,40,0.30),
+        inset 0 1px 0 rgba(200,130,60,0.20),
+        0 8px 32px rgba(0,0,0,0.60);
     }
-    .hero-photo-card.hpc-left  { left:0;  border-radius:0 14px 14px 0; border-left:none; }
-    .hero-photo-card.hpc-right { right:0; border-radius:14px 0 0 14px; border-right:none; }
-    .hero-photo-card.expanded  { width:85vw; height:calc(100vh - 80px - 130px); top:80px !important; z-index:8; box-shadow:0 16px 64px rgba(0,0,0,0.72),0 0 48px rgba(34,197,94,0.12); }
+    .hero-photo-card.hpc-left  { left:6px; }
+    .hero-photo-card.hpc-right { right:6px; }
+    .hero-photo-card.expanded  {
+      width:85vw; height:calc(100vh - 80px - 130px); top:80px !important; z-index:8;
+      box-shadow:
+        0 0 0 1px #1e0c02,
+        inset 0 0 0 1px rgba(180,100,40,0.25),
+        0 20px 70px rgba(0,0,0,0.80), 0 0 60px rgba(80,30,5,0.25);
+    }
     .hpc-thumb { position:relative; width:100%; height:100%; overflow:hidden; }
     .hpc-thumb img { width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.52s ease,object-position 0.52s ease; }
     .hpc-left  .hpc-thumb img { object-position:left center; }
