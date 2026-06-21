@@ -407,7 +407,7 @@ const hasHero = Astro.slots.has('hero');
     </main>
 
     <ArenaFooter />
-    <BottomNav client:load />
+    <BottomNav client:only="react" />
     <ChatWidget client:load />
 
     <style is:global>
