@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import Navbar from '../components/Navbar';
+import BottomNav from '../components/BottomNav';
 import ArenaFooter from '../components/ArenaFooter.astro';
 import ChatWidget from '../components/ChatWidget';
 
@@ -22,8 +23,13 @@ const hasHero = Astro.slots.has('hero');
 <html lang="es" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#070D1A" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#043a48" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Capachica" />
     <title>{title}</title>
     <meta name="description" content={description} />
 
@@ -401,6 +407,7 @@ const hasHero = Astro.slots.has('hero');
     </main>
 
     <ArenaFooter />
+    <BottomNav client:load />
     <ChatWidget client:load />
 
     <style is:global>

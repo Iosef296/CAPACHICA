@@ -119,6 +119,7 @@ export default function ChatWidget() {
       <button
         onClick={() => setOpen(o => !o)}
         aria-label={open ? 'Cerrar asistente' : 'Abrir asistente IA'}
+        className="chat-fab"
         style={{
           position: 'fixed', bottom: 24, right: 24, zIndex: 10000,
           width: 58, height: 58, borderRadius: '50%', border: 'none',
@@ -150,7 +151,7 @@ export default function ChatWidget() {
 
       {/* ── Chat panel ── */}
       {open && (
-        <div style={{
+        <div className="chat-panel" style={{
           position: 'fixed', bottom: 94, right: 24, zIndex: 9999,
           width: 370, maxWidth: 'calc(100vw - 32px)',
           height: 520, maxHeight: 'calc(100vh - 120px)',

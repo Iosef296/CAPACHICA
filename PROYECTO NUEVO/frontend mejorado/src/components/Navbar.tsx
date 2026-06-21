@@ -85,6 +85,8 @@ export default function Navbar() {
         .hamburger { display: none !important; }
         @media (max-width: 960px) {
           .nav-desktop { display: none !important; }
+        }
+        @media (max-width: 960px) and (min-width: 769px) {
           .hamburger { display: flex !important; }
         }
         .mobile-menu a {

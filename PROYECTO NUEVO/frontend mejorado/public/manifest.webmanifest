@@ -1,0 +1,20 @@
+{
+  "name": "Capachica Turismo",
+  "short_name": "Capachica",
+  "description": "Descubre la península de Capachica — joya del Lago Titicaca",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#043a48",
+  "theme_color": "#043a48",
+  "icons": [
+    {
+      "src": "/campfire.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["travel", "lifestyle"],
+  "lang": "es-PE"
+}
