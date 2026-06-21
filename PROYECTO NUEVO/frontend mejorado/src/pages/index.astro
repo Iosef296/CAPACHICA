@@ -220,6 +220,26 @@ const statsData = cmsStats?.items || [
 
 /* mobile: hide photo cards */
 @media (max-width: 900px) { .hpc { display: none; } }
+
+/* ─── INDEX RESPONSIVE ─── */
+@media (max-width: 768px) {
+  .idx-title { font-size: clamp(2.4rem, 10vw, 3.8rem); }
+  .idx-desc { font-size: 1rem; max-width: 100%; }
+  .idx-ctas { flex-direction: column; align-items: center; gap: 0.75rem; }
+  .idx-ctas .btn-primary,
+  .idx-ctas .btn-outline { width: min(100%, 280px); justify-content: center; text-align: center; }
+  .idx-stats { width: 100%; border-radius: 8px; }
+  .idx-stat-item { padding: 10px 14px; }
+  .idx-stat-val { font-size: 1.2rem; }
+  .idx-stat-lbl { font-size: 0.62rem; }
+  .idx-quicknav { gap: 0.4rem; }
+  .idx-quicknav a { font-size: 10px; padding: 5px 10px; }
+}
+@media (max-width: 480px) {
+  .idx-stats { border-radius: 0; margin-left: -1rem; margin-right: -1rem; }
+  .idx-stat-item { padding: 8px 10px; }
+  .idx-quicknav a { padding: 5px 8px; font-size: 9px; }
+}
 </style>
 
 <script is:inline>

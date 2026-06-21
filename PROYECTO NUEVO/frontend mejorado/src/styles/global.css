@@ -251,7 +251,24 @@ section { padding: 90px 0; }
 .text-center .divider { margin: 1rem auto; }
 
 /* ─── RESPONSIVE ─── */
-@media (max-width: 768px) { section { padding: 60px 0; } .container { padding: 0 1rem; } }
+@media (max-width: 1024px) {
+  .container { padding: 0 1.5rem; }
+  section { padding: 72px 0; }
+}
+@media (max-width: 768px) {
+  .container { padding: 0 1rem; }
+  section { padding: 52px 0; }
+  .section-title { font-size: clamp(1.5rem, 6vw, 2.2rem); }
+  .btn-primary { padding: 13px 22px; font-size: 13px; }
+  .btn-outline  { padding: 12px 20px; font-size: 13px; }
+  .section-label { font-size: 0.65rem; padding: 0.3rem 0.85rem; }
+}
+@media (max-width: 480px) {
+  .container { padding: 0 0.875rem; }
+  section { padding: 40px 0; }
+  .btn-primary, .btn-outline { min-height: 44px; }
+  .card:hover { transform: none; }
+}
 
 /* ─── PAGE SCENE BACKDROP (cielo + océano fijo) ─── */
 .page-scene-bg {

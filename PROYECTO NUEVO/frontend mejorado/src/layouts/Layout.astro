@@ -342,6 +342,27 @@ const hasHero = Astro.slots.has('hero');
       [data-theme="light"] .layout-ocean {
         background: linear-gradient(180deg, #005f73 0%, #007288 35%, #008899 65%, #00a0b5 100%);
       }
+
+      /* ─── RESPONSIVE HERO ─── */
+      @media (max-width: 1024px) {
+        .layout-hero-content { max-width: 720px; }
+      }
+      @media (max-width: 768px) {
+        .layout-hero.hero-full { min-height: 82vh; }
+        .hero-moon { width: 72px !important; height: 72px !important; }
+        .hero-waves { height: 160px; }
+        .layout-hero-content {
+          padding-left: 1rem;
+          padding-right: 1rem;
+          margin-bottom: 120px;
+        }
+      }
+      @media (max-width: 480px) {
+        .layout-hero.hero-full { min-height: 78vh; }
+        .hero-moon { width: 52px !important; height: 52px !important; top: 4% !important; }
+        .layout-hero-content { margin-bottom: 88px; padding-top: clamp(32px, 6vh, 60px) !important; }
+        .hero-waves { height: 110px; }
+      }
     </style>
 
     <script is:inline>
