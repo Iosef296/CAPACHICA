@@ -559,7 +559,7 @@ const hasBody = bodySecciones.length > 0;
     @media(max-width:768px) {
       .hero { min-height:88vh; }
       .hero-moon { width:72px !important; height:72px !important; }
-      .hero-content { padding-top:clamp(155px,22vh,200px) !important; margin-bottom:130px; padding-left:1rem; padding-right:1rem; }
+      .hero-content { padding-top:clamp(155px,22vh,200px) !important; margin-bottom:130px; padding-left:80px; padding-right:80px; }
       .hero-title { font-size:clamp(2.4rem,10vw,4rem); }
       .hero-desc { font-size:1rem; max-width:100%; text-align:center; }
       .hero-ctas { flex-direction:column; align-items:center; gap:0.75rem; }
@@ -575,7 +575,7 @@ const hasBody = bodySecciones.length > 0;
     }
     @media(max-width:480px) {
       .hero-moon { width:52px !important; height:52px !important; top:3% !important; }
-      .hero-content { padding-top:clamp(90px,18vh,150px) !important; margin-bottom:90px; }
+      .hero-content { padding-top:clamp(90px,18vh,150px) !important; margin-bottom:90px; padding-left:68px; padding-right:68px; }
       .hero-stats { border-radius:0; margin-left:-1rem; margin-right:-1rem; }
       .stat-item { padding:8px 10px; }
       .hero-quicknav a { padding:4px 6px; font-size:8.5px; }
@@ -665,20 +665,15 @@ const hasBody = bodySecciones.length > 0;
     .hpc-title { font-family:'Playfair Display',serif; font-size:16px; font-weight:700; color:#f0ede8; margin-bottom:6px; line-height:1.2; }
     .hpc-desc  { font-size:13px; color:rgba(240,237,232,0.62); line-height:1.6; }
     @media(max-width:1100px) {
-      .hero-photo-card { width:52px; height:165px; }
+      .hero-photo-card { width:58px; height:170px; }
     }
     @media(max-width:768px) {
-      /* Tab handle at screen edge — only arrow visible, no stolen content space */
-      .hero-photo-card { width:28px; height:120px; }
+      .hero-photo-card { width:72px; height:180px; }
       .hero-photo-card.hpc-left  { left:0 !important; border-radius:0 12px 12px 0 !important; }
       .hero-photo-card.hpc-right { right:0 !important; border-radius:12px 0 0 12px !important; }
-      .hpc-left  .hpc-arrow { right:0; width:28px; border-radius:0 10px 10px 0; }
-      .hpc-right .hpc-arrow { left:0;  width:28px; border-radius:10px 0 0 10px; }
     }
     @media(max-width:480px) {
-      .hero-photo-card { width:22px; height:100px; }
-      .hpc-left  .hpc-arrow { width:22px; }
-      .hpc-right .hpc-arrow { width:22px; }
+      .hero-photo-card { width:60px; height:155px; }
     }
   </style>
 </head>
