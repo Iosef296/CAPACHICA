@@ -1,8 +1,7 @@
 ---
-// src/pages/festividades.astro
-import Navbar from '../components/Navbar';
-import ArenaFooter from '../components/ArenaFooter.astro';
-let festividades = [];
+import Layout from '../layouts/Layout.astro';
+
+let festividades: any[] = [];
 try {
   const res = await fetch(`${import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api'}/festividades`);
   if (res.ok) festividades = await res.json();
@@ -19,1190 +18,498 @@ if (!festividades.length) {
   ];
 }
 
-const tipos = ['Todos', ...new Set(festividades.map(f => f.tipo).filter(Boolean))];
+const tipos = ['Todos', ...new Set(festividades.map((f: any) => f.tipo).filter(Boolean))];
 const NOMBRES_MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const tipoIcon: Record<string,string> = { Religiosa:'⛪', Ceremonial:'☀️', Tradicional:'💃', Cultural:'🎭', Nacional:'🏛️' };
 const tipoColor: Record<string,string> = { Religiosa:'#9333ea', Ceremonial:'#f59e0b', Tradicional:'#FF6B35', Cultural:'#3b82f6', Nacional:'#10b981' };
+const hasGallery = festividades.some((f: any) => f.galeria && f.galeria.length > 0);
 ---
-<html lang="es" data-theme="dark">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Festividades · Capachica Turismo</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Pro:wght@300;400;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <style is:global>
-    @property --sky-c1 { syntax:'<color>'; initial-value:#070D1A; inherits:false; }
-    @property --sky-c2 { syntax:'<color>'; initial-value:#0B1426; inherits:false; }
-    @property --sky-c3 { syntax:'<color>'; initial-value:#132042; inherits:false; }
-    @property --sky-c4 { syntax:'<color>'; initial-value:#1B2D5A; inherits:false; }
-    /* ─── CSS VARS (same as actividades) ─── */
-    :root {
-      --turquoise: #2dd4bf;
-      --turquoise-dark: #0f9488;
-      --turquoise-glow: rgba(45,212,191,0.25);
-      --gold: #d4a843;
-      --gold-light: #f0c96a;
-      --gold-pale: rgba(212,168,67,0.15);
-      --navy: #0a1628;
-      --navy-mid: #0f2240;
-      --navy-light: #162d4e;
-      --sand: #e8dcc8;
-      --sand-dark: #c4a882;
-      --text-main: #f0ede8;
-      --text-muted: rgba(240,237,232,0.65);
-      --card-bg: rgba(10,22,40,0.75);
-      --card-border: rgba(45,212,191,0.18);
-      --accent: #FF6B35;
-      --accent-glow: rgba(255,107,53,0.25);
-      --transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
-    }
-    [data-theme="light"] {
-      --turquoise: #0f9488;
-      --turquoise-dark: #0d7a6f;
-      --gold: #b8860b;
-      --gold-light: #d4a843;
-      --gold-pale: rgba(184,134,11,0.12);
-      --navy: #f8f6f3;
-      --navy-mid: #f0ede8;
-      --navy-light: #e8e4de;
-      --text-main: #1a1a2e;
-      --text-muted: rgba(26,26,46,0.6);
-      --card-bg: rgba(255,255,255,0.88);
-      --card-border: rgba(10,120,200,0.22);
-      --accent: #c25a18;
-      --accent-glow: rgba(194,90,24,0.22);
-    }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Crimson Pro', Georgia, serif;
-      background: var(--navy);
-      color: var(--text-main);
-      min-height: 100vh;
-      overflow-x: hidden;
-      transition: background 0.7s ease, color 0.7s ease;
-    }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #0a1628; }
-    ::-webkit-scrollbar-thumb { background: rgba(45,212,191,0.35); border-radius: 3px; }
-    [data-theme="light"] ::-webkit-scrollbar-track { background: #d4b060; }
-    [data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(10,80,150,0.4); }
+<Layout title="Festividades · Capachica Turismo" description="Tradición, fe y cultura viva a orillas del lago más alto del mundo. Descubre las celebraciones ancestrales de Capachica.">
 
-    /* ─── HERO ─── */
-    .hero {
-      position:relative; min-height:100vh;
-      display:flex; align-items:center; justify-content:center;
-      overflow:hidden;
-    }
-    .hero-sky {
-      position:absolute; inset:0; z-index:0;
-      @property --sky-c1 { syntax:'<color>'; initial-value:#070D1A; inherits:false; }
-      @property --sky-c2 { syntax:'<color>'; initial-value:#0B1426; inherits:false; }
-      @property --sky-c3 { syntax:'<color>'; initial-value:#132042; inherits:false; }
-      @property --sky-c4 { syntax:'<color>'; initial-value:#1B2D5A; inherits:false; }
-      --sky-c1: #070D1A; --sky-c2: #0B1426; --sky-c3: #132042; --sky-c4: #1B2D5A;
-      background: linear-gradient(180deg, var(--sky-c1) 0%, var(--sky-c2) 30%, var(--sky-c3) 65%, var(--sky-c4) 100%);
-      transition: --sky-c1 1.5s ease, --sky-c2 1.5s ease, --sky-c3 1.5s ease, --sky-c4 1.5s ease;
-    }
-    [data-theme="light"] .hero-sky {
-      --sky-c1: #0d47a1; --sky-c2: #1565c0; --sky-c3: #42a5f5; --sky-c4: #90caf9;
-    }
-    .stars-layer { position:absolute; inset:0; z-index:1; pointer-events:none; }
-    [data-theme="light"] .stars-layer { opacity:0; transition:opacity 1s ease; }
-    .hero-moon {
-      position:absolute; top:9%; left:50%; transform:translateX(-50%);
-      width:90px; height:90px; border-radius:50%; z-index:6; pointer-events:none;
-      background: radial-gradient(circle at 35% 35%, #e8e0cc, #c8bfa0 60%, #a09070);
-      box-shadow: 0 0 40px rgba(220,200,150,0.35), 0 0 80px rgba(220,200,150,0.15), inset -12px -12px 20px rgba(0,0,0,0.25);
-      animation: moonPulse 6s ease-in-out infinite;
-    }
-    .hero-moon::before, .hero-moon::after { display:none; }
-    [data-theme="light"] .hero-moon {
-      background: radial-gradient(circle at 35% 35%, #FFD700, #FFA500 60%, #FF8C00) !important;
-      box-shadow: 0 0 40px rgba(255,215,0,0.45), 0 0 80px rgba(255,165,0,0.25), inset -12px -12px 20px rgba(0,0,0,0.1) !important;
-      animation: sunPulse 6s ease-in-out infinite !important;
-    }
-    .hero-moon.theme-switching-down {
-      animation: themeSwitchDown 2.4s cubic-bezier(0.33,0,0.12,1) forwards !important;
-      will-change: transform, opacity, filter;
-    }
-    .hero-moon.theme-switching-up {
-      animation: themeSwitchUp 2.4s cubic-bezier(0.33,0,0.12,1) forwards !important;
-      will-change: transform, opacity, filter;
-    }
-    .hero-sky.sky-transitioning         { animation: skyToLight 2.4s cubic-bezier(0.33,0,0.12,1) forwards !important; }
-    .hero-sky.sky-transitioning-reverse { animation: skyToDark  2.4s cubic-bezier(0.33,0,0.12,1) forwards !important; }
-    @keyframes moonPulse {
-      0%,100% { box-shadow: 0 0 40px rgba(220,200,150,0.35), 0 0 80px rgba(220,200,150,0.15), inset -12px -12px 20px rgba(0,0,0,0.25); }
-      50%     { box-shadow: 0 0 55px rgba(220,200,150,0.5),  0 0 110px rgba(220,200,150,0.25), inset -12px -12px 20px rgba(0,0,0,0.25); }
-    }
-    @keyframes sunPulse {
-      0%,100% { box-shadow: 0 0 40px rgba(255,215,0,0.35), 0 0 80px rgba(255,165,0,0.15), inset -12px -12px 20px rgba(0,0,0,0.1); }
-      50%     { box-shadow: 0 0 55px rgba(255,215,0,0.5),  0 0 110px rgba(255,165,0,0.25), inset -12px -12px 20px rgba(0,0,0,0.1); }
-    }
-    @keyframes themeSwitchDown {
-      0%   { transform:translateX(-50%)              translateY(0)    rotate(0deg)   scale(1);    opacity:1;    filter:brightness(1)   blur(0px);   }
-      5%   { transform:translateX(calc(-50% + 3vw))  translateY(2vh)  rotate(10deg)  scale(0.99); opacity:0.99; filter:brightness(0.99) blur(0px);   }
-      12%  { transform:translateX(calc(-50% + 8vw))  translateY(6vh)  rotate(26deg)  scale(0.96); opacity:0.96; filter:brightness(0.95) blur(0.1px); }
-      20%  { transform:translateX(calc(-50% + 15vw)) translateY(12vh) rotate(48deg)  scale(0.91); opacity:0.90; filter:brightness(0.87) blur(0.2px); }
-      30%  { transform:translateX(calc(-50% + 23vw)) translateY(20vh) rotate(76deg)  scale(0.84); opacity:0.81; filter:brightness(0.75) blur(0.5px); }
-      40%  { transform:translateX(calc(-50% + 31vw)) translateY(28vh) rotate(104deg) scale(0.74); opacity:0.69; filter:brightness(0.60) blur(0.9px); }
-      50%  { transform:translateX(calc(-50% + 38vw)) translateY(36vh) rotate(130deg) scale(0.62); opacity:0.56; filter:brightness(0.46) blur(1.4px); }
-      60%  { transform:translateX(calc(-50% + 44vw)) translateY(43vh) rotate(154deg) scale(0.48); opacity:0.42; filter:brightness(0.33) blur(2px);   }
-      70%  { transform:translateX(calc(-50% + 49vw)) translateY(49vh) rotate(175deg) scale(0.34); opacity:0.27; filter:brightness(0.21) blur(3px);   }
-      80%  { transform:translateX(calc(-50% + 53vw)) translateY(53vh) rotate(194deg) scale(0.20); opacity:0.14; filter:brightness(0.11) blur(4.5px); }
-      90%  { transform:translateX(calc(-50% + 56vw)) translateY(56vh) rotate(209deg) scale(0.09); opacity:0.05; filter:brightness(0.05) blur(6.5px); }
-      100% { transform:translateX(calc(-50% + 58vw)) translateY(58vh) rotate(220deg) scale(0.02); opacity:0;    filter:brightness(0.02) blur(8px);   }
-    }
-    @keyframes themeSwitchUp {
-      0%   { transform:translateX(calc(-50% - 58vw)) translateY(58vh) rotate(0deg)    scale(0.02); opacity:0;    filter:brightness(0.02) blur(8px);   }
-      10%  { transform:translateX(calc(-50% - 56vw)) translateY(56vh) rotate(-12deg)  scale(0.09); opacity:0.05; filter:brightness(0.05) blur(6.5px); }
-      20%  { transform:translateX(calc(-50% - 53vw)) translateY(53vh) rotate(-28deg)  scale(0.20); opacity:0.14; filter:brightness(0.11) blur(4.5px); }
-      30%  { transform:translateX(calc(-50% - 49vw)) translateY(49vh) rotate(-47deg)  scale(0.34); opacity:0.27; filter:brightness(0.21) blur(3px);   }
-      40%  { transform:translateX(calc(-50% - 44vw)) translateY(43vh) rotate(-68deg)  scale(0.48); opacity:0.42; filter:brightness(0.33) blur(2px);   }
-      50%  { transform:translateX(calc(-50% - 38vw)) translateY(36vh) rotate(-92deg)  scale(0.62); opacity:0.56; filter:brightness(0.46) blur(1.4px); }
-      60%  { transform:translateX(calc(-50% - 31vw)) translateY(28vh) rotate(-118deg) scale(0.74); opacity:0.69; filter:brightness(0.60) blur(0.9px); }
-      70%  { transform:translateX(calc(-50% - 23vw)) translateY(20vh) rotate(-146deg) scale(0.84); opacity:0.81; filter:brightness(0.75) blur(0.5px); }
-      80%  { transform:translateX(calc(-50% - 15vw)) translateY(12vh) rotate(-174deg) scale(0.91); opacity:0.90; filter:brightness(0.87) blur(0.2px); }
-      88%  { transform:translateX(calc(-50% - 8vw))  translateY(6vh)  rotate(-196deg) scale(0.96); opacity:0.96; filter:brightness(0.95) blur(0.1px); }
-      95%  { transform:translateX(calc(-50% - 3vw))  translateY(2vh)  rotate(-212deg) scale(0.99); opacity:0.99; filter:brightness(0.99) blur(0px);   }
-      100% { transform:translateX(-50%)              translateY(0)    rotate(-220deg) scale(1);    opacity:1;    filter:brightness(1)    blur(0px);   }
-    }
-    @keyframes skyToLight {
-      0%   { --sky-c1:#070D1A; --sky-c2:#0B1426; --sky-c3:#132042; --sky-c4:#1B2D5A; }
-      30%  { --sky-c1:#0a1828; --sky-c2:#12243c; --sky-c3:#1a345c; --sky-c4:#264c74; }
-      60%  { --sky-c1:#183040; --sky-c2:#24405e; --sky-c3:#32567e; --sky-c4:#46749c; }
-      100% { --sky-c1:#0d47a1; --sky-c2:#1565c0; --sky-c3:#42a5f5; --sky-c4:#90caf9; }
-    }
-    @keyframes skyToDark {
-      0%   { --sky-c1:#0d47a1; --sky-c2:#1565c0; --sky-c3:#42a5f5; --sky-c4:#90caf9; }
-      30%  { --sky-c1:#183040; --sky-c2:#24405e; --sky-c3:#32567e; --sky-c4:#46749c; }
-      60%  { --sky-c1:#0a1828; --sky-c2:#12243c; --sky-c3:#1a345c; --sky-c4:#264c74; }
-      100% { --sky-c1:#070D1A; --sky-c2:#0B1426; --sky-c3:#132042; --sky-c4:#1B2D5A; }
-    }
-    .sky-glow {
-      position:absolute; inset:0; pointer-events:none; z-index:1; opacity:0;
-      transition: opacity 2.4s cubic-bezier(0.33,0,0.12,1);
-    }
-    .sky-glow.glow-sunrise {
-      background: radial-gradient(ellipse at 50% 80%, rgba(255,200,100,0.2) 0%, rgba(200,160,100,0.1) 40%, transparent 70%);
-      opacity:1;
-    }
-    .sky-glow.glow-sunset {
-      background: radial-gradient(ellipse at 50% 80%, rgba(10,20,50,0.2) 0%, rgba(20,30,60,0.1) 40%, transparent 70%);
-      opacity:1;
-    }
-    .hero-birds.birds-fade-in  { opacity:1 !important; transition:opacity 1.8s cubic-bezier(0.33,0,0.12,1) 0.6s !important; }
-    .hero-birds.birds-fade-out { opacity:0 !important; transition:opacity 1.2s cubic-bezier(0.33,0,0.12,1) !important; }
-    .hero-sun { display:none !important; }
-    /* Lock falling sphere to its PRE-transition color until off-screen */
-    [data-theme="light"] .hero-moon.theme-switching-down {
-      background: radial-gradient(circle at 35% 35%, #e8e0cc, #c8bfa0 60%, #a09070) !important;
-      box-shadow: 0 0 40px rgba(220,200,150,0.35), 0 0 80px rgba(220,200,150,0.15), inset -12px -12px 20px rgba(0,0,0,0.25) !important;
-    }
-    [data-theme="dark"] .hero-moon.theme-switching-down {
-      background: radial-gradient(circle at 35% 35%, #FFD700, #FFA500 60%, #FF8C00) !important;
-      box-shadow: 0 0 40px rgba(255,215,0,0.45), 0 0 80px rgba(255,165,0,0.25), inset -12px -12px 20px rgba(0,0,0,0.1) !important;
-    }
-    .hero-lake {
-      position:absolute; bottom:0; left:0; right:0; z-index:3;
-      height:28%; pointer-events:none;
-    }
-    .hero-lake svg { display:block; width:100%; height:80px; }
-    .hero-birds { position:absolute; inset:0; z-index:2; pointer-events:none; overflow:visible; opacity:0; transition:opacity 2s ease; color:rgba(26,14,4,0.70); }
-    .bird { position:absolute; }
-    .hero-content {
-      position:relative; z-index:10; text-align:center;
-      padding:0 2rem; padding-top:80px; max-width:760px;
-    }
-    .hero-badge {
-      display:inline-flex; align-items:center; gap:8px;
-      padding:6px 16px; border-radius:20px;
-      background:rgba(255,107,53,0.12); border:1px solid rgba(255,107,53,0.3);
-      font-family:'Space Mono',monospace; font-size:10px; letter-spacing:2px;
-      color:rgba(255,140,90,0.9); text-transform:uppercase; margin-bottom:1.5rem;
-    }
-    [data-theme="light"] .hero-badge { background:rgba(255,255,255,0.18); border-color:rgba(255,255,255,0.45); color:rgba(255,255,255,0.92); }
-    .hero-title {
-      font-family:'Playfair Display',serif; font-size:clamp(2.8rem,7vw,5.5rem);
-      font-weight:700; line-height:1.1; color:#fff; margin-bottom:1.2rem;
-    }
-    .hero-title em {
-      font-style:italic; display:block;
-      background:linear-gradient(135deg,#FF6B35,#FFD700,#FF8C5A);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    }
-    .hero-subtitle {
-      font-size:1.15rem; color:rgba(240,237,232,0.68); line-height:1.7; margin-bottom:2rem; max-width:560px; margin-inline:auto;
-    }
-    .hero-ctas { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
-    .hero-cta-primary {
-      padding:13px 28px; border-radius:10px; font-size:15px; font-weight:600;
-      background:linear-gradient(135deg,#FF6B35,#FF8C5A); color:#fff;
-      border:none; cursor:pointer; text-decoration:none;
-      box-shadow:0 4px 20px rgba(255,107,53,0.4);
-      transition:transform 0.2s, box-shadow 0.2s;
-    }
-    .hero-cta-primary:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(255,107,53,0.5); }
-    .hero-cta-secondary {
-      padding:13px 28px; border-radius:10px; font-size:15px; font-weight:600;
-      background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.22);
-      color:#fff; cursor:pointer; text-decoration:none; transition:background 0.2s;
-    }
-    .hero-cta-secondary:hover { background:rgba(255,255,255,0.14); }
-    .hero-stats {
-      display:inline-flex; gap:0; margin-top:2.5rem;
-      background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12);
-      border-radius:14px; backdrop-filter:blur(12px); overflow:hidden;
-    }
-    .stat-item {
-      padding:14px 24px; text-align:center;
-      border-right:1px solid rgba(255,255,255,0.08);
-    }
-    .stat-item:last-child { border-right:none; }
-    .stat-val { font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:700; color:var(--gold); }
-    .stat-label { font-size:11px; color:rgba(240,237,232,0.5); letter-spacing:1px; text-transform:uppercase; font-family:'Space Mono',monospace; }
-
-    /* ─── BOTTOM WAVE (hero → content) ─── */
-    .hero-wave {
-      position:absolute; bottom:0; left:-5%; right:-5%; z-index:5;
-    }
-    .hero-wave svg { display:block; width:110%; }
-
-    /* ─── MAIN CONTENT ─── */
-    main {
-      background: linear-gradient(180deg,#0f2240 0%,#0a1628 30%,#091224 100%);
-      padding: 4rem 2rem 0;
-      position:relative; z-index:10;
-      transition:background 0.7s ease;
-    }
-    [data-theme="light"] main {
-      background: linear-gradient(180deg,#005f73 0%,#007288 35%,#008899 65%,#00a0b5 100%);
-    }
-
-    /* ─── SECTION HEADER ─── */
-    .section-header { text-align:center; margin-bottom:2.5rem; }
-    .section-eyebrow {
-      display:inline-flex; align-items:center; gap:8px;
-      font-family:'Space Mono',monospace; font-size:10px; letter-spacing:2.5px;
-      text-transform:uppercase; color:rgba(255,107,53,0.85); margin-bottom:0.75rem;
-    }
-    .section-eyebrow::before { content:''; display:block; width:20px; height:1px; background:rgba(255,107,53,0.6); }
-    [data-theme="light"] .section-eyebrow { color:rgba(255,220,160,0.95); }
-    [data-theme="light"] .section-eyebrow::before { background:rgba(255,220,160,0.7); }
-    .section-title {
-      font-family:'Playfair Display',serif; font-size:clamp(1.8rem,4vw,2.8rem);
-      font-weight:700; color:var(--text-main); line-height:1.2;
-    }
-    [data-theme="light"] .section-title { color:#fff; }
-
-    /* ─── FILTERS ─── */
-    .filter-bar {
-      max-width:1100px; margin:0 auto 2rem;
-      display:flex; flex-wrap:wrap; gap:1rem; align-items:center; justify-content:center;
-    }
-    .filter-group { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-    .filter-label {
-      font-family:'Space Mono',monospace; font-size:9px; letter-spacing:1.5px;
-      text-transform:uppercase; color:rgba(240,237,232,0.38); padding-right:4px;
-    }
-    [data-theme="light"] .filter-label { color:rgba(255,255,255,0.55); }
-    .month-chip, .tipo-chip {
-      padding:6px 14px; border-radius:20px; font-size:12.5px; font-weight:600;
-      border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.05);
-      color:rgba(240,237,232,0.62); cursor:pointer;
-      transition:all 0.2s; font-family:'Space Mono',monospace; letter-spacing:0.5px;
-    }
-    .month-chip:hover, .tipo-chip:hover { border-color:rgba(255,107,53,0.5); color:rgba(255,140,90,0.95); }
-    .month-chip.active, .tipo-chip.active {
-      background:linear-gradient(135deg,rgba(255,107,53,0.22),rgba(255,107,53,0.08));
-      border-color:rgba(255,107,53,0.6); color:#FF8C5A;
-    }
-    [data-theme="light"] .month-chip, [data-theme="light"] .tipo-chip {
-      border-color:rgba(255,255,255,0.28); color:rgba(255,255,255,0.75);
-    }
-    [data-theme="light"] .month-chip:hover, [data-theme="light"] .tipo-chip:hover { background:rgba(255,255,255,0.12); color:#fff; }
-    [data-theme="light"] .month-chip.active, [data-theme="light"] .tipo-chip.active {
-      background:rgba(255,255,255,0.2); border-color:rgba(255,255,255,0.7); color:#fff;
-    }
-    .result-count {
-      font-size:12px; color:rgba(240,237,232,0.5); font-family:'Space Mono',monospace;
-      border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:5px 12px;
-    }
-    [data-theme="light"] .result-count { color:rgba(255,255,255,0.75); border-color:rgba(255,255,255,0.25); }
-
-    /* ─── FESTIVAL CARDS ─── */
-    .fest-grid {
-      max-width:1100px; margin:0 auto;
-      display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem;
-    }
-    @media(max-width:900px) { .fest-grid { grid-template-columns:repeat(2,1fr); } }
-    @media(max-width:580px) { .fest-grid { grid-template-columns:1fr; } }
-
-    .fest-card {
-      border-radius:16px; overflow:hidden;
-      background:var(--card-bg); border:1px solid var(--card-border);
-      backdrop-filter:blur(16px);
-      transition:transform 0.35s cubic-bezier(0.4,0,0.2,1), box-shadow 0.35s ease, border-color 0.35s ease;
-      cursor:pointer;
-    }
-    .fest-card:hover {
-      transform:translateY(-6px);
-      box-shadow:0 20px 50px rgba(0,0,0,0.5),0 0 30px rgba(255,107,53,0.12);
-      border-color:rgba(255,107,53,0.35);
-    }
-    [data-theme="light"] .fest-card:hover {
-      box-shadow:0 20px 50px rgba(0,0,0,0.18),0 0 30px rgba(10,150,220,0.15);
-      border-color:rgba(10,120,200,0.45);
-    }
-    .fest-card.destacado { border-color:rgba(255,107,53,0.3); }
-    [data-theme="light"] .fest-card.destacado { border-color:rgba(10,150,220,0.35); }
-
-    .fest-card-img {
-      width:100%; height:180px; object-fit:cover; display:block;
-      transition:transform 0.5s ease;
-    }
-    .fest-card:hover .fest-card-img { transform:scale(1.05); }
-    .fest-card-img-wrap { overflow:hidden; position:relative; }
-    .fest-card-badge {
-      position:absolute; top:10px; right:10px;
-      padding:4px 10px; border-radius:20px; font-size:10.5px; font-weight:700;
-      font-family:'Space Mono',monospace; letter-spacing:0.5px;
-      backdrop-filter:blur(8px);
-    }
-    .fest-card-body { padding:1.2rem 1.3rem 1.3rem; }
-    .fest-card-date {
-      font-family:'Space Mono',monospace; font-size:10px; letter-spacing:1px;
-      color:rgba(255,107,53,0.85); text-transform:uppercase; margin-bottom:0.5rem;
-    }
-    [data-theme="light"] .fest-card-date { color:rgba(194,90,24,0.9); }
-    .fest-card-name {
-      font-family:'Playfair Display',serif; font-size:1.15rem; font-weight:700;
-      color:var(--text-main); margin-bottom:0.6rem; line-height:1.3;
-    }
-    .fest-card-desc {
-      font-size:13.5px; color:var(--text-muted); line-height:1.65; margin-bottom:0.9rem;
-      display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
-    }
-    .fest-actividades {
-      display:flex; flex-wrap:wrap; gap:5px; margin-bottom:0.85rem;
-    }
-    .fest-actividad-pill {
-      padding:3px 9px; border-radius:20px; font-size:11px;
-      background:rgba(255,107,53,0.1); border:1px solid rgba(255,107,53,0.2);
-      color:rgba(255,140,90,0.85);
-    }
-    [data-theme="light"] .fest-actividad-pill {
-      background:rgba(194,90,24,0.1); border-color:rgba(194,90,24,0.25); color:rgba(150,60,10,0.9);
-    }
-    .fest-card-footer {
-      display:flex; align-items:center; justify-content:space-between;
-      padding-top:0.75rem; border-top:1px solid rgba(255,255,255,0.06);
-      font-size:12px; color:var(--text-muted);
-    }
-    [data-theme="light"] .fest-card-footer { border-top-color:rgba(0,0,0,0.07); }
-    .fest-card-location { display:flex; align-items:center; gap:4px; }
-    .fest-destacado-star { color:var(--gold); font-size:13px; }
-
-    /* ─── CALENDAR SECTION ─── */
-    .calendar-section {
-      padding:5rem 2rem 4rem;
-      background:linear-gradient(180deg,#091224 0%,#070D1A 100%);
-      position:relative;
-    }
-    [data-theme="light"] .calendar-section { background:linear-gradient(180deg,#00a0b5 0%,#005f73 100%); }
-    .calendar-grid {
-      max-width:1100px; margin:0 auto;
-      display:grid; grid-template-columns:repeat(3,1fr); gap:1rem;
-    }
-    @media(max-width:900px) { .calendar-grid { grid-template-columns:repeat(2,1fr); } }
-    @media(max-width:540px) { .calendar-grid { grid-template-columns:1fr; } }
-    .cal-month-card {
-      border-radius:14px; padding:1rem;
-      background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07);
-      transition:border-color 0.2s, background 0.2s;
-    }
-    .cal-month-card.current {
-      background:rgba(255,107,53,0.07); border-color:rgba(255,107,53,0.25);
-    }
-    [data-theme="light"] .cal-month-card { background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.2); }
-    [data-theme="light"] .cal-month-card.current { background:rgba(255,255,255,0.22); border-color:rgba(255,255,255,0.5); }
-    .cal-month-name {
-      font-family:'Space Mono',monospace; font-size:10px; letter-spacing:2px;
-      text-transform:uppercase; text-align:center; margin-bottom:0.6rem;
-      color:rgba(240,237,232,0.55);
-    }
-    .cal-month-card.current .cal-month-name { color:#FF8C5A; }
-    [data-theme="light"] .cal-month-name { color:rgba(255,255,255,0.7); }
-    [data-theme="light"] .cal-month-card.current .cal-month-name { color:#fff; }
-    .cal-table { width:100%; border-collapse:collapse; font-size:0.65rem; text-align:center; }
-    .cal-table th { color:rgba(255,255,255,0.28); font-weight:600; padding:2px; font-family:'Space Mono',monospace; }
-    [data-theme="light"] .cal-table th { color:rgba(255,255,255,0.5); }
-    .cal-day { padding:2px; color:rgba(255,255,255,0.38); }
-    [data-theme="light"] .cal-day { color:rgba(255,255,255,0.65); }
-    .cal-day.today {
-      background:#FF6B35; color:#fff; font-weight:700;
-      border-radius:50%; display:inline-flex; width:18px; height:18px;
-      align-items:center; justify-content:center;
-    }
-    .cal-day.has-fest {
-      background:rgba(255,107,53,0.22); color:#FF8C5A; font-weight:700;
-      border-radius:50%; display:inline-flex; width:18px; height:18px;
-      align-items:center; justify-content:center; cursor:pointer;
-    }
-    [data-theme="light"] .cal-day.has-fest { background:rgba(255,255,255,0.3); color:#fff; }
-    .cal-fest-list { margin-top:0.6rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:0.5rem; }
-    [data-theme="light"] .cal-fest-list { border-top-color:rgba(255,255,255,0.15); }
-    .cal-fest-item {
-      font-size:0.6rem; color:rgba(255,255,255,0.42); padding:2px 0;
-      display:flex; align-items:center; gap:4px;
-    }
-    [data-theme="light"] .cal-fest-item { color:rgba(255,255,255,0.7); }
-
-    /* ─── GALLERY ─── */
-    .gallery-section { padding:5rem 2rem 4rem; }
-    .gallery-grid {
-      max-width:1100px; margin:0 auto;
-      display:grid; grid-template-columns:repeat(3,1fr); gap:1rem;
-    }
-    @media(max-width:700px) { .gallery-grid { grid-template-columns:repeat(2,1fr); } }
-    .gallery-item {
-      border-radius:12px; overflow:hidden; position:relative; cursor:pointer;
-      aspect-ratio:4/3; border:1px solid rgba(255,255,255,0.08);
-    }
-    .gallery-item img {
-      width:100%; height:100%; object-fit:cover; display:block;
-      transition:transform 0.4s ease;
-    }
-    .gallery-item:hover img { transform:scale(1.08); }
-    .gallery-item-overlay {
-      position:absolute; inset:0;
-      background:linear-gradient(to top,rgba(0,0,0,0.65),transparent);
-      opacity:0; transition:opacity 0.3s;
-      display:flex; align-items:flex-end; padding:12px;
-    }
-    .gallery-item:hover .gallery-item-overlay { opacity:1; }
-    .gallery-item-label { font-size:12px; color:#fff; font-weight:600; }
-    .gallery-modal {
-      position:fixed; inset:0; z-index:2000;
-      background:rgba(0,0,0,0.92); backdrop-filter:blur(10px);
-      display:none; align-items:center; justify-content:center; flex-direction:column;
-    }
-    .gallery-modal.open { display:flex; }
-    .gallery-modal img { max-width:90vw; max-height:82vh; border-radius:12px; object-fit:contain; }
-    .gallery-modal-close {
-      position:absolute; top:20px; right:24px; font-size:28px; color:#fff;
-      background:none; border:none; cursor:pointer; opacity:0.75; transition:opacity 0.2s;
-    }
-    .gallery-modal-close:hover { opacity:1; }
-
-    /* ─── FLOATING CALENDAR ─── */
-    .floating-cal {
-      position:fixed; bottom:24px; right:24px; width:270px; z-index:1500;
-      border-radius:18px; overflow:hidden;
-      background:rgba(7,13,26,0.94); border:1px solid rgba(255,255,255,0.1);
-      backdrop-filter:blur(22px); box-shadow:0 12px 40px rgba(0,0,0,0.5);
-      transition:box-shadow 0.2s;
-      user-select:none;
-    }
-    .floating-cal.hidden { display:none !important; }
-    .fc-header {
-      display:flex; align-items:center; justify-content:space-between;
-      padding:10px 14px; cursor:grab;
-      background:linear-gradient(135deg,#FF6B35,#FF8C5A);
-    }
-    .fc-header-left { display:flex; align-items:center; gap:6px; }
-    .fc-header span { font-size:11px; font-weight:700; letter-spacing:0.5px; color:#fff; text-transform:uppercase; }
-    .fc-minimize {
-      width:22px; height:22px; border-radius:50%;
-      background:rgba(255,255,255,0.22); border:none; cursor:pointer;
-      color:#fff; font-size:14px; display:flex; align-items:center; justify-content:center;
-      transition:background 0.2s;
-    }
-    .fc-minimize:hover { background:rgba(255,255,255,0.4); }
-    .fc-body { padding:14px; }
-    .fc-next-fest { text-align:center; margin-bottom:10px; }
-    .fc-next-icon { font-size:2rem; margin-bottom:4px; }
-    .fc-next-name { font-weight:700; font-size:13px; color:#fff; margin-bottom:2px; }
-    .fc-next-date { font-size:11px; color:rgba(255,255,255,0.5); margin-bottom:4px; }
-    .fc-days-left { font-size:2rem; font-weight:900; color:#FF6B35; line-height:1; }
-    .fc-days-label { font-size:9.5px; color:rgba(255,255,255,0.38); }
-    .fc-mini-cal { margin-top:8px; }
-    .fc-mini-table { width:100%; border-collapse:collapse; font-size:0.6rem; text-align:center; }
-    .fc-mini-table th { color:rgba(255,255,255,0.3); padding:2px; }
-    .fc-mini-day { padding:2px; color:rgba(255,255,255,0.45); }
-    .fc-mini-today { background:#FF6B35; color:#fff; font-weight:700; border-radius:50%; display:inline-flex; width:17px; height:17px; align-items:center; justify-content:center; }
-    .fc-mini-fest { background:rgba(255,107,53,0.25); color:#FF8C5A; font-weight:700; border-radius:50%; display:inline-flex; width:17px; height:17px; align-items:center; justify-content:center; }
-    .fc-icon-btn {
-      position:fixed; bottom:24px; right:24px; width:52px; height:52px;
-      border-radius:50%; border:none; cursor:pointer; font-size:22px; z-index:1499;
-      background:linear-gradient(135deg,#FF6B35,#FF8C5A);
-      box-shadow:0 4px 18px rgba(255,107,53,0.45); display:none;
-      align-items:center; justify-content:center;
-      animation:floatBtn 3s ease-in-out infinite;
-    }
-    .fc-icon-btn.visible { display:flex; }
-    @keyframes floatBtn {
-      0%,100% { transform:translateY(0); }
-      50% { transform:translateY(-5px); }
-    }
-
-    /* ─── WAVE separators ─── */
-    .wave-sep { position:relative; height:60px; overflow:hidden; }
-    .wave-sep svg { position:absolute; bottom:0; width:100%; }
-
-    /* ─── RESPONSIVE ─── */
-    @media(max-width:768px) {
-      .hero-stats { flex-direction:column; gap:0; }
-      main { padding:3rem 1rem 0; }
-    }
-
-    /* ─── REVEAL ANIMATION ─── */
-    .reveal { opacity:0; transform:translateY(24px); transition:opacity 0.65s ease,transform 0.65s ease; }
-    .reveal.visible { opacity:1; transform:translateY(0); }
-
-    /* ─── BIRD KEYFRAMES ─── */
-    @keyframes flapSlow { 0%,100%{d:path('M0,0 Q-8,-8 -16,0')} 50%{d:path('M0,0 Q-8,6 -16,0')} }
-    @keyframes flapMed  { 0%,100%{d:path('M0,0 Q-8,-8 -16,0')} 50%{d:path('M0,0 Q-8,7 -16,0')} }
-    @keyframes flapFast { 0%,100%{d:path('M0,0 Q-8,-9 -16,0')} 50%{d:path('M0,0 Q-8,8 -16,0')} }
-    @keyframes birdFloat1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(18px,-12px)} }
-    @keyframes birdFloat2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-14px,-10px)} }
-    @keyframes birdFloat3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(22px,-8px)} }
-    @keyframes birdFloat4 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-10px,-14px)} }
-
-    /* ─── BOTTOM WAVE ─── */
-    .bottom-wave { position:relative; height:80px; overflow:hidden; margin-top:-2px; background:linear-gradient(180deg,#043a48 0%,#342e24 35%,#342e24 65%,#4a3a28 100%); }
-    .sand-wave { position:absolute; bottom:0; left:-5%; right:-5%; height:100%; background:linear-gradient(180deg,rgba(20,32,24,0.25) 0%,rgba(48,44,34,0.5) 45%,#4a3a28 100%); clip-path:polygon(0% 52%,4% 46%,10% 41%,18% 37%,26% 35%,34% 36%,42% 38%,50% 40%,58% 40%,66% 38%,74% 35%,82% 34%,90% 36%,96% 40%,100% 44%,105% 44%,105% 100%,0% 100%); animation:sandWave 10s ease-in-out infinite; }
-    @keyframes sandWave { 0%,100%{clip-path:polygon(0% 52%,4% 46%,10% 41%,18% 37%,26% 35%,34% 36%,42% 38%,50% 40%,58% 40%,66% 38%,74% 35%,82% 34%,90% 36%,96% 40%,100% 44%,105% 44%,105% 100%,0% 100%)} 50%{clip-path:polygon(0% 57%,4% 51%,10% 46%,18% 42%,26% 40%,34% 41%,42% 43%,50% 45%,58% 45%,66% 43%,74% 40%,82% 39%,90% 41%,96% 45%,100% 49%,105% 49%,105% 100%,0% 100%)} }
-    [data-theme="light"] .bottom-wave { height:180px !important; background:linear-gradient(180deg,#00a0b5 0%,#04a8ac 10%,#10a89e 20%,#2aaa90 30%,#52a872 40%,#7ea055 50%,#a89440 60%,#c4a032 70%,#d4b048 80%,#e0c468 90%,#edd890 100%) !important; }
-    [data-theme="light"] .sand-wave { background:linear-gradient(180deg,rgba(0,160,181,0.20) 0%,rgba(40,168,144,0.35) 28%,rgba(120,152,80,0.45) 52%,rgba(210,184,100,0.70) 78%,#edd890 100%) !important; }
-
-    /* ─── ARENA FOOTER ─── */
-    .arena-footer { background:linear-gradient(180deg,#4a3a28 0%,#3a2a18 30%,#2a1a10 60%,#1a1008 100%); padding:3.5rem 2rem 2rem; position:relative; overflow:hidden; }
-    .arena-footer::before { content:''; position:absolute; bottom:0; left:0; right:0; height:340px; background:radial-gradient(ellipse 340px 260px at 8% 95%,rgba(255,130,10,0.28) 0%,rgba(255,80,10,0.14) 42%,rgba(255,40,0,0.05) 65%,transparent 80%),radial-gradient(ellipse 340px 260px at 92% 95%,rgba(255,130,10,0.28) 0%,rgba(255,80,10,0.14) 42%,rgba(255,40,0,0.05) 65%,transparent 80%); pointer-events:none; z-index:0; animation:footerGlowPulse 2.2s ease-in-out infinite; }
-    @keyframes footerGlowPulse { 0%,100%{opacity:1} 50%{opacity:0.65} }
-    .arena-footer::after { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent 5%,rgba(212,168,67,0.25) 30%,rgba(45,212,191,0.15) 70%,transparent 95%); }
-    [data-theme="light"] .arena-footer { background:linear-gradient(180deg,#edd890 0%,#dbb852 28%,#c89838 60%,#ae7e20 100%) !important; margin-top:-4px !important; }
-    [data-theme="light"] .arena-footer::before { display:none; }
-    [data-theme="light"] .arena-footer::after { display:none; }
-    .arena-footer-body { max-width:1100px; margin:0 auto; position:relative; z-index:2; }
-    .arena-footer-grid { display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:2rem 2.5rem; padding-bottom:2rem; border-bottom:1px solid rgba(212,168,67,0.15); align-items:start; }
-    [data-theme="light"] .arena-footer-grid { border-bottom-color:rgba(90,55,5,0.22) !important; }
-    .arena-brand-logo { display:flex; align-items:center; gap:10px; margin-bottom:1rem; }
-    .arena-logo-circle { width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#2dd4bf,#d4a843); display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-weight:700; font-size:18px; color:#0a1628; flex-shrink:0; }
-    .arena-brand-name { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:rgba(240,237,232,0.92); line-height:1.1; }
-    .arena-brand-tagline { font-family:'Space Mono',monospace; font-size:9px; color:rgba(212,168,67,0.6); letter-spacing:2px; }
-    .arena-brand-desc { font-size:13px; line-height:1.65; max-width:225px; margin-bottom:1.1rem; }
-    [data-theme="light"] .arena-brand-name { color:rgba(26,16,4,0.95) !important; }
-    [data-theme="light"] .arena-brand-tagline { color:rgba(90,55,5,0.80) !important; }
-    .arena-social-row { display:flex; gap:9px; flex-wrap:wrap; }
-    .arena-social-btn { width:34px; height:34px; border-radius:50%; border:1px solid rgba(212,168,67,0.25); background:rgba(212,168,67,0.08); display:flex; align-items:center; justify-content:center; color:rgba(240,237,232,0.50); cursor:pointer; transition:background 0.2s,color 0.2s,border-color 0.2s; text-decoration:none; }
-    .arena-social-btn:hover { background:rgba(212,168,67,0.22); color:rgba(240,237,232,0.95); border-color:rgba(212,168,67,0.55); }
-    [data-theme="light"] .arena-social-btn { color:rgba(26,14,2,0.70) !important; border-color:rgba(90,55,5,0.40); background:rgba(90,55,5,0.12); }
-    [data-theme="light"] .arena-social-btn:hover { color:rgba(26,14,2,1) !important; background:rgba(90,55,5,0.25); border-color:rgba(90,55,5,0.65); }
-    .arena-heading { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:2.5px; text-transform:uppercase; color:rgba(212,168,67,0.7); margin-bottom:1rem; }
-    [data-theme="light"] .arena-heading { color:rgba(80,48,4,0.85) !important; }
-    .arena-link-list { list-style:none; display:flex; flex-direction:column; gap:8px; }
-    .arena-link-list li { display:flex; align-items:center; gap:7px; }
-    .arena-link-list li::before { content:''; display:block; width:4px; height:4px; border-radius:50%; background:rgba(212,168,67,0.45); flex-shrink:0; }
-    [data-theme="light"] .arena-link-list li::before { background:rgba(90,55,5,0.50) !important; }
-    .arena-link { color:rgba(240,237,232,0.55) !important; transition:color 0.25s ease,padding-left 0.25s ease; display:inline-block; text-decoration:none; font-size:13.5px; }
-    .arena-link:hover { color:rgba(240,237,232,0.95) !important; padding-left:4px; }
-    [data-theme="light"] .arena-link { color:rgba(30,18,4,0.72) !important; }
-    [data-theme="light"] .arena-link:hover { color:rgba(30,18,4,1) !important; }
-    .arena-link-list .arena-link { padding-left:0 !important; display:inline !important; }
-    .arena-link-list .arena-link:hover { padding-left:0 !important; }
-    .arena-newsletter-form { display:flex; flex-direction:column; gap:8px; margin-bottom:0.75rem; }
-    .arena-newsletter-input { background:rgba(255,255,255,0.07); border:1px solid rgba(212,168,67,0.25); border-radius:6px; padding:8px 12px; font-size:13px; color:rgba(240,237,232,0.92); font-family:'Crimson Pro',serif; outline:none; width:100%; transition:border-color 0.2s; }
-    .arena-newsletter-input::placeholder { color:rgba(240,237,232,0.30); }
-    .arena-newsletter-input:focus { border-color:rgba(212,168,67,0.55); }
-    [data-theme="light"] .arena-newsletter-input { background:rgba(255,255,255,0.50) !important; border-color:rgba(90,55,5,0.40) !important; color:rgba(26,14,2,0.95) !important; }
-    [data-theme="light"] .arena-newsletter-input::placeholder { color:rgba(26,14,2,0.40) !important; }
-    .arena-subscribe-btn { background:linear-gradient(135deg,#d4a843,#c08a28); color:#0a1628; border:none; border-radius:6px; padding:9px 12px; font-size:13px; font-weight:700; cursor:pointer; transition:opacity 0.15s,transform 0.15s; width:100%; }
-    .arena-subscribe-btn:hover { opacity:0.88; transform:translateY(-1px); }
-    [data-theme="light"] .arena-subscribe-btn { background:linear-gradient(135deg,#7a4e06,#5e3a04); color:#fff8ef; }
-    .arena-contact-row { display:flex; flex-direction:column; gap:8px; margin-top:1.25rem; }
-    .arena-contact-item { display:flex; align-items:center; gap:7px; font-size:12px; color:rgba(240,237,232,0.48); text-decoration:none; transition:color 0.15s; }
-    .arena-contact-item:hover { color:rgba(240,237,232,0.98); }
-    [data-theme="light"] .arena-contact-item { color:rgba(26,14,2,0.72) !important; }
-    [data-theme="light"] .arena-contact-item:hover { color:rgba(26,14,2,1) !important; }
-    .arena-text { color:rgba(240,237,232,0.45) !important; }
-    [data-theme="light"] .arena-text { color:rgba(30,18,4,0.65) !important; }
-    .arena-bottom-bar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; padding-top:1.25rem; }
-    .arena-legal-links { display:flex; gap:1.2rem; }
-    .arena-legal-links .arena-link { font-size:12px; display:inline !important; padding-left:0 !important; }
-    .arena-legal-links .arena-link:hover { padding-left:0 !important; }
-    @media(max-width:900px) { .arena-footer-grid{grid-template-columns:1fr 1fr} .arena-brand-col{grid-column:1/-1} }
-    @media(max-width:768px) { .bottom-wave{height:50px} .arena-footer{padding:2rem 1rem} .arena-footer-grid{grid-template-columns:1fr} }
-
-    /* ─── CAMPFIRE (dark mode) ─── */
-    .illo-campfire  { position:absolute; bottom:0; right:40px; width:300px; height:300px; z-index:5; pointer-events:none; animation:campfireFlicker 2.0s ease-in-out infinite; }
-    .illo-campfire2 { position:absolute; bottom:0; left:40px;  width:300px; height:300px; z-index:5; pointer-events:none; animation:campfireFlicker 2.4s ease-in-out infinite 0.35s; transform:scaleX(-1); }
-    [data-theme="light"] .illo-campfire  { display:none !important; }
-    [data-theme="light"] .illo-campfire2 { display:none !important; }
-    .illo-campfire img, .illo-campfire2 img { width:100%; height:100%; display:block; image-rendering:pixelated; }
-    @keyframes campfireFlicker {
-      0%,100% { filter:drop-shadow(0 0 28px rgba(255,110,10,0.80)) drop-shadow(0 0 65px rgba(255,60,0,0.45)); }
-      25%     { filter:drop-shadow(0 0 44px rgba(255,150,20,0.95)) drop-shadow(0 0 90px rgba(255,80,10,0.60)); }
-      60%     { filter:drop-shadow(0 0 18px rgba(255,80,0,0.60))  drop-shadow(0 0 45px rgba(255,40,0,0.35)); }
-    }
-    /* ─── BEACH BALLS (light mode) ─── */
-    [data-theme="dark"] .beach-ball-wrap { display:none !important; }
-    .beach-ball-wrap { position:absolute; z-index:5; pointer-events:none; display:flex; flex-direction:column; align-items:center; }
-    .beach-ball { position:relative; border-radius:50%; background:conic-gradient(from 12deg,#FF3333 0deg 60deg,#FFD700 60deg 120deg,#33CC55 120deg 180deg,#1E8FFF 180deg 240deg,#FF33AA 240deg 300deg,#FF7700 300deg 360deg); box-shadow:0 16px 40px rgba(0,0,0,0.40),0 5px 12px rgba(0,0,0,0.22),inset 0 -18px 32px rgba(0,0,0,0.32),inset 0 16px 24px rgba(255,255,255,0.42); animation:beachBallBounce var(--bb-dur,2.8s) linear infinite; animation-delay:var(--bb-delay,0s); }
-    .beach-ball::before { content:''; position:absolute; inset:0; border-radius:50%; background:radial-gradient(ellipse 58% 46% at 30% 25%,rgba(255,255,255,0.75) 0%,rgba(255,255,255,0.22) 35%,transparent 64%); }
-    .beach-ball-shadow { border-radius:50%; background:radial-gradient(ellipse,rgba(0,0,0,0.30) 0%,transparent 72%); transform:scaleY(0.25); transform-origin:center top; margin-top:-2px; animation:beachShadowAnim var(--bb-dur,2.8s) linear infinite; animation-delay:var(--bb-delay,0s); }
-    @keyframes beachBallBounce { 0%{transform:translateY(0) rotate(0deg);animation-timing-function:cubic-bezier(0.33,0,0.66,0)} 50%{transform:translateY(-28px) rotate(16deg);animation-timing-function:cubic-bezier(0.33,1,0.66,1)} 100%{transform:translateY(0) rotate(32deg)} }
-    @keyframes beachShadowAnim { 0%{transform:scaleY(0.24) scaleX(1.0);opacity:0.55} 50%{transform:scaleY(0.10) scaleX(0.64);opacity:0.20} 100%{transform:scaleY(0.24) scaleX(1.0);opacity:0.55} }
-    @media(max-width:900px) { .illo-campfire{transform:scale(0.65);transform-origin:bottom right} .illo-campfire2{transform:scaleX(-1) scale(0.65);transform-origin:bottom left} }
-    @media(max-width:768px) { .illo-campfire{transform:scale(0.48);bottom:0;right:-10px;opacity:0.55;transform-origin:bottom right} .illo-campfire2{transform:scaleX(-1) scale(0.48);bottom:0;left:-10px;opacity:0.55;transform-origin:bottom left} .beach-ball-wrap{display:none} }
-  </style>
-  <script is:inline>
-    (function() {
-      const saved = localStorage.getItem('capachica-theme') || localStorage.getItem('theme');
-      if (saved) document.documentElement.setAttribute('data-theme', saved);
-    })();
-  </script>
-</head>
-<body>
-
-<Navbar client:load />
-
-<!-- HERO -->
-<section class="hero" id="inicio">
-  <div class="hero-sky"></div>
-  <div class="sky-glow" id="skyGlow"></div>
-  <canvas class="stars-layer" id="starsCanvas"></canvas>
-  <div class="hero-moon" id="heroMoon"></div>
-  <div class="hero-birds" id="heroBirds"></div>
-  <div class="hero-lake">
-    <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0,30 C200,55 420,5 720,30 C1020,55 1260,10 1440,28 L1440,80 L0,80Z" fill="rgba(20,60,120,0.55)" style="animation:lakeWave 6s ease-in-out infinite;"/>
-      <path d="M0,48 C260,28 520,62 840,42 C1100,28 1300,58 1440,44 L1440,80 L0,80Z" fill="rgba(15,45,90,0.45)"/>
-    </svg>
-    <div style="position:absolute;bottom:18px;left:30%;width:35%;height:2px;background:rgba(255,255,255,0.18);border-radius:50%;animation:lakeShimmer 3s ease-in-out infinite;"></div>
-  </div>
-  <div class="hero-content">
-    <div class="hero-badge">🎉 Festividades · Capachica · Lago Titicaca</div>
-    <h1 class="hero-title">
-      Celebraciones
-      <em>Ancestrales</em>
+  <!-- HERO -->
+  <Fragment slot="hero">
+    <span class="section-label">🎉 Festividades · Capachica · Lago Titicaca</span>
+    <h1 style="font-family:var(--font-display);font-size:clamp(3rem,7vw,5.5rem);line-height:1.05;color:var(--text-main);margin-bottom:0.4rem;animation:fadeUp 0.8s ease both;">
+      Celebraciones <em style="font-style:italic;color:var(--gold);">Ancestrales</em>
     </h1>
-    <p class="hero-subtitle">
+    <p style="font-size:clamp(1rem,2vw,1.15rem);color:var(--text-muted);max-width:520px;margin:0.6rem auto 1.4rem;line-height:1.75;animation:fadeUp 0.8s 0.1s ease both;">
       Tradición, fe y cultura viva a orillas del lago más alto del mundo.
       Cada festividad es una ventana al alma del pueblo capachiquense.
     </p>
-    <div class="hero-ctas">
-      <a href="#festividades" class="hero-cta-primary">🎉 Ver Festividades</a>
-      <a href="#calendario" class="hero-cta-secondary">📅 Calendario</a>
+    <div class="fst-hero-ctas">
+      <a href="#festividades" class="btn-primary">🎉 Ver Festividades</a>
+      <a href="#calendario" class="btn-outline">📅 Calendario</a>
     </div>
-    <div class="hero-stats">
-      <div class="stat-item">
-        <div class="stat-val">{festividades.length}+</div>
-        <div class="stat-label">Festividades</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-val">12</div>
-        <div class="stat-label">Meses activos</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-val">500+</div>
-        <div class="stat-label">Años de tradición</div>
-      </div>
+    <div class="fst-hero-stats">
+      <div class="fst-stat"><span class="fst-stat-val">{festividades.length}+</span><span class="fst-stat-lbl">Festividades</span></div>
+      <div class="fst-stat"><span class="fst-stat-val">12</span><span class="fst-stat-lbl">Meses activos</span></div>
+      <div class="fst-stat"><span class="fst-stat-val">500+</span><span class="fst-stat-lbl">Años tradición</span></div>
     </div>
-  </div>
-  <div class="hero-wave">
-    <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0,20 C360,55 720,0 1080,35 C1260,50 1380,15 1440,25 L1440,60 L0,60Z" fill="#0f2240"/>
-    </svg>
-  </div>
-</section>
+  </Fragment>
 
-<!-- MAIN CONTENT -->
-<main id="festividades">
-  <div class="section-header reveal">
-    <div class="section-eyebrow">Cultura Viva · Capachica</div>
-    <h2 class="section-title">Nuestras Festividades</h2>
-  </div>
+  <!-- MAIN CONTENT -->
+  <div id="festividades">
 
-  <!-- FILTER BAR -->
-  <div class="filter-bar" id="filterBar">
-    <div class="filter-group">
-      <span class="filter-label">Mes</span>
-      <button class="month-chip active" data-mes="0">Todos</button>
-      {NOMBRES_MESES.map((nombre, i) => {
-        const tiene = festividades.some(f => f.mes === i + 1);
-        return tiene ? <button class="month-chip" data-mes={i + 1}>{nombre}</button> : null;
-      })}
+    <!-- SECTION HEADER -->
+    <div class="fst-section-hdr reveal">
+      <div class="fst-eyebrow">Cultura Viva · Capachica</div>
+      <h2 class="section-title">Nuestras Festividades</h2>
     </div>
-    <div class="filter-group">
-      <span class="filter-label">Tipo</span>
-      {tipos.map((t, i) => (
-        <button class="tipo-chip" class:list={[i===0 && 'active']} data-tipo={t}>{t}</button>
+
+    <!-- FILTER BAR -->
+    <div class="fst-filter-bar" id="filterBar">
+      <div class="fst-filter-grp">
+        <span class="fst-filter-lbl">Mes</span>
+        <button class="fst-chip active" data-mes="0">Todos</button>
+        {NOMBRES_MESES.map((nombre, i) => {
+          const tiene = festividades.some((f: any) => f.mes === i + 1);
+          return tiene ? <button class="fst-chip" data-mes={i + 1}>{nombre}</button> : null;
+        })}
+      </div>
+      <div class="fst-filter-grp">
+        <span class="fst-filter-lbl">Tipo</span>
+        {tipos.map((t, i) => (
+          <button class:list={['fst-chip fst-tipo-chip', i===0 && 'active']} data-tipo={t}>{t}</button>
+        ))}
+      </div>
+      <span class="fst-result-count" id="resultCount">{festividades.length} festividades</span>
+    </div>
+
+    <!-- FESTIVAL GRID -->
+    <div class="fst-grid" id="festGrid">
+      {festividades.map((f: any) => (
+        <article
+          class:list={['fest-card reveal', f.destacado && 'destacado']}
+          data-mes={f.mes}
+          data-tipo={f.tipo || ''}
+        >
+          <div class="fest-img-wrap">
+            <img class="fest-img" src={f.imagen} alt={f.nombre} loading="lazy" />
+            {f.tipo && (
+              <span class="fest-badge" style={`background:${tipoColor[f.tipo] || '#666'}22;color:${tipoColor[f.tipo] || '#999'};border:1px solid ${tipoColor[f.tipo] || '#666'}44;`}>
+                {tipoIcon[f.tipo] || '🎉'} {f.tipo}
+              </span>
+            )}
+          </div>
+          <div class="fest-body">
+            <div class="fest-date">📅 {f.fecha || `Mes ${f.mes}`}</div>
+            <h3 class="fest-name">{f.nombre}</h3>
+            {f.descripcion && <p class="fest-desc">{f.descripcion}</p>}
+            {f.actividades && f.actividades.length > 0 && (
+              <div class="fest-acts">
+                {f.actividades.slice(0, 3).map((a: string) => (
+                  <span class="fest-act-pill">{a}</span>
+                ))}
+              </div>
+            )}
+            <div class="fest-footer">
+              <span class="fest-location">📍 {f.ubicacion || 'Capachica'}</span>
+              {f.destacado && <span class="fest-star" title="Festividad destacada">⭐</span>}
+            </div>
+          </div>
+        </article>
       ))}
     </div>
-    <span class="result-count" id="resultCount">{festividades.length} festividades</span>
+    <div style="padding-bottom:4rem;"></div>
   </div>
 
-  <!-- FESTIVAL GRID -->
-  <div class="fest-grid" id="festGrid">
-    {festividades.map(f => (
-      <article
-        class:list={['fest-card reveal', f.destacado && 'destacado']}
-        data-mes={f.mes}
-        data-tipo={f.tipo || ''}
-      >
-        <div class="fest-card-img-wrap">
-          <img class="fest-card-img" src={f.imagen} alt={f.nombre} loading="lazy" />
-          {f.tipo && (
-            <span class="fest-card-badge" style={`background:${tipoColor[f.tipo] || '#666'}22;color:${tipoColor[f.tipo] || '#999'};border:1px solid ${tipoColor[f.tipo] || '#666'}44;`}>
-              {tipoIcon[f.tipo] || '🎉'} {f.tipo}
-            </span>
-          )}
-        </div>
-        <div class="fest-card-body">
-          <div class="fest-card-date">📅 {f.fecha || `Mes ${f.mes}`}</div>
-          <h3 class="fest-card-name">{f.nombre}</h3>
-          {f.descripcion && <p class="fest-card-desc">{f.descripcion}</p>}
-          {f.actividades && f.actividades.length > 0 && (
-            <div class="fest-actividades">
-              {f.actividades.slice(0, 3).map(a => (
-                <span class="fest-actividad-pill">{a}</span>
-              ))}
-            </div>
-          )}
-          <div class="fest-card-footer">
-            <span class="fest-card-location">📍 {f.ubicacion || 'Capachica'}</span>
-            {f.destacado && <span class="fest-destacado-star" title="Festividad destacada">⭐</span>}
-          </div>
-        </div>
-      </article>
-    ))}
-  </div>
-  <div style="padding-bottom:5rem;"></div>
-</main>
-
-<!-- CALENDAR SECTION -->
-<section class="calendar-section" id="calendario">
-  <div class="section-header reveal">
-    <div class="section-eyebrow">Planifica tu visita</div>
-    <h2 class="section-title">Calendario Festivo</h2>
-  </div>
-  <div class="calendar-grid" id="calendarGrid"></div>
-</section>
-
-<!-- GALLERY SECTION -->
-{festividades.some(f => f.galeria && f.galeria.length > 0) && (
-  <section class="gallery-section">
-    <div style="max-width:1100px;margin:0 auto;">
-      <div class="section-header reveal">
-        <div class="section-eyebrow">Momentos capturados</div>
-        <h2 class="section-title">Galería</h2>
-      </div>
-      <div class="gallery-grid">
-        {festividades.flatMap(f => (f.galeria || []).slice(0, 2).map((img, i) => (
-          <div class="gallery-item reveal" data-src={img} data-label={f.nombre}>
-            <img src={img} alt={f.nombre} loading="lazy" />
-            <div class="gallery-item-overlay">
-              <span class="gallery-item-label">{f.nombre}</span>
-            </div>
-          </div>
-        ))).slice(0, 9)}
-      </div>
+  <!-- CALENDAR SECTION -->
+  <section class="fst-calendar-section" id="calendario">
+    <div class="fst-section-hdr reveal">
+      <div class="fst-eyebrow">Planifica tu visita</div>
+      <h2 class="section-title">Calendario Festivo</h2>
     </div>
+    <div class="fst-cal-grid" id="calendarGrid"></div>
   </section>
-)}
 
-<!-- Gallery modal -->
-<div class="gallery-modal" id="galleryModal">
-  <button class="gallery-modal-close" id="galleryClose">×</button>
-  <img id="galleryModalImg" src="" alt="" />
-  <p id="galleryModalLabel" style="color:rgba(255,255,255,0.65);font-size:13px;margin-top:10px;"></p>
-</div>
+  <!-- GALLERY SECTION -->
+  {hasGallery && (
+    <section class="fst-gallery-section">
+      <div style="max-width:1100px;margin:0 auto;">
+        <div class="fst-section-hdr reveal">
+          <div class="fst-eyebrow">Momentos capturados</div>
+          <h2 class="section-title">Galería</h2>
+        </div>
+        <div class="fst-gallery-grid">
+          {festividades.flatMap((f: any) => (f.galeria || []).slice(0, 2).map((img: string) => (
+            <div class="fst-gallery-item reveal" data-src={img} data-label={f.nombre}>
+              <img src={img} alt={f.nombre} loading="lazy" />
+              <div class="fst-gallery-overlay"><span class="fst-gallery-label">{f.nombre}</span></div>
+            </div>
+          ))).slice(0, 9)}
+        </div>
+      </div>
+    </section>
+  )}
 
-<ArenaFooter />
+  <!-- Gallery modal -->
+  <div class="fst-gallery-modal" id="galleryModal">
+    <button class="fst-gallery-close" id="galleryClose">×</button>
+    <img id="galleryModalImg" src="" alt="" />
+    <p id="galleryModalLabel" style="color:rgba(255,255,255,0.65);font-size:13px;margin-top:10px;"></p>
+  </div>
 
-<!-- FLOATING CALENDAR -->
-<div class="floating-cal" id="floatingCal">
-  <div class="fc-header" id="fcHeader">
-    <div class="fc-header-left">
-      <span>📅</span>
-      <span>Próxima Festividad</span>
+  <!-- FLOATING CALENDAR WIDGET -->
+  <div class="fst-floating-cal" id="floatingCal">
+    <div class="fc-hdr" id="fcHeader">
+      <div style="display:flex;align-items:center;gap:6px;"><span>📅</span><span style="font-size:11px;font-weight:700;letter-spacing:0.5px;color:#fff;text-transform:uppercase;">Próxima Festividad</span></div>
+      <button class="fc-min" id="fcMinimize">−</button>
     </div>
-    <button class="fc-minimize" id="fcMinimize">−</button>
+    <div class="fc-bd">
+      <div class="fc-next" id="fcNextFest"></div>
+      <div class="fc-mini-cal" id="fcMiniCal"></div>
+    </div>
   </div>
-  <div class="fc-body">
-    <div class="fc-next-fest" id="fcNextFest"></div>
-    <div class="fc-mini-cal" id="fcMiniCal"></div>
-  </div>
-</div>
-<button class="fc-icon-btn" id="fcIconBtn" aria-label="Abrir calendario">📅</button>
+  <button class="fc-icon-btn" id="fcIconBtn" aria-label="Abrir calendario">📅</button>
+
+</Layout>
+
+<style is:global>
+/* ─── FESTIVIDADES HERO ─── */
+.fst-hero-ctas {
+  display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+  margin-bottom: 1.6rem; animation: fadeUp 0.8s 0.2s ease both;
+}
+.fst-hero-stats {
+  display: flex; gap: 0; flex-wrap: wrap;
+  background: rgba(10,22,40,0.7); border: 1px solid rgba(45,212,191,0.2);
+  border-radius: 12px; backdrop-filter: blur(12px); overflow: hidden;
+  animation: fadeUp 0.8s 0.3s ease both;
+}
+.fst-stat { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 28px; flex: 1; min-width: 90px; border-right: 1px solid rgba(45,212,191,0.12); }
+.fst-stat:last-child { border-right: none; }
+.fst-stat-val { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--gold); line-height: 1; }
+.fst-stat-lbl { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
+[data-theme="light"] .fst-hero-stats { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.32); }
+[data-theme="light"] .fst-stat-val { color: #ffd060; }
+[data-theme="light"] .fst-stat-lbl { color: rgba(255,255,255,0.7); }
+
+/* ─── SECTION HEADER ─── */
+.fst-section-hdr { text-align: center; margin-bottom: 2.5rem; }
+.fst-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 2.5px;
+  text-transform: uppercase; color: rgba(255,107,53,0.85); margin-bottom: 0.75rem;
+}
+.fst-eyebrow::before { content: ''; display: block; width: 20px; height: 1px; background: rgba(255,107,53,0.6); }
+[data-theme="light"] .fst-eyebrow { color: rgba(255,220,160,0.95); }
+[data-theme="light"] .fst-eyebrow::before { background: rgba(255,220,160,0.7); }
+[data-theme="light"] .section-title { color: #fff; }
+
+/* ─── FILTER BAR ─── */
+.fst-filter-bar { max-width: 1100px; margin: 0 auto 2rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: center; }
+.fst-filter-grp { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.fst-filter-lbl { font-family: var(--font-mono); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(240,237,232,0.38); padding-right: 4px; }
+[data-theme="light"] .fst-filter-lbl { color: rgba(255,255,255,0.55); }
+.fst-chip {
+  padding: 6px 14px; border-radius: 20px; font-size: 12.5px; font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.05);
+  color: rgba(240,237,232,0.62); cursor: pointer; transition: all 0.2s;
+  font-family: var(--font-mono); letter-spacing: 0.5px;
+}
+.fst-chip:hover { border-color: rgba(255,107,53,0.5); color: rgba(255,140,90,0.95); }
+.fst-chip.active { background: linear-gradient(135deg,rgba(255,107,53,0.22),rgba(255,107,53,0.08)); border-color: rgba(255,107,53,0.6); color: #FF8C5A; }
+[data-theme="light"] .fst-chip { border-color: rgba(255,255,255,0.28); color: rgba(255,255,255,0.75); }
+[data-theme="light"] .fst-chip:hover { background: rgba(255,255,255,0.12); color: #fff; }
+[data-theme="light"] .fst-chip.active { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.7); color: #fff; }
+.fst-result-count { font-size: 12px; color: rgba(240,237,232,0.5); font-family: var(--font-mono); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 5px 12px; }
+[data-theme="light"] .fst-result-count { color: rgba(255,255,255,0.75); border-color: rgba(255,255,255,0.25); }
+
+/* ─── FESTIVAL GRID ─── */
+.fst-grid {
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+}
+@media (max-width: 900px) { .fst-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 580px) { .fst-grid { grid-template-columns: 1fr; } }
+
+.fest-card {
+  border-radius: 16px; overflow: hidden;
+  background: var(--card-bg); border: 1px solid var(--card-border);
+  backdrop-filter: blur(16px); cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), box-shadow 0.35s, border-color 0.35s;
+}
+.fest-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(255,107,53,0.12); border-color: rgba(255,107,53,0.35); }
+.fest-card.destacado { border-color: rgba(255,107,53,0.3); }
+[data-theme="light"] .fest-card:hover { box-shadow: 0 20px 50px rgba(0,0,0,0.18), 0 0 30px rgba(10,150,220,0.15); border-color: rgba(10,120,200,0.45); }
+[data-theme="light"] .fest-card.destacado { border-color: rgba(10,150,220,0.35); }
+
+.fest-img-wrap { overflow: hidden; position: relative; }
+.fest-img { width: 100%; height: 180px; object-fit: cover; display: block; transition: transform 0.5s; }
+.fest-card:hover .fest-img { transform: scale(1.05); }
+.fest-badge { position: absolute; top: 10px; right: 10px; padding: 4px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 700; font-family: var(--font-mono); letter-spacing: 0.5px; backdrop-filter: blur(8px); }
+.fest-body { padding: 1.2rem 1.3rem 1.3rem; }
+.fest-date { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; color: rgba(255,107,53,0.85); text-transform: uppercase; margin-bottom: 0.5rem; }
+[data-theme="light"] .fest-date { color: rgba(194,90,24,0.9); }
+.fest-name { font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.6rem; line-height: 1.3; }
+.fest-desc { font-size: 13.5px; color: var(--text-muted); line-height: 1.65; margin-bottom: 0.9rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.fest-acts { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 0.85rem; }
+.fest-act-pill { padding: 3px 9px; border-radius: 20px; font-size: 11px; background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2); color: rgba(255,140,90,0.85); }
+[data-theme="light"] .fest-act-pill { background: rgba(194,90,24,0.1); border-color: rgba(194,90,24,0.25); color: rgba(150,60,10,0.9); }
+.fest-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); font-size: 12px; color: var(--text-muted); }
+[data-theme="light"] .fest-footer { border-top-color: rgba(0,0,0,0.07); }
+.fest-star { color: var(--gold); font-size: 13px; }
+
+/* ─── CALENDAR SECTION ─── */
+.fst-calendar-section { padding: 5rem 2rem 4rem; background: linear-gradient(180deg, #091224 0%, #070D1A 100%); position: relative; }
+[data-theme="light"] .fst-calendar-section { background: linear-gradient(180deg, #00a0b5 0%, #005f73 100%); }
+.fst-cal-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+@media (max-width: 900px) { .fst-cal-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 540px) { .fst-cal-grid { grid-template-columns: 1fr; } }
+
+.cal-month-card { border-radius: 14px; padding: 1rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); transition: border-color 0.2s, background 0.2s; }
+.cal-month-card.current { background: rgba(255,107,53,0.07); border-color: rgba(255,107,53,0.25); }
+[data-theme="light"] .cal-month-card { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.2); }
+[data-theme="light"] .cal-month-card.current { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.5); }
+.cal-month-name { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; text-align: center; margin-bottom: 0.6rem; color: rgba(240,237,232,0.55); }
+.cal-month-card.current .cal-month-name { color: #FF8C5A; }
+[data-theme="light"] .cal-month-name { color: rgba(255,255,255,0.7); }
+[data-theme="light"] .cal-month-card.current .cal-month-name { color: #fff; }
+.cal-table { width: 100%; border-collapse: collapse; font-size: 0.65rem; text-align: center; }
+.cal-table th { color: rgba(255,255,255,0.28); font-weight: 600; padding: 2px; font-family: var(--font-mono); }
+[data-theme="light"] .cal-table th { color: rgba(255,255,255,0.5); }
+.cal-day { padding: 2px; color: rgba(255,255,255,0.38); }
+[data-theme="light"] .cal-day { color: rgba(255,255,255,0.65); }
+.cal-day.today { background: #FF6B35; color: #fff; font-weight: 700; border-radius: 50%; display: inline-flex; width: 18px; height: 18px; align-items: center; justify-content: center; }
+.cal-day.has-fest { background: rgba(255,107,53,0.22); color: #FF8C5A; font-weight: 700; border-radius: 50%; display: inline-flex; width: 18px; height: 18px; align-items: center; justify-content: center; cursor: pointer; }
+[data-theme="light"] .cal-day.has-fest { background: rgba(255,255,255,0.3); color: #fff; }
+.cal-fest-list { margin-top: 0.6rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.5rem; }
+.cal-fest-item { font-size: 0.6rem; color: rgba(255,255,255,0.42); padding: 2px 0; display: flex; align-items: center; gap: 4px; }
+[data-theme="light"] .cal-fest-item { color: rgba(255,255,255,0.7); }
+
+/* ─── GALLERY ─── */
+.fst-gallery-section { padding: 5rem 2rem 4rem; }
+.fst-gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+@media (max-width: 700px) { .fst-gallery-grid { grid-template-columns: repeat(2, 1fr); } }
+.fst-gallery-item { border-radius: 12px; overflow: hidden; position: relative; cursor: pointer; aspect-ratio: 4/3; border: 1px solid rgba(255,255,255,0.08); }
+.fst-gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s; }
+.fst-gallery-item:hover img { transform: scale(1.08); }
+.fst-gallery-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.65), transparent); opacity: 0; transition: opacity 0.3s; display: flex; align-items: flex-end; padding: 12px; }
+.fst-gallery-item:hover .fst-gallery-overlay { opacity: 1; }
+.fst-gallery-label { font-size: 12px; color: #fff; font-weight: 600; }
+.fst-gallery-modal { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.92); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; flex-direction: column; }
+.fst-gallery-modal.open { display: flex; }
+.fst-gallery-modal img { max-width: 90vw; max-height: 82vh; border-radius: 12px; object-fit: contain; }
+.fst-gallery-close { position: absolute; top: 20px; right: 24px; font-size: 28px; color: #fff; background: none; border: none; cursor: pointer; opacity: 0.75; transition: opacity 0.2s; }
+.fst-gallery-close:hover { opacity: 1; }
+
+/* ─── FLOATING CALENDAR ─── */
+.fst-floating-cal { position: fixed; bottom: 24px; right: 24px; width: 270px; z-index: 1500; border-radius: 18px; overflow: hidden; background: rgba(7,13,26,0.94); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(22px); box-shadow: 0 12px 40px rgba(0,0,0,0.5); user-select: none; }
+.fst-floating-cal.hidden { display: none !important; }
+.fc-hdr { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; cursor: grab; background: linear-gradient(135deg, #FF6B35, #FF8C5A); }
+.fc-min { width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.22); border: none; cursor: pointer; color: #fff; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+.fc-min:hover { background: rgba(255,255,255,0.4); }
+.fc-bd { padding: 14px; }
+.fc-next { text-align: center; margin-bottom: 10px; }
+.fc-next-icon { font-size: 2rem; margin-bottom: 4px; }
+.fc-next-name { font-weight: 700; font-size: 13px; color: #fff; margin-bottom: 2px; }
+.fc-next-date { font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+.fc-days-left { font-size: 2rem; font-weight: 900; color: #FF6B35; line-height: 1; }
+.fc-days-label { font-size: 9.5px; color: rgba(255,255,255,0.38); }
+.fc-mini-cal { margin-top: 8px; }
+.fc-mini-table { width: 100%; border-collapse: collapse; font-size: 0.6rem; text-align: center; }
+.fc-mini-table th { color: rgba(255,255,255,0.3); padding: 2px; }
+.fc-mini-day { padding: 2px; color: rgba(255,255,255,0.45); }
+.fc-mini-today { background: #FF6B35; color: #fff; font-weight: 700; border-radius: 50%; display: inline-flex; width: 17px; height: 17px; align-items: center; justify-content: center; }
+.fc-mini-fest { background: rgba(255,107,53,0.25); color: #FF8C5A; font-weight: 700; border-radius: 50%; display: inline-flex; width: 17px; height: 17px; align-items: center; justify-content: center; }
+.fc-icon-btn { position: fixed; bottom: 24px; right: 24px; width: 52px; height: 52px; border-radius: 50%; border: none; cursor: pointer; font-size: 22px; z-index: 1499; background: linear-gradient(135deg, #FF6B35, #FF8C5A); box-shadow: 0 4px 18px rgba(255,107,53,0.45); display: none; align-items: center; justify-content: center; animation: fst-float 3s ease-in-out infinite; }
+.fc-icon-btn.visible { display: flex; }
+@keyframes fst-float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px)} }
+
+/* main bg for festividades */
+[data-theme="light"] main { background: linear-gradient(180deg, #005f73 0%, #007288 35%, #008899 65%, #00a0b5 100%); }
+</style>
 
 <script is:inline>
-  /* ─── DATA (for client-side calendar & filter) ─── */
-  const FEST_DATA = [
-    { id:'epifania',      nombre:'Epifanía',                 mes:1,  dia:6,  icono:'👑' },
-    { id:'candelaria',    nombre:'Virgen de la Candelaria',  mes:2,  dia:2,  icono:'🕯️' },
-    { id:'carnavales',    nombre:'Carnavales de Capachica',  mes:2,  dia:20, icono:'🎭' },
-    { id:'fiesta-cruz',   nombre:'Fiesta de la Cruz',        mes:5,  dia:3,  icono:'✝️' },
-    { id:'danza-triunfal',nombre:'Danza de la Triunfal',     mes:5,  dia:3,  icono:'💃' },
-    { id:'corpus-christi',nombre:'Corpus Christi',           mes:6,  dia:19, icono:'⛪' },
-    { id:'inti-raymi',    nombre:'Inti Raymi',                mes:6,  dia:21, icono:'☀️' },
-    { id:'san-juan',      nombre:'San Juan Bautista',        mes:6,  dia:24, icono:'🔥' },
-    { id:'santos',        nombre:'Fiesta de los Santos',     mes:7,  dia:25, icono:'🙏' },
-    { id:'llachon',       nombre:'Aniv. Llachón',            mes:7,  dia:28, icono:'🏘️' },
-    { id:'pachamama',     nombre:'Pachamama Raymi',          mes:8,  dia:1,  icono:'🌍' },
-    { id:'asuncion',      nombre:'Virgen de la Asunción',    mes:8,  dia:15, icono:'🕊️' },
-    { id:'primavera',     nombre:'Fiesta de la Primavera',   mes:9,  dia:21, icono:'🌸' },
-    { id:'milagros',      nombre:'Señor de los Milagros',    mes:10, dia:18, icono:'✝️' },
-    { id:'todos-santos',  nombre:'Día de Todos los Santos',  mes:11, dia:1,  icono:'🕯️' },
-    { id:'difuntos',      nombre:'Día de los Difuntos',      mes:11, dia:2,  icono:'🪔' },
-    { id:'inmaculada',    nombre:'Inmaculada Concepción',    mes:12, dia:8,  icono:'🌟' },
-    { id:'novena',        nombre:'Novena de Navidad',        mes:12, dia:16, icono:'🎶' },
-    { id:'navidad',       nombre:'Navidad en Capachica',     mes:12, dia:25, icono:'🎄' },
-  ];
-  const MESES_NOMBRES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  const DIAS_CORTOS = ['Do','Lu','Ma','Mi','Ju','Vi','Sa'];
+var FEST_DATA = [
+  { id:'epifania',      nombre:'Epifanía',                mes:1,  dia:6,  icono:'👑' },
+  { id:'candelaria',    nombre:'Virgen de la Candelaria', mes:2,  dia:2,  icono:'🕯️' },
+  { id:'carnavales',    nombre:'Carnavales de Capachica', mes:2,  dia:20, icono:'🎭' },
+  { id:'fiesta-cruz',   nombre:'Fiesta de la Cruz',       mes:5,  dia:3,  icono:'✝️' },
+  { id:'corpus-christi',nombre:'Corpus Christi',          mes:6,  dia:19, icono:'⛪' },
+  { id:'inti-raymi',    nombre:'Inti Raymi',               mes:6,  dia:21, icono:'☀️' },
+  { id:'san-juan',      nombre:'San Juan Bautista',       mes:6,  dia:24, icono:'🔥' },
+  { id:'llachon',       nombre:'Aniv. Llachón',           mes:7,  dia:28, icono:'🏘️' },
+  { id:'pachamama',     nombre:'Pachamama Raymi',         mes:8,  dia:1,  icono:'🌍' },
+  { id:'asuncion',      nombre:'Virgen de la Asunción',   mes:8,  dia:15, icono:'🕊️' },
+  { id:'primavera',     nombre:'Fiesta de la Primavera',  mes:9,  dia:21, icono:'🌸' },
+  { id:'milagros',      nombre:'Señor de los Milagros',   mes:10, dia:18, icono:'✝️' },
+  { id:'todos-santos',  nombre:'Día de Todos los Santos', mes:11, dia:1,  icono:'🕯️' },
+  { id:'difuntos',      nombre:'Día de los Difuntos',     mes:11, dia:2,  icono:'🪔' },
+  { id:'inmaculada',    nombre:'Inmaculada Concepción',   mes:12, dia:8,  icono:'🌟' },
+  { id:'navidad',       nombre:'Navidad en Capachica',    mes:12, dia:25, icono:'🎄' },
+];
+var MESES_NOMBRES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+var DIAS_CORTOS = ['Do','Lu','Ma','Mi','Ju','Vi','Sa'];
 
-  /* ─── STARS CANVAS ─── */
-  (function initStars() {
-    const canvas = document.getElementById('starsCanvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-    resize();
-    window.addEventListener('resize', resize, { passive:true });
-    const stars = Array.from({ length:160 }, () => ({
-      x: Math.random(), y: Math.random() * 0.75,
-      r: 0.8 + Math.random() * 2.2,
-      a: Math.random(), da: 0.003 + Math.random() * 0.008,
-    }));
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      stars.forEach(s => {
-        s.a = Math.abs(Math.sin(Date.now() * s.da / 500));
-        ctx.beginPath();
-        ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,240,${0.35 + s.a * 0.65})`;
-        ctx.fill();
-      });
-      requestAnimationFrame(draw);
-    }
-    draw();
-  })();
+/* ── FESTIVAL FILTER ── */
+(function() {
+  var monthChips = document.querySelectorAll('.fst-chip:not(.fst-tipo-chip)');
+  var tipoChips  = document.querySelectorAll('.fst-tipo-chip');
+  var cards = document.querySelectorAll('.fest-card');
+  var resultCount = document.getElementById('resultCount');
+  var activeMes = 0, activeTipo = 'Todos';
 
-  /* ─── FLYING BIRDS (light mode) ─── */
-  (function initBirds() {
-    const container = document.getElementById('heroBirds');
-    if (!container) return;
-    const birds = [
-      { w:58, stroke:2.4, flap:'flapSlow', dur:'1.5s', top:'12%', left:'8%',  float:'birdFloat1', floatDur:'9s' },
-      { w:46, stroke:2.0, flap:'flapMed',  dur:'1.1s', top:'18%', left:'70%', float:'birdFloat2', floatDur:'11s' },
-      { w:52, stroke:2.2, flap:'flapFast', dur:'0.8s', top:'24%', left:'32%', float:'birdFloat3', floatDur:'7.5s' },
-      { w:38, stroke:1.8, flap:'flapSlow', dur:'1.4s', top:'9%',  left:'86%', float:'birdFloat4', floatDur:'10s' },
-    ];
-    birds.forEach(b => {
-      const el = document.createElement('div');
-      el.className = 'bird';
-      el.style.cssText = `position:absolute;top:${b.top};left:${b.left};animation:${b.float} ${b.floatDur} ease-in-out infinite;`;
-      el.innerHTML = `<svg width="${b.w}" height="${b.w*0.55}" viewBox="-16 -12 32 20" fill="none" stroke="currentColor" stroke-width="${b.stroke}" stroke-linecap="round"><path d="M0,0 Q-8,-8 -16,0" style="animation:${b.flap} ${b.dur} ease-in-out infinite;"/><path d="M0,0 Q8,-8 16,0" style="animation:${b.flap} ${b.dur} ease-in-out infinite;"/></svg>`;
-      container.appendChild(el);
+  function applyFilter() {
+    var count = 0;
+    cards.forEach(function(card) {
+      var mes = parseInt(card.dataset.mes || '0');
+      var tipo = card.dataset.tipo || '';
+      var show = (activeMes === 0 || mes === activeMes) && (activeTipo === 'Todos' || tipo === activeTipo);
+      card.style.display = show ? '' : 'none';
+      if (show) count++;
     });
-  })();
+    if (resultCount) resultCount.textContent = count + ' festividade' + (count !== 1 ? 's' : '');
+  }
 
-  /* ─── LAKE WAVE ─── */
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes lakeWave { 0%,100%{d:path('M0,30 C200,55 420,5 720,30 C1020,55 1260,10 1440,28 L1440,80 L0,80Z')} 50%{d:path('M0,38 C200,18 450,58 720,35 C990,15 1240,52 1440,36 L1440,80 L0,80Z')} }
-    @keyframes lakeShimmer { 0%,100%{opacity:0.4;transform:scaleX(1)} 50%{opacity:0.8;transform:scaleX(1.15)} }
-  `;
-  document.head.appendChild(style);
-
-  /* ─── FESTIVAL FILTER ─── */
-  (function initFilter() {
-    const monthChips = document.querySelectorAll('.month-chip');
-    const tipoChips  = document.querySelectorAll('.tipo-chip');
-    const cards = document.querySelectorAll('.fest-card');
-    const resultCount = document.getElementById('resultCount');
-    let activeMes = 0, activeTipo = 'Todos';
-
-    function applyFilter() {
-      let count = 0;
-      cards.forEach(card => {
-        const mes = parseInt(card.dataset.mes || '0');
-        const tipo = card.dataset.tipo || '';
-        const show = (activeMes === 0 || mes === activeMes) && (activeTipo === 'Todos' || tipo === activeTipo);
-        card.style.display = show ? '' : 'none';
-        if (show) count++;
-      });
-      if (resultCount) resultCount.textContent = `${count} festividade${count !== 1 ? 's' : ''}`;
-    }
-
-    monthChips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        monthChips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        activeMes = parseInt(chip.dataset.mes || '0');
-        applyFilter();
-      });
+  monthChips.forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      monthChips.forEach(function(c){ c.classList.remove('active'); });
+      chip.classList.add('active');
+      activeMes = parseInt(chip.dataset.mes || '0');
+      applyFilter();
     });
-    tipoChips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        tipoChips.forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        activeTipo = chip.dataset.tipo || 'Todos';
-        applyFilter();
-      });
+  });
+  tipoChips.forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      tipoChips.forEach(function(c){ c.classList.remove('active'); });
+      chip.classList.add('active');
+      activeTipo = chip.dataset.tipo || 'Todos';
+      applyFilter();
     });
-  })();
+  });
+})();
 
-  /* ─── 12-MONTH CALENDAR ─── */
-  (function initCalendar() {
-    const grid = document.getElementById('calendarGrid');
-    if (!grid) return;
-    const now = new Date();
-    const year = now.getFullYear();
-    const currentMonth = now.getMonth();
-    const today = now.getDate();
+/* ── 12-MONTH CALENDAR ── */
+(function() {
+  var grid = document.getElementById('calendarGrid');
+  if (!grid) return;
+  var now = new Date();
+  var year = now.getFullYear();
+  var currentMonth = now.getMonth();
+  var today = now.getDate();
 
-    for (let m = 0; m < 12; m++) {
-      const isCurrent = m === currentMonth;
-      const firstDay = new Date(year, m, 1).getDay();
-      const daysInMonth = new Date(year, m + 1, 0).getDate();
-      const festMonth = FEST_DATA.filter(f => f.mes === m + 1);
+  for (var m = 0; m < 12; m++) {
+    var isCurrent = m === currentMonth;
+    var firstDay = new Date(year, m, 1).getDay();
+    var daysInMonth = new Date(year, m + 1, 0).getDate();
+    var festMonth = FEST_DATA.filter(function(f){ return f.mes === m + 1; });
 
-      const card = document.createElement('div');
-      card.className = 'cal-month-card reveal' + (isCurrent ? ' current' : '');
+    var card = document.createElement('div');
+    card.className = 'cal-month-card reveal' + (isCurrent ? ' current' : '');
 
-      let html = `<div class="cal-month-name">${MESES_NOMBRES[m]} ${year}</div>`;
-      html += `<table class="cal-table"><thead><tr>`;
-      DIAS_CORTOS.forEach(d => { html += `<th>${d}</th>`; });
-      html += `</tr></thead><tbody><tr>`;
+    var html = '<div class="cal-month-name">' + MESES_NOMBRES[m] + ' ' + year + '</div>';
+    html += '<table class="cal-table"><thead><tr>';
+    DIAS_CORTOS.forEach(function(d){ html += '<th>' + d + '</th>'; });
+    html += '</tr></thead><tbody><tr>';
 
-      let col = 0;
-      for (let i = 0; i < firstDay; i++) { html += `<td></td>`; col++; }
-      for (let d = 1; d <= daysInMonth; d++) {
-        const isToday = isCurrent && d === today;
-        const fest = festMonth.find(f => f.dia === d);
-        let cls = 'cal-day';
-        if (isToday) cls += ' today';
-        else if (fest) cls += ' has-fest';
-        html += `<td><span class="${cls}" title="${fest ? fest.icono + ' ' + fest.nombre : ''}">${d}</span></td>`;
-        col++;
-        if (col % 7 === 0 && d < daysInMonth) { html += `</tr><tr>`; col = 0; }
-      }
-      html += `</tr></tbody></table>`;
-
-      if (festMonth.length > 0) {
-        html += `<div class="cal-fest-list">`;
-        festMonth.forEach(f => {
-          html += `<div class="cal-fest-item"><span>${f.icono}</span><span>${f.nombre} (${f.dia})</span></div>`;
-        });
-        html += `</div>`;
-      }
-      card.innerHTML = html;
-      grid.appendChild(card);
+    var col = 0;
+    for (var i = 0; i < firstDay; i++) { html += '<td></td>'; col++; }
+    for (var d = 1; d <= daysInMonth; d++) {
+      var isToday = isCurrent && d === today;
+      var fest = festMonth.find(function(f){ return f.dia === d; });
+      var cls = 'cal-day';
+      if (isToday) cls += ' today';
+      else if (fest) cls += ' has-fest';
+      html += '<td><span class="' + cls + '" title="' + (fest ? fest.icono + ' ' + fest.nombre : '') + '">' + d + '</span></td>';
+      col++;
+      if (col % 7 === 0 && d < daysInMonth) { html += '</tr><tr>'; col = 0; }
     }
-  })();
+    html += '</tr></tbody></table>';
 
-  /* ─── FLOATING CALENDAR ─── */
-  (function initFloatingCal() {
-    const fc = document.getElementById('floatingCal');
-    const iconBtn = document.getElementById('fcIconBtn');
-    const minimize = document.getElementById('fcMinimize');
-    const nextFestEl = document.getElementById('fcNextFest');
-    const miniCalEl = document.getElementById('fcMiniCal');
-
-    // Find next festivity
-    const now = new Date();
-    const year = now.getFullYear();
-    const today = new Date(year, now.getMonth(), now.getDate());
-    const upcoming = FEST_DATA
-      .map(f => {
-        let d = new Date(year, f.mes - 1, f.dia);
-        if (d < today) d = new Date(year + 1, f.mes - 1, f.dia);
-        return { ...f, daysLeft: Math.ceil((d - today) / 86400000), date: d };
-      })
-      .sort((a, b) => a.daysLeft - b.daysLeft);
-    const next = upcoming[0];
-
-    if (next && nextFestEl) {
-      nextFestEl.innerHTML = `
-        <div class="fc-next-icon">${next.icono}</div>
-        <div class="fc-next-name">${next.nombre}</div>
-        <div class="fc-next-date">${next.date.toLocaleDateString('es-PE',{day:'numeric',month:'long'})}</div>
-        <div class="fc-days-left">${next.daysLeft}</div>
-        <div class="fc-days-label">días restantes</div>
-      `;
+    if (festMonth.length > 0) {
+      html += '<div class="cal-fest-list">';
+      festMonth.forEach(function(f){ html += '<div class="cal-fest-item"><span>' + f.icono + '</span><span>' + f.nombre + ' (' + f.dia + ')</span></div>'; });
+      html += '</div>';
     }
+    card.innerHTML = html;
+    grid.appendChild(card);
+  }
+})();
 
-    // Mini calendar for current month
-    if (miniCalEl) {
-      const m = now.getMonth(); const d0 = now.getDate();
-      const firstDay = new Date(year, m, 1).getDay();
-      const daysInMonth = new Date(year, m + 1, 0).getDate();
-      const festDays = FEST_DATA.filter(f => f.mes === m + 1).map(f => f.dia);
-      let html = `<table class="fc-mini-table"><thead><tr>`;
-      DIAS_CORTOS.forEach(d => { html += `<th>${d}</th>`; });
-      html += `</tr></thead><tbody><tr>`;
-      let col = 0;
-      for (let i = 0; i < firstDay; i++) { html += `<td></td>`; col++; }
-      for (let d = 1; d <= daysInMonth; d++) {
-        const isToday = d === d0;
-        const hasFest = festDays.includes(d);
-        let cls = 'fc-mini-day';
-        if (isToday) cls = 'fc-mini-today';
-        else if (hasFest) cls = 'fc-mini-fest';
-        html += `<td><span class="${cls}">${d}</span></td>`;
-        col++;
-        if (col % 7 === 0) html += `</tr><tr>`;
-      }
-      html += `</tr></tbody></table>`;
-      miniCalEl.innerHTML = html;
+/* ── FLOATING CALENDAR ── */
+(function() {
+  var fc = document.getElementById('floatingCal');
+  var iconBtn = document.getElementById('fcIconBtn');
+  var minimize = document.getElementById('fcMinimize');
+  var nextFestEl = document.getElementById('fcNextFest');
+  var miniCalEl = document.getElementById('fcMiniCal');
+
+  var now = new Date();
+  var year = now.getFullYear();
+  var today = new Date(year, now.getMonth(), now.getDate());
+
+  var upcoming = FEST_DATA.map(function(f) {
+    var d = new Date(year, f.mes - 1, f.dia);
+    if (d < today) d = new Date(year + 1, f.mes - 1, f.dia);
+    return Object.assign({}, f, { daysLeft: Math.ceil((d - today) / 86400000), date: d });
+  }).sort(function(a, b){ return a.daysLeft - b.daysLeft; });
+  var next = upcoming[0];
+
+  if (next && nextFestEl) {
+    nextFestEl.innerHTML = '<div class="fc-next-icon">' + next.icono + '</div><div class="fc-next-name">' + next.nombre + '</div><div class="fc-next-date">' + next.date.toLocaleDateString('es-PE',{day:'numeric',month:'long'}) + '</div><div class="fc-days-left">' + next.daysLeft + '</div><div class="fc-days-label">días restantes</div>';
+  }
+
+  if (miniCalEl) {
+    var m = now.getMonth(); var d0 = now.getDate();
+    var firstDay = new Date(year, m, 1).getDay();
+    var daysInMonth = new Date(year, m + 1, 0).getDate();
+    var festDays = FEST_DATA.filter(function(f){ return f.mes === m + 1; }).map(function(f){ return f.dia; });
+    var html = '<table class="fc-mini-table"><thead><tr>';
+    DIAS_CORTOS.forEach(function(d){ html += '<th>' + d + '</th>'; });
+    html += '</tr></thead><tbody><tr>';
+    var col = 0;
+    for (var i = 0; i < firstDay; i++) { html += '<td></td>'; col++; }
+    for (var d = 1; d <= daysInMonth; d++) {
+      var isToday2 = d === d0;
+      var hasFest = festDays.indexOf(d) >= 0;
+      var cls = isToday2 ? 'fc-mini-today' : hasFest ? 'fc-mini-fest' : 'fc-mini-day';
+      html += '<td><span class="' + cls + '">' + d + '</span></td>';
+      col++;
+      if (col % 7 === 0) html += '</tr><tr>';
     }
+    html += '</tr></tbody></table>';
+    miniCalEl.innerHTML = html;
+  }
 
-    // Minimize/maximize
-    minimize && minimize.addEventListener('click', () => {
-      fc && fc.classList.add('hidden');
-      iconBtn && iconBtn.classList.add('visible');
+  minimize && minimize.addEventListener('click', function() {
+    fc && fc.classList.add('hidden');
+    iconBtn && iconBtn.classList.add('visible');
+  });
+  iconBtn && iconBtn.addEventListener('click', function() {
+    iconBtn.classList.remove('visible');
+    fc && fc.classList.remove('hidden');
+  });
+
+  var dragging = false, ox = 0, oy = 0;
+  var fcHeader = document.getElementById('fcHeader');
+  function startDrag(cx, cy) { dragging = true; var r = fc.getBoundingClientRect(); ox = cx - r.left; oy = cy - r.top; }
+  function moveDrag(cx, cy) { if (!dragging || !fc) return; fc.style.left = (cx-ox)+'px'; fc.style.top = (cy-oy)+'px'; fc.style.right='auto'; fc.style.bottom='auto'; }
+  function endDrag() { dragging = false; }
+  fcHeader && fcHeader.addEventListener('mousedown', function(e){ startDrag(e.clientX, e.clientY); });
+  document.addEventListener('mousemove', function(e){ moveDrag(e.clientX, e.clientY); });
+  document.addEventListener('mouseup', endDrag);
+  fcHeader && fcHeader.addEventListener('touchstart', function(e){ var t=e.touches[0]; startDrag(t.clientX, t.clientY); }, {passive:true});
+  document.addEventListener('touchmove', function(e){ if(!dragging) return; var t=e.touches[0]; moveDrag(t.clientX, t.clientY); }, {passive:true});
+  document.addEventListener('touchend', endDrag);
+})();
+
+/* ── GALLERY MODAL ── */
+(function() {
+  var modal = document.getElementById('galleryModal');
+  var modalImg = document.getElementById('galleryModalImg');
+  var modalLabel = document.getElementById('galleryModalLabel');
+  var closeBtn = document.getElementById('galleryClose');
+  document.querySelectorAll('.fst-gallery-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      if (!modal || !modalImg) return;
+      modalImg.src = item.dataset.src || (item.querySelector('img') && item.querySelector('img').src) || '';
+      if (modalLabel) modalLabel.textContent = item.dataset.label || '';
+      modal.classList.add('open');
     });
-    iconBtn && iconBtn.addEventListener('click', () => {
-      iconBtn.classList.remove('visible');
-      fc && fc.classList.remove('hidden');
-    });
-
-    // Drag
-    let dragging = false, ox = 0, oy = 0;
-    const fcHeader = document.getElementById('fcHeader');
-    function startDrag(cx, cy) {
-      dragging = true;
-      const r = fc.getBoundingClientRect();
-      ox = cx - r.left; oy = cy - r.top;
-    }
-    function moveDrag(cx, cy) {
-      if (!dragging || !fc) return;
-      fc.style.left = (cx - ox) + 'px'; fc.style.top = (cy - oy) + 'px';
-      fc.style.right = 'auto'; fc.style.bottom = 'auto';
-    }
-    function endDrag() { dragging = false; }
-    fcHeader && fcHeader.addEventListener('mousedown', e => startDrag(e.clientX, e.clientY));
-    document.addEventListener('mousemove', e => moveDrag(e.clientX, e.clientY));
-    document.addEventListener('mouseup', endDrag);
-    fcHeader && fcHeader.addEventListener('touchstart', e => { const t = e.touches[0]; startDrag(t.clientX, t.clientY); }, { passive:true });
-    document.addEventListener('touchmove', e => { if (!dragging) return; const t = e.touches[0]; moveDrag(t.clientX, t.clientY); }, { passive:true });
-    document.addEventListener('touchend', endDrag);
-  })();
-
-  /* ─── GALLERY MODAL ─── */
-  (function initGallery() {
-    const modal = document.getElementById('galleryModal');
-    const modalImg = document.getElementById('galleryModalImg');
-    const modalLabel = document.getElementById('galleryModalLabel');
-    const closeBtn = document.getElementById('galleryClose');
-    document.querySelectorAll('.gallery-item').forEach(item => {
-      item.addEventListener('click', () => {
-        if (!modal || !modalImg) return;
-        modalImg.src = item.dataset.src || item.querySelector('img')?.src || '';
-        if (modalLabel) modalLabel.textContent = item.dataset.label || '';
-        modal.classList.add('open');
-      });
-    });
-    closeBtn && closeBtn.addEventListener('click', () => modal && modal.classList.remove('open'));
-    modal && modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
-  })();
-
-  /* ─── NEWSLETTER ─── */
-  (function initNewsletter() {
-    const form = document.getElementById('arenaNewsletterForm');
-    const input = document.getElementById('arenaEmailInput');
-    const btn = document.getElementById('arenaSubscribeBtn');
-    const msg = document.getElementById('arenaSubscribedMsg');
-    if (!btn || !input || !form || !msg) return;
-    async function subscribe() {
-      const email = input.value.trim();
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        input.style.borderColor = 'rgba(220,60,60,0.6)';
-        setTimeout(() => input.style.borderColor = '', 1200); return;
-      }
-      btn.disabled = true; btn.textContent = 'Enviando…';
-      try {
-        const res = await fetch('http://localhost:3030/api/newsletter', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email }) });
-        const data = await res.json();
-        if (!data.success) { alert(data.message || 'Error'); btn.disabled = false; btn.textContent = 'Suscribirme'; return; }
-      } catch {}
-      form.style.display = 'none'; msg.style.display = 'block';
-    }
-    btn.addEventListener('click', subscribe);
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') subscribe(); });
-  })();
-
-  /* ─── REVEAL ON SCROLL ─── */
-  (function initReveal() {
-    const els = document.querySelectorAll('.reveal');
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
-    }, { threshold:0.1 });
-    els.forEach(el => io.observe(el));
-  })();
-
-  /* ─── CINEMATIC THEME TRANSITION ─── */
-  (function initThemeTransition() {
-    const html  = document.documentElement;
-    const moon  = document.getElementById('heroMoon');
-    const sky   = document.querySelector('.hero-sky');
-    const glow  = document.getElementById('skyGlow');
-    const birds = document.getElementById('heroBirds');
-    const starsCanvas = document.getElementById('starsCanvas');
-    if (!moon || !sky || !glow) return;
-
-    let lastTheme = html.getAttribute('data-theme') || 'dark';
-    new MutationObserver(() => {
-      const currentTheme = lastTheme;
-      const newTheme = html.getAttribute('data-theme');
-      if (newTheme === currentTheme) return;
-      lastTheme = newTheme;
-
-      const wash = document.createElement('div');
-      wash.style.cssText = 'position:fixed;inset:0;z-index:180;pointer-events:none;opacity:0;transition:opacity 0.45s ease;';
-      wash.style.background = currentTheme === 'dark'
-        ? 'linear-gradient(180deg,rgba(14,72,160,0.18) 0%,rgba(0,100,120,0.26) 50%,rgba(190,170,55,0.18) 100%)'
-        : 'linear-gradient(180deg,rgba(4,13,28,0.26) 0%,rgba(4,58,72,0.30) 55%,rgba(26,16,8,0.18) 100%)';
-      document.body.appendChild(wash);
-
-      moon.classList.remove('theme-switching-down', 'theme-switching-up');
-      glow.classList.remove('glow-sunrise', 'glow-sunset');
-      void moon.offsetWidth;
-
-      if (currentTheme === 'dark') {
-        moon.classList.add('theme-switching-down');
-        sky.classList.add('sky-transitioning');
-        glow.classList.add('glow-sunrise');
-        if (starsCanvas) { starsCanvas.style.transition = 'opacity 2.4s cubic-bezier(0.33,0,0.12,1)'; starsCanvas.style.opacity = '0'; }
-        if (birds) { birds.classList.add('birds-fade-in'); birds.classList.remove('birds-fade-out'); }
-      } else {
-        moon.classList.add('theme-switching-down');
-        sky.classList.add('sky-transitioning-reverse');
-        glow.classList.add('glow-sunset');
-        if (starsCanvas) { starsCanvas.style.transition = 'opacity 1.2s cubic-bezier(0.33,0,0.12,1)'; starsCanvas.style.opacity = '1'; }
-        if (birds) { birds.classList.add('birds-fade-out'); birds.classList.remove('birds-fade-in'); }
-      }
-
-      setTimeout(() => { wash.style.opacity = '1'; }, 1900);
-      setTimeout(() => {
-        moon.classList.remove('theme-switching-down');
-        sky.classList.remove('sky-transitioning', 'sky-transitioning-reverse');
-        glow.classList.remove('glow-sunrise', 'glow-sunset');
-        void moon.offsetWidth;
-        moon.classList.add('theme-switching-up');
-        wash.style.transition = 'opacity 1.1s cubic-bezier(0.33,0,0.12,1)';
-        wash.style.opacity = '0';
-        setTimeout(() => { moon.classList.remove('theme-switching-up'); wash.remove(); }, 2500);
-      }, 2400);
-    }).observe(html, { attributes: true, attributeFilter: ['data-theme'] });
-  })();
+  });
+  closeBtn && closeBtn.addEventListener('click', function(){ modal && modal.classList.remove('open'); });
+  modal && modal.addEventListener('click', function(e){ if (e.target === modal) modal.classList.remove('open'); });
+})();
 </script>
-
-</body>
-</html>
