@@ -551,6 +551,36 @@ const hasBody = bodySecciones.length > 0;
     .arena-legal-links { display:flex; gap:1.2rem; }
     @media(max-width:900px) { .illo-campfire{opacity:0.75;transform:scale(0.65);transform-origin:bottom right} .illo-campfire2{opacity:0.75;transform:scaleX(-1) scale(0.65);transform-origin:bottom left} .beach-ball-wrap{transform:scale(0.65);opacity:0.85;transform-origin:bottom center} .arena-footer-grid{grid-template-columns:1fr 1fr} }
     @media(max-width:768px) { .bottom-wave{height:50px} .illo-campfire{transform:scale(0.48);bottom:0;right:-10px;opacity:0.55;transform-origin:bottom right} .illo-campfire2{transform:scaleX(-1) scale(0.48);bottom:0;left:-10px;opacity:0.55;transform-origin:bottom left} .beach-ball-wrap{display:none} .arena-footer{padding:2rem 1rem} .arena-footer-grid{grid-template-columns:1fr} }
+
+    /* ─── HERO RESPONSIVE ─── */
+    @media(max-width:1024px) {
+      .hero-content { padding-left:1.5rem; padding-right:1.5rem; }
+    }
+    @media(max-width:768px) {
+      .hero { min-height:88vh; }
+      .hero-moon { width:72px !important; height:72px !important; }
+      .hero-content { padding-top:clamp(155px,22vh,200px) !important; margin-bottom:130px; padding-left:1rem; padding-right:1rem; }
+      .hero-title { font-size:clamp(2.4rem,10vw,4rem); }
+      .hero-desc { font-size:1rem; max-width:100%; text-align:center; }
+      .hero-ctas { flex-direction:column; align-items:center; gap:0.75rem; }
+      .hero-ctas .btn-primary,
+      .hero-ctas .btn-outline { width:min(100%,280px); justify-content:center; text-align:center; }
+      .hero-stats { width:100%; border-radius:8px; flex-wrap:wrap; }
+      .stat-item { flex:1; min-width:80px; padding:10px 14px; }
+      .stat-val { font-size:1.2rem; }
+      .stat-label { font-size:0.62rem; }
+      .hero-quicknav { gap:0.3rem; }
+      .hero-quicknav a { font-size:9px; padding:4px 8px; letter-spacing:0.02em; }
+      .hero-waves { height:160px; }
+    }
+    @media(max-width:480px) {
+      .hero-moon { width:52px !important; height:52px !important; top:3% !important; }
+      .hero-content { padding-top:clamp(90px,18vh,150px) !important; margin-bottom:90px; }
+      .hero-stats { border-radius:0; margin-left:-1rem; margin-right:-1rem; }
+      .stat-item { padding:8px 10px; }
+      .hero-quicknav a { padding:4px 6px; font-size:8.5px; }
+      .hero-waves { height:110px; }
+    }
     @keyframes chatPanelIn { from{opacity:0;transform:translateY(16px) scale(0.96)} to{opacity:1;transform:translateY(0) scale(1)} }
     @keyframes chatDot { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
 
