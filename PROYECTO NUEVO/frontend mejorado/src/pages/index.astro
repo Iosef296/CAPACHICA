@@ -557,42 +557,49 @@ const hasBody = bodySecciones.length > 0;
     /* ─── HERO PHOTO CARDS ─── */
     .hero-photo-card {
       position:absolute; z-index:4;
-      background:rgba(10,22,40,0.82); border:1.5px solid rgba(34,197,94,0.38);
-      border-radius:12px; overflow:hidden; cursor:pointer;
-      width:130px; transition:width 0.42s cubic-bezier(0.4,0,0.2,1),box-shadow 0.3s,z-index 0s;
-      backdrop-filter:blur(10px); box-shadow:0 4px 24px rgba(0,0,0,0.45);
-      user-select:none;
+      background:rgba(8,18,36,0.92); border:1.5px solid rgba(34,197,94,0.35);
+      overflow:hidden; cursor:pointer;
+      width:200px;
+      transition:width 0.52s cubic-bezier(0.4,0,0.2,1),box-shadow 0.3s;
+      backdrop-filter:blur(14px); box-shadow:0 8px 32px rgba(0,0,0,0.55);
     }
-    .hero-photo-card:hover { box-shadow:0 6px 32px rgba(34,197,94,0.22),0 4px 24px rgba(0,0,0,0.45); }
-    .hero-photo-card.expanded { width:252px; z-index:6; }
-    .hpc-thumb { position:relative; width:252px; height:88px; overflow:hidden; }
-    .hpc-thumb img { width:100%;height:100%;object-fit:cover;transition:transform 0.45s ease;display:block; }
-    .hero-photo-card.expanded .hpc-thumb img { transform:scale(1.06); }
-    .hpc-expand-btn {
-      position:absolute;bottom:7px;right:7px;
-      background:rgba(34,197,94,0.88);border:none;border-radius:6px;
-      width:24px;height:24px;color:#052e10;font-size:14px;font-weight:700;
-      cursor:pointer;display:flex;align-items:center;justify-content:center;
-      transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);line-height:1;pointer-events:none;
+    .hero-photo-card.hpc-left  { left:0;  border-radius:0 14px 14px 0; border-left:none; }
+    .hero-photo-card.hpc-right { right:0; border-radius:14px 0 0 14px; border-right:none; }
+    .hero-photo-card.expanded  { width:75vw; z-index:8; box-shadow:0 16px 64px rgba(0,0,0,0.72),0 0 48px rgba(34,197,94,0.12); }
+    .hpc-thumb { position:relative; width:100%; height:190px; overflow:hidden; }
+    .hpc-thumb img { width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.52s ease,object-position 0.52s ease; }
+    .hpc-left  .hpc-thumb img { object-position:left center; }
+    .hpc-right .hpc-thumb img { object-position:right center; }
+    .hero-photo-card.expanded .hpc-thumb img { transform:scale(1.03); object-position:center center; }
+    /* fallback bg when no image */
+    .hpc-thumb { background:linear-gradient(135deg,#0f2240 0%,#0a3040 100%); }
+    /* arrow — sticks to inner edge of card */
+    .hpc-arrow {
+      position:absolute; top:50%; z-index:2; pointer-events:none;
+      background:rgba(34,197,94,0.90); border:none;
+      width:22px; height:52px; color:#052e10;
+      display:flex; align-items:center; justify-content:center;
+      font-size:18px; font-weight:900; line-height:1;
     }
-    .hero-photo-card.expanded .hpc-expand-btn { transform:rotate(45deg); }
+    .hpc-left  .hpc-arrow { right:0; border-radius:0 8px 8px 0; transform:translateY(-50%);          transition:transform 0.45s cubic-bezier(0.4,0,0.2,1); }
+    .hpc-right .hpc-arrow { left:0;  border-radius:8px 0 0 8px; transform:translateY(-50%) scaleX(-1); transition:transform 0.45s cubic-bezier(0.4,0,0.2,1); }
+    .hpc-left.expanded  .hpc-arrow { transform:translateY(-50%) scaleX(-1); }
+    .hpc-right.expanded .hpc-arrow { transform:translateY(-50%); }
+    /* body */
     .hpc-body {
-      max-height:0;overflow:hidden;
-      transition:max-height 0.42s cubic-bezier(0.4,0,0.2,1),padding 0.3s;
-      padding:0 12px;
+      max-height:0; overflow:hidden;
+      transition:max-height 0.52s cubic-bezier(0.4,0,0.2,1),padding 0.35s;
+      padding:0 16px; background:rgba(8,18,36,0.97);
     }
-    .hero-photo-card.expanded .hpc-body { max-height:140px;padding:10px 12px; }
+    .hero-photo-card.expanded .hpc-body { max-height:160px; padding:14px 22px 16px; }
     .hpc-tag {
-      display:inline-block;margin-bottom:6px;padding:2px 8px;border-radius:100px;
-      background:rgba(34,197,94,0.14);border:1px solid rgba(34,197,94,0.38);
-      color:#4ade80;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;
+      display:inline-block; margin-bottom:7px; padding:2px 9px; border-radius:100px;
+      background:rgba(34,197,94,0.13); border:1px solid rgba(34,197,94,0.38);
+      color:#4ade80; font-size:9px; font-weight:700; letter-spacing:0.13em; text-transform:uppercase;
       font-family:'Space Mono',monospace;
     }
-    .hpc-title { font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:#f0ede8;margin-bottom:4px;line-height:1.2; }
-    .hpc-desc { font-size:11px;color:rgba(240,237,232,0.60);line-height:1.55; }
-    /* right-side cards expand leftward */
-    .hero-photo-card.hpc-right { right:2%; }
-    .hero-photo-card.hpc-left  { left:2%; }
+    .hpc-title { font-family:'Playfair Display',serif; font-size:16px; font-weight:700; color:#f0ede8; margin-bottom:6px; line-height:1.2; }
+    .hpc-desc  { font-size:13px; color:rgba(240,237,232,0.62); line-height:1.6; }
     @media(max-width:1100px) { .hero-photo-card { display:none !important; } }
   </style>
 </head>
@@ -650,48 +657,48 @@ const hasBody = bodySecciones.length > 0;
 
 
   <!-- Photo Cards -->
-  <div class="hero-photo-card hpc-left" id="hpc1" style="top:19%;" onclick="toggleHPC(this)">
+  <div class="hero-photo-card hpc-left" id="hpc1" style="top:18%;" onclick="toggleHPC(this)">
     <div class="hpc-thumb">
-      <img src="/foto-lago.jpg" alt="Lago Titicaca" loading="lazy" onerror="this.style.background='#0f2240';this.removeAttribute('src')"/>
-      <div class="hpc-expand-btn" aria-hidden="true">+</div>
+      <img src="/foto-lago.jpg" alt="Lago Titicaca" loading="lazy"/>
+      <div class="hpc-arrow" aria-hidden="true">&#8250;</div>
     </div>
     <div class="hpc-body">
       <span class="hpc-tag">Destinos</span>
       <h4 class="hpc-title">Lago Titicaca</h4>
-      <p class="hpc-desc">El lago navegable mas alto del mundo a 3,820 msnm. Aguas azul profundo y horizontes infinitos.</p>
+      <p class="hpc-desc">El lago navegable mas alto del mundo a 3,820 msnm. Aguas azul profundo, cielos inmensos y cinco siglos de historia vivos en cada orilla.</p>
     </div>
   </div>
-  <div class="hero-photo-card hpc-left" id="hpc2" style="top:50%;" onclick="toggleHPC(this)">
+  <div class="hero-photo-card hpc-left" id="hpc2" style="top:52%;" onclick="toggleHPC(this)">
     <div class="hpc-thumb">
-      <img src="/foto-vivencial.jpg" alt="Turismo vivencial" loading="lazy" onerror="this.style.background='#0f2240';this.removeAttribute('src')"/>
-      <div class="hpc-expand-btn" aria-hidden="true">+</div>
+      <img src="/foto-vivencial.jpg" alt="Turismo vivencial" loading="lazy"/>
+      <div class="hpc-arrow" aria-hidden="true">&#8250;</div>
     </div>
     <div class="hpc-body">
       <span class="hpc-tag">Vivencial</span>
       <h4 class="hpc-title">Vida en Comunidad</h4>
-      <p class="hpc-desc">Convive con familias quechuas, aprende tecnicas ancestrales y comparte sus tradiciones milenarias.</p>
+      <p class="hpc-desc">Convive con familias quechuas, aprende tejido en telar, pesca ancestral y cocina andina en las comunidades de Capachica.</p>
     </div>
   </div>
-  <div class="hero-photo-card hpc-right" id="hpc3" style="top:19%;" onclick="toggleHPC(this)">
+  <div class="hero-photo-card hpc-right" id="hpc3" style="top:18%;" onclick="toggleHPC(this)">
     <div class="hpc-thumb">
-      <img src="/foto-actividades.jpg" alt="Actividades en Capachica" loading="lazy" onerror="this.style.background='#0f2240';this.removeAttribute('src')"/>
-      <div class="hpc-expand-btn" aria-hidden="true">+</div>
+      <img src="/foto-actividades.jpg" alt="Actividades en Capachica" loading="lazy"/>
+      <div class="hpc-arrow" aria-hidden="true">&#8250;</div>
     </div>
     <div class="hpc-body">
       <span class="hpc-tag">Actividades</span>
       <h4 class="hpc-title">Aventura en el Lago</h4>
-      <p class="hpc-desc">Kayak, pesca tradicional, senderismo entre cactus y vistas panoramicas del Titicaca.</p>
+      <p class="hpc-desc">Kayak, pesca tradicional, senderismo entre cactus gigantes y vistas panoramicas del Titicaca desde los miradores de la peninsula.</p>
     </div>
   </div>
-  <div class="hero-photo-card hpc-right" id="hpc4" style="top:50%;" onclick="toggleHPC(this)">
+  <div class="hero-photo-card hpc-right" id="hpc4" style="top:52%;" onclick="toggleHPC(this)">
     <div class="hpc-thumb">
-      <img src="/foto-festividades.jpg" alt="Festividades de Capachica" loading="lazy" onerror="this.style.background='#0f2240';this.removeAttribute('src')"/>
-      <div class="hpc-expand-btn" aria-hidden="true">+</div>
+      <img src="/foto-festividades.jpg" alt="Festividades de Capachica" loading="lazy"/>
+      <div class="hpc-arrow" aria-hidden="true">&#8250;</div>
     </div>
     <div class="hpc-body">
       <span class="hpc-tag">Festividades</span>
       <h4 class="hpc-title">Fiestas Ancestrales</h4>
-      <p class="hpc-desc">Danzas, musica y rituales que mantienen viva la herencia cultural quechua del altiplano.</p>
+      <p class="hpc-desc">Danzas, musica y rituales milenarios que mantienen viva la herencia cultural quechua del altiplano a orillas del Titicaca.</p>
     </div>
   </div>
 
@@ -725,7 +732,9 @@ const hasBody = bodySecciones.length > 0;
 
   /* -- HERO PHOTO CARDS -- */
   function toggleHPC(card) {
-    card.classList.toggle('expanded');
+    var wasExpanded = card.classList.contains('expanded');
+    document.querySelectorAll('.hero-photo-card').forEach(function(c) { c.classList.remove('expanded'); });
+    if (!wasExpanded) card.classList.add('expanded');
   }
 
   /* -- STARS (gentle twinkle) -- */
