@@ -1210,13 +1210,32 @@ const hasBody = bodySecciones.length > 0;
   });
 
   /* -- HERO PHOTO CARDS -- */
+  function closeHPC() {
+    document.querySelectorAll('.hero-photo-card').forEach(function(c){c.classList.remove('expanded');c.style.opacity='';c.style.pointerEvents='';});
+    var d=document.getElementById('hpc-dimmer'); if(d)d.style.display='none';
+    var o=document.getElementById('hpc-frame-overlay'); if(o)o.style.display='none';
+  }
   function toggleHPC(card) {
     var wasExpanded = card.classList.contains('expanded');
-    document.querySelectorAll('.hero-photo-card').forEach(function(c) {
-      c.classList.remove('expanded');
-      c.style.opacity = '';
-      c.style.pointerEvents = '';
+    closeHPC();
+    if (wasExpanded) return;
+
+    card.classList.add('expanded');
+    var side = card.classList.contains('hpc-left') ? 'hpc-left' : 'hpc-right';
+    document.querySelectorAll('.hero-photo-card.' + side).forEach(function(c) {
+      if (c !== card) { c.style.opacity = '0'; c.style.pointerEvents = 'none'; }
     });
+
+    var dimmer = document.getElementById('hpc-dimmer');
+    if (!dimmer) {
+      dimmer = document.createElement('div');
+      dimmer.id = 'hpc-dimmer';
+      dimmer.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:5;pointer-events:auto;display:none;';
+      dimmer.onclick = closeHPC;
+      document.body.appendChild(dimmer);
+    }
+    dimmer.style.display = 'block';
+
     var overlay = document.getElementById('hpc-frame-overlay');
     if (!overlay) {
       overlay = document.createElement('div');
@@ -1224,23 +1243,15 @@ const hasBody = bodySecciones.length > 0;
       overlay.style.cssText = 'position:fixed;pointer-events:none;z-index:20;background-image:url("/flower-frame.svg");background-size:100% 100%;background-repeat:no-repeat;display:none;';
       document.body.appendChild(overlay);
     }
-    if (!wasExpanded) {
-      card.classList.add('expanded');
-      var side = card.classList.contains('hpc-left') ? 'hpc-left' : 'hpc-right';
-      document.querySelectorAll('.hero-photo-card.' + side).forEach(function(c) {
-        if (c !== card) { c.style.opacity = '0'; c.style.pointerEvents = 'none'; }
-      });
-      setTimeout(function() {
-        var r = card.getBoundingClientRect();
-        overlay.style.left   = r.left   + 'px';
-        overlay.style.top    = r.top    + 'px';
-        overlay.style.width  = r.width  + 'px';
-        overlay.style.height = r.height + 'px';
-        overlay.style.display = 'block';
-      }, 560);
-    } else {
-      overlay.style.display = 'none';
-    }
+
+    setTimeout(function() {
+      var r = card.getBoundingClientRect();
+      overlay.style.left   = r.left   + 'px';
+      overlay.style.top    = r.top    + 'px';
+      overlay.style.width  = r.width  + 'px';
+      overlay.style.height = r.height + 'px';
+      overlay.style.display = 'block';
+    }, 560);
   }
 
   /* -- STARS (gentle twinkle) -- */
