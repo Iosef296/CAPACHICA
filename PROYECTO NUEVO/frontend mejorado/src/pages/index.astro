@@ -1244,14 +1244,18 @@ const hasBody = bodySecciones.length > 0;
       document.body.appendChild(overlay);
     }
 
-    setTimeout(function() {
-      var r = card.getBoundingClientRect();
-      overlay.style.left   = r.left   + 'px';
-      overlay.style.top    = r.top    + 'px';
-      overlay.style.width  = r.width  + 'px';
-      overlay.style.height = r.height + 'px';
-      overlay.style.display = 'block';
-    }, 560);
+    var isLeft = card.classList.contains('hpc-left');
+    overlay.style.top    = '80px';
+    overlay.style.width  = '85vw';
+    overlay.style.height = 'calc(100vh - 80px - 130px)';
+    if (isLeft) {
+      overlay.style.left  = '6px';
+      overlay.style.right = 'auto';
+    } else {
+      overlay.style.right = '6px';
+      overlay.style.left  = 'auto';
+    }
+    setTimeout(function() { overlay.style.display = 'block'; }, 540);
   }
 
   /* -- STARS (gentle twinkle) -- */
