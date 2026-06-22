@@ -832,60 +832,79 @@ const hasBody = bodySecciones.length > 0;
 
     /* ══════════════ MOBILE APP RESTRUCTURE ══════════════ */
     @media(max-width:768px) {
-      /* ── Hero: compact banner (≈65vh) ── */
-      .hero { min-height:65vh !important; }
+      /* Hero: compact banner (~65vh), preserve 56px top pad for fixed navbar */
+      .hero { min-height:65vh !important; padding-top:56px !important; }
       .hero-content {
-        padding-top:clamp(68px,11vh,96px) !important;
+        padding-top:clamp(62px,10vh,88px) !important;
         padding-left:20px !important;
         padding-right:20px !important;
         margin-bottom:0.5rem !important;
       }
 
-      /* Badge: tighter on mobile */
-      .hero-badge { font-size:8px; padding:3px 10px; margin-bottom:0.55rem; letter-spacing:1.5px; }
+      /* Badge */
+      .hero-badge { font-size:8px; padding:3px 10px; margin-bottom:0.5rem; letter-spacing:1.4px; }
 
-      /* Title: app-style bold heading */
+      /* Title: bold app heading */
       .hero-title { font-size:clamp(1.85rem,7.5vw,2.6rem) !important; line-height:1.07; }
 
-      /* Desc: 3-line clamp, small */
+      /* Desc: 3-line clamp */
       .hero-desc {
         font-size:12.5px !important; line-height:1.5; margin-top:0.35rem;
-        display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+        display:-webkit-box; -webkit-line-clamp:3;
+        -webkit-box-orient:vertical; overflow:hidden; max-width:100%;
       }
 
-      /* CTAs: full-width pill buttons */
-      .hero-ctas { flex-direction:column !important; gap:0.5rem; margin-top:0.9rem; }
+      /* CTAs: full-width */
+      .hero-ctas { flex-direction:column !important; gap:0.5rem; margin-top:0.85rem; }
       .hero-ctas .btn-primary,
       .hero-ctas .btn-outline {
         width:100% !important; padding:13px 20px !important;
-        font-size:14px !important; border-radius:14px !important; text-align:center;
+        font-size:14px !important; text-align:center; justify-content:center !important;
       }
 
-      /* Stats: horizontal scroll strip */
+      /* Stats: 2x2 app card grid */
       .hero-stats {
-        flex-wrap:nowrap !important; overflow-x:auto !important;
-        -webkit-overflow-scrolling:touch; scrollbar-width:none;
-        margin-top:0.9rem !important; border-radius:10px !important;
+        display:grid !important;
+        grid-template-columns:1fr 1fr !important;
+        gap:6px !important;
+        background:transparent !important;
+        border:none !important;
+        border-radius:0 !important;
+        padding:0 !important;
+        margin-top:0.85rem !important;
+        width:100%;
+        backdrop-filter:none !important;
+        -webkit-backdrop-filter:none !important;
       }
-      .hero-stats::-webkit-scrollbar { display:none; }
-      .stat-item { flex-shrink:0 !important; }
+      .stat-item {
+        background:rgba(10,22,40,0.72) !important;
+        border:1px solid rgba(45,212,191,0.18) !important;
+        border-radius:10px !important;
+        border-right:1px solid rgba(45,212,191,0.18) !important;
+        flex:none !important;
+        padding:10px 12px !important;
+        text-align:center;
+      }
+      .stat-val { font-size:1.15rem !important; }
+      .stat-label { font-size:0.6rem !important; }
 
-      /* Hide quick nav pills — bottom nav is the navigation */
+      /* Hide quick nav pills — bottom nav handles navigation */
       .hero-quicknav { display:none !important; }
 
-      /* Gallery FAB: float above bottom nav */
+      /* Gallery FAB: above bottom nav */
       .gallery-fab { bottom:calc(82px + env(safe-area-inset-bottom)) !important; }
 
-      /* Hero waves: shorter on mobile */
-      .hero-waves { height:90px !important; }
+      /* Hero waves: shorter */
+      .hero-waves { height:80px !important; }
 
-      /* Main sections: tighter app padding */
-      section { padding:2rem 0 !important; }
-      .container { padding-left:16px !important; padding-right:16px !important; }
+      /* Main content sections: tighter padding (not hero section) */
+      main section { padding:2rem 0 !important; }
+      main .container { padding-left:16px !important; padding-right:16px !important; }
     }
     @media(max-width:480px) {
-      .hero { min-height:60vh !important; }
+      .hero { min-height:58vh !important; }
       .gallery-fab { bottom:calc(80px + env(safe-area-inset-bottom)) !important; }
+      .hero-title { font-size:clamp(1.7rem,8vw,2.3rem) !important; }
     }
   </style>
 </head>
