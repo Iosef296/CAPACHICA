@@ -37,6 +37,7 @@
     "tailwindcss": "^3.4.0"
   },
   "devDependencies": {
+    "cloudinary": "^2.10.0",
     "typescript": "^6.0.3"
   }
 }

@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import SectionRenderer from '../components/SectionRenderer.astro';
+import cloudinaryData from '../data/cloudinary-urls.json';
 
 const IA_URL = 'http://localhost:5000';
 let cms: any = null;
@@ -11,190 +12,172 @@ try {
 
 const cmsHero = cms?.secciones?.find((s: any) => s.tipo === 'hero');
 
-function imgUrl(folder: string, file: string): string {
-  return `/images/FOTOS/${encodeURIComponent(folder)}/${encodeURIComponent(file)}`;
+function getCldUrls(folder: string): string[] {
+  const entries = (cloudinaryData as any)[folder] || [];
+  return entries.map((e: any) => e.url);
 }
 
 const casas = [
   {
     nombre: "Casa Alfonso",
     folder: "CASA ALFONSO",
-    lugar: "Llachón",
-    desc: "Amplia casa familiar a orillas del Titicaca con jardín propio y vistas al lago desde el segundo piso. Don Alfonso y su familia ofrecen desayuno con productos frescos de su chacra y paseos en bote al amanecer.",
-    amenities: ["🌅 Vista al lago","🚣 Bote propio","🍳 Desayuno incluido","🌿 Jardín y huerto"],
-    fotos: ["1686443894924 (1).jpg","1686444310501.jpg","1686444403067.jpg","20240405_163331 (2).jpg","20240405_163332 (1).jpg","20240406_132107 (1).jpg","20240513_184426 (1).jpg","20240513_184548 (1).jpg","469881700_1103193314815187_636213506223544191_n.jpg","469970912_1103193304815188_247825898400249105_n.jpg","470032430_1103193204815198_7965951934230981446_n.jpg","470136672_1103193218148530_5246794969475909682_n.jpg","470157579_1103193268148525_4609475470647696203_n.jpg","470173092_1103193201481865_2719703916367221882_n.jpg","472526587_1120807006387151_4342994850906539866_n.jpg","472545242_1120807029720482_5443840022290883632_n.jpg","487081981_1091305476343164_2734145542499535158_n.jpg","C2047T01 (1).jpg","C2048T01.jpg","C2050T01.jpg","images (1).jpeg","IMG_20231104_070211 (1).jpg","IMG_20231104_113240 (1).jpg","IMG_20231104_121658 (1).jpg","IMG_20231104_170536 (1).jpg","IMG_20231110_165128 (1).jpg","IMG_20240507_190127 (1).jpg","portada.jpgddd.jpg","portada.jpgtyh.jpg"],
+    lugar: "LlachÃ³n",
+    desc: "Amplia casa familiar a orillas del Titicaca con jardÃ­n propio y vistas al lago desde el segundo piso. Don Alfonso y su familia ofrecen desayuno con productos frescos de su chacra y paseos en bote al amanecer.",
+    amenities: ["ðŸŒ… Vista al lago","ðŸš£ Bote propio","ðŸ³ Desayuno incluido","ðŸŒ¿ JardÃ­n y huerto"],
     popular: true,
   },
   {
-    nombre: "Casa Ana María",
+    nombre: "Casa Ana MarÃ­a",
     folder: "CASA ANA MARIA",
     lugar: "Capachica",
-    desc: "Hogar cálido y espacioso atendido por doña Ana María, maestra de tejido quechua. Habitaciones ventiladas con colchas tejidas a mano y desayuno andino con quinua, cañihua y leche fresca del campo.",
-    amenities: ["🎨 Taller de tejido","☕ Desayuno andino","🌾 Ambiente rural","🌺 Flores del campo"],
-    fotos: ["485907401_10232292291603257_430732859191654629_n.jpg","WhatsApp Image 2025-09-04 at 09.04.39 (1).jpeg","WhatsApp Image 2025-09-04 at 09.04.39 (2).jpeg","WhatsApp Image 2025-09-04 at 09.04.39.jpeg","WhatsApp Image 2025-09-04 at 09.04.40.jpeg","WhatsApp Image 2025-09-04 at 09.04.41.jpeg","WhatsApp Image 2025-09-04 at 09.04.43 (1).jpeg","WhatsApp Image 2025-09-04 at 09.04.43 (2).jpeg","WhatsApp Image 2025-09-04 at 09.04.43 (3).jpeg","WhatsApp Image 2025-09-04 at 09.04.43 (4).jpeg","WhatsApp Image 2025-09-04 at 09.04.43.jpeg","WhatsApp Image 2025-09-04 at 09.04.44 (1).jpeg","WhatsApp Image 2025-09-04 at 09.04.44.jpeg","WhatsApp Image 2025-09-04 at 09.04.45 (1).jpeg","WhatsApp Image 2025-09-04 at 09.04.45 (2).jpeg","WhatsApp Image 2025-09-04 at 09.04.45.jpeg","WhatsApp Image 2025-09-04 at 09.04.47 (1).jpeg","WhatsApp Image 2025-09-04 at 09.04.47 (2).jpeg","WhatsApp Image 2025-09-04 at 09.04.47 (3).jpeg","WhatsApp Image 2025-09-04 at 09.04.47.jpeg"],
+    desc: "Hogar cÃ¡lido y espacioso atendido por doÃ±a Ana MarÃ­a, maestra de tejido quechua. Habitaciones ventiladas con colchas tejidas a mano y desayuno andino con quinua, caÃ±ihua y leche fresca del campo.",
+    amenities: ["ðŸŽ¨ Taller de tejido","â˜• Desayuno andino","ðŸŒ¾ Ambiente rural","ðŸŒº Flores del campo"],
     popular: false,
   },
   {
     nombre: "Casa Antonia",
     folder: "CASA ANTONIA",
-    lugar: "Llachón",
-    desc: "Pintoresca casa de piedra con patio central y flores andinas. Doña Antonia prepara trucha del lago a la parrilla y enseña a sus huéspedes el arte de la alfarería local cada tarde.",
-    amenities: ["🐟 Trucha fresca","🏺 Taller de alfarería","🌸 Patio con flores","🌄 Senderos cercanos"],
-    fotos: ["039DEEA0-F8EA-4946-916C-C4A8901B2D3B.jpeg","06131CAD-D7AA-4B3E-AE6D-E6178DFA0B61.jpeg","2023-04-06 (1).jpg","2023-04-06.jpg","2023-04-22 (1).jpg","2023-04-22 (2).jpg","2023-04-22 (3).jpg","2023-04-22.jpg","309430874_610266610879747_8923442499067690145_n.jpg","486329805_1181769770396092_1651964747968414769_n.jpg","4AAE795B-E5BC-4B66-8A26-CAC0E05504BD.jpeg","60C89BA5-A147-48F5-A798-BCD1D5A83813.jpeg","ABFE20FC-B616-41C8-9BCC-93570263EB2B.jpeg","AEC42042-DE8F-4EE9-8D25-636C9B0C702E.jpeg","E407441B-C5C1-4038-9B9F-45B02E237F57.jpeg","E8EA8C56-8D91-4CB2-AF34-627B1E2E6418.jpeg","IMG_6969.MOV.jpg","unnamed (4).jpg"],
+    lugar: "LlachÃ³n",
+    desc: "Pintoresca casa de piedra con patio central y flores andinas. DoÃ±a Antonia prepara trucha del lago a la parrilla y enseÃ±a a sus huÃ©spedes el arte de la alfarerÃ­a local cada tarde.",
+    amenities: ["ðŸŸ Trucha fresca","ðŸº Taller de alfarerÃ­a","ðŸŒ¸ Patio con flores","ðŸŒ„ Senderos cercanos"],
     popular: false,
   },
   {
     nombre: "Casa Balbino",
     folder: "CASA BALBINO",
     lugar: "Capachica",
-    desc: "Casa vivencial amplia con terraza panorámica y corrales de animales domésticos. Don Balbino lleva a sus huéspedes de pesca artesanal con redes tradicionales al amanecer sobre las aguas azules del Titicaca.",
-    amenities: ["🎣 Pesca artesanal","🏔️ Terraza panorámica","🐄 Animales de granja","🌙 Cielo estrellado"],
-    fotos: ["WhatsApp Image 2025-09-15 at 11.47.41.jpeg","WhatsApp Image 2025-09-15 at 11.47.42.jpeg","WhatsApp Image 2025-09-15 at 11.47.44 (1).jpeg","WhatsApp Image 2025-09-15 at 11.47.44.jpeg","WhatsApp Image 2025-09-15 at 11.47.53.jpeg","WhatsApp Image 2025-09-15 at 11.48.01 (1).jpeg","WhatsApp Image 2025-09-15 at 11.48.01.jpeg","WhatsApp Image 2025-09-15 at 11.48.02 (1).jpeg","WhatsApp Image 2025-09-15 at 11.48.02 (2).jpeg","WhatsApp Image 2025-09-15 at 11.48.02 (3).jpeg","WhatsApp Image 2025-09-15 at 11.48.02 (4).jpeg","WhatsApp Image 2025-09-15 at 11.48.02.jpeg","WhatsApp Image 2025-09-15 at 11.48.03 (1).jpeg","WhatsApp Image 2025-09-15 at 11.48.03 (2).jpeg","WhatsApp Image 2025-09-15 at 11.48.03 (3).jpeg","WhatsApp Image 2025-09-15 at 11.48.03 (4).jpeg","WhatsApp Image 2025-09-15 at 11.48.03.jpeg","WhatsApp Image 2025-09-15 at 11.48.04 (1).jpeg","WhatsApp Image 2025-09-15 at 11.48.04 (2).jpeg","WhatsApp Image 2025-09-15 at 11.48.04 (3).jpeg","WhatsApp Image 2025-09-15 at 11.48.04.jpeg","WhatsApp Image 2025-09-15 at 11.48.05 (1).jpeg","WhatsApp Image 2025-09-15 at 11.48.05 (2).jpeg","WhatsApp Image 2025-09-15 at 11.48.05 (3).jpeg","WhatsApp Image 2025-09-15 at 11.48.05.jpeg","WhatsApp Image 2025-09-15 at 11.48.06 (1).jpeg","WhatsApp Image 2025-09-15 at 11.48.06 (2).jpeg","WhatsApp Image 2025-09-15 at 11.48.06 (3).jpeg","WhatsApp Image 2025-09-15 at 11.48.06.jpeg","WhatsApp Image 2025-09-15 at 11.48.07 (1).jpeg","WhatsApp Image 2025-09-15 at 11.48.07 (2).jpeg","WhatsApp Image 2025-09-15 at 11.48.07 (3).jpeg","WhatsApp Image 2025-09-15 at 11.48.07 (4).jpeg","WhatsApp Image 2025-09-15 at 11.48.07.jpeg","WhatsApp Image 2025-09-15 at 11.48.08 (1).jpeg","WhatsApp Image 2025-09-15 at 11.48.08 (2).jpeg","WhatsApp Image 2025-09-15 at 11.48.08 (3).jpeg","WhatsApp Image 2025-09-15 at 11.48.08 (4).jpeg","WhatsApp Image 2025-09-15 at 11.48.08.jpeg","WhatsApp Image 2025-09-15 at 11.48.09 (1).jpeg","WhatsApp Image 2025-09-15 at 11.48.09 (2).jpeg","WhatsApp Image 2025-09-15 at 11.48.09 (3).jpeg","WhatsApp Image 2025-09-15 at 11.48.09.jpeg","WhatsApp Image 2025-09-15 at 11.48.10 (1).jpeg","WhatsApp Image 2025-09-15 at 11.48.10.jpeg"],
+    desc: "Casa vivencial amplia con terraza panorÃ¡mica y corrales de animales domÃ©sticos. Don Balbino lleva a sus huÃ©spedes de pesca artesanal con redes tradicionales al amanecer sobre las aguas azules del Titicaca.",
+    amenities: ["ðŸŽ£ Pesca artesanal","ðŸ”ï¸ Terraza panorÃ¡mica","ðŸ„ Animales de granja","ðŸŒ™ Cielo estrellado"],
     popular: false,
   },
   {
     nombre: "Casa Calixto",
     folder: "CASA CALIXTO",
     lugar: "Capachica",
-    desc: "Pequeña y acogedora, perfecta para viajeros que buscan tranquilidad. Don Calixto ofrece caminatas guiadas por los miradores de la península y convida chicha morada artesanal al atardecer.",
-    amenities: ["🥾 Caminatas guiadas","🍹 Chicha artesanal","🌄 Miradores cercanos","🤫 Ambiente tranquilo"],
-    fotos: ["WhatsApp Image 2025-09-03 at 11.00.08.jpeg","WhatsApp Image 2025-09-03 at 11.03.07.jpeg","WhatsApp Image 2025-09-03 at 11.15.27.jpeg","WhatsApp Image 2025-09-03 at 11.20.16.jpeg"],
+    desc: "PequeÃ±a y acogedora, perfecta para viajeros que buscan tranquilidad. Don Calixto ofrece caminatas guiadas por los miradores de la penÃ­nsula y convida chicha morada artesanal al atardecer.",
+    amenities: ["ðŸ¥¾ Caminatas guiadas","ðŸ¹ Chicha artesanal","ðŸŒ„ Miradores cercanos","ðŸ¤« Ambiente tranquilo"],
     popular: false,
   },
   {
     nombre: "Casa Eustaquio",
     folder: "CASA EUSTAQUIO",
     lugar: "Escallani",
-    desc: "Familia Eustaquio recibe huéspedes con hospitalidad quechua genuina. Habitaciones con vista a los totorales sagrados y noches de música folclórica con zampoñas y quenas alrededor de la fogata.",
-    amenities: ["🎵 Música folclórica","🌿 Totorales sagrados","🔥 Fogata nocturna","🎭 Cultura viva"],
-    fotos: ["491957967_3008387196028885_2533961187161639664_n.jpg","WhatsApp Image 2025-09-03 at 17.56.34.jpeg","WhatsApp Image 2025-09-03 at 17.57.18.jpeg","WhatsApp Image 2025-09-03 at 17.58.48.jpeg","WhatsApp Image 2025-09-03 at 18.00.13.jpeg","WhatsApp Image 2025-09-03 at 18.05.08.jpeg","WhatsApp Image 2025-09-03 at 18.06.06.jpeg"],
+    desc: "Familia Eustaquio recibe huÃ©spedes con hospitalidad quechua genuina. Habitaciones con vista a los totorales sagrados y noches de mÃºsica folclÃ³rica con zampoÃ±as y quenas alrededor de la fogata.",
+    amenities: ["ðŸŽµ MÃºsica folclÃ³rica","ðŸŒ¿ Totorales sagrados","ðŸ”¥ Fogata nocturna","ðŸŽ­ Cultura viva"],
     popular: false,
   },
   {
-    nombre: "Casa Félix",
+    nombre: "Casa FÃ©lix",
     folder: "CASA FELIX",
-    lugar: "Llachón",
-    desc: "Casa con huerto orgánico y vista al islote de los Uros. Don Félix cultiva habas, papas nativas y quinua que forman el desayuno de sus huéspedes. Incluye tour en balsa de totora tradicional.",
-    amenities: ["🌱 Huerto orgánico","🛶 Balsa de totora","🥔 Cocina tradicional","🏝️ Vista a los Uros"],
-    fotos: ["unnamed (1).jpg","unnamed (2).jpg","unnamed (3).jpg","unnamed (6).jpg","unnamed.jpg","WhatsApp Image 2025-09-03 at 11.15.34.jpeg","WhatsApp Image 2025-09-03 at 11.15.35 (1).jpeg","WhatsApp Image 2025-09-03 at 11.15.35 (2).jpeg","WhatsApp Image 2025-09-03 at 11.15.35.jpeg","WhatsApp Image 2025-09-03 at 11.16.25.jpeg","WhatsApp Image 2025-09-03 at 11.16.26.jpeg","WhatsApp Image 2025-09-03 at 11.16.27 (1).jpeg","WhatsApp Image 2025-09-03 at 11.16.27 (2).jpeg","WhatsApp Image 2025-09-03 at 11.16.27 (3).jpeg","WhatsApp Image 2025-09-03 at 11.16.27 (4).jpeg","WhatsApp Image 2025-09-03 at 11.16.27.jpeg","WhatsApp Image 2025-09-03 at 11.16.28 (1).jpeg","WhatsApp Image 2025-09-03 at 11.16.28 (2).jpeg","WhatsApp Image 2025-09-03 at 11.16.28 (3).jpeg","WhatsApp Image 2025-09-03 at 11.16.28.jpeg","WhatsApp Image 2025-09-03 at 11.16.29.jpeg"],
+    lugar: "LlachÃ³n",
+    desc: "Casa con huerto orgÃ¡nico y vista al islote de los Uros. Don FÃ©lix cultiva habas, papas nativas y quinua que forman el desayuno de sus huÃ©spedes. Incluye tour en balsa de totora tradicional.",
+    amenities: ["ðŸŒ± Huerto orgÃ¡nico","ðŸ›¶ Balsa de totora","ðŸ¥” Cocina tradicional","ðŸï¸ Vista a los Uros"],
     popular: false,
   },
   {
-    nombre: "Casa Germán",
+    nombre: "Casa GermÃ¡n",
     folder: "CASA GERMAN",
-    lugar: "Bahía Chifrón",
-    desc: "Privilegiada ubicación frente a la bahía de Chifrón con muelle privado. Don Germán es pescador de toda la vida y comparte sus conocimientos del lago en salidas matutinas al amanecer dorado del altiplano.",
-    amenities: ["⛵ Muelle privado","🌅 Amanecer en el lago","🐟 Pesca con lugareño","🏖️ Acceso a bahía"],
-    fotos: ["WhatsApp Image 2025-09-10 at 10.17.39.jpeg","WhatsApp Image 2025-09-10 at 10.18.22.jpeg","WhatsApp Image 2025-09-10 at 10.20.35 (1).jpeg","WhatsApp Image 2025-09-10 at 10.20.35.jpeg","WhatsApp Image 2025-09-10 at 10.21.41.jpeg","WhatsApp Image 2025-09-10 at 10.22.21 (1).jpeg","WhatsApp Image 2025-09-10 at 10.22.21.jpeg","WhatsApp Image 2025-09-10 at 10.30.35 (1).jpeg","WhatsApp Image 2025-09-10 at 10.30.35.jpeg","WhatsApp Image 2025-09-10 at 10.31.16 (1).jpeg","WhatsApp Image 2025-09-10 at 10.31.16 (2).jpeg","WhatsApp Image 2025-09-10 at 10.31.16.jpeg","WhatsApp Image 2025-09-10 at 10.33.35 (1).jpeg","WhatsApp Image 2025-09-10 at 10.33.35.jpeg"],
+    lugar: "BahÃ­a ChifrÃ³n",
+    desc: "Privilegiada ubicaciÃ³n frente a la bahÃ­a de ChifrÃ³n con muelle privado. Don GermÃ¡n es pescador de toda la vida y comparte sus conocimientos del lago en salidas matutinas al amanecer dorado del altiplano.",
+    amenities: ["â›µ Muelle privado","ðŸŒ… Amanecer en el lago","ðŸŸ Pesca con lugareÃ±o","ðŸ–ï¸ Acceso a bahÃ­a"],
     popular: false,
   },
   {
-    nombre: "Casa Gerónimo",
+    nombre: "Casa GerÃ³nimo",
     folder: "CASA GERONIMO",
     lugar: "Capachica",
-    desc: "Sencilla y auténtica, la casa de don Gerónimo conserva la arquitectura tradicional de la península con muros de adobe y techo de calamina. Ideal para quienes buscan una experiencia rural genuina y sin pretensiones.",
-    amenities: ["🏚️ Adobe tradicional","🌾 Vida campesina","🌌 Cielo nocturno","🤝 Familia acogedora"],
-    fotos: ["WhatsApp Image 2025-09-03 at 13.00.29.jpeg","WhatsApp Image 2025-09-03 at 13.00.58.jpeg"],
+    desc: "Sencilla y autÃ©ntica, la casa de don GerÃ³nimo conserva la arquitectura tradicional de la penÃ­nsula con muros de adobe y techo de calamina. Ideal para quienes buscan una experiencia rural genuina y sin pretensiones.",
+    amenities: ["ðŸšï¸ Adobe tradicional","ðŸŒ¾ Vida campesina","ðŸŒŒ Cielo nocturno","ðŸ¤ Familia acogedora"],
     popular: false,
   },
   {
-    nombre: "Casa Héctor",
+    nombre: "Casa HÃ©ctor",
     folder: "CASA HECTOR",
-    lugar: "Llachón",
-    desc: "Moderna casa vivencial con habitaciones bien equipadas y baño compartido con agua caliente solar. Don Héctor organiza excursiones en cuatrimoto por los senderos de la meseta y cenas comunitarias los fines de semana.",
-    amenities: ["🏍️ Excursiones en moto","☀️ Agua caliente solar","🍽️ Cenas comunitarias","📡 Wifi disponible"],
-    fotos: ["615605007.jpg","615605063.jpg","615605075.jpg","618972619.jpg","618972630.jpg","618972649.jpg","634520580.jpg","634520586.jpg","634520593.jpg","634521916.jpg","688721003.jpg","688733552.jpg","WhatsApp Image 2025-09-03 at 20.29.17.jpeg","WhatsApp Image 2025-09-03 at 20.29.18 (1).jpeg","WhatsApp Image 2025-09-03 at 20.29.18 (2).jpeg","WhatsApp Image 2025-09-03 at 20.29.18.jpeg","WhatsApp Image 2025-09-03 at 20.29.19 (1).jpeg","WhatsApp Image 2025-09-03 at 20.29.19 (2).jpeg","WhatsApp Image 2025-09-03 at 20.29.19 (3).jpeg","WhatsApp Image 2025-09-03 at 20.29.19 (4).jpeg","WhatsApp Image 2025-09-03 at 20.29.19 (5).jpeg","WhatsApp Image 2025-09-03 at 20.29.19.jpeg","WhatsApp Image 2025-09-03 at 20.29.20.jpeg"],
+    lugar: "LlachÃ³n",
+    desc: "Moderna casa vivencial con habitaciones bien equipadas y baÃ±o compartido con agua caliente solar. Don HÃ©ctor organiza excursiones en cuatrimoto por los senderos de la meseta y cenas comunitarias los fines de semana.",
+    amenities: ["ðŸï¸ Excursiones en moto","â˜€ï¸ Agua caliente solar","ðŸ½ï¸ Cenas comunitarias","ðŸ“¡ Wifi disponible"],
     popular: false,
   },
   {
-    nombre: "Collpa Wasy — Casa Juana Cahui",
+    nombre: "Collpa Wasy â€” Casa Juana Cahui",
     folder: "CASA JUANA CAHUI - COLLPA WASY",
-    lugar: "Llachón",
-    desc: "\"Collpa Wasy\" (Casa de Sal en quechua) es el alojamiento más fotografiado de la península. Doña Juana Cahui ofrece habitaciones decoradas con textiles andinos, gastronomía lacustre completa y rituales de agradecimiento a la Pachamama.",
-    amenities: ["🙏 Ritual Pachamama","🧵 Textiles andinos","🌊 Frente al lago","⭐ Muy valorada"],
-    fotos: ["475110485_9776830362345894_3907637816920182095_n.jpg","482056125_1310990077198244_9173759320951419825_n.jpg","483758564_1313165013647417_595053805018479919_n.jpg","64935460_2750500554978945_6916977132933480448_n.jpg","69546309_2854570654571934_5498522036915404800_n.jpg","caption (1).jpg","caption (10).jpg","caption (11).jpg","caption (12).jpg","caption (13).jpg","caption (14).jpg","caption (15).jpg","caption (16).jpg","caption (17).jpg","caption (18).jpg","caption (19).jpg","caption (2).jpg","caption (20).jpg","caption (21).jpg","caption (22).jpg","caption (23).jpg","caption (24).jpg","caption (25).jpg","caption (26).jpg","caption (27).jpg","caption (28).jpg","caption (29).jpg","caption (3).jpg","caption (30).jpg","caption (31).jpg","caption (32).jpg","caption (33).jpg","caption (34).jpg","caption (35).jpg","caption (36).jpg","caption (37).jpg","caption (38).jpg","caption (39).jpg","caption (4).jpg","caption (40).jpg","caption (41).jpg","caption (42).jpg","caption (43).jpg","caption (5).jpg","caption (6).jpg","caption (7).jpg","caption (8).jpg","caption (9).jpg","caption.jpg","ccollpa-wasy (1).jpg","ccollpa-wasy (2).jpg","ccollpa-wasy (3).jpg","ccollpa-wasy (4).jpg","ccollpa-wasy (5).jpg","ccollpa-wasy (6).jpg","ccollpa-wasy (7).jpg","ccollpa-wasy (8).jpg","ccollpa-wasy.jpg","photo2jpg.jpg","WhatsApp Image 2025-11-26 at 14.01.07.jpeg","WhatsApp Image 2025-11-26 at 14.01.08 (1).jpeg","WhatsApp Image 2025-11-26 at 14.01.08.jpeg","WhatsApp Image 2025-11-26 at 14.01.09.jpeg","WhatsApp Image 2025-11-26 at 14.01.18.jpeg","WhatsApp Image 2025-11-26 at 14.07.17.jpeg","WhatsApp Image 2025-11-26 at 14.07.19.jpeg","WhatsApp Image 2025-11-26 at 14.07.20.jpeg","WhatsApp Image 2025-11-26 at 14.07.22.jpeg","WhatsApp Image 2025-11-26 at 14.09.27.jpeg","WhatsApp Image 2025-11-26 at 14.09.36.jpeg","WhatsApp Image 2025-11-26 at 14.09.37.jpeg","WhatsApp Image 2025-11-26 at 14.09.38.jpeg","WhatsApp Image 2025-11-26 at 14.09.39.jpeg","WhatsApp Image 2025-11-26 at 14.09.40.jpeg","WhatsApp Image 2025-11-26 at 14.09.42.jpeg"],
+    lugar: "LlachÃ³n",
+    desc: "\"Collpa Wasy\" (Casa de Sal en quechua) es el alojamiento mÃ¡s fotografiado de la penÃ­nsula. DoÃ±a Juana Cahui ofrece habitaciones decoradas con textiles andinos, gastronomÃ­a lacustre completa y rituales de agradecimiento a la Pachamama.",
+    amenities: ["ðŸ™ Ritual Pachamama","ðŸ§µ Textiles andinos","ðŸŒŠ Frente al lago","â­ Muy valorada"],
     popular: true,
   },
   {
     nombre: "Casa Luciano",
     folder: "CASA LUCIANO",
-    lugar: "Llachón",
-    desc: "Don Luciano ofrece un rincón íntimo y silencioso en el punto más alto de Llachón, con vista de 180° sobre el lago sagrado. Un solo cuarto disponible para quienes quieran vivir la experiencia en exclusiva total.",
-    amenities: ["👁️ Vista 180° al lago","🔐 Exclusivo 1 habitación","🌬️ Brisa del altiplano","⛰️ Punto más alto"],
-    fotos: ["llachon.jpg"],
+    lugar: "LlachÃ³n",
+    desc: "Don Luciano ofrece un rincÃ³n Ã­ntimo y silencioso en el punto mÃ¡s alto de LlachÃ³n, con vista de 180Â° sobre el lago sagrado. Un solo cuarto disponible para quienes quieran vivir la experiencia en exclusiva total.",
+    amenities: ["ðŸ‘ï¸ Vista 180Â° al lago","ðŸ” Exclusivo 1 habitaciÃ³n","ðŸŒ¬ï¸ Brisa del altiplano","â›°ï¸ Punto mÃ¡s alto"],
     popular: false,
   },
   {
     nombre: "Casa Magno",
     folder: "CASA MAGNO",
     lugar: "Capachica",
-    desc: "Familia Magno tiene una de las casas mejor equipadas de la zona con dormitorios amplios y baño privado. Cena incluida con sopa de quinua, trucha al ajo y mate de muña recién cortada del jardín.",
-    amenities: ["🛁 Baño privado","🍲 Cena incluida","🌿 Mate de muña","🏡 Casa amplia"],
-    fotos: ["WhatsApp Image 2025-09-03 at 20.32.33.jpeg","WhatsApp Image 2025-09-03 at 20.32.39.jpeg","WhatsApp Image 2025-09-03 at 20.32.41.jpeg","WhatsApp Image 2025-09-03 at 20.32.50.jpeg","WhatsApp Image 2025-09-03 at 20.33.22.jpeg","WhatsApp Image 2025-09-03 at 20.33.23 (1).jpeg","WhatsApp Image 2025-09-03 at 20.33.23.jpeg","WhatsApp Image 2025-09-03 at 20.33.24 (1).jpeg","WhatsApp Image 2025-09-03 at 20.33.24.jpeg","WhatsApp Image 2025-09-03 at 20.33.25 (1).jpeg","WhatsApp Image 2025-09-03 at 20.33.25 (2).jpeg","WhatsApp Image 2025-09-03 at 20.33.25.jpeg","WhatsApp Image 2025-09-03 at 20.33.26 (1).jpeg","WhatsApp Image 2025-09-03 at 20.33.26.jpeg","WhatsApp Image 2025-09-03 at 20.33.27 (1).jpeg","WhatsApp Image 2025-09-03 at 20.33.27.jpeg","WhatsApp Image 2025-09-03 at 20.33.28.jpeg","WhatsApp Image 2025-09-03 at 20.33.31.jpeg","WhatsApp Image 2025-09-03 at 20.33.32 (1).jpeg","WhatsApp Image 2025-09-03 at 20.33.32 (2).jpeg","WhatsApp Image 2025-09-03 at 20.33.32 (3).jpeg","WhatsApp Image 2025-09-03 at 20.33.32.jpeg","WhatsApp Image 2025-09-03 at 20.33.33 (1).jpeg","WhatsApp Image 2025-09-03 at 20.33.33.jpeg"],
+    desc: "Familia Magno tiene una de las casas mejor equipadas de la zona con dormitorios amplios y baÃ±o privado. Cena incluida con sopa de quinua, trucha al ajo y mate de muÃ±a reciÃ©n cortada del jardÃ­n.",
+    amenities: ["ðŸ› BaÃ±o privado","ðŸ² Cena incluida","ðŸŒ¿ Mate de muÃ±a","ðŸ¡ Casa amplia"],
     popular: false,
   },
   {
     nombre: "Casa Richard",
     folder: "CASA RICHARD",
-    lugar: "Llachón",
-    desc: "Casa con vista directa a las chullpas funerarias preincas de la colina sagrada. Don Richard comparte relatos orales de la historia Lupaca del lago y organiza visitas arqueológicas al atardecer con su familia.",
-    amenities: ["🏛️ Junto a chullpas","📜 Historia Lupaca","🌇 Visitas arqueológicas","🎙️ Relatos orales"],
-    fotos: ["chullpa.jpg","WhatsApp Image 2025-11-29 at 20.16.00.jpeg","WhatsApp Image 2025-11-29 at 20.16.01 (1).jpeg","WhatsApp Image 2025-11-29 at 20.16.01.jpeg","WhatsApp Image 2025-11-29 at 20.16.02 (1).jpeg","WhatsApp Image 2025-11-29 at 20.16.02.jpeg","WhatsApp Image 2025-11-29 at 20.16.03 (1).jpeg","WhatsApp Image 2025-11-29 at 20.16.03.jpeg","WhatsApp Image 2025-11-29 at 20.16.04 (1).jpeg","WhatsApp Image 2025-11-29 at 20.16.04 (2).jpeg","WhatsApp Image 2025-11-29 at 20.16.04.jpeg","WhatsApp Image 2025-11-29 at 20.16.05 (1).jpeg","WhatsApp Image 2025-11-29 at 20.16.05 (2).jpeg","WhatsApp Image 2025-11-29 at 20.16.05.jpeg","WhatsApp Image 2025-11-29 at 20.16.06 (1).jpeg","WhatsApp Image 2025-11-29 at 20.16.06 (2).jpeg","WhatsApp Image 2025-11-29 at 20.16.06.jpeg","WhatsApp Image 2025-11-29 at 20.16.07 (1).jpeg","WhatsApp Image 2025-11-29 at 20.16.07.jpeg"],
+    lugar: "LlachÃ³n",
+    desc: "Casa con vista directa a las chullpas funerarias preincas de la colina sagrada. Don Richard comparte relatos orales de la historia Lupaca del lago y organiza visitas arqueolÃ³gicas al atardecer con su familia.",
+    amenities: ["ðŸ›ï¸ Junto a chullpas","ðŸ“œ Historia Lupaca","ðŸŒ‡ Visitas arqueolÃ³gicas","ðŸŽ™ï¸ Relatos orales"],
     popular: false,
   },
   {
     nombre: "Casa Roberth",
     folder: "CASA ROBERTH",
     lugar: "Capachica",
-    desc: "Joven familia que combina hospitalidad tradicional con comodidades modernas. Roberth habla español e inglés y facilita la comunicación con toda la comunidad. Wifi, desayuno continental y excursiones en bicicleta incluidas.",
-    amenities: ["🚲 Bicicletas incluidas","📶 Wifi","🌍 Guía bilingüe","🥐 Desayuno continental"],
-    fotos: ["WhatsApp Image 2025-09-09 at 07.09.40.jpeg","WhatsApp Image 2025-09-09 at 07.09.41.jpeg","WhatsApp Image 2025-09-09 at 07.09.43 (1).jpeg","WhatsApp Image 2025-09-09 at 07.09.43.jpeg","WhatsApp Image 2025-09-09 at 07.09.44 (1).jpeg","WhatsApp Image 2025-09-09 at 07.09.44.jpeg","WhatsApp Image 2025-09-09 at 07.10.10.jpeg","WhatsApp Image 2025-09-09 at 07.10.11 (1).jpeg","WhatsApp Image 2025-09-09 at 07.10.11 (2).jpeg","WhatsApp Image 2025-09-09 at 07.10.11 (3).jpeg","WhatsApp Image 2025-09-09 at 07.10.11.jpeg","WhatsApp Image 2025-09-09 at 07.10.12 (1).jpeg","WhatsApp Image 2025-09-09 at 07.10.12.jpeg"],
+    desc: "Joven familia que combina hospitalidad tradicional con comodidades modernas. Roberth habla espaÃ±ol e inglÃ©s y facilita la comunicaciÃ³n con toda la comunidad. Wifi, desayuno continental y excursiones en bicicleta incluidas.",
+    amenities: ["ðŸš² Bicicletas incluidas","ðŸ“¶ Wifi","ðŸŒ GuÃ­a bilingÃ¼e","ðŸ¥ Desayuno continental"],
     popular: false,
   },
   {
     nombre: "Casa Teodora",
     folder: "CASA TEODORA",
     lugar: "Escallani",
-    desc: "Doña Teodora es la cocinera más reconocida de Escallani. Su casa huele a hierbas frescas del jardín todo el día. Los huéspedes aprenden a preparar chuño, moraya y el clásico chairo andino en clases de cocina incluidas.",
-    amenities: ["👩‍🍳 Clases de cocina","🌿 Jardín de hierbas","🥘 Recetas ancestrales","🏡 Casa centenaria"],
-    fotos: ["114913936.jpg","163806925.jpg","163806927.jpg","198334959.jpg","198334962.jpg","198334966.jpg","307281641.jpg","307281866.jpg","321218671.jpg","321218987.jpg","321222321.jpg","321227497.jpg","321244821.jpg","321251606.jpg","321252255.jpg","321252418.jpg","321252707.jpg","321252914.jpg","321253322.jpg","321253539.jpg","321260331.jpg","321854991.jpg","321855954.jpg","321857289.jpg","321858877.jpg","321858903.jpg","349764488.jpg","91853462.jpg","91853881.jpg"],
+    desc: "DoÃ±a Teodora es la cocinera mÃ¡s reconocida de Escallani. Su casa huele a hierbas frescas del jardÃ­n todo el dÃ­a. Los huÃ©spedes aprenden a preparar chuÃ±o, moraya y el clÃ¡sico chairo andino en clases de cocina incluidas.",
+    amenities: ["ðŸ‘©â€ðŸ³ Clases de cocina","ðŸŒ¿ JardÃ­n de hierbas","ðŸ¥˜ Recetas ancestrales","ðŸ¡ Casa centenaria"],
     popular: false,
   },
   {
-    nombre: "Casa Valentín",
+    nombre: "Casa ValentÃ­n",
     folder: "CASA VALENTIN",
-    lugar: "Llachón",
-    desc: "Una de las casas con más habitaciones de la península, ideal para grupos y familias. Don Valentín tiene décadas acogiendo visitantes y conoce cada rincón del lago. Pensión completa con menú cambiante cada día.",
-    amenities: ["👨‍👩‍👧‍👦 Grupos y familias","🍽️ Pensión completa","🗺️ Guía experto","🛶 Paseo en canoa"],
-    fotos: ["174453234.jpg","179760942.jpg","179767577.jpg","312091011.jpg","312091013.jpg","313443736.jpg","494983773.jpg","494983775.jpg","590491104 (1).jpg","590491104.jpg","590491109.jpg","590491587.jpg","590491593.jpg","590492952.jpg","590492958.jpg","742029694.jpg","WhatsApp Image 2025-09-09 at 08.25.52 (1).jpeg","WhatsApp Image 2025-09-09 at 08.25.52.jpeg","WhatsApp Image 2025-09-09 at 08.25.53 (1).jpeg","WhatsApp Image 2025-09-09 at 08.25.53.jpeg","WhatsApp Image 2025-09-09 at 08.25.54 (1).jpeg","WhatsApp Image 2025-09-09 at 08.25.54 (2).jpeg","WhatsApp Image 2025-09-09 at 08.25.54 (3).jpeg","WhatsApp Image 2025-09-09 at 08.25.54 (4).jpeg","WhatsApp Image 2025-09-09 at 08.25.54.jpeg","WhatsApp Image 2025-09-09 at 08.25.55 (1).jpeg","WhatsApp Image 2025-09-09 at 08.25.55 (2).jpeg","WhatsApp Image 2025-09-09 at 08.25.55 (3).jpeg","WhatsApp Image 2025-09-09 at 08.25.55.jpeg","WhatsApp Image 2025-09-09 at 08.25.56 (1).jpeg","WhatsApp Image 2025-09-09 at 08.25.56.jpeg"],
+    lugar: "LlachÃ³n",
+    desc: "Una de las casas con mÃ¡s habitaciones de la penÃ­nsula, ideal para grupos y familias. Don ValentÃ­n tiene dÃ©cadas acogiendo visitantes y conoce cada rincÃ³n del lago. PensiÃ³n completa con menÃº cambiante cada dÃ­a.",
+    amenities: ["ðŸ‘¨â€ðŸ‘©â€ðŸ‘§â€ðŸ‘¦ Grupos y familias","ðŸ½ï¸ PensiÃ³n completa","ðŸ—ºï¸ GuÃ­a experto","ðŸ›¶ Paseo en canoa"],
     popular: false,
   },
   {
     nombre: "Casa Venancio",
     folder: "CASA VENANCIO",
     lugar: "Capachica",
-    desc: "Don Venancio es artesano de instrumentos musicales andinos. Sus quenas y sikus decoran las paredes de la casa y cada noche toca para sus huéspedes bajo el cielo estrellado del altiplano a 3800 msnm.",
-    amenities: ["🎶 Música en vivo","🪘 Artesanía musical","⭐ Cielo a 3800 msnm","🌃 Noche andina"],
-    fotos: ["WhatsApp Image 2025-09-03 at 18.48.49.jpeg","WhatsApp Image 2025-09-03 at 18.48.52 (1).jpeg","WhatsApp Image 2025-09-03 at 18.48.52 (2).jpeg","WhatsApp Image 2025-09-03 at 18.48.52.jpeg","WhatsApp Image 2025-09-03 at 18.48.53 (1).jpeg","WhatsApp Image 2025-09-03 at 18.48.53 (2).jpeg","WhatsApp Image 2025-09-03 at 18.48.53 (3).jpeg","WhatsApp Image 2025-09-03 at 18.48.53.jpeg","WhatsApp Image 2025-09-03 at 18.48.54 (1).jpeg","WhatsApp Image 2025-09-03 at 18.48.54 (2).jpeg","WhatsApp Image 2025-09-03 at 18.48.54 (3).jpeg","WhatsApp Image 2025-09-03 at 18.48.54.jpeg","WhatsApp Image 2025-09-03 at 18.48.55 (1).jpeg","WhatsApp Image 2025-09-03 at 18.48.55 (2).jpeg","WhatsApp Image 2025-09-03 at 18.48.55 (3).jpeg","WhatsApp Image 2025-09-03 at 18.48.55.jpeg","WhatsApp Image 2025-09-03 at 18.48.56 (1).jpeg","WhatsApp Image 2025-09-03 at 18.48.56 (2).jpeg","WhatsApp Image 2025-09-03 at 18.48.56 (3).jpeg","WhatsApp Image 2025-09-03 at 18.48.56 (4).jpeg","WhatsApp Image 2025-09-03 at 18.48.56.jpeg"],
+    desc: "Don Venancio es artesano de instrumentos musicales andinos. Sus quenas y sikus decoran las paredes de la casa y cada noche toca para sus huÃ©spedes bajo el cielo estrellado del altiplano a 3800 msnm.",
+    amenities: ["ðŸŽ¶ MÃºsica en vivo","ðŸª˜ ArtesanÃ­a musical","â­ Cielo a 3800 msnm","ðŸŒƒ Noche andina"],
     popular: false,
   },
   {
     nombre: "Casa Walther",
     folder: "CASA WALTHER",
-    lugar: "Llachón",
-    desc: "Don Walther gestiona la única casa con sala de uso común equipada con estufa de leña para las noches frías del altiplano. Organiza noches de cuentos quechuas e invita a los turistas a participar en la siembra comunitaria.",
-    amenities: ["🔥 Estufa de leña","📖 Cuentos quechuas","🌱 Siembra comunitaria","🏡 Sala común"],
-    fotos: ["128580706_3454956997928322_1536100179240040551_n.jpg","446959880_1134971741005635_4615519143494296834_n.jpg","473064324_1108712504336012_6492584814219353032_n.jpg","473080866_1108712457669350_4100383372481447077_n.jpg","473188944_1108712417669354_6522266646997926460_n.jpg","473373527_1108199004387362_1937573966521981470_n.jpg","482049933_1329638534872287_5265400387739798748_n.jpg","482221147_1329643874871753_6854242512130801838_n.jpg","482962258_1329645324871608_1145397596588717404_n.jpg"],
+    lugar: "LlachÃ³n",
+    desc: "Don Walther gestiona la Ãºnica casa con sala de uso comÃºn equipada con estufa de leÃ±a para las noches frÃ­as del altiplano. Organiza noches de cuentos quechuas e invita a los turistas a participar en la siembra comunitaria.",
+    amenities: ["ðŸ”¥ Estufa de leÃ±a","ðŸ“– Cuentos quechuas","ðŸŒ± Siembra comunitaria","ðŸ¡ Sala comÃºn"],
     popular: false,
   },
 ];
 ---
 <Layout
-  title="Alojamiento — Capachica Turismo"
-  description="19 casas vivenciales auténticas en Capachica: familias quechuas con vista al Titicaca, cocina andina y experiencias únicas."
+  title="Alojamiento â€” Capachica Turismo"
+  description="19 casas vivenciales autÃ©nticas en Capachica: familias quechuas con vista al Titicaca, cocina andina y experiencias Ãºnicas."
 >
   <Fragment slot="hero">
-    <span class="section-label">🏡 Hospedaje Auténtico</span>
+    <span class="section-label">ðŸ¡ Hospedaje AutÃ©ntico</span>
     <h1 class="section-title" style="font-size:clamp(2.2rem,5.5vw,3.8rem);margin-bottom:1rem;">
       {cmsHero?.titulo || <Fragment>Duerme en <span class="gradient-text">Capachica</span></Fragment>}
     </h1>
@@ -217,15 +200,16 @@ const casas = [
 
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.6rem;">
       {casas.map((c, i) => {
-        const cover = imgUrl(c.folder, c.fotos[0]);
-        const thumbs = c.fotos.slice(1, 4).map(f => imgUrl(c.folder, f));
-        const allJson = JSON.stringify(c.fotos.map(f => imgUrl(c.folder, f)));
+        const fotos = getCldUrls(c.folder);
+        const cover = fotos[0] || '';
+        const thumbs = fotos.slice(1, 4);
+        const allJson = JSON.stringify(fotos);
         return (
           <div class="reveal card alo-card" style={`padding:0;overflow:hidden;transition-delay:${i*0.05}s;position:relative;`}
                data-gallery={allJson} data-title={c.nombre}>
             {c.popular && (
               <div style="position:absolute;top:10px;right:10px;z-index:10;padding:3px 11px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:0.1em;background:linear-gradient(135deg,#c0522a,#d4862a);color:#fff;box-shadow:0 2px 10px rgba(192,82,42,0.45);">
-                ★ DESTACADA
+                â˜… DESTACADA
               </div>
             )}
 
@@ -251,9 +235,9 @@ const casas = [
                       loading="lazy"
                       style="width:100%;height:100%;object-fit:cover;display:block;opacity:0.85;"
                     />
-                    {ti === thumbs.length - 1 && c.fotos.length > 4 && (
+                    {ti === thumbs.length - 1 && fotos.length > 4 && (
                       <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;">
-                        +{c.fotos.length - 4}
+                        +{fotos.length - 4}
                       </div>
                     )}
                   </div>
@@ -265,10 +249,10 @@ const casas = [
             <div style="padding:1.2rem 1.3rem 1.3rem;">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;margin-bottom:0.25rem;">
                 <h3 style="font-family:var(--font-display);font-size:1.05rem;font-weight:700;color:var(--text);line-height:1.3;">{c.nombre}</h3>
-                <span style="font-size:11px;color:#fbbf24;letter-spacing:-0.5px;flex-shrink:0;padding-top:2px;">★★★★★</span>
+                <span style="font-size:11px;color:#fbbf24;letter-spacing:-0.5px;flex-shrink:0;padding-top:2px;">â˜…â˜…â˜…â˜…â˜…</span>
               </div>
               <div style="font-size:0.72rem;color:var(--accent);margin-bottom:0.65rem;font-weight:600;letter-spacing:0.03em;">
-                📍 {c.lugar} · Capachica, Puno
+                ðŸ“ {c.lugar} Â· Capachica, Puno
               </div>
               <p style="font-size:0.83rem;color:var(--text2);line-height:1.65;margin-bottom:0.9rem;">{c.desc}</p>
 
@@ -285,12 +269,12 @@ const casas = [
                   class="alo-gallery-btn"
                   style="flex:1;padding:8px 0;border-radius:999px;border:1px solid rgba(192,82,42,0.35);background:rgba(192,82,42,0.08);color:#c0522a;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;"
                 >
-                  📷 Ver galería ({c.fotos.length})
+                  📷 Ver galería ({fotos.length})
                 </button>
                 <button
                   style="flex:1;padding:8px 0;border-radius:999px;border:1px solid rgba(212,134,42,0.35);background:rgba(212,134,42,0.08);color:#d4862a;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;"
                 >
-                  Consultar →
+                  Consultar â†’
                 </button>
               </div>
             </div>
@@ -305,10 +289,10 @@ const casas = [
     <div style="max-width:900px;margin:0 auto;">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;">
         {[
-          {icon:"✅",title:"Verificados",desc:"Todos los alojamientos son inspeccionados y verificados por la asociación de turismo vivencial de Capachica."},
-          {icon:"💬",title:"Sin intermediarios",desc:"Contacto directo con las familias. Tu pago va íntegramente a la comunidad local."},
-          {icon:"🔄",title:"Cancelación flexible",desc:"La mayoría permite cancelar hasta 48 horas antes sin penalización alguna."},
-          {icon:"🗺️",title:"Soporte local",desc:"Nuestro equipo en Capachica te asiste durante toda tu estadía en la península."},
+          {icon:"âœ…",title:"Verificados",desc:"Todos los alojamientos son inspeccionados y verificados por la asociaciÃ³n de turismo vivencial de Capachica."},
+          {icon:"ðŸ’¬",title:"Sin intermediarios",desc:"Contacto directo con las familias. Tu pago va Ã­ntegramente a la comunidad local."},
+          {icon:"ðŸ”„",title:"CancelaciÃ³n flexible",desc:"La mayorÃ­a permite cancelar hasta 48 horas antes sin penalizaciÃ³n alguna."},
+          {icon:"ðŸ—ºï¸",title:"Soporte local",desc:"Nuestro equipo en Capachica te asiste durante toda tu estadÃ­a en la penÃ­nsula."},
         ].map(item => (
           <div class="reveal" style="text-align:center;padding:1.5rem 1rem;">
             <div style="font-size:2rem;margin-bottom:0.75rem;">{item.icon}</div>
@@ -326,12 +310,12 @@ const casas = [
 <div id="alo-lightbox" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.93);flex-direction:column;align-items:center;justify-content:center;">
   <div style="position:absolute;top:14px;right:18px;display:flex;gap:12px;z-index:2;">
     <span id="alo-lb-counter" style="color:rgba(255,255,255,0.6);font-size:13px;padding-top:4px;"></span>
-    <button id="alo-lb-close" style="background:none;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1;">×</button>
+    <button id="alo-lb-close" style="background:none;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1;">Ã—</button>
   </div>
-  <button id="alo-lb-prev" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.12);border:none;color:#fff;font-size:28px;width:48px;height:48px;border-radius:50%;cursor:pointer;z-index:2;">‹</button>
+  <button id="alo-lb-prev" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.12);border:none;color:#fff;font-size:28px;width:48px;height:48px;border-radius:50%;cursor:pointer;z-index:2;">â€¹</button>
   <img id="alo-lb-img" src="" alt="" style="max-width:92vw;max-height:82vh;object-fit:contain;border-radius:6px;" />
   <div id="alo-lb-title" style="color:rgba(255,255,255,0.75);font-size:13px;margin-top:12px;letter-spacing:0.04em;"></div>
-  <button id="alo-lb-next" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.12);border:none;color:#fff;font-size:28px;width:48px;height:48px;border-radius:50%;cursor:pointer;z-index:2;">›</button>
+  <button id="alo-lb-next" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.12);border:none;color:#fff;font-size:28px;width:48px;height:48px;border-radius:50%;cursor:pointer;z-index:2;">â€º</button>
 </div>
 
 <style>
