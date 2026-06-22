@@ -618,7 +618,7 @@ const hasBody = bodySecciones.length > 0;
         0 24px 80px rgba(0,0,0,0.85),
         0 0 60px rgba(60,20,5,0.28);
     }
-    .hero-photo-card.expanded::before { content:''; position:absolute; inset:-20px; z-index:9; pointer-events:none; background-image:url('/flower-frame.svg'); background-size:100% 100%; background-repeat:no-repeat; }
+    .hero-photo-card.expanded::before { content:none; }
     .hero-photo-card.expanded::after { content:none; }
     @keyframes hpcLeafIn {
       from{ opacity:0; transform:translateY(-5px); }
@@ -1217,12 +1217,29 @@ const hasBody = bodySecciones.length > 0;
       c.style.opacity = '';
       c.style.pointerEvents = '';
     });
+    var overlay = document.getElementById('hpc-frame-overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'hpc-frame-overlay';
+      overlay.style.cssText = 'position:fixed;pointer-events:none;z-index:20;background-image:url("/flower-frame.svg");background-size:100% 100%;background-repeat:no-repeat;display:none;';
+      document.body.appendChild(overlay);
+    }
     if (!wasExpanded) {
       card.classList.add('expanded');
       var side = card.classList.contains('hpc-left') ? 'hpc-left' : 'hpc-right';
       document.querySelectorAll('.hero-photo-card.' + side).forEach(function(c) {
         if (c !== card) { c.style.opacity = '0'; c.style.pointerEvents = 'none'; }
       });
+      setTimeout(function() {
+        var r = card.getBoundingClientRect();
+        overlay.style.left   = r.left   + 'px';
+        overlay.style.top    = r.top    + 'px';
+        overlay.style.width  = r.width  + 'px';
+        overlay.style.height = r.height + 'px';
+        overlay.style.display = 'block';
+      }, 560);
+    } else {
+      overlay.style.display = 'none';
     }
   }
 
