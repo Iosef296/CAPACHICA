@@ -1087,16 +1087,16 @@ const hasBody = bodySecciones.length > 0;
   </div>
 
   <!-- Gallery FAB: mobile only, shown when side cards hidden -->
-  <button class="gallery-fab" onclick="openGallery(0)" aria-label="Ver galería de fotos">
+  <button class="gallery-fab" onclick="openGallery(0)" aria-label="Ver galería de casas">
     <div class="gallery-fab-thumbs">
-      <img src="/foto-lago.jpg" alt="" />
-      <img src="/foto-actividades.jpg" alt="" />
-      <img src="/foto-vivencial.jpg" alt="" />
-      <img src="/foto-festividades.jpg" alt="" />
+      <img id="fab-t0" src="" alt="" />
+      <img id="fab-t1" src="" alt="" />
+      <img id="fab-t2" src="" alt="" />
+      <img id="fab-t3" src="" alt="" />
     </div>
     <div class="gallery-fab-text">
-      <span class="gallery-fab-label">Galería</span>
-      <span class="gallery-fab-sub">4 fotos · Explorar</span>
+      <span class="gallery-fab-label">Casas</span>
+      <span class="gallery-fab-sub" id="fab-sub">Explorar alojamiento</span>
     </div>
   </button>
 
@@ -1200,17 +1200,45 @@ const hasBody = bodySecciones.length > 0;
 
 
   /* ── GALLERY ── */
-  var G_DATA = [
-    { src:'/foto-lago.jpg',         tag:'Destinos',     title:'Lago Titicaca',       desc:'El lago navegable más alto del mundo a 3,820 msnm. Aguas azul profundo, cielos inmensos y cinco siglos de historia.' },
-    { src:'/foto-vivencial.jpg',    tag:'Vivencial',    title:'Vida en Comunidad',   desc:'Convive con familias quechuas, aprende tejido en telar, pesca ancestral y cocina andina en Capachica.' },
-    { src:'/foto-actividades.jpg',  tag:'Actividades',  title:'Aventura en el Lago', desc:'Kayak, pesca tradicional, senderismo entre cactus gigantes y vistas panorámicas desde los miradores.' },
-    { src:'/foto-festividades.jpg', tag:'Festividades', title:'Fiestas Ancestrales', desc:'Danzas, música y rituales milenarios que mantienen viva la herencia cultural quechua del altiplano.' },
-  ];
+  var G_DATA = [];
   var gIdx = 0;
 
-  (function buildGrid() {
+  /* Populate G_DATA from Cloudinary casa data */
+  (function() {
+    var raw = document.getElementById('hpc-casa-data');
+    if (!raw) return;
+    var casas = JSON.parse(raw.textContent || '[]');
+    G_DATA = casas.map(function(c) {
+      return { src: c.url, tag: 'Alojamiento', title: 'Casa ' + c.nombre, desc: c.desc || '', fotos: c.fotos || [c.url] };
+    });
+
+    /* FAB: set 4 random thumbnails + subtitle */
+    var fabImgs = [
+      document.getElementById('fab-t0'), document.getElementById('fab-t1'),
+      document.getElementById('fab-t2'), document.getElementById('fab-t3'),
+    ];
+    var fabSub = document.getElementById('fab-sub');
+    if (fabSub) fabSub.textContent = casas.length + ' casas · Explorar';
+
+    function shuf(a) { var b=a.slice(); for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;} return b; }
+    var fabPool = shuf(casas); var fabCur = 0;
+    function rotateFab() {
+      if (fabCur + 4 > fabPool.length) { fabPool = shuf(casas); fabCur = 0; }
+      fabImgs.forEach(function(img, i) {
+        if (img && fabPool[fabCur + i]) img.src = fabPool[fabCur + i].url;
+      });
+      fabCur += 4;
+    }
+    rotateFab();
+    setInterval(rotateFab, 5000);
+
+    buildGrid();
+  })();
+
+  function buildGrid() {
     var grid = document.getElementById('gGrid');
     if (!grid) return;
+    grid.innerHTML = '';
     G_DATA.forEach(function(p, i) {
       var el = document.createElement('div');
       el.className = 'gallery-grid-item';
@@ -1223,7 +1251,7 @@ const hasBody = bodySecciones.length > 0;
       grid.appendChild(el);
     });
     buildDots();
-  })();
+  }
 
   function buildDots() {
     var wrap = document.getElementById('gDots');
