@@ -611,16 +611,14 @@ const hasBody = bodySecciones.length > 0;
     .hero-photo-card.hpc-right { right:6px; }
     .hero-photo-card.expanded  {
       width:85vw; height:calc(100vh - 80px - 130px); top:80px !important; z-index:8;
-      overflow:visible;
+      overflow:hidden;
       border-width:0;
       border-color:transparent;
       border-radius:10px;
+      display:flex; flex-direction:row;
       box-shadow:
         0 0 0 1px #1a0800,
         0 0 0 3px #3d1e08,
-        inset 0 0 0 1px rgba(200,130,60,0.28),
-        inset 0 2px 0 rgba(220,160,80,0.18),
-        inset 0 -2px 0 rgba(0,0,0,0.38),
         0 24px 80px rgba(0,0,0,0.85),
         0 0 60px rgba(60,20,5,0.28);
     }
@@ -631,13 +629,12 @@ const hasBody = bodySecciones.length > 0;
       to  { opacity:1; transform:translateY(0); }
     }
     .hpc-thumb { position:relative; width:100%; height:100%; overflow:hidden; }
+    .hero-photo-card.expanded .hpc-thumb { width:50%; flex-shrink:0; height:100%; }
     .hpc-thumb img { width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.52s ease,object-position 0.52s ease; }
     .hpc-left  .hpc-thumb img { object-position:left center; }
     .hpc-right .hpc-thumb img { object-position:right center; }
     .hero-photo-card.expanded .hpc-thumb img { transform:scale(1.03); object-position:center center; }
-    /* fallback bg when no image */
     .hpc-thumb { background:linear-gradient(135deg,#0f2240 0%,#0a3040 100%); }
-    /* arrow — sticks to inner edge of card */
     .hpc-arrow {
       position:absolute; top:50%; z-index:2; pointer-events:none;
       background:rgba(34,197,94,0.90); border:none;
@@ -647,8 +644,8 @@ const hasBody = bodySecciones.length > 0;
     }
     .hpc-left  .hpc-arrow { right:0; border-radius:0 8px 8px 0; transform:translateY(-50%);          transition:transform 0.45s cubic-bezier(0.4,0,0.2,1); }
     .hpc-right .hpc-arrow { left:0;  border-radius:8px 0 0 8px; transform:translateY(-50%) scaleX(-1); transition:transform 0.45s cubic-bezier(0.4,0,0.2,1); }
-    .hpc-left.expanded  .hpc-arrow { transform:translateY(-50%) scaleX(-1); }
-    .hpc-right.expanded .hpc-arrow { transform:translateY(-50%); }
+    .hpc-left.expanded  .hpc-arrow { opacity:0; }
+    .hpc-right.expanded .hpc-arrow { opacity:0; }
     /* body */
     .hpc-body {
       position:absolute; bottom:0; left:0; right:0;
@@ -657,15 +654,35 @@ const hasBody = bodySecciones.length > 0;
       padding:0 22px;
       background:linear-gradient(to top, rgba(4,9,20,0.97) 0%, rgba(4,9,20,0.88) 55%, transparent 100%);
     }
-    .hero-photo-card.expanded .hpc-body { max-height:180px; padding:32px 22px 20px; }
+    .hero-photo-card.expanded .hpc-body {
+      position:relative; bottom:auto; left:auto; right:auto;
+      width:50%; flex-shrink:0;
+      max-height:none; height:100%; overflow:visible;
+      display:flex; flex-direction:column; justify-content:center;
+      padding:48px 40px;
+      background:linear-gradient(135deg,#090e1d 0%,#0d1a30 100%);
+      border-left:1px solid rgba(122,74,30,0.35);
+      gap:0;
+    }
     .hpc-tag {
-      display:inline-block; margin-bottom:7px; padding:2px 9px; border-radius:100px;
+      display:inline-block; margin-bottom:14px; padding:2px 9px; border-radius:100px;
       background:rgba(34,197,94,0.13); border:1px solid rgba(34,197,94,0.38);
       color:#4ade80; font-size:9px; font-weight:700; letter-spacing:0.13em; text-transform:uppercase;
-      font-family:'Space Mono',monospace;
+      font-family:'Space Mono',monospace; align-self:flex-start;
     }
     .hpc-title { font-family:'Playfair Display',serif; font-size:16px; font-weight:700; color:#f0ede8; margin-bottom:6px; line-height:1.2; }
+    .hero-photo-card.expanded .hpc-title { font-size:clamp(22px,2.2vw,36px); margin-bottom:18px; }
     .hpc-desc  { font-size:13px; color:rgba(240,237,232,0.62); line-height:1.6; }
+    .hero-photo-card.expanded .hpc-desc { font-size:clamp(13px,1.1vw,17px); line-height:1.7; margin-bottom:32px; }
+    .hpc-reservar {
+      display:none; align-self:flex-start;
+      padding:13px 32px; background:#7a4a1e; color:#f0ede8;
+      border-radius:8px; font-size:14px; font-weight:700;
+      font-family:'Space Mono',monospace; text-decoration:none;
+      letter-spacing:0.05em; transition:background 0.2s, transform 0.15s;
+    }
+    .hpc-reservar:hover { background:#9a5e28; transform:translateY(-2px); }
+    .hero-photo-card.expanded .hpc-reservar { display:inline-block; }
     @media(max-width:1100px) {
       .hero-photo-card { width:58px; height:170px; }
     }
@@ -979,6 +996,7 @@ const hasBody = bodySecciones.length > 0;
       <span class="hpc-tag">Alojamiento</span>
       <h4 class="hpc-title" id="hpc1-title"></h4>
       <p class="hpc-desc">Familia anfitriona quechua a orillas del lago Titicaca. Desayuno andino, tejidos y el amanecer más hermoso del altiplano.</p>
+      <a class="hpc-reservar" href="/alojamiento" onclick="event.stopPropagation()">Reservar ahora</a>
     </div>
   </div>
   <div class="hero-photo-card hpc-left" id="hpc2" style="top:52%;" onclick="toggleHPC(this)">
@@ -990,6 +1008,7 @@ const hasBody = bodySecciones.length > 0;
       <span class="hpc-tag">Alojamiento</span>
       <h4 class="hpc-title" id="hpc2-title"></h4>
       <p class="hpc-desc">Convive con familias quechuas, aprende tejido en telar, pesca ancestral y cocina andina en las comunidades de Capachica.</p>
+      <a class="hpc-reservar" href="/alojamiento" onclick="event.stopPropagation()">Reservar ahora</a>
     </div>
   </div>
   <div class="hero-photo-card hpc-right" id="hpc3" style="top:18%;" onclick="toggleHPC(this)">
@@ -1001,6 +1020,7 @@ const hasBody = bodySecciones.length > 0;
       <span class="hpc-tag">Alojamiento</span>
       <h4 class="hpc-title" id="hpc3-title"></h4>
       <p class="hpc-desc">Vista panorámica al lago, estrellas a 3800 msnm y la calidez de una familia que te recibe como en casa.</p>
+      <a class="hpc-reservar" href="/alojamiento" onclick="event.stopPropagation()">Reservar ahora</a>
     </div>
   </div>
   <div class="hero-photo-card hpc-right" id="hpc4" style="top:52%;" onclick="toggleHPC(this)">
@@ -1012,6 +1032,7 @@ const hasBody = bodySecciones.length > 0;
       <span class="hpc-tag">Alojamiento</span>
       <h4 class="hpc-title" id="hpc4-title"></h4>
       <p class="hpc-desc">Pesca artesanal al amanecer, huerto orgánico y noches de música quechua junto a la fogata del altiplano.</p>
+      <a class="hpc-reservar" href="/alojamiento" onclick="event.stopPropagation()">Reservar ahora</a>
     </div>
   </div>
 
@@ -1254,7 +1275,7 @@ const hasBody = bodySecciones.length > 0;
       var cardRect = card.getBoundingClientRect();
       overlay.style.left   = (cardRect.left - heroRect.left) + 'px';
       overlay.style.top    = (cardRect.top  - heroRect.top)  + 'px';
-      overlay.style.width  = cardRect.width  + 'px';
+      overlay.style.width  = (cardRect.width / 2) + 'px';
       overlay.style.height = cardRect.height + 'px';
       overlay.style.right  = 'auto';
       overlay.style.display = 'block';
