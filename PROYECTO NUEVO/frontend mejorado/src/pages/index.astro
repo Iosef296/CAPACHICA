@@ -957,6 +957,9 @@ const hasBody = bodySecciones.length > 0;
   </div>
 
 
+  <!-- Flower frame overlay - position:absolute same context as cards -->
+  <div id="hpc-frame-overlay" style="position:absolute;display:none;z-index:9;pointer-events:none;background-image:url('/flower-frame.svg');background-size:100% 100%;background-repeat:no-repeat;"></div>
+
   <!-- Photo Cards -->
   <div class="hero-photo-card hpc-left" id="hpc1" style="top:18%;" onclick="toggleHPC(this)">
     <div class="hpc-thumb">
@@ -1237,13 +1240,6 @@ const hasBody = bodySecciones.length > 0;
     dimmer.style.display = 'block';
 
     var overlay = document.getElementById('hpc-frame-overlay');
-    if (!overlay) {
-      overlay = document.createElement('div');
-      overlay.id = 'hpc-frame-overlay';
-      overlay.style.cssText = 'position:fixed;pointer-events:none;z-index:20;background-image:url("/flower-frame.svg");background-size:100% 100%;background-repeat:no-repeat;display:none;';
-      document.body.appendChild(overlay);
-    }
-
     var isLeft = card.classList.contains('hpc-left');
     overlay.style.top    = '80px';
     overlay.style.width  = '85vw';
