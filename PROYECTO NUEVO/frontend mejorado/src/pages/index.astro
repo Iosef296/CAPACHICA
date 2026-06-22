@@ -734,19 +734,17 @@ const hasBody = bodySecciones.length > 0;
     }
     @media(max-width:768px) {
       .hero-content { padding-left:1.5rem !important; padding-right:1.5rem !important; }
-      .gallery-fab { bottom:195px; }
     }
     @media(max-width:480px) {
       .hero-content { padding-left:1rem !important; padding-right:1rem !important; }
-      .gallery-fab { bottom:160px; }
       .gallery-fab-thumbs { width:40px; height:40px; }
     }
 
     /* ─── GALLERY FAB ─── */
     .gallery-fab {
       display:none; /* hidden on desktop, shown via @media(max-width:900px) */
-      position:absolute; bottom:225px; left:50%; transform:translateX(-50%);
-      z-index:7; align-items:center; gap:12px;
+      position:fixed; bottom:calc(72px + env(safe-area-inset-bottom)); right:12px;
+      z-index:200; align-items:center; gap:12px;
       background:rgba(6,14,30,0.82); border:1px solid rgba(212,168,67,0.42);
       border-radius:16px; padding:10px 18px 10px 10px;
       cursor:pointer; backdrop-filter:blur(18px);
@@ -757,7 +755,7 @@ const hasBody = bodySecciones.length > 0;
     .gallery-fab:hover {
       background:rgba(6,14,30,0.96); border-color:rgba(212,168,67,0.72);
       box-shadow:0 10px 40px rgba(0,0,0,0.65), 0 0 0 1px rgba(212,168,67,0.3);
-      transform:translateX(-50%) translateY(-2px);
+      transform:translateY(-2px);
     }
     .gallery-fab-thumbs {
       display:grid; grid-template-columns:1fr 1fr; gap:2px;
@@ -951,8 +949,8 @@ const hasBody = bodySecciones.length > 0;
       /* Hide quick nav pills — bottom nav handles navigation */
       .hero-quicknav { display:none !important; }
 
-      /* Gallery FAB: above bottom nav */
-      .gallery-fab { bottom:calc(82px + env(safe-area-inset-bottom)) !important; }
+      /* Gallery FAB: fixed bottom-right above bottom nav */
+      .gallery-fab { bottom:calc(72px + env(safe-area-inset-bottom)) !important; right:12px !important; }
 
       /* Hero waves: shorter */
       .hero-waves { height:80px !important; }
@@ -963,7 +961,7 @@ const hasBody = bodySecciones.length > 0;
     }
     @media(max-width:480px) {
       .hero { min-height:58vh !important; }
-      .gallery-fab { bottom:calc(80px + env(safe-area-inset-bottom)) !important; }
+      .gallery-fab { bottom:calc(70px + env(safe-area-inset-bottom)) !important; }
       .hero-title { font-size:clamp(1.7rem,8vw,2.3rem) !important; }
     }
   </style>
@@ -1086,26 +1084,26 @@ const hasBody = bodySecciones.length > 0;
     </div>
   </div>
 
-  <!-- Gallery FAB: mobile only, shown when side cards hidden -->
-  <button class="gallery-fab" onclick="openGallery(0)" aria-label="Ver galería de casas">
-    <div class="gallery-fab-thumbs">
-      <img id="fab-t0" src="" alt="" />
-      <img id="fab-t1" src="" alt="" />
-      <img id="fab-t2" src="" alt="" />
-      <img id="fab-t3" src="" alt="" />
-    </div>
-    <div class="gallery-fab-text">
-      <span class="gallery-fab-label">Casas</span>
-      <span class="gallery-fab-sub" id="fab-sub">Explorar alojamiento</span>
-    </div>
-  </button>
-
   <!-- Wave layers -->
   <div class="hero-waves">
     <div class="wave wave-sand"></div>
     <div class="wave wave-water"></div>
   </div>
 </section>
+
+<!-- Gallery FAB: fixed bottom-right, mobile only -->
+<button class="gallery-fab" onclick="openGallery(0)" aria-label="Ver galería de casas">
+  <div class="gallery-fab-thumbs">
+    <img id="fab-t0" src="" alt="" />
+    <img id="fab-t1" src="" alt="" />
+    <img id="fab-t2" src="" alt="" />
+    <img id="fab-t3" src="" alt="" />
+  </div>
+  <div class="gallery-fab-text">
+    <span class="gallery-fab-label">Casas</span>
+    <span class="gallery-fab-sub" id="fab-sub">Explorar alojamiento</span>
+  </div>
+</button>
 
 <!-- ═══════════ MAIN (React components o CMS) ═══════════ -->
 <main>
