@@ -1233,8 +1233,7 @@ const hasBody = bodySecciones.length > 0;
     if (wasExpanded) return;
 
     card.classList.add('expanded');
-    var side = card.classList.contains('hpc-left') ? 'hpc-left' : 'hpc-right';
-    document.querySelectorAll('.hero-photo-card.' + side).forEach(function(c) {
+    document.querySelectorAll('.hero-photo-card').forEach(function(c) {
       if (c !== card) { c.style.opacity = '0'; c.style.pointerEvents = 'none'; }
     });
 
