@@ -31,6 +31,7 @@ const casaCovers = Object.entries(cloudinaryData).map(([folder, entries]: [strin
   nombre: folder.replace('CASA ', '').replace(' - COLLPA WASY', ' (Collpa Wasy)'),
   url: entries[0]?.url || '',
   desc: casaDescs[folder] || '',
+  fotos: (entries as any[]).map((e: any) => e.url),
 })).filter(c => c.url);
 
 const IA_URL = import.meta.env.PUBLIC_IA_URL || 'http://localhost:5000';
@@ -705,6 +706,24 @@ const hasBody = bodySecciones.length > 0;
     }
     .hpc-reservar:hover { background:#9a5e28; transform:translateY(-2px); }
     .hero-photo-card.expanded .hpc-reservar { display:inline-block; }
+    /* Carousel */
+    .hpc-car-btn {
+      display:none; position:absolute; top:50%; transform:translateY(-50%);
+      z-index:12; background:rgba(0,0,0,0.55); color:#fff; border:none;
+      width:36px; height:56px; font-size:22px; font-weight:900; cursor:pointer;
+      align-items:center; justify-content:center; line-height:1;
+      transition:background 0.15s; border-radius:4px;
+    }
+    .hpc-car-btn:hover { background:rgba(0,0,0,0.8); }
+    .hpc-car-prev { left:8px; }
+    .hpc-car-next { right:8px; }
+    .hero-photo-card.expanded .hpc-car-btn { display:flex; }
+    .hpc-car-counter {
+      display:none; position:absolute; bottom:10px; left:50%; transform:translateX(-50%);
+      background:rgba(0,0,0,0.55); color:#fff; font-size:12px; font-family:'Space Mono',monospace;
+      padding:3px 10px; border-radius:100px; pointer-events:none; white-space:nowrap;
+    }
+    .hero-photo-card.expanded .hpc-car-counter { display:block; }
     @media(max-width:1100px) {
       .hero-photo-card { width:58px; height:170px; }
     }
@@ -1008,8 +1027,11 @@ const hasBody = bodySecciones.length > 0;
   <!-- Photo Cards -->
   <div class="hero-photo-card hpc-left" id="hpc1" style="top:18%;" onclick="toggleHPC(this)">
     <div class="hpc-thumb">
-      <img id="hpc1-img" src="" alt="" style="transition:opacity 0.6s ease;"/>
+      <img id="hpc1-img" src="" alt="" style="transition:opacity 0.4s ease;"/>
       <div class="hpc-arrow" aria-hidden="true">&#8250;</div>
+      <button class="hpc-car-btn hpc-car-prev" onclick="event.stopPropagation();hpcCarNav(this,-1)" aria-label="Anterior">&#8249;</button>
+      <button class="hpc-car-btn hpc-car-next" onclick="event.stopPropagation();hpcCarNav(this,1)"  aria-label="Siguiente">&#8250;</button>
+      <div class="hpc-car-counter"></div>
     </div>
     <div class="hpc-body">
       <span class="hpc-tag">Alojamiento</span>
@@ -1020,8 +1042,11 @@ const hasBody = bodySecciones.length > 0;
   </div>
   <div class="hero-photo-card hpc-left" id="hpc2" style="top:52%;" onclick="toggleHPC(this)">
     <div class="hpc-thumb">
-      <img id="hpc2-img" src="" alt="" style="transition:opacity 0.6s ease;"/>
+      <img id="hpc2-img" src="" alt="" style="transition:opacity 0.4s ease;"/>
       <div class="hpc-arrow" aria-hidden="true">&#8250;</div>
+      <button class="hpc-car-btn hpc-car-prev" onclick="event.stopPropagation();hpcCarNav(this,-1)" aria-label="Anterior">&#8249;</button>
+      <button class="hpc-car-btn hpc-car-next" onclick="event.stopPropagation();hpcCarNav(this,1)"  aria-label="Siguiente">&#8250;</button>
+      <div class="hpc-car-counter"></div>
     </div>
     <div class="hpc-body">
       <span class="hpc-tag">Alojamiento</span>
@@ -1032,8 +1057,11 @@ const hasBody = bodySecciones.length > 0;
   </div>
   <div class="hero-photo-card hpc-right" id="hpc3" style="top:18%;" onclick="toggleHPC(this)">
     <div class="hpc-thumb">
-      <img id="hpc3-img" src="" alt="" style="transition:opacity 0.6s ease;"/>
+      <img id="hpc3-img" src="" alt="" style="transition:opacity 0.4s ease;"/>
       <div class="hpc-arrow" aria-hidden="true">&#8250;</div>
+      <button class="hpc-car-btn hpc-car-prev" onclick="event.stopPropagation();hpcCarNav(this,-1)" aria-label="Anterior">&#8249;</button>
+      <button class="hpc-car-btn hpc-car-next" onclick="event.stopPropagation();hpcCarNav(this,1)"  aria-label="Siguiente">&#8250;</button>
+      <div class="hpc-car-counter"></div>
     </div>
     <div class="hpc-body">
       <span class="hpc-tag">Alojamiento</span>
@@ -1044,8 +1072,11 @@ const hasBody = bodySecciones.length > 0;
   </div>
   <div class="hero-photo-card hpc-right" id="hpc4" style="top:52%;" onclick="toggleHPC(this)">
     <div class="hpc-thumb">
-      <img id="hpc4-img" src="" alt="" style="transition:opacity 0.6s ease;"/>
+      <img id="hpc4-img" src="" alt="" style="transition:opacity 0.4s ease;"/>
       <div class="hpc-arrow" aria-hidden="true">&#8250;</div>
+      <button class="hpc-car-btn hpc-car-prev" onclick="event.stopPropagation();hpcCarNav(this,-1)" aria-label="Anterior">&#8249;</button>
+      <button class="hpc-car-btn hpc-car-next" onclick="event.stopPropagation();hpcCarNav(this,1)"  aria-label="Siguiente">&#8250;</button>
+      <div class="hpc-car-counter"></div>
     </div>
     <div class="hpc-body">
       <span class="hpc-tag">Alojamiento</span>
@@ -1262,10 +1293,27 @@ const hasBody = bodySecciones.length > 0;
   });
 
   /* -- HERO PHOTO CARDS -- */
+  var _hpcCar = { fotos: [], idx: 0, img: null, counter: null };
+
+  function hpcCarNav(btn, dir) {
+    if (!_hpcCar.fotos.length || !_hpcCar.img) return;
+    _hpcCar.idx = (_hpcCar.idx + dir + _hpcCar.fotos.length) % _hpcCar.fotos.length;
+    var img = _hpcCar.img;
+    img.style.opacity = '0';
+    setTimeout(function() {
+      img.src = _hpcCar.fotos[_hpcCar.idx];
+      img.style.opacity = '1';
+      if (_hpcCar.counter) _hpcCar.counter.textContent = (_hpcCar.idx + 1) + ' / ' + _hpcCar.fotos.length;
+    }, 200);
+  }
+
   function closeHPC() {
     document.querySelectorAll('.hero-photo-card').forEach(function(c){c.classList.remove('expanded');c.style.opacity='';c.style.pointerEvents='';});
     var d=document.getElementById('hpc-dimmer'); if(d)d.style.display='none';
+    _hpcCar = { fotos: [], idx: 0, img: null, counter: null };
+    if (window._hpcResume) window._hpcResume();
   }
+
   function toggleHPC(card) {
     var wasExpanded = card.classList.contains('expanded');
     closeHPC();
@@ -1276,6 +1324,17 @@ const hasBody = bodySecciones.length > 0;
       if (c !== card) { c.style.opacity = '0'; c.style.pointerEvents = 'none'; }
     });
 
+    if (window._hpcPause) window._hpcPause();
+
+    var slotIdx = parseInt(card.id.replace('hpc','')) - 1;
+    var casa = window._hpcSlotCasas && window._hpcSlotCasas[slotIdx];
+    if (casa && casa.fotos && casa.fotos.length > 1) {
+      var img = card.querySelector('.hpc-thumb img');
+      var counter = card.querySelector('.hpc-car-counter');
+      _hpcCar = { fotos: casa.fotos, idx: 0, img: img, counter: counter };
+      if (counter) counter.textContent = '1 / ' + casa.fotos.length;
+    }
+
     var dimmer = document.getElementById('hpc-dimmer');
     if (!dimmer) {
       dimmer = document.createElement('div');
@@ -1285,7 +1344,6 @@ const hasBody = bodySecciones.length > 0;
       document.body.appendChild(dimmer);
     }
     dimmer.style.display = 'block';
-
   }
 
   /* -- STARS (gentle twinkle) -- */
@@ -1460,7 +1518,9 @@ const hasBody = bodySecciones.length > 0;
       return pool.slice(cursor, cursor += 4);
     }
 
-    function setSlot(slot, casa) {
+    window._hpcSlotCasas = [null, null, null, null];
+
+    function setSlot(slot, casa, i) {
       var img = slot.img;
       var title = slot.title;
       if (!img || !casa) return;
@@ -1471,16 +1531,20 @@ const hasBody = bodySecciones.length > 0;
         if (title) title.textContent = 'Casa ' + casa.nombre;
         if (slot.desc) slot.desc.textContent = casa.desc || '';
         img.style.opacity = '1';
+        if (i !== undefined) window._hpcSlotCasas[i] = casa;
       }, 300);
     }
 
     var initial = pick();
-    slots.forEach(function(s, i) { setSlot(s, initial[i]); });
+    slots.forEach(function(s, i) { setSlot(s, initial[i], i); });
 
-    setInterval(function() {
+    var _rotTimer = setInterval(doRotate, 20000);
+    function doRotate() {
       var next = pick();
-      slots.forEach(function(s, i) { setSlot(s, next[i]); });
-    }, 20000);
+      slots.forEach(function(s, i) { setSlot(s, next[i], i); });
+    }
+    window._hpcPause  = function() { clearInterval(_rotTimer); };
+    window._hpcResume = function() { _rotTimer = setInterval(doRotate, 20000); };
   })();
 </script>
 
