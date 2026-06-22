@@ -13,20 +13,6 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 11
-
-      - name: Install frontend dependencies
-        working-directory: 'PROYECTO NUEVO/frontend mejorado'
-        run: pnpm install --frozen-lockfile --config.onlyBuiltDependencies=esbuild,sharp
-
       - name: Setup Java JDK 17
         uses: actions/setup-java@v4
         with:
@@ -35,10 +21,6 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-
-      - name: Cap sync (copy config to android)
-        working-directory: 'PROYECTO NUEVO/frontend mejorado'
-        run: npx cap sync android --inline
 
       - name: Make gradlew executable
         working-directory: 'PROYECTO NUEVO/frontend mejorado/android'
