@@ -13,6 +13,24 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Install dependencies (skip native build scripts)
+        working-directory: 'PROYECTO NUEVO/frontend mejorado'
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Cap sync android
+        working-directory: 'PROYECTO NUEVO/frontend mejorado'
+        run: npx cap sync android
+
       - name: Setup Java JDK 17
         uses: actions/setup-java@v4
         with:
