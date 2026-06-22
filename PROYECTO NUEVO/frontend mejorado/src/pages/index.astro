@@ -4,6 +4,12 @@ import HomeSections from '../components/HomeSections';
 import ChatWidget from '../components/ChatWidget';
 import SectionRenderer from '../components/SectionRenderer.astro';
 import ArenaFooter from '../components/ArenaFooter.astro';
+import cloudinaryData from '../data/cloudinary-urls.json';
+
+const casaCovers = Object.entries(cloudinaryData).map(([folder, entries]: [string, any[]]) => ({
+  nombre: folder.replace('CASA ', '').replace(' - COLLPA WASY', ' (Collpa Wasy)'),
+  url: entries[0]?.url || '',
+})).filter(c => c.url);
 
 const IA_URL = import.meta.env.PUBLIC_IA_URL || 'http://localhost:5000';
 let cms: any = null;
@@ -960,49 +966,52 @@ const hasBody = bodySecciones.length > 0;
   <!-- Flower frame overlay - position:absolute same context as cards -->
   <div id="hpc-frame-overlay" style="position:absolute;display:none;z-index:9;pointer-events:none;background-image:url('/flower-frame.svg');background-size:100% 100%;background-repeat:no-repeat;"></div>
 
+  <!-- Casa covers data for rotation -->
+  <script type="application/json" id="hpc-casa-data" set:html={JSON.stringify(casaCovers)}></script>
+
   <!-- Photo Cards -->
   <div class="hero-photo-card hpc-left" id="hpc1" style="top:18%;" onclick="toggleHPC(this)">
     <div class="hpc-thumb">
-      <img src="/foto-lago.jpg" alt="Lago Titicaca" loading="lazy"/>
+      <img id="hpc1-img" src="" alt="" style="transition:opacity 0.6s ease;"/>
       <div class="hpc-arrow" aria-hidden="true">&#8250;</div>
     </div>
     <div class="hpc-body">
-      <span class="hpc-tag">Destinos</span>
-      <h4 class="hpc-title">Lago Titicaca</h4>
-      <p class="hpc-desc">El lago navegable mas alto del mundo a 3,820 msnm. Aguas azul profundo, cielos inmensos y cinco siglos de historia vivos en cada orilla.</p>
+      <span class="hpc-tag">Alojamiento</span>
+      <h4 class="hpc-title" id="hpc1-title"></h4>
+      <p class="hpc-desc">Familia anfitriona quechua a orillas del lago Titicaca. Desayuno andino, tejidos y el amanecer más hermoso del altiplano.</p>
     </div>
   </div>
   <div class="hero-photo-card hpc-left" id="hpc2" style="top:52%;" onclick="toggleHPC(this)">
     <div class="hpc-thumb">
-      <img src="/foto-vivencial.jpg" alt="Turismo vivencial" loading="lazy"/>
+      <img id="hpc2-img" src="" alt="" style="transition:opacity 0.6s ease;"/>
       <div class="hpc-arrow" aria-hidden="true">&#8250;</div>
     </div>
     <div class="hpc-body">
-      <span class="hpc-tag">Vivencial</span>
-      <h4 class="hpc-title">Vida en Comunidad</h4>
+      <span class="hpc-tag">Alojamiento</span>
+      <h4 class="hpc-title" id="hpc2-title"></h4>
       <p class="hpc-desc">Convive con familias quechuas, aprende tejido en telar, pesca ancestral y cocina andina en las comunidades de Capachica.</p>
     </div>
   </div>
   <div class="hero-photo-card hpc-right" id="hpc3" style="top:18%;" onclick="toggleHPC(this)">
     <div class="hpc-thumb">
-      <img src="/foto-actividades.jpg" alt="Actividades en Capachica" loading="lazy"/>
+      <img id="hpc3-img" src="" alt="" style="transition:opacity 0.6s ease;"/>
       <div class="hpc-arrow" aria-hidden="true">&#8250;</div>
     </div>
     <div class="hpc-body">
-      <span class="hpc-tag">Actividades</span>
-      <h4 class="hpc-title">Aventura en el Lago</h4>
-      <p class="hpc-desc">Kayak, pesca tradicional, senderismo entre cactus gigantes y vistas panoramicas del Titicaca desde los miradores de la peninsula.</p>
+      <span class="hpc-tag">Alojamiento</span>
+      <h4 class="hpc-title" id="hpc3-title"></h4>
+      <p class="hpc-desc">Vista panorámica al lago, estrellas a 3800 msnm y la calidez de una familia que te recibe como en casa.</p>
     </div>
   </div>
   <div class="hero-photo-card hpc-right" id="hpc4" style="top:52%;" onclick="toggleHPC(this)">
     <div class="hpc-thumb">
-      <img src="/foto-festividades.jpg" alt="Festividades de Capachica" loading="lazy"/>
+      <img id="hpc4-img" src="" alt="" style="transition:opacity 0.6s ease;"/>
       <div class="hpc-arrow" aria-hidden="true">&#8250;</div>
     </div>
     <div class="hpc-body">
-      <span class="hpc-tag">Festividades</span>
-      <h4 class="hpc-title">Fiestas Ancestrales</h4>
-      <p class="hpc-desc">Danzas, musica y rituales milenarios que mantienen viva la herencia cultural quechua del altiplano a orillas del Titicaca.</p>
+      <span class="hpc-tag">Alojamiento</span>
+      <h4 class="hpc-title" id="hpc4-title"></h4>
+      <p class="hpc-desc">Pesca artesanal al amanecer, huerto orgánico y noches de música quechua junto a la fogata del altiplano.</p>
     </div>
   </div>
 
@@ -1393,6 +1402,59 @@ const hasBody = bodySecciones.length > 0;
     if(btn) btn.addEventListener('click', function(){ sheet.style.display==='none'? open():close(); });
     if(backdrop) backdrop.addEventListener('click', close);
     document.addEventListener('keydown', function(e){ if(e.key==='Escape') close(); });
+  })();
+
+  /* ── HPC CASA ROTATION ── */
+  (function() {
+    var raw = document.getElementById('hpc-casa-data');
+    if (!raw) return;
+    var casas = JSON.parse(raw.textContent || '[]');
+    if (casas.length < 4) return;
+
+    var slots = [
+      { img: document.getElementById('hpc1-img'), title: document.getElementById('hpc1-title') },
+      { img: document.getElementById('hpc2-img'), title: document.getElementById('hpc2-title') },
+      { img: document.getElementById('hpc3-img'), title: document.getElementById('hpc3-title') },
+      { img: document.getElementById('hpc4-img'), title: document.getElementById('hpc4-title') },
+    ];
+
+    function shuffle(arr) {
+      var a = arr.slice();
+      for (var i = a.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+      }
+      return a;
+    }
+
+    var pool = shuffle(casas);
+    var cursor = 0;
+
+    function pick() {
+      if (cursor + 4 > pool.length) { pool = shuffle(casas); cursor = 0; }
+      return pool.slice(cursor, cursor += 4);
+    }
+
+    function setSlot(slot, casa) {
+      var img = slot.img;
+      var title = slot.title;
+      if (!img || !casa) return;
+      img.style.opacity = '0';
+      setTimeout(function() {
+        img.src = casa.url;
+        img.alt = 'Casa ' + casa.nombre;
+        if (title) title.textContent = 'Casa ' + casa.nombre;
+        img.style.opacity = '1';
+      }, 300);
+    }
+
+    var initial = pick();
+    slots.forEach(function(s, i) { setSlot(s, initial[i]); });
+
+    setInterval(function() {
+      var next = pick();
+      slots.forEach(function(s, i) { setSlot(s, next[i]); });
+    }, 20000);
   })();
 </script>
 
