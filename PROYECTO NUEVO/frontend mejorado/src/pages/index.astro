@@ -743,7 +743,7 @@ const hasBody = bodySecciones.length > 0;
     /* ─── GALLERY FAB ─── */
     .gallery-fab {
       display:none; /* hidden on desktop, shown via @media(max-width:900px) */
-      position:fixed; bottom:calc(72px + env(safe-area-inset-bottom)); right:12px;
+      position:fixed; bottom:calc(72px + env(safe-area-inset-bottom)); left:12px;
       z-index:200; align-items:center; gap:12px;
       background:rgba(6,14,30,0.82); border:1px solid rgba(212,168,67,0.42);
       border-radius:16px; padding:10px 18px 10px 10px;
@@ -949,8 +949,8 @@ const hasBody = bodySecciones.length > 0;
       /* Hide quick nav pills — bottom nav handles navigation */
       .hero-quicknav { display:none !important; }
 
-      /* Gallery FAB: fixed bottom-right above bottom nav */
-      .gallery-fab { bottom:calc(72px + env(safe-area-inset-bottom)) !important; right:12px !important; }
+      /* Gallery FAB: fixed bottom-left above bottom nav */
+      .gallery-fab { bottom:calc(72px + env(safe-area-inset-bottom)) !important; left:12px !important; right:auto !important; }
 
       /* Hero waves: shorter */
       .hero-waves { height:80px !important; }
@@ -961,7 +961,7 @@ const hasBody = bodySecciones.length > 0;
     }
     @media(max-width:480px) {
       .hero { min-height:58vh !important; }
-      .gallery-fab { bottom:calc(70px + env(safe-area-inset-bottom)) !important; }
+      .gallery-fab { bottom:calc(70px + env(safe-area-inset-bottom)) !important; left:12px !important; right:auto !important; }
       .hero-title { font-size:clamp(1.7rem,8vw,2.3rem) !important; }
     }
   </style>
