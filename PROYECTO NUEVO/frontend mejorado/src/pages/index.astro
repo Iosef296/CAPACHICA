@@ -6,9 +6,31 @@ import SectionRenderer from '../components/SectionRenderer.astro';
 import ArenaFooter from '../components/ArenaFooter.astro';
 import cloudinaryData from '../data/cloudinary-urls.json';
 
+const casaDescs: Record<string,string> = {
+  'CASA ALFONSO': 'Amplia casa familiar a orillas del Titicaca con jardín propio y vistas al lago desde el segundo piso. Don Alfonso y su familia ofrecen desayuno con productos frescos de su chacra y paseos en bote al amanecer.',
+  'CASA ANA MARIA': 'Hogar cálido atendido por doña Ana María, maestra de tejido quechua. Habitaciones con colchas tejidas a mano y desayuno andino con quinua, cañihua y leche fresca del campo.',
+  'CASA ANTONIA': 'Pintoresca casa de piedra con patio central y flores andinas. Doña Antonia prepara trucha del lago a la parrilla y enseña el arte de la alfarería local cada tarde a sus visitantes.',
+  'CASA BALBINO': 'Casa vivencial con terraza panorámica y corrales de animales domésticos. Don Balbino lleva a sus huéspedes de pesca artesanal con redes tradicionales al amanecer sobre el Titicaca.',
+  'CASA CALIXTO': 'Pequeña y acogedora, perfecta para viajeros que buscan tranquilidad. Don Calixto ofrece caminatas guiadas por los miradores de la península y chicha morada artesanal al atardecer.',
+  'CASA EUSTAQUIO': 'Familia Eustaquio recibe huéspedes con hospitalidad quechua genuina. Habitaciones con vista a los totorales sagrados y noches de música folclórica con zampoñas y quenas junto a la fogata.',
+  'CASA FELIX': 'Casa con huerto orgánico y vista al islote de los Uros. Don Félix cultiva habas, papas nativas y quinua que forman el desayuno. Incluye tour en balsa de totora tradicional.',
+  'CASA GERMAN': 'Ubicación privilegiada frente a la bahía de Chifrón con muelle privado. Don Germán es pescador de toda la vida y comparte sus conocimientos del lago en salidas matutinas al amanecer dorado.',
+  'CASA GERONIMO': 'Casa de don Gerónimo conserva la arquitectura tradicional de la península con muros de adobe y techo de calamina. Ideal para quienes buscan una experiencia rural genuina y auténtica.',
+  'CASA HECTOR': 'Casa moderna con habitaciones bien equipadas y baño con agua caliente solar. Don Héctor organiza excursiones en cuatrimoto por la meseta y cenas comunitarias los fines de semana.',
+  'CASA JUANA CAHUI - COLLPA WASY': '"Collpa Wasy" (Casa de Sal) es el alojamiento más fotografiado de la península. Doña Juana ofrece habitaciones con textiles andinos, gastronomía lacustre y rituales de agradecimiento a la Pachamama.',
+  'CASA LUCIANO': 'Don Luciano ofrece un rincón íntimo en el punto más alto de Llachón, con vista de 180° sobre el lago sagrado. Un solo cuarto disponible para quienes quieran vivir la experiencia en exclusiva total.',
+  'CASA MAGNO': 'Familia Magno tiene una de las casas mejor equipadas de la zona con dormitorios amplios y baño privado. Cena incluida con sopa de quinua, trucha al ajo y mate de muña del jardín.',
+  'CASA RICHARD': 'Casa con vista directa a las chullpas funerarias preincas de la colina sagrada. Don Richard comparte relatos orales de la historia Lupaca y organiza visitas arqueológicas al atardecer.',
+  'CASA ROBERTH': 'Joven familia que combina hospitalidad tradicional con comodidades modernas. Roberth habla español e inglés y ofrece wifi, desayuno continental y excursiones en bicicleta incluidas.',
+  'CASA TEODORA': 'Doña Teodora es la cocinera más reconocida de Escallani. Los huéspedes aprenden a preparar chuño, moraya y el clásico chairo andino en clases de cocina incluidas en la estadía.',
+  'CASA VALENTIN': 'Una de las casas con más habitaciones de la península, ideal para grupos. Don Valentín tiene décadas acogiendo visitantes y conoce cada rincón del lago. Pensión completa con menú diario.',
+  'CASA VENANCIO': 'Don Venancio es artesano de instrumentos musicales andinos. Sus quenas y sikus decoran las paredes y cada noche toca para sus huéspedes bajo el cielo estrellado del altiplano a 3800 msnm.',
+  'CASA WALTHER': 'Don Walther gestiona la única casa con sala equipada con estufa de leña para las noches frías del altiplano. Organiza noches de cuentos quechuas y siembra comunitaria con los turistas.',
+};
 const casaCovers = Object.entries(cloudinaryData).map(([folder, entries]: [string, any[]]) => ({
   nombre: folder.replace('CASA ', '').replace(' - COLLPA WASY', ' (Collpa Wasy)'),
   url: entries[0]?.url || '',
+  desc: casaDescs[folder] || '',
 })).filter(c => c.url);
 
 const IA_URL = import.meta.env.PUBLIC_IA_URL || 'http://localhost:5000';
@@ -995,7 +1017,7 @@ const hasBody = bodySecciones.length > 0;
     <div class="hpc-body">
       <span class="hpc-tag">Alojamiento</span>
       <h4 class="hpc-title" id="hpc1-title"></h4>
-      <p class="hpc-desc">Familia anfitriona quechua a orillas del lago Titicaca. Desayuno andino, tejidos y el amanecer más hermoso del altiplano.</p>
+      <p class="hpc-desc" id="hpc1-desc"></p>
       <a class="hpc-reservar" href="/alojamiento" onclick="event.stopPropagation()">Reservar ahora</a>
     </div>
   </div>
@@ -1007,7 +1029,7 @@ const hasBody = bodySecciones.length > 0;
     <div class="hpc-body">
       <span class="hpc-tag">Alojamiento</span>
       <h4 class="hpc-title" id="hpc2-title"></h4>
-      <p class="hpc-desc">Convive con familias quechuas, aprende tejido en telar, pesca ancestral y cocina andina en las comunidades de Capachica.</p>
+      <p class="hpc-desc" id="hpc2-desc"></p>
       <a class="hpc-reservar" href="/alojamiento" onclick="event.stopPropagation()">Reservar ahora</a>
     </div>
   </div>
@@ -1019,7 +1041,7 @@ const hasBody = bodySecciones.length > 0;
     <div class="hpc-body">
       <span class="hpc-tag">Alojamiento</span>
       <h4 class="hpc-title" id="hpc3-title"></h4>
-      <p class="hpc-desc">Vista panorámica al lago, estrellas a 3800 msnm y la calidez de una familia que te recibe como en casa.</p>
+      <p class="hpc-desc" id="hpc3-desc"></p>
       <a class="hpc-reservar" href="/alojamiento" onclick="event.stopPropagation()">Reservar ahora</a>
     </div>
   </div>
@@ -1031,7 +1053,7 @@ const hasBody = bodySecciones.length > 0;
     <div class="hpc-body">
       <span class="hpc-tag">Alojamiento</span>
       <h4 class="hpc-title" id="hpc4-title"></h4>
-      <p class="hpc-desc">Pesca artesanal al amanecer, huerto orgánico y noches de música quechua junto a la fogata del altiplano.</p>
+      <p class="hpc-desc" id="hpc4-desc"></p>
       <a class="hpc-reservar" href="/alojamiento" onclick="event.stopPropagation()">Reservar ahora</a>
     </div>
   </div>
@@ -1431,10 +1453,10 @@ const hasBody = bodySecciones.length > 0;
     if (casas.length < 4) return;
 
     var slots = [
-      { img: document.getElementById('hpc1-img'), title: document.getElementById('hpc1-title') },
-      { img: document.getElementById('hpc2-img'), title: document.getElementById('hpc2-title') },
-      { img: document.getElementById('hpc3-img'), title: document.getElementById('hpc3-title') },
-      { img: document.getElementById('hpc4-img'), title: document.getElementById('hpc4-title') },
+      { img: document.getElementById('hpc1-img'), title: document.getElementById('hpc1-title'), desc: document.getElementById('hpc1-desc') },
+      { img: document.getElementById('hpc2-img'), title: document.getElementById('hpc2-title'), desc: document.getElementById('hpc2-desc') },
+      { img: document.getElementById('hpc3-img'), title: document.getElementById('hpc3-title'), desc: document.getElementById('hpc3-desc') },
+      { img: document.getElementById('hpc4-img'), title: document.getElementById('hpc4-title'), desc: document.getElementById('hpc4-desc') },
     ];
 
     function shuffle(arr) {
@@ -1463,6 +1485,7 @@ const hasBody = bodySecciones.length > 0;
         img.src = casa.url;
         img.alt = 'Casa ' + casa.nombre;
         if (title) title.textContent = 'Casa ' + casa.nombre;
+        if (slot.desc) slot.desc.textContent = casa.desc || '';
         img.style.opacity = '1';
       }, 300);
     }
