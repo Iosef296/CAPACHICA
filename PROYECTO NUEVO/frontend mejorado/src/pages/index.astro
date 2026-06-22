@@ -1002,9 +1002,6 @@ const hasBody = bodySecciones.length > 0;
   </div>
 
 
-  <!-- Flower frame overlay - position:absolute same context as cards -->
-  <div id="hpc-frame-overlay" style="position:absolute;display:none;z-index:9;pointer-events:none;background-image:url('/flower-frame.svg');background-size:100% 100%;background-repeat:no-repeat;"></div>
-
   <!-- Casa covers data for rotation -->
   <script type="application/json" id="hpc-casa-data" set:html={JSON.stringify(casaCovers)}></script>
 
@@ -1268,7 +1265,6 @@ const hasBody = bodySecciones.length > 0;
   function closeHPC() {
     document.querySelectorAll('.hero-photo-card').forEach(function(c){c.classList.remove('expanded');c.style.opacity='';c.style.pointerEvents='';});
     var d=document.getElementById('hpc-dimmer'); if(d)d.style.display='none';
-    var o=document.getElementById('hpc-frame-overlay'); if(o)o.style.display='none';
   }
   function toggleHPC(card) {
     var wasExpanded = card.classList.contains('expanded');
@@ -1290,16 +1286,6 @@ const hasBody = bodySecciones.length > 0;
     }
     dimmer.style.display = 'block';
 
-    var overlay = document.getElementById('hpc-frame-overlay');
-    setTimeout(function() {
-      var thumb = card.querySelector('.hpc-thumb');
-      overlay.style.left   = card.offsetLeft + 'px';
-      overlay.style.top    = card.offsetTop  + 'px';
-      overlay.style.width  = thumb.offsetWidth  + 'px';
-      overlay.style.height = card.offsetHeight + 'px';
-      overlay.style.right  = 'auto';
-      overlay.style.display = 'block';
-    }, 640);
   }
 
   /* -- STARS (gentle twinkle) -- */
