@@ -1249,18 +1249,17 @@ const hasBody = bodySecciones.length > 0;
     dimmer.style.display = 'block';
 
     var overlay = document.getElementById('hpc-frame-overlay');
-    var isLeft = card.classList.contains('hpc-left');
-    overlay.style.top    = '80px';
-    overlay.style.width  = '85vw';
-    overlay.style.height = 'calc(100vh - 80px - 130px)';
-    if (isLeft) {
-      overlay.style.left  = '6px';
-      overlay.style.right = 'auto';
-    } else {
-      overlay.style.right = '6px';
-      overlay.style.left  = 'auto';
-    }
-    setTimeout(function() { overlay.style.display = 'block'; }, 540);
+    setTimeout(function() {
+      var heroEl = document.querySelector('.hero');
+      var heroRect = heroEl.getBoundingClientRect();
+      var cardRect = card.getBoundingClientRect();
+      overlay.style.left   = (cardRect.left - heroRect.left) + 'px';
+      overlay.style.top    = (cardRect.top  - heroRect.top)  + 'px';
+      overlay.style.width  = cardRect.width  + 'px';
+      overlay.style.height = cardRect.height + 'px';
+      overlay.style.right  = 'auto';
+      overlay.style.display = 'block';
+    }, 640);
   }
 
   /* -- STARS (gentle twinkle) -- */
