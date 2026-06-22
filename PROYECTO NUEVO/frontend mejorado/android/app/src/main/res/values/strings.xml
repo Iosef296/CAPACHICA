@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Capachica Turismo</string>
+    <string name="title_activity_main">Capachica Turismo</string>
+    <string name="package_name">com.capachica.turismo</string>
+    <string name="custom_url_scheme">com.capachica.turismo</string>
+</resources>
