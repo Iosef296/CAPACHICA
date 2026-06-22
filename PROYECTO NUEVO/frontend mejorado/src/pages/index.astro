@@ -618,7 +618,7 @@ const hasBody = bodySecciones.length > 0;
         0 24px 80px rgba(0,0,0,0.85),
         0 0 60px rgba(60,20,5,0.28);
     }
-    .hero-photo-card.expanded::before { content:none; }
+    .hero-photo-card.expanded::before { content:''; position:absolute; inset:0; z-index:9; pointer-events:none; background-image:url('/flower-frame.svg'); background-size:100% 100%; background-repeat:no-repeat; }
     .hero-photo-card.expanded::after { content:none; }
     @keyframes hpcLeafIn {
       from{ opacity:0; transform:translateY(-5px); }
@@ -957,9 +957,6 @@ const hasBody = bodySecciones.length > 0;
   </div>
 
 
-  <!-- Flower frame overlay: shown full-screen when a photo card is expanded -->
-  <div id="flower-overlay" style="display:none;position:fixed;inset:0;z-index:7;pointer-events:none;background-image:url('/flower-frame.svg');background-size:100% 100%;background-repeat:no-repeat;"></div>
-
   <!-- Photo Cards -->
   <div class="hero-photo-card hpc-left" id="hpc1" style="top:18%;" onclick="toggleHPC(this)">
     <div class="hpc-thumb">
@@ -1220,16 +1217,12 @@ const hasBody = bodySecciones.length > 0;
       c.style.opacity = '';
       c.style.pointerEvents = '';
     });
-    var overlay = document.getElementById('flower-overlay');
     if (!wasExpanded) {
       card.classList.add('expanded');
       var side = card.classList.contains('hpc-left') ? 'hpc-left' : 'hpc-right';
       document.querySelectorAll('.hero-photo-card.' + side).forEach(function(c) {
         if (c !== card) { c.style.opacity = '0'; c.style.pointerEvents = 'none'; }
       });
-      if (overlay) overlay.style.display = 'block';
-    } else {
-      if (overlay) overlay.style.display = 'none';
     }
   }
 
