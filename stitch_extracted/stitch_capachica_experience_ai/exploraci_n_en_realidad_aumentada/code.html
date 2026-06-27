@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500;600&family=Hanken+Grotesk:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@100..900&family=Hanken+Grotesk:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(161, 84, 53, 0.1);
+        }
+        .ai-glow {
+            box-shadow: 0 0 20px rgba(253, 140, 99, 0.3), inset 0 0 10px rgba(253, 140, 99, 0.2);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+        .ar-reticle {
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+        }
+        .ar-reticle::before, .ar-reticle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-color: #fd8c63;
+            border-style: solid;
+        }
+        .ar-reticle-tl::before { top: -2px; left: -2px; border-width: 2px 0 0 2px; }
+        .ar-reticle-tr::before { top: -2px; right: -2px; border-width: 2px 2px 0 0; }
+        .ar-reticle-bl::before { bottom: -2px; left: -2px; border-width: 0 0 2px 2px; }
+        .ar-reticle-br::before { bottom: -2px; right: -2px; border-width: 0 2px 2px 0; }
+
+        .scan-line {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #fd8c63, transparent);
+            position: absolute;
+            width: 100%;
+            top: 0;
+            animation: scan 3s linear infinite;
+        }
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f2f3f8",
+                        "primary-container": "#005a8c",
+                        "tertiary-fixed-dim": "#ffb2be",
+                        "on-surface-variant": "#41474f",
+                        "tertiary-fixed": "#ffd9de",
+                        "inverse-primary": "#95ccff",
+                        "primary-fixed-dim": "#95ccff",
+                        "error-container": "#ffdad6",
+                        "surface-container": "#eceef2",
+                        "tertiary-container": "#ac0044",
+                        "inverse-surface": "#2e3134",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#e1e2e7",
+                        "outline-variant": "#c1c7d0",
+                        "on-secondary-container": "#742503",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#400014",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#d8dadf",
+                        "surface-container-high": "#e7e8ed",
+                        "on-primary-fixed-variant": "#004a75",
+                        "surface-tint": "#166395",
+                        "secondary-fixed": "#ffdbcf",
+                        "secondary-fixed-dim": "#ffb59b",
+                        "secondary-container": "#fd8c63",
+                        "on-tertiary-fixed-variant": "#900038",
+                        "tertiary": "#810031",
+                        "surface": "#f8f9fe",
+                        "on-secondary-fixed-variant": "#7e2c0a",
+                        "outline": "#717880",
+                        "on-background": "#191c1f",
+                        "secondary": "#9d4320",
+                        "primary": "#004268",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#9fd0ff",
+                        "surface-bright": "#f8f9fe",
+                        "on-primary-fixed": "#001d32",
+                        "primary-fixed": "#cde5ff",
+                        "on-surface": "#191c1f",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed": "#380d00",
+                        "surface-variant": "#e1e2e7",
+                        "inverse-on-surface": "#eff1f5",
+                        "background": "#f8f9fe",
+                        "on-tertiary-container": "#ffb8c3"
+                    },
+                    "spacing": {
+                        "container-padding": "24px",
+                        "gutter": "16px",
+                        "stack-lg": "40px",
+                        "stack-sm": "12px",
+                        "stack-md": "24px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Hanken Grotesk"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["EB Garamond"],
+                        "headline-md": ["EB Garamond"],
+                        "label-sm": ["Hanken Grotesk"],
+                        "headline-lg": ["EB Garamond"],
+                        "display-lg": ["EB Garamond"],
+                        "label-md": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body-md text-on-surface overflow-hidden h-screen w-screen flex flex-col">
+<!-- AR Camera View Container -->
+<div class="relative flex-grow w-full h-full overflow-hidden">
+<!-- Live Camera Feed Simulation -->
+<div class="absolute inset-0 z-0 bg-cover bg-center" data-alt="A breathtaking, cinematic panoramic view of the Lake Titicaca shoreline in Capachica, Peru, during a golden hour sunset. The deep sapphire blue water gently laps against smooth pebbles and terracotta-colored rocks. In the distance, Andean peaks are silhouetted against a warm sky filled with wisps of orange and pink. The overall style is immersive and majestic, capturing the serene and spiritual atmosphere of the highlands with premium photography quality." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDus8WXD6_ZHAwHxDr6nOFBcqAlx7HZzcstlPSTSP4dDq6J-ZQyjfyF_ccpXtJ6ZOhQfZMM9vBy54MBXaNt4vyqkpLazB1VzbLsr5b0WGBH3Q8TQ3YZOvSfKc9T336efbZOdTG_0jyBQ1GOyvsOvk1-AK5IMpqP2Koot6nw-Uf6Kfd3sQspCJVVWYzX5ilfp2MGMZSSqVOOlS5_T0v1drlIaBAUkwVZbpyLXRZXakb6WcWnzDltMecdBYua1t-g-2k3waJwcfrjOjM')"></div>
+<!-- AR HUD Overlay Layer -->
+<div class="absolute inset-0 z-10 p-container-padding flex flex-col pointer-events-none">
+<!-- Top App Bar (Shared Component Style Implementation) -->
+<header class="flex justify-between items-center w-full z-50 pointer-events-auto">
+<div class="flex items-center gap-base">
+<button class="w-10 h-10 rounded-full flex items-center justify-center glass-panel text-primary active:scale-95 transition-transform">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md-mobile text-primary tracking-tight">Capachica AR</h1>
+</div>
+<div class="flex items-center gap-base">
+<button class="w-10 h-10 rounded-full flex items-center justify-center glass-panel text-primary active:scale-95 transition-transform">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<!-- Floating AR Labels (Asymmetric Bento-ish Layout) -->
+<div class="flex-grow relative mt-stack-lg">
+<!-- Label 1: Mirador -->
+<div class="absolute top-[15%] left-[10%] animate-float pointer-events-auto" style="animation-delay: 0.2s">
+<div class="glass-panel p-4 rounded-xl max-w-[200px] shadow-lg flex flex-col gap-base">
+<div class="flex items-center gap-2 text-secondary">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+<span class="font-label-md text-label-md">Mirador Tikonata</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">A 2.4km. Vista de 360° del Lago Mayor.</p>
+</div>
+<div class="w-[2px] h-12 bg-gradient-to-t from-secondary/50 to-transparent mx-auto"></div>
+</div>
+<!-- Label 2: Leyenda -->
+<div class="absolute top-[45%] right-[15%] animate-float pointer-events-auto" style="animation-delay: 1s">
+<div class="glass-panel p-4 rounded-xl max-w-[220px] shadow-lg flex flex-col gap-base">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-[20px]">auto_stories</span>
+<span class="font-label-md text-label-md">Leyenda de Manco Cápac</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Se dice que los fundadores del Imperio Inca emergieron de estas aguas.</p>
+</div>
+<div class="w-[2px] h-12 bg-gradient-to-t from-primary/50 to-transparent mx-auto"></div>
+</div>
+<!-- Killa AI Floating Bubble -->
+<div class="absolute bottom-[20%] left-[20%] animate-float pointer-events-auto">
+<div class="flex items-start gap-3">
+<div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center ai-glow border-2 border-secondary-container">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div class="glass-panel p-4 rounded-2xl rounded-tl-none max-w-[240px] shadow-xl">
+<p class="font-label-md text-label-md text-secondary mb-1">Killa AI dice:</p>
+<p class="font-body-md text-[14px] text-on-surface">¿Sabías que el Lago Titicaca es el lago navegable más alto del mundo? Estamos a 3,812 metros.</p>
+</div>
+</div>
+</div>
+<!-- Central Reticle (Scanning Area) -->
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-48 h-48 ar-reticle rounded-3xl flex items-center justify-center">
+<div class="ar-reticle-tl"></div>
+<div class="ar-reticle-tr"></div>
+<div class="ar-reticle-bl"></div>
+<div class="ar-reticle-br"></div>
+<div class="scan-line"></div>
+<span class="material-symbols-outlined text-white/40 text-4xl">filter_center_focus</span>
+</div>
+</div>
+</div>
+<!-- Footer Action Area -->
+<div class="w-full pb-32 flex justify-center pointer-events-auto">
+<button class="bg-primary text-on-primary px-10 py-4 rounded-full font-label-md text-label-md flex items-center gap-3 shadow-2xl active:scale-95 transition-all hover:bg-primary/90" id="scanButton">
+<span class="material-symbols-outlined">document_scanner</span>
+                    Escanear lugar
+                </button>
+</div>
+</div>
+</div>
+<!-- Bottom Nav Bar (Shared Component Style Implementation) -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-surface-container-lowest/80 backdrop-blur-2xl border-t border-secondary/10 shadow-[0_-10px_30px_rgba(0,66,104,0.05)] rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 transition-all hover:text-primary active:scale-90" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 transition-all hover:text-primary active:scale-90" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="font-label-sm text-label-sm">Mapa</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1.5 transition-all active:scale-90" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="font-label-sm text-label-sm">Killa AI</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 transition-all hover:text-primary active:scale-90" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-label-sm text-label-sm">Experiencias</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 transition-all hover:text-primary active:scale-90" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">Perfil</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions for the Scan Button
+        const scanBtn = document.getElementById('scanButton');
+        scanBtn.addEventListener('click', () => {
+            const originalText = scanBtn.innerHTML;
+            scanBtn.innerHTML = `
+                <span class="material-symbols-outlined animate-spin">sync</span>
+                Analizando...
+            `;
+            scanBtn.classList.add('bg-secondary');
+            
+            setTimeout(() => {
+                scanBtn.innerHTML = originalText;
+                scanBtn.classList.remove('bg-secondary');
+                
+                // Trigger a small visual feedback on a card
+                const killaBubble = document.querySelector('.ai-glow').parentElement.nextElementSibling;
+                killaBubble.style.transform = 'scale(1.1)';
+                killaBubble.querySelector('p:last-child').innerText = '¡Nuevo punto detectado! La Isla Amantaní se encuentra justo detrás de ese promontorio.';
+                setTimeout(() => { killaBubble.style.transform = 'scale(1)'; }, 300);
+            }, 2000);
+        });
+
+        // Simulating subtle perspective shift on hover (Desktop only)
+        document.addEventListener('mousemove', (e) => {
+            if (window.innerWidth > 768) {
+                const x = (e.clientX / window.innerWidth - 0.5) * 10;
+                const y = (e.clientY / window.innerHeight - 0.5) * 10;
+                document.querySelectorAll('.animate-float').forEach(el => {
+                    el.style.transform = `translate(${x}px, ${y}px)`;
+                });
+            }
+        });
+    </script>
+</body></html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&amp;family=Hanken+Grotesk:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#f2f3f8",
+                    "tertiary": "#810031",
+                    "on-primary-container": "#9fd0ff",
+                    "on-secondary-fixed-variant": "#7e2c0a",
+                    "secondary-fixed-dim": "#ffb59b",
+                    "error": "#ba1a1a",
+                    "on-background": "#191c1f",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container": "#eceef2",
+                    "on-surface": "#191c1f",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-fixed": "#400014",
+                    "on-primary-fixed": "#001d32",
+                    "surface-dim": "#d8dadf",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-container": "#ac0044",
+                    "surface-tint": "#166395",
+                    "on-error": "#ffffff",
+                    "on-secondary-container": "#742503",
+                    "background": "#f8f9fe",
+                    "primary-fixed-dim": "#95ccff",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed": "#ffd9de",
+                    "primary-fixed": "#cde5ff",
+                    "surface": "#f8f9fe",
+                    "error-container": "#ffdad6",
+                    "surface-variant": "#e1e2e7",
+                    "outline": "#717880",
+                    "on-tertiary-container": "#ffb8c3",
+                    "tertiary-fixed-dim": "#ffb2be",
+                    "surface-container-high": "#e7e8ed",
+                    "inverse-surface": "#2e3134",
+                    "inverse-primary": "#95ccff",
+                    "secondary-container": "#fd8c63",
+                    "primary": "#004268",
+                    "inverse-on-surface": "#eff1f5",
+                    "secondary": "#9d4320",
+                    "surface-container-highest": "#e1e2e7",
+                    "on-secondary-fixed": "#380d00",
+                    "surface-bright": "#f8f9fe",
+                    "primary-container": "#005a8c",
+                    "on-primary": "#ffffff",
+                    "on-surface-variant": "#41474f",
+                    "secondary-fixed": "#ffdbcf",
+                    "outline-variant": "#c1c7d0",
+                    "on-primary-fixed-variant": "#004a75",
+                    "on-tertiary-fixed-variant": "#900038"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "12px",
+                    "base": "8px",
+                    "stack-md": "24px",
+                    "container-padding": "24px",
+                    "gutter": "16px",
+                    "stack-lg": "40px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["EB Garamond"],
+                    "body-md": ["Hanken Grotesk"],
+                    "headline-md": ["EB Garamond"],
+                    "display-lg": ["EB Garamond"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "label-sm": ["Hanken Grotesk"],
+                    "headline-lg": ["EB Garamond"],
+                    "label-md": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(129, 0, 49, 0.1);
+        }
+        .ai-gradient-glow {
+            box-shadow: 0 0 30px rgba(253, 140, 99, 0.2);
+        }
+        .message-in {
+            animation: slideInLeft 0.3s ease-out forwards;
+        }
+        .message-out {
+            animation: slideInRight 0.3s ease-out forwards;
+        }
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .andean-pattern {
+            background-image: radial-gradient(circle at 2px 2px, rgba(157, 67, 32, 0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col antialiased andean-pattern">
+<!-- Top Navigation Anchor -->
+<header class="bg-surface/70 backdrop-blur-xl flex justify-between items-center px-container-padding py-base w-full sticky top-0 z-50">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="A professional close-up portrait of a local guide from the Capachica Peninsula in Peru. He is wearing a traditional knitted 'chullo' hat with intricate Andean patterns in deep blue and terracotta. The lighting is soft and golden, characteristic of a high-altitude sunset over Lake Titicaca. The image style is sharp and cinematic, emphasizing cultural heritage and hospitality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDendVUFg5QTa4dmyT2mCbfUpmPiDvYjIq-WT8iqYsNtFr7MuhjS8oJj0xkrSlHjlraZUXCqRU3lEaq5dA-ADCTa9pzM3AozSxB7ZwJrMS2vStv5_vmqJ34OKLfb6w-rWOslncVXmn9jqdps8RrqNe8QHZOcibNo31_oUCcC_jb9z-ZC2U3P7SgDV_oCPflyxPTvb9RDDPoSQkz8p1DMADRicVi8q4UeilpoggVnQ-10dGMcWAfT-QKT9OpmXY1cQjSkJ2VSH8yV5A"/>
+</div>
+<span class="font-headline-md text-headline-md text-primary tracking-tight">Capachica</span>
+</div>
+<button class="w-10 h-10 flex items-center justify-center text-primary active:scale-95 transition-transform">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow px-container-padding flex flex-col pb-40">
+<!-- AI Identity Header -->
+<div class="mt-stack-md mb-stack-sm flex flex-col items-center">
+<div class="w-16 h-16 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container ai-gradient-glow mb-3">
+<span class="material-symbols-outlined text-[32px]">auto_awesome</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary text-center">Killa AI</h1>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-80 uppercase tracking-widest">Tu guía en Capachica</p>
+</div>
+<!-- Chat History -->
+<div class="space-y-gutter flex flex-col py-4">
+<!-- AI Message -->
+<div class="message-in flex flex-col items-start max-w-[85%]">
+<div class="glass-panel p-4 rounded-t-2xl rounded-br-2xl shadow-sm">
+<p class="text-body-md text-on-surface">¡Kamisaraki! Bienvenido a la península de Capachica. Soy Killa AI, tu guía local. ¿Cómo puedo ayudarte a descubrir los secretos del Lago Sagrado hoy?</p>
+</div>
+<span class="text-[10px] font-label-sm text-outline-variant mt-1 ml-2">HACE UN MOMENTO</span>
+</div>
+<!-- User Query Visualization (Prompt Chips) -->
+<div class="flex flex-wrap gap-2 py-2">
+<button class="bg-surface-container-lowest border border-outline-variant/30 px-4 py-2 rounded-full font-label-md text-label-md text-primary hover:bg-primary/5 transition-colors">¿Cuántos días estarás?</button>
+<button class="bg-surface-container-lowest border border-outline-variant/30 px-4 py-2 rounded-full font-label-md text-label-md text-primary hover:bg-primary/5 transition-colors">Busco aventura</button>
+<button class="bg-surface-container-lowest border border-outline-variant/30 px-4 py-2 rounded-full font-label-md text-label-md text-primary hover:bg-primary/5 transition-colors">Cultura local</button>
+<button class="bg-surface-container-lowest border border-outline-variant/30 px-4 py-2 rounded-full font-label-md text-label-md text-primary hover:bg-primary/5 transition-colors">Presupuesto bajo</button>
+</div>
+<!-- AI Response - Itinerary Result -->
+<div class="message-in flex flex-col items-start w-full">
+<div class="glass-panel p-4 rounded-2xl shadow-sm w-full space-y-4">
+<div class="flex items-center gap-2 text-tertiary">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-md text-label-md uppercase">Itinerario Sugerido</span>
+</div>
+<div class="relative w-full h-48 rounded-xl overflow-hidden shadow-inner mb-2">
+<img class="w-full h-full object-cover" data-alt="A breathtaking panoramic view of the Llachón community on the Capachica Peninsula at Lake Titicaca. Traditional houses with terracotta-colored roofs are nestled against a lush green hillside. The deep blue, crystal-clear water of the lake sparkles under a bright high-altitude sun. Local inhabitants in vibrant traditional Andean clothing are visible in the foreground, maintaining a peaceful, ancient atmosphere. Cinematic photography, wide-angle, warm natural lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1nQpN1AueQ0dVaD8ZnIrtKqLK83rILSZl7ASqGsbvlwOcmQXbwAzkIvHHiXRuWyl9YfF_un5AWnIeehghVEqDpToRIVrKzSHhbC_K8Zrd8Db1csBedwdXh63EuV6TiqQhJFtAKVH29huGtKA5A1xmh4bYaedie4FtTYny2BcQMrm5AaFPEXXMDAalG33_iQYOo95HEG-ROXZZGdCNeSBhDNlMWCFg5htzBlqwzmduUE1ORSNLjT_gz2naXIylIxweeuJ8l-3sgko"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+<h3 class="font-headline-md text-headline-md text-white">Día 1: Inmersión en Llachón</h3>
+</div>
+</div>
+<ul class="space-y-3">
+<li class="flex gap-3 items-start">
+<div class="w-6 h-6 rounded-full bg-secondary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[14px] text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary">Mañana</span>
+<span class="text-body-md text-on-surface-variant">Llegada a Llachón y bienvenida tradicional por la comunidad.</span>
+</div>
+</li>
+<li class="flex gap-3 items-start">
+<div class="w-6 h-6 rounded-full bg-secondary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[14px] text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary">Almuerzo</span>
+<span class="text-body-md text-on-surface-variant">Almuerzo típico con la familia Quispe (Trucha del lago).</span>
+</div>
+</li>
+<li class="flex gap-3 items-start">
+<div class="w-6 h-6 rounded-full bg-secondary/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[14px] text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary">Tarde</span>
+<span class="text-body-md text-on-surface-variant">Taller de Pesca Artesanal en el Lago Sagrado.</span>
+</div>
+</li>
+</ul>
+<button class="w-full py-4 bg-primary text-white rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-[0.98] transition-transform">
+                        RESERVAR ESTA EXPERIENCIA
+                        <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Killa AI Input Panel -->
+<div class="fixed bottom-[88px] left-0 w-full px-container-padding z-40">
+<div class="glass-panel rounded-2xl p-2 flex items-center gap-2 shadow-2xl border-white/50">
+<button class="w-12 h-12 flex items-center justify-center text-outline transition-colors hover:text-primary">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<input class="flex-grow bg-transparent border-none focus:ring-0 text-body-md text-on-surface placeholder:text-on-surface-variant/50 px-2 py-3" placeholder="Pregunta a Killa AI..." type="text"/>
+<div class="flex items-center gap-1">
+<button class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container transition-all hover:scale-110 active:scale-95 shadow-md" id="mic-trigger">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">mic</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Shell -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-surface-container-lowest/80 backdrop-blur-2xl border-t border-secondary/10 shadow-[0_-10px_30px_rgba(0,66,104,0.05)] rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm mt-1">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="font-label-sm text-label-sm mt-1">Mapa</span>
+</a>
+<!-- ACTIVE TAB: Killa AI -->
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1.5 transition-all active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="font-label-sm text-label-sm mt-0.5">Killa AI</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-label-sm text-label-sm mt-1">Experiencias</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm mt-1">Perfil</span>
+</a>
+</nav>
+<script>
+        // Simple Micro-interaction for the voice button
+        const micBtn = document.getElementById('mic-trigger');
+        let isListening = false;
+
+        micBtn.addEventListener('click', () => {
+            isListening = !isListening;
+            if (isListening) {
+                micBtn.classList.remove('bg-secondary-container');
+                micBtn.classList.add('bg-tertiary', 'text-white', 'animate-pulse');
+            } else {
+                micBtn.classList.add('bg-secondary-container');
+                micBtn.classList.remove('bg-tertiary', 'text-white', 'animate-pulse');
+            }
+        });
+
+        // Add a parallax effect to the andean pattern on scroll
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            document.body.style.backgroundPosition = `0 ${scrolled * 0.1}px`;
+        });
+    </script>
+</body></html>

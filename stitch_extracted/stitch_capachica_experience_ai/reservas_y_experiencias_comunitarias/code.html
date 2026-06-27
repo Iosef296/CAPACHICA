@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capachica Experience AI - Marketplace de Reservas</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500;600&amp;family=Hanken+Grotesk:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "surface-container-low": "#f2f3f8",
+                "primary-container": "#005a8c",
+                "tertiary-fixed-dim": "#ffb2be",
+                "on-surface-variant": "#41474f",
+                "tertiary-fixed": "#ffd9de",
+                "inverse-primary": "#95ccff",
+                "primary-fixed-dim": "#95ccff",
+                "error-container": "#ffdad6",
+                "surface-container": "#eceef2",
+                "tertiary-container": "#ac0044",
+                "inverse-surface": "#2e3134",
+                "surface-container-lowest": "#ffffff",
+                "surface-container-highest": "#e1e2e7",
+                "outline-variant": "#c1c7d0",
+                "on-secondary-container": "#742503",
+                "on-primary": "#ffffff",
+                "on-tertiary-fixed": "#400014",
+                "on-error": "#ffffff",
+                "error": "#ba1a1a",
+                "surface-dim": "#d8dadf",
+                "surface-container-high": "#e7e8ed",
+                "on-primary-fixed-variant": "#004a75",
+                "surface-tint": "#166395",
+                "secondary-fixed": "#ffdbcf",
+                "secondary-fixed-dim": "#ffb59b",
+                "secondary-container": "#fd8c63",
+                "on-tertiary-fixed-variant": "#900038",
+                "tertiary": "#810031",
+                "surface": "#f8f9fe",
+                "on-secondary-fixed-variant": "#7e2c0a",
+                "outline": "#717880",
+                "on-background": "#191c1f",
+                "secondary": "#9d4320",
+                "primary": "#004268",
+                "on-secondary": "#ffffff",
+                "on-primary-container": "#9fd0ff",
+                "surface-bright": "#f8f9fe",
+                "on-primary-fixed": "#001d32",
+                "primary-fixed": "#cde5ff",
+                "on-surface": "#191c1f",
+                "on-tertiary": "#ffffff",
+                "on-error-container": "#93000a",
+                "on-secondary-fixed": "#380d00",
+                "surface-variant": "#e1e2e7",
+                "inverse-on-surface": "#eff1f5",
+                "background": "#f8f9fe",
+                "on-tertiary-container": "#ffb8c3"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "container-padding": "24px",
+                "gutter": "16px",
+                "stack-lg": "40px",
+                "stack-sm": "12px",
+                "stack-md": "24px",
+                "base": "8px"
+            },
+            "fontFamily": {
+                "body-md": ["Hanken Grotesk"],
+                "body-lg": ["Hanken Grotesk"],
+                "headline-lg-mobile": ["EB Garamond"],
+                "headline-md": ["EB Garamond"],
+                "label-sm": ["Hanken Grotesk"],
+                "headline-lg": ["EB Garamond"],
+                "display-lg": ["EB Garamond"],
+                "label-md": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "600"}],
+                "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-fixed-dim">
+<!-- TopAppBar Shell -->
+<header class="bg-surface/70 dark:bg-surface-container-low/70 backdrop-blur-xl flex justify-between items-center px-container-padding py-base w-full sticky top-0 z-50">
+<div class="flex items-center gap-base">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A warm, scholarly portrait of an elderly Andean woman with wise eyes, wearing traditional colorful textiles from Capachica. The lighting is soft and natural, emphasizing the rich textures of her clothing and the serene background of Lake Titicaca. The visual style is premium photography with a focus on human connection and cultural depth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDM9utV5_Di-ELTBR0OWSgCP7NkiLrFNxDmf0kOSJYNXeK47EDsD8tIMGRKGpAmzhxvARAu35dkI0uJD1lNSVwwM_jJFzJFXilvS9Xzt0TwDbBrJ2jzSn3sO1cfvfItW6An_1yCVLQRIwk-W9_2vAiS1B483HyOCi9gWxegt6ZcJ6oCtl_YS4nJNLElwLcpFeO9O92GCTOTizwkyAiDKRB6kCWPFuctalWu-SrxNyYA2oTv0C9rlT6lMocoHn_tQupNyDVnRVY3e1c"/>
+</div>
+<h1 class="font-headline-md text-headline-md-mobile md:text-headline-md text-primary dark:text-primary-fixed-dim tracking-tight">Capachica</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 duration-200">notifications</button>
+<button class="hidden md:flex items-center gap-1 text-primary font-bold transition-opacity">
+<span class="font-label-md text-label-md">Experiencias</span>
+</button>
+</div>
+</header>
+<main class="pb-32">
+<!-- Hero Section & AI Prompt -->
+<section class="px-container-padding pt-stack-md pb-stack-lg">
+<div class="relative rounded-[24px] overflow-hidden h-[240px] md:h-[320px] mb-stack-md group">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A panoramic wide-angle view of the Capachica Peninsula at sunset. The calm waters of Lake Titicaca reflect the deep orange and purple sky. Traditional stone houses with terracotta roofs are nestled among terraced fields. The mood is majestic and peaceful, captured in a high-end travel photography style with soft atmospheric depth." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBw6rwJozVOtMFESmAu0qpNpIm-59XqVjeRpjqISFniTCQCQpDVlQeLkjiXk-A6xdWRiKzJ-SVuGbDETzVMk_Z3nmLaol5NzXFmmBDPsimZlj_04Gt0H7nvIqeUVT9JC_8c1PEm867irJWglmPDpHItjtweXxsrpjMAaAcZdoNJzn7xrGzizsGjVcwPekqHeg71tyHz728OLFeqva1wwKiZEY_DkF5TTOAqSOJah5JWst_y9LGFYPKDW3dg4gC3remIgGGfw-gefEk')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<div class="absolute bottom-6 left-6 text-white">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-2">Reserva tu Escapada Ancestral</h2>
+<p class="font-body-md opacity-90 max-w-md">Descubre la magia del Titicaca a través de los ojos de sus comunidades.</p>
+</div>
+</div>
+<!-- Killa AI Floating Search -->
+<div class="glass-panel border border-secondary/10 rounded-full p-2 flex items-center shadow-lg -mt-12 relative z-10 mx-auto max-w-2xl">
+<div class="bg-secondary p-3 rounded-full flex items-center justify-center text-white mr-3">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<input class="flex-grow bg-transparent border-none focus:ring-0 text-body-md placeholder:text-on-surface-variant/50" placeholder="Killa AI: 'Busco un hospedaje frente al lago en Llachón...'" type="text"/>
+<button class="bg-primary text-white font-label-md px-6 py-2.5 rounded-full hover:opacity-90 transition-all active:scale-95">Buscar</button>
+</div>
+</section>
+<!-- Filters Section -->
+<section class="px-container-padding mb-stack-lg overflow-x-auto scrollbar-hide flex gap-3 pb-2">
+<button class="px-5 py-2 rounded-full border border-secondary text-on-secondary-container bg-secondary-container font-label-md whitespace-nowrap flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+                Todo Capachica
+            </button>
+<button class="px-5 py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-md whitespace-nowrap hover:bg-surface-container transition-colors">Llachón</button>
+<button class="px-5 py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-md whitespace-nowrap hover:bg-surface-container transition-colors">Ccotos</button>
+<button class="px-5 py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-md whitespace-nowrap hover:bg-surface-container transition-colors">Siale</button>
+<button class="px-5 py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-md whitespace-nowrap hover:bg-surface-container transition-colors">Chifrón</button>
+<button class="px-5 py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-md whitespace-nowrap hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px] align-middle">tune</span>
+                Filtros
+            </button>
+</section>
+<!-- Marketplace Sections -->
+<div class="px-container-padding space-y-stack-lg">
+<!-- Hospedajes Familiares -->
+<section>
+<div class="flex justify-between items-end mb-stack-sm">
+<div>
+<h3 class="font-headline-md text-headline-md text-primary">Hospedajes Familiares</h3>
+<p class="text-on-surface-variant font-body-md">Vive la hospitalidad local genuina.</p>
+</div>
+<a class="text-primary font-label-md hover:underline decoration-2 underline-offset-4" href="#">Ver todos</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Card 1 -->
+<div class="bg-surface shadow-[0_10px_30px_rgba(0,66,104,0.05)] rounded-[24px] overflow-hidden border border-outline-variant/10 group cursor-pointer">
+<div class="relative h-64">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A cozy, sunlit bedroom in a traditional stone house in Llachón. Large windows overlook the blue expanse of Lake Titicaca. The bed is covered in artisanal hand-woven blankets with vibrant geometric patterns. Earthy clay walls and exposed wooden beams create a warm, tactile, and grounded atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqOhtdV2oPcwbuZqc_HDKzvAdrF7XL-6ZsGJpwRhIbWGTeKHlEEd1X6zdEbgKbisJcVjVSzcWGAk3M4brF4LH8CMr7zlZYj1iVS28pWDFDtGhUwPn4NWwI6p8JQDKxAIEuEchwiZlgYkUD897osg9QeEju9aM0XfICpTkTXBatIREvPaOfi3ZS06Onlq5XtxQiWF8AGEBXbA5GkB4cd6oktsDepKSn5U-Iu31f7_KSAxIEYAvZFqyDoXsllXVX8DchGv8CJj5nFKk"/>
+<button class="absolute top-4 right-4 glass-panel p-2 rounded-full text-primary hover:text-error transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+<div class="absolute bottom-4 left-4 glass-panel px-3 py-1 rounded-full font-label-sm text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">star</span>
+                                4.9 (124)
+                            </div>
+</div>
+<div class="p-stack-md">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-headline-md text-[20px] text-primary">Posada de Doña Paula</h4>
+<span class="font-label-md text-secondary">S/ 120 <span class="font-normal text-on-surface-variant">/noche</span></span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant text-body-md mb-4">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+                                Comunidad de Llachón
+                            </div>
+<button class="w-full py-4 bg-primary text-white rounded-xl font-label-md hover:opacity-90 active:scale-95 transition-all">Reservar ahora</button>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface shadow-[0_10px_30px_rgba(0,66,104,0.05)] rounded-[24px] overflow-hidden border border-outline-variant/10 group cursor-pointer">
+<div class="relative h-64">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A modern eco-lodge terrace in Ccotos overlooking the lake. The structure uses natural materials like bamboo and local stone, blending into the landscape. Soft morning light bathes the scene, highlighting the minimalist and premium design. The mood is scholarly and serene, perfect for high-end cultural exploration." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqmtEsRF9hijn4GEdmiSq2mE4RC7ceEvDlzSL0raFAZtW4aUkk3AxkzvKEi0ryRph-f90-rskdssMsCmI5Pvbeh-URQb2CbRN1A1Ivahnfb4pdVVTdLTd26_AIbU5HBH1kYRfaAwIaU9U6WY33cZ0jgPVeWGQIGQ_YaPkRh13oJUehlCiIyNdNUghi8UklRFlYBDyYGK1sUNxHSCw0NNXOukoKfYa-jAtFhGNK93T58lb6KcDscQNuWwINrAf1IkCkxNG8vA5zP5g"/>
+<button class="absolute top-4 right-4 glass-panel p-2 rounded-full text-primary hover:text-error transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+<div class="absolute bottom-4 left-4 glass-panel px-3 py-1 rounded-full font-label-sm text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">star</span>
+                                4.8 (89)
+                            </div>
+</div>
+<div class="p-stack-md">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-headline-md text-[20px] text-primary">Eco-Refugio Ccotos</h4>
+<span class="font-label-md text-secondary">S/ 185 <span class="font-normal text-on-surface-variant">/noche</span></span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant text-body-md mb-4">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+                                Península de Ccotos
+                            </div>
+<button class="w-full py-4 bg-primary text-white rounded-xl font-label-md hover:opacity-90 active:scale-95 transition-all">Reservar ahora</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Tours Guiados & Actividades -->
+<section>
+<div class="flex justify-between items-end mb-stack-sm">
+<div>
+<h3 class="font-headline-md text-headline-md text-primary">Tours y Actividades</h3>
+<p class="text-on-surface-variant font-body-md">Experiencias inmersivas con expertos locales.</p>
+</div>
+<a class="text-primary font-label-md hover:underline decoration-2 underline-offset-4" href="#">Ver todos</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Tour 1 -->
+<div class="relative group h-[400px] rounded-[24px] overflow-hidden cursor-pointer">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Action shot of a kayaking tour on Lake Titicaca. Travelers in bright life vests are paddling through clear, deep blue water with the snow-capped Andes mountains in the distant background. The lighting is crisp and midday, creating high-contrast sparkles on the water surface. Energetic and majestic mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC85I3p6IH-8g9H5vGVfDT9q8JUoRijm__1nX0XG8-H93EGFd2lQtbYX9epXJPsgLLjbw6ADpTEz4gDBmucIKkR06yIn-E0finIoA-WgNVZBwCt1ckilT9hyvPHbNa_nvdeVjLjXgTe7rQLM7qaRmUgQABLW4jgPB4Ao4q64na-hiKqix9l7ghnOuixk5gp5ze6xt9H8B3rXLUBEgZEBR2uZQtAy_p9vR-LnLhAIHqT_ifUer_Vj1H-R2T4Uy1kT_WHSpych17tYxA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full">
+<span class="bg-secondary text-white text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded mb-2 inline-block">Aventura</span>
+<h4 class="font-headline-md text-white text-[22px] leading-tight mb-2">Kayak al Atardecer</h4>
+<div class="flex justify-between items-center text-white/90">
+<p class="font-label-sm">Desde S/ 45 /pers</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="text-[12px]">3h</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Tour 2 -->
+<div class="relative group h-[400px] rounded-[24px] overflow-hidden cursor-pointer">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A close-up of hands working on a traditional backstrap loom with vibrant pink and blue threads. The scene is set in an outdoor courtyard in Capachica, with warm sunlight highlighting the intricate textile patterns. The style is tactile and focused on artisanal craft, with a soft blur in the background showing the stone walls of the village." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOAFZ4XpknXs-ouVcUPYpSyyvtpp0X15P3N3YoGNiE_1DAx8jgq3EvR-zLLU1U-LjNuz_h0B0b9_vntARCKVs_PQPUXA8lIFCep617cHUlLZEytiCzAUCtFayaOKWYagx0tNseQIpXHotWJzK4zYfX_5SI-0of5A-ATK8c6xqjLDEXNF67XkmorT9EaMxhzGPLIsicUZmsNo9h1E4FD1gf6vqyNHogSPtFbRYi5ZiMxrlfhXKSvucETnl7CwdfxUZTA-1ZxwF6LXE"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full">
+<span class="bg-secondary text-white text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded mb-2 inline-block">Cultura</span>
+<h4 class="font-headline-md text-white text-[22px] leading-tight mb-2">Taller de Tejido Ancestral</h4>
+<div class="flex justify-between items-center text-white/90">
+<p class="font-label-sm">Desde S/ 60 /pers</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="text-[12px]">4h</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Tour 3 -->
+<div class="relative group h-[400px] rounded-[24px] overflow-hidden cursor-pointer">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A steaming traditional Pachamanca feast being uncovered from the earth. Local villagers in traditional dress are carefully removing hot stones to reveal potatoes, beans, and meat. The steam rises into the cool Andean air, creating a rich, atmospheric scene of community and tradition. Earthy terracotta tones dominate the palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMnwMgycE7HzDNiVHixD_Mt8qYu7C0wpqmAIXuAuAUFuTswCGNiiG0Op8vOF8us37U5JQApfNjeOqXAl8dEKLta0XIgyR5rEmiZNEsK5S1r_CdLHqtQoon3snUleBwYyveedjtuplRDQAkA0DUWBKn5qp3jpZsexJ34WyNbi1YLE_QWCObzFxpNmomBRrY27ygKAJGTIBsXu3TMNtwziqeX-umrFj5e2HDhht2MLLbI2Vne8EnDQVT-JDAMnF98t-91XpAgMhvPpE"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full">
+<span class="bg-secondary text-white text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded mb-2 inline-block">Gastronomía</span>
+<h4 class="font-headline-md text-white text-[22px] leading-tight mb-2">Pachamanca Comunitaria</h4>
+<div class="flex justify-between items-center text-white/90">
+<p class="font-label-sm">Desde S/ 55 /pers</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="text-[12px]">2h</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Tour 4 -->
+<div class="relative group h-[400px] rounded-[24px] overflow-hidden cursor-pointer">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A small traditional wooden fishing boat sailing on the calm, turquoise waters of Lake Titicaca at dawn. A local fisherman is casting a net into the water. The light is ethereal and golden, creating a shimmering effect on the lake's surface. The mood is peaceful, scholarly, and deeply connected to nature." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBo3_xbbwKLgOtdoHMh1oewIiJW1YpGa8BnBLEsG6Sok4HStyHJGENbATyWWgPHvX3rsgc-0j3nWF2NUv_ziK70Sr7OeDPy64OLiRNjzEAON0hQh_CTuMzdshT1F4eCUlKI2A58d_Fk9-l_MMO8XUWXikHB_EvOx-95_nFYxcKtf2MDv6RsJjnWe7PXdFJBKlflLLLx-84B38YYo4yZYe61YtsjNQNeX39_enLiA0_Yv85T5iXikmf2nAUhlXxPMEAuQRsqmSMrSDc"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full">
+<span class="bg-secondary text-white text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded mb-2 inline-block">Vida Local</span>
+<h4 class="font-headline-md text-white text-[22px] leading-tight mb-2">Pesca Tradicional</h4>
+<div class="flex justify-between items-center text-white/90">
+<p class="font-label-sm">Desde S/ 40 /pers</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="text-[12px]">3h</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar Shell -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-surface-container-lowest/80 dark:bg-surface-container-lowest/70 backdrop-blur-2xl border-t border-secondary/10 shadow-[0_-10px_30px_rgba(0,66,104,0.05)] rounded-t-xl">
+<div class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90 duration-150">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Inicio</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90 duration-150">
+<span class="material-symbols-outlined">map</span>
+<span class="font-label-sm text-label-sm">Mapa</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90 duration-150">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="font-label-sm text-label-sm">Killa AI</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-full px-4 py-1.5 transition-all active:scale-90 duration-150">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-label-sm text-label-sm">Experiencias</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90 duration-150">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">Perfil</span>
+</div>
+</nav>
+<!-- Availability Calendar Modal (Pseudo-state) -->
+<div class="hidden fixed inset-0 z-[60] flex items-center justify-center p-6" id="calendarModal">
+<div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="toggleCalendar()"></div>
+<div class="glass-panel w-full max-w-md rounded-[32px] overflow-hidden relative z-10 p-8 shadow-2xl border border-outline-variant/20">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-md text-primary">Selecciona Fechas</h3>
+<button class="material-symbols-outlined text-on-surface-variant" onclick="toggleCalendar()">close</button>
+</div>
+<div class="grid grid-cols-7 gap-2 text-center mb-4">
+<span class="text-on-surface-variant font-label-sm opacity-50">Do</span>
+<span class="text-on-surface-variant font-label-sm opacity-50">Lu</span>
+<span class="text-on-surface-variant font-label-sm opacity-50">Ma</span>
+<span class="text-on-surface-variant font-label-sm opacity-50">Mi</span>
+<span class="text-on-surface-variant font-label-sm opacity-50">Ju</span>
+<span class="text-on-surface-variant font-label-sm opacity-50">Vi</span>
+<span class="text-on-surface-variant font-label-sm opacity-50">Sa</span>
+<!-- Simple Calendar Simulation -->
+<div class="p-3 text-body-md opacity-20">28</div>
+<div class="p-3 text-body-md opacity-20">29</div>
+<div class="p-3 text-body-md opacity-20">30</div>
+<div class="p-3 text-body-md hover:bg-surface-container-high rounded-full cursor-pointer">1</div>
+<div class="p-3 text-body-md hover:bg-surface-container-high rounded-full cursor-pointer">2</div>
+<div class="p-3 text-body-md hover:bg-surface-container-high rounded-full cursor-pointer">3</div>
+<div class="p-3 text-body-md hover:bg-surface-container-high rounded-full cursor-pointer">4</div>
+<div class="p-3 text-body-md hover:bg-surface-container-high rounded-full cursor-pointer">5</div>
+<div class="p-3 text-body-md hover:bg-surface-container-high rounded-full cursor-pointer">6</div>
+<div class="p-3 bg-primary text-white rounded-full cursor-pointer">7</div>
+<div class="p-3 bg-primary-fixed-dim text-primary rounded-full cursor-pointer">8</div>
+<div class="p-3 bg-primary text-white rounded-full cursor-pointer">9</div>
+<div class="p-3 text-body-md hover:bg-surface-container-high rounded-full cursor-pointer">10</div>
+<div class="p-3 text-body-md hover:bg-surface-container-high rounded-full cursor-pointer">11</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/20">
+<div class="flex justify-between items-center mb-6">
+<span class="text-body-md">2 Noches Seleccionadas</span>
+<span class="font-label-md text-primary">S/ 240.00 total</span>
+</div>
+<button class="w-full py-4 bg-primary text-white rounded-xl font-label-md hover:opacity-90 transition-all">Confirmar Reserva</button>
+</div>
+</div>
+</div>
+<script>
+        function toggleCalendar() {
+            const modal = document.getElementById('calendarModal');
+            modal.classList.toggle('hidden');
+        }
+
+        // Add event listeners to all "Reservar ahora" buttons for demonstration
+        document.querySelectorAll('button').forEach(btn => {
+            if (btn.innerText === 'Reservar ahora') {
+                btn.onclick = toggleCalendar;
+            }
+        });
+    </script>
+</body></html>

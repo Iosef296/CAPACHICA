@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /c/Users/crist/Documents/SISTEMAS/CAPACHICA/stitch_extracted)",
+      "Bash(unzip -o /c/Users/crist/Downloads/stitch_capachica_experience_ai.zip -d stitch_extracted/)",
+      "Bash(ipconfig)",
+      "Bash(netstat -ano)",
+      "Bash(curl -s -o /dev/null -w \"backend: %{http_code}\\\\n\" https://capachica-backend-production.up.railway.app/api/health)",
+      "Bash(curl -s -o /dev/null -w \"ia: %{http_code}\\\\n\" https://capachica-ia-production.up.railway.app/api/health)",
+      "Bash(curl -s -o /dev/null -w \"backend root: %{http_code}\\\\n\" https://capachica-backend-production.up.railway.app)",
+      "Bash(curl -s -o /dev/null -w \"ia root: %{http_code}\\\\n\" https://capachica-ia-production.up.railway.app)",
+      "Bash(curl -s -X POST https://capachica-ia-production.up.railway.app/api/chat -H \"Content-Type: application/json\" -d '{\"message\":\"Hola Killa\",\"history\":[]}' --max-time 30)",
+      "Bash(curl -s -X POST https://capachica-ia-production.up.railway.app/api/chat -H \"Content-Type: application/json\" -d '{\"mensaje\":\"Hola Killa, ¿qué actividades hay en Llachón?\"}' --max-time 60)",
+      "Bash(curl -s https://capachica-backend-production.up.railway.app/api/health --max-time 15)",
+      "Bash(curl -s -o /dev/null -w \"swagger: %{http_code}\\\\n\" https://capachica-backend-production.up.railway.app/api-docs/swagger.json --max-time 15)",
+      "Bash(curl -s https://capachica-backend-production.up.railway.app/api-docs/swagger.json --max-time 15)",
+      "Bash(curl -s https://capachica-backend-production.up.railway.app/api/__TRACKED_VAR__ --max-time 10)",
+      "Bash(curl -s \"https://capachica-backend-production.up.railway.app/api/festividades\" --max-time 10)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('count:',len\\(d\\)\\); print\\('keys:',list\\(d[0].keys\\(\\)\\) if d else []\\); print\\('sample item names:',[x['nombre'] for x in d[:5]]\\)\")",
+      "Bash(npm ls *)",
+      "Bash(npm install *)",
+      "Bash(curl -s --max-time 10 https://capachica-ia-production.up.railway.app/api/widget/config)",
+      "Bash(curl -s --max-time 10 https://capachica-ia-production.up.railway.app/api/admin/knowledge)"
+    ]
+  }
+}

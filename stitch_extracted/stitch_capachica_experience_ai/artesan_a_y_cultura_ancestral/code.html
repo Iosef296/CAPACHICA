@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Capachica - Artesanía y Cultura</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500;600&family=Hanken+Grotesk:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@100..900&family=Hanken+Grotesk:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .killa-glow {
+            box-shadow: 0 0 20px rgba(253, 140, 99, 0.2);
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f8f9fe;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #717880;
+            border-radius: 10px;
+        }
+        .premium-shadow {
+            box-shadow: 0 10px 30px rgba(0, 66, 104, 0.05);
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#f2f3f8",
+                    "primary-container": "#005a8c",
+                    "tertiary-fixed-dim": "#ffb2be",
+                    "on-surface-variant": "#41474f",
+                    "tertiary-fixed": "#ffd9de",
+                    "inverse-primary": "#95ccff",
+                    "primary-fixed-dim": "#95ccff",
+                    "error-container": "#ffdad6",
+                    "surface-container": "#eceef2",
+                    "tertiary-container": "#ac0044",
+                    "inverse-surface": "#2e3134",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-highest": "#e1e2e7",
+                    "outline-variant": "#c1c7d0",
+                    "on-secondary-container": "#742503",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed": "#400014",
+                    "on-error": "#ffffff",
+                    "error": "#ba1a1a",
+                    "surface-dim": "#d8dadf",
+                    "surface-container-high": "#e7e8ed",
+                    "on-primary-fixed-variant": "#004a75",
+                    "surface-tint": "#166395",
+                    "secondary-fixed": "#ffdbcf",
+                    "secondary-fixed-dim": "#ffb59b",
+                    "secondary-container": "#fd8c63",
+                    "on-tertiary-fixed-variant": "#900038",
+                    "tertiary": "#810031",
+                    "surface": "#f8f9fe",
+                    "on-secondary-fixed-variant": "#7e2c0a",
+                    "outline": "#717880",
+                    "on-background": "#191c1f",
+                    "secondary": "#9d4320",
+                    "primary": "#004268",
+                    "on-secondary": "#ffffff",
+                    "on-primary-container": "#9fd0ff",
+                    "surface-bright": "#f8f9fe",
+                    "on-primary-fixed": "#001d32",
+                    "primary-fixed": "#cde5ff",
+                    "on-surface": "#191c1f",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed": "#380d00",
+                    "surface-variant": "#e1e2e7",
+                    "inverse-on-surface": "#eff1f5",
+                    "background": "#f8f9fe",
+                    "on-tertiary-container": "#ffb8c3"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-padding": "24px",
+                    "gutter": "16px",
+                    "stack-lg": "40px",
+                    "stack-sm": "12px",
+                    "stack-md": "24px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "body-md": ["Hanken Grotesk"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "headline-lg-mobile": ["EB Garamond"],
+                    "headline-md": ["EB Garamond"],
+                    "label-sm": ["Hanken Grotesk"],
+                    "headline-lg": ["EB Garamond"],
+                    "display-lg": ["EB Garamond"],
+                    "label-md": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center px-container-padding py-base w-full sticky top-0 z-50 bg-surface/70 backdrop-blur-xl transition-all duration-300">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline/10">
+<img class="w-full h-full object-cover" data-alt="A sophisticated professional portrait of a user with warm lighting, set against a blurred background of Andean textiles. The style is premium and high-end, using soft focus and natural daylight to emphasize a modern, scholarly aesthetic consistent with the Capachica brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3YpVSpgP4RkQv0V0vMNVppGoc2kqA5LZxUBnuAccZspcHRQVxpENYbXrBp635vBWsat-PuJyj0PCYPC8_kk5AMVUjejyNOWGlQaWrgHOQ_KLGVRt9zl5KclHt6cwrWAEouydhe6Y2cyeebpqBZuON9YdRg3K_gPgdvstGeHRa6VGCnnIRaCI58KZ-zg4SVNFJ12XyEbMYbpxQhchh83T00828bq-Vgj-qMtqllG8ETTAyePErz1tbi06-hUUsR3E4IvwNk_ZUzQg"/>
+</div>
+<h1 class="font-headline-md text-headline-md-mobile md:text-headline-md text-primary tracking-tight">Capachica</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</header>
+<main class="px-container-padding mt-stack-md">
+<!-- Hero Section: Traditions -->
+<section class="mb-stack-lg">
+<div class="relative h-80 rounded-3xl overflow-hidden premium-shadow group">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A breathtaking close-up of a traditional Andean weaver's hands working on a backstrap loom. Vibrant yarns in deep reds, earthy ochres, and sky blues create intricate geometric patterns. The lighting is warm and golden, highlighting the tactile texture of the alpaca fibers and the ancient artistry of the Capachica region." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA9Q4-Ii-iGnpAi54ifXv0A5iZSTk5wqssAkv94et7uehmQ0z8tODLZE6kKiZby-uK2H_nedUaf-Zv4cXfcrhbpUAXXLYZBgXKCIwZl80I9q2kdmcCaXBv8atyPPZrrxnSNx_HcqiuUCaR8Ep6By_dfYs7uyUZRleBDfsVF3aV1hANYgkIfd8E9hql6fPhQIv1Lts4eDXUfikHEkk71vW0INkNV6_PA6G-5FKwX56DyawuFagMWDWYD9D4Ic3QWrTGcV9FSnGCmkgE')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-stack-md">
+<span class="bg-secondary text-on-secondary px-3 py-1 rounded-full font-label-sm text-label-sm mb-2 inline-block">Cultura Viva</span>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-white leading-tight">El Arte del Tejido Capachiqueño</h2>
+</div>
+</div>
+</section>
+<!-- Killa AI: Sabiduría Ancestral (Glassmorphism AI Card) -->
+<section class="mb-stack-lg">
+<div class="glass-panel border border-secondary/10 rounded-3xl p-stack-md killa-glow relative overflow-hidden">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-secondary" data-icon="auto_awesome" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<h3 class="font-label-md text-label-md text-secondary uppercase tracking-widest">Sabiduría Ancestral con Killa AI</h3>
+</div>
+<div class="flex flex-col md:flex-row gap-gutter items-center">
+<div class="w-20 h-20 flex-shrink-0 bg-secondary-container/30 rounded-full flex items-center justify-center border border-secondary/20">
+<span class="material-symbols-outlined text-secondary text-4xl" data-icon="conditions">conditions</span>
+</div>
+<div class="flex-1">
+<p class="font-headline-md text-headline-md text-primary mb-2">Simbolismo del "Ch’aska"</p>
+<p class="font-body-md text-on-surface-variant italic">"En nuestros textiles, la estrella de ocho puntas o Ch’aska no solo guía al viajero, representa el equilibrio entre los cuatro mundos y el fluir de la energía del Titicaca."</p>
+</div>
+</div>
+<div class="mt-4 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+<button class="flex-shrink-0 px-4 py-2 rounded-full border border-outline/20 text-label-sm font-label-sm hover:bg-surface-container transition-colors">Significado del Cóndor</button>
+<button class="flex-shrink-0 px-4 py-2 rounded-full border border-outline/20 text-label-sm font-label-sm hover:bg-surface-container transition-colors">La Chakana</button>
+<button class="flex-shrink-0 px-4 py-2 rounded-full border border-outline/20 text-label-sm font-label-sm hover:bg-surface-container transition-colors">Dualidad Hanan/Hurin</button>
+</div>
+</div>
+</section>
+<!-- Featured Artisans (Horizontal Carousel) -->
+<section class="mb-stack-lg">
+<div class="flex justify-between items-end mb-gutter">
+<div>
+<h3 class="font-headline-md text-headline-md text-primary">Maestros del Telar</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">Guardianes de la técnica milenaria</p>
+</div>
+<button class="text-secondary font-label-md text-label-md hover:underline">Ver todos</button>
+</div>
+<div class="flex gap-gutter overflow-x-auto pb-4 -mx-container-padding px-container-padding snap-x scrollbar-hide">
+<!-- Artisan Card 1 -->
+<div class="flex-shrink-0 w-64 snap-start">
+<div class="relative h-72 rounded-2xl overflow-hidden mb-3">
+<img class="w-full h-full object-cover" data-alt="A portrait of a serene elderly woman artisan, Mamá Victoria, dressed in traditional Capachica attire including a colorful embroidered pollera and a montera hat. She is sitting in a sunlit courtyard, her face lined with wisdom and a gentle smile, as she demonstrates her spinning technique with a drop spindle. The style is soft, tactile, and deeply human." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0Lmylmhy2eqBD1rgcDwU2v8pYm5xrfMhaHv1SgxKJLHkrjsV2x7NmmTJTHbVpkWi5DwTtC2OeyYzUpnrippViWlytwMEDGkz96bLw9XuD-vtG4aP4cYuJWp7S8IxL7zVwbKMyCQ-4qyLwDBaVK5Ck_hkxlbeAQyJM2BsadDZkzF7xFUammokxuOQsFIHzOsjs5jvLY2Vy4QmpjGKj0fzIflLpUNdwaq4JXedPis_MDeU5Q_F3RihLyTxY2VJAE0OlfxuwG5b2Kx4"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent"></div>
+<div class="absolute bottom-3 left-3">
+<p class="text-white font-label-md text-label-md">Mamá Victoria</p>
+<p class="text-white/80 text-xs">Experta en Fibras de Alpaca</p>
+</div>
+</div>
+<button class="w-full py-3 bg-primary text-on-primary rounded-xl font-label-md text-label-md active:scale-95 transition-transform flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="chat">chat</span>
+                        Contactar artesano
+                    </button>
+</div>
+<!-- Artisan Card 2 -->
+<div class="flex-shrink-0 w-64 snap-start">
+<div class="relative h-72 rounded-2xl overflow-hidden mb-3">
+<img class="w-full h-full object-cover" data-alt="A portrait of Mateo, a young artisan from the Capachica community, specializing in the weaving of traditional belts or 'chumpis'. He is shown in a modern yet rustic studio with natural light streaming in, highlighting the vivid colors of the textile he is working on. The atmosphere is scholarly yet fresh, blending ancient tradition with a contemporary touch." src="https://lh3.googleusercontent.com/aida-public/AB6AXuASKszA3RGRr4fnK2sDpezFm_YbFTJ8L7R3cqLpBXo2UbdTjTL4heKmWQEP9UyXZTrpfQfOELpZGRqzu6aLAyNLsvYsly37LeWEW2RI9wjKLfATz5rmdgpJ79IIpX_442BhNtX6XlPufwZvg1akBGu0C_ZADhbt8Vr58RnMynYOEEgnXIQnHwsR99e7985OHd9zykwyi2pAPRwqjcf5NWmPjEb5ARMTYm7_iGvj7onVb1KiBD84XwdyA0fYgJvGSpaeDTGXmY28Li4"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent"></div>
+<div class="absolute bottom-3 left-3">
+<p class="text-white font-label-md text-label-md">Mateo Huatta</p>
+<p class="text-white/80 text-xs">Maestro del Chumpi</p>
+</div>
+</div>
+<button class="w-full py-3 bg-primary text-on-primary rounded-xl font-label-md text-label-md active:scale-95 transition-transform flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="chat">chat</span>
+                        Contactar artesano
+                    </button>
+</div>
+</div>
+</section>
+<!-- Textile Gallery (Bento Grid) -->
+<section class="mb-stack-lg">
+<h3 class="font-headline-md text-headline-md text-primary mb-gutter">Galería de Piezas Únicas</h3>
+<div class="grid grid-cols-2 gap-gutter">
+<!-- Large Vertical Item -->
+<div class="col-span-1 row-span-2 glass-panel rounded-3xl overflow-hidden premium-shadow border border-outline/5 flex flex-col">
+<div class="h-64 relative">
+<img class="w-full h-full object-cover" data-alt="High-resolution close-up of a traditional Capachica poncho with complex, multi-colored geometric borders against a dark indigo base. The lighting emphasizes the individual stitches and the slight sheen of the high-quality alpaca wool. The composition is artistic and minimalist, focusing on the texture and pattern of the weaving." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCA5tKCHH4nuCFEH2hjA7ukTn7vdpzRf0K9eaIUcwJrQrnEOJaFrPK_krZBG6Dkjp4lYaLVUugqJv98n-raxc6Gu_q4WNHtnmnHp7M1X5dLCBIXCODZRZ48lmfZL42Gh8GAI0d5XK8Du6jeXUwcrYSF-_sQa5LGKbqL-nMi0IWnqK2xMxADvDzZXp_zrP5MLiNHjIhkyQsJ_azAoENmLc9k9s88dKT85o5L3nJKStGZr6WFu4H0RfZCt_UpvDuClz_b4SdBeMHWFt4"/>
+<div class="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded-full">
+<p class="text-primary font-bold text-xs">$240</p>
+</div>
+</div>
+<div class="p-4 flex-1">
+<h4 class="font-label-md text-label-md text-primary">Poncho Ceremonial</h4>
+<p class="text-xs text-on-surface-variant mt-1">Tejido en lana de alpaca premium con tintes naturales de cochinilla y chilca.</p>
+</div>
+</div>
+<!-- Small Item 1 -->
+<div class="glass-panel rounded-3xl overflow-hidden premium-shadow border border-outline/5">
+<div class="h-32 relative">
+<img class="w-full h-full object-cover" data-alt="Detailed macro photograph of a hand-woven Capachica belt or 'chumpi' showing intricate figures of llamas and agricultural symbols. The colors are vibrant Terracotta and Deep Blue. The focus is sharp on the textile detail, conveying a sense of premium quality and cultural depth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTAev1RJa2RSmpAIS2YjbTrdy1eqWaN6mZlHDPhNGnu5tYXJmE4rBTT3JAdlRn0T7_N5E-D5wwCwTTnaHc9lH5Z2M6rzMuxexB-Ibc0fV9QQI_E9YZee60eGW7v1DK8-Rqozpl8laviNtYW2jbdL9SXwp0_Xlqz-d8pk_bT6I7wta_Nl8YsS1xN8S5w2jVNd4eb5onIS6A66Wo_PCPhmTyJ7zBxxrvb_EcZX80_FX0sNrpRj5yy_9wC0gK6JNdy1FsqgvO7sevplA"/>
+</div>
+<div class="p-3">
+<h4 class="font-label-md text-label-md text-primary">Chumpi Tradicional</h4>
+</div>
+</div>
+<!-- Small Item 2 -->
+<div class="glass-panel rounded-3xl overflow-hidden premium-shadow border border-outline/5">
+<div class="h-32 relative">
+<img class="w-full h-full object-cover" data-alt="A beautiful, soft Chullo hat from Capachica, lying on a wooden rustic surface. The hat features iconic earflaps and detailed symbolic patterns in shades of pink and slate blue. Soft, diffused lighting creates a cozy and authentic feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCabG7cQJkKT1gDsD3x0_i0rw27yYwLqoT87yPnPSV2LvtClvABPxYCM8VmJqL3DahyjOjFWmoK0qmwEvDXHW9Sy5sJBi0lfvgvkOG4Sb88IEmz9eu1h-TuXmdC8KOcdR7XlCW44kVcwmE3L6mJ5LYcsbdpB9IxxX-1ddQoFUTycloLHGdf3jHU2g1N-vUCvJHvjGw4WYH3ig29gkvfjsN4aZ0KzLwcOsrkShoLZXJ6oSlzmaDyJKzoDP19KLEaavd5b2z-wXl7FNc"/>
+</div>
+<div class="p-3">
+<h4 class="font-label-md text-label-md text-primary">Chullo de Gala</h4>
+</div>
+</div>
+</div>
+</section>
+<!-- Cultural Insights Section -->
+<section class="mb-stack-lg bg-surface-container-high rounded-[32px] p-stack-md">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white">
+<span class="material-symbols-outlined" data-icon="palette">palette</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-primary">Tintes de la Tierra</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">El color del Titicaca</p>
+</div>
+</div>
+<p class="font-body-md text-on-surface-variant mb-4">
+                Cada color en nuestras vestimentas cuenta una historia. El **rojo** extraído de la cochinilla representa la fuerza vital, mientras que el **azul** de la planta del añil simboliza la profundidad del lago sagrado.
+            </p>
+<div class="grid grid-cols-4 gap-2">
+<div class="aspect-square bg-[#810031] rounded-full border-4 border-white shadow-sm"></div>
+<div class="aspect-square bg-[#004268] rounded-full border-4 border-white shadow-sm"></div>
+<div class="aspect-square bg-[#9d4320] rounded-full border-4 border-white shadow-sm"></div>
+<div class="aspect-square bg-[#fd8c63] rounded-full border-4 border-white shadow-sm"></div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-surface-container-lowest/80 backdrop-blur-2xl border-t border-secondary/10 shadow-[0_-10px_30px_rgba(0,66,104,0.05)] rounded-t-xl">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90 duration-150">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm">Inicio</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90 duration-150">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span class="font-label-sm text-label-sm">Mapa</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90 duration-150">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-label-sm text-label-sm">Killa AI</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1.5 transition-all active:scale-90 duration-150">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-label-sm text-label-sm">Experiencias</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90 duration-150">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm">Perfil</span>
+</button>
+</nav>
+<script>
+        // Simple scroll interaction for header
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 20) {
+                header.classList.add('shadow-md', 'bg-surface/95');
+            } else {
+                header.classList.remove('shadow-md', 'bg-surface/70');
+            }
+        });
+
+        // Hover effect for artisan buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('touchstart', () => btn.classList.add('scale-95'));
+            btn.addEventListener('touchend', () => btn.classList.remove('scale-95'));
+        });
+    </script>
+</body></html>

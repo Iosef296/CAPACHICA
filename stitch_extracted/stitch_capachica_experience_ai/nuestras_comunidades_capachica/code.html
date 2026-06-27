@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Comunidades de Capachica | Exploración Cultural</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: EB Garamond & Hanken Grotesk -->
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&amp;family=Hanken+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#ac0044",
+                    "surface-variant": "#e1e2e7",
+                    "error": "#ba1a1a",
+                    "surface-container-highest": "#e1e2e7",
+                    "primary-fixed-dim": "#95ccff",
+                    "secondary-fixed": "#ffdbcf",
+                    "inverse-on-surface": "#eff1f5",
+                    "on-error-container": "#93000a",
+                    "secondary": "#9d4320",
+                    "on-error": "#ffffff",
+                    "secondary-fixed-dim": "#ffb59b",
+                    "on-tertiary-fixed": "#400014",
+                    "surface-container-high": "#e7e8ed",
+                    "surface-container": "#eceef2",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed-variant": "#004a75",
+                    "background": "#f8f9fe",
+                    "outline": "#717880",
+                    "on-secondary-fixed-variant": "#7e2c0a",
+                    "on-primary-fixed": "#001d32",
+                    "on-background": "#191c1f",
+                    "inverse-surface": "#2e3134",
+                    "on-primary": "#ffffff",
+                    "surface-bright": "#f8f9fe",
+                    "primary-fixed": "#cde5ff",
+                    "on-surface": "#191c1f",
+                    "on-surface-variant": "#41474f",
+                    "tertiary": "#810031",
+                    "outline-variant": "#c1c7d0",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-container": "#ffb8c3",
+                    "surface-dim": "#d8dadf",
+                    "on-primary-container": "#9fd0ff",
+                    "surface-container-low": "#f2f3f8",
+                    "surface": "#f8f9fe",
+                    "tertiary-fixed-dim": "#ffb2be",
+                    "surface-tint": "#166395",
+                    "secondary-container": "#fd8c63",
+                    "on-secondary-fixed": "#380d00",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-container": "#005a8c",
+                    "on-secondary-container": "#742503",
+                    "tertiary-fixed": "#ffd9de",
+                    "primary": "#004268",
+                    "inverse-primary": "#95ccff",
+                    "on-tertiary-fixed-variant": "#900038"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-lg": "40px",
+                    "gutter": "16px",
+                    "container-padding": "24px",
+                    "stack-md": "24px",
+                    "stack-sm": "12px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "label-md": ["Hanken Grotesk"],
+                    "headline-lg-mobile": ["EB Garamond"],
+                    "body-md": ["Hanken Grotesk"],
+                    "label-sm": ["Hanken Grotesk"],
+                    "headline-lg": ["EB Garamond"],
+                    "display-lg": ["EB Garamond"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "headline-md": ["EB Garamond"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(157, 67, 32, 0.1);
+        }
+        .text-shadow-sm {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #fd8c63;
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-32">
+<!-- TopAppBar Shell -->
+<header class="flex justify-between items-center px-container-padding py-base w-full sticky top-0 z-50 bg-surface/70 backdrop-blur-xl">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/20">
+<img class="w-full h-full object-cover" data-alt="A close-up portrait of a traveler with a friendly smile, set against a blurred background of Lake Titicaca at sunset. The lighting is warm and golden, reflecting the premium Andean contemporary aesthetic. The style is professional travel photography with soft depth of field and vibrant natural colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrqrFZrWe1aEtok3Iq7QroSw5bbDaY_G_RjQu7TtrYAWV0_dPNyTOatvusg0HRgXl6r23gl2WFOWiV2Fc0tn_F4ws2ulT_lLtqoQaTuN9UKrpC2dWZwkR13w1dbXeRjdQHmEdedoY1Fpw1glOH29gZUQsghrebZ-F9SG6wTlMnRfw3u7hGJw8fZ2hU15EwryUQOz3ENAY7jeCGEivZIT_tPcQRxlME8xv8cxVoBpskSNHtm189W9NKQbNe6u79ascEFmBR7GoS0D8"/>
+</div>
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">Capachica</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:opacity-80 transition-opacity active:scale-95 text-primary">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</header>
+<main class="px-container-padding pt-stack-md">
+<!-- Hero Section -->
+<section class="mb-stack-lg">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-2">Comunidades Ancestrales</h2>
+<p class="font-body-md text-on-surface-variant max-w-md">Descubre el corazón de la península a través de sus pueblos, donde el tiempo se detiene y la tradición cobra vida.</p>
+</section>
+<!-- Bento Grid: Communities -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md mb-stack-lg">
+<!-- Community: Llachón -->
+<div class="group relative overflow-hidden rounded-[24px] shadow-[0_10px_30px_rgba(0,66,104,0.05)] h-[420px] transition-transform duration-500 hover:-translate-y-1">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" data-alt="Panoramic view of Llachón village at the edge of Lake Titicaca. Traditional stone houses with red tiled roofs are nestled between terraced hills and the deep blue water. The sun is shining brightly, casting clear shadows and highlighting the earthy terracotta tones of the landscape. High-end cultural travel photography style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBbiklvwVg6Wt0KwJ7W0oFWWiAKJbF2DNJ-pc4q4g6A-A79UiW-acB9PzR6m06QHj3Ip1v5IfRgtWHmvzzwRrPhm59yChdnh0DYwCOJOgzSGk8N3QhU0TJ4iqSCym8X7rcz5Se0y4wWNCFz7IQ6VT3iH1xLcxt-XXqvghAFAKgRt_b3I8xMlIgrvTHP5XV4Fu9wD7dItu7DDXQS-zJ2UuYY4eRU82AZmUBfG46RU2a_3ww1JfzndaknRsITAK2Wiqo1ATUPAnfIP-o')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-container-padding w-full">
+<span class="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-3 py-1 rounded-full mb-3 inline-block">Más Popular</span>
+<h3 class="font-headline-md text-white mb-2">Llachón</h3>
+<p class="text-white/80 font-body-md text-sm line-clamp-2 mb-4">Cuna de tejedores y guardianes de la sabiduría andina, famoso por sus impresionantes atardeceres sobre el lago.</p>
+<div class="flex gap-2">
+<div class="glass-card px-3 py-2 rounded-xl flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary" data-icon="checkroom">checkroom</span>
+<span class="text-xs font-label-md text-primary">Tejido Tradicional</span>
+</div>
+<div class="glass-card px-3 py-2 rounded-xl flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary" data-icon="kayaking">kayaking</span>
+<span class="text-xs font-label-md text-primary">Navegación</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Community: Ccotos -->
+<div class="group relative overflow-hidden rounded-[24px] shadow-[0_10px_30px_rgba(0,66,104,0.05)] h-[420px] transition-transform duration-500 hover:-translate-y-1">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" data-alt="The tranquil community of Ccotos on a peninsula, featuring lush green eucalyptus trees framing a white sandy beach by the Lake Titicaca. Local people in vibrant traditional Andean clothing are engaged in agriculture. The atmosphere is serene and scholarly, with soft morning light illuminating the misty mountains in the distance." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD0T2VLIlEAuq_FGTymjvMMUCh5vlvW_h4U7CCNIyZKoDZXZDaBhIYjt63vj-5gYaYDJx8tAcFa5lNVaC5WWwtFAQKGRQ-5PkVRB5iJ4QM1bIMunf-aUja1_vWDf_04WBUlRbix0QLWhziSjdilV1wRRE1IOKXr40ablwohlmooCK1d_LraRST_tj8dYNBx3K6fFZrrz-2uVaen01wwP-0mY9JnVYWfwXRN7iSQFbJHPmXUKLN5gta1mG5ZD3GPSHwIBKcK3DJpGGQ')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-container-padding w-full">
+<h3 class="font-headline-md text-white mb-2">Ccotos</h3>
+<p class="text-white/80 font-body-md text-sm line-clamp-2 mb-4">Un refugio de paz rodeado de playas de arena blanca y bosques de eucaliptos donde la naturaleza y el hombre conviven en armonía.</p>
+<div class="flex gap-2">
+<div class="glass-card px-3 py-2 rounded-xl flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary" data-icon="beach_access">beach_access</span>
+<span class="text-xs font-label-md text-primary">Playas del Lago</span>
+</div>
+<div class="glass-card px-3 py-2 rounded-xl flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary" data-icon="forest">forest</span>
+<span class="text-xs font-label-md text-primary">Senderismo</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Community: Chifrón -->
+<div class="md:col-span-1 group relative overflow-hidden rounded-[24px] shadow-[0_10px_30px_rgba(0,66,104,0.05)] h-[300px] transition-transform duration-500 hover:-translate-y-1">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Close-up of traditional agricultural terraces in Chifrón, showcasing the ancient stone-wall engineering. Farmers are seen working the land with traditional tools. The lighting is high-contrast, emphasizing the textures of the soil and stone. Modern Andean aesthetic with a focus on tactile earthy details." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCPsh7LfHVKi54mQvgweBC2o_hfRj3CsIRhw2BffSYog7E5boxQPz8o-ZhBqFZKQwmHN62bqzbGEb79kRjrgLo1Hvvru-5zsVsq9wXhVzWjK1xyz0jux9nB7xHcY0AlGocgBm5n68zzMGcHrrrsK8Z8KUOXPl8bNJ6dNstwaciwNCjmQnN7_5qhPjbv_ABwmkfA9G6kwQHBJ3_2InIOoupu53NCsC5khmCqFqsobCJsK1mC9Qg5GNr1_4lcE96ffJtZCICF2Gj0r8s')"></div>
+<div class="absolute inset-0 bg-primary/40 group-hover:bg-primary/20 transition-colors duration-300"></div>
+<div class="absolute inset-0 flex flex-col justify-end p-6">
+<h3 class="font-headline-md text-white">Chifrón</h3>
+<p class="text-white/90 text-sm font-label-md">Sabiduría Agrícola</p>
+</div>
+</div>
+<!-- Community: Yapura -->
+<div class="md:col-span-1 group relative overflow-hidden rounded-[24px] shadow-[0_10px_30px_rgba(0,66,104,0.05)] h-[300px] transition-transform duration-500 hover:-translate-y-1">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="A mystical evening scene in Yapura, with a traditional stone archway framing a view of the stars over Lake Titicaca. A small campfire burns in the foreground, casting a warm glow on local storytellers. The style is majestic and intuitive, with deep blue night sky and warm firelight highlights." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCZbIiGe_WV7k_momXVEsW5dN35t2RDu6wPRAr2oWlTgb5K7xg9plMWlMfWWYZQ5IjdBWxhy_ykMlsNwe6OSajPCzF-n3-raTbTrm8hm7_kaZEYMJqd8yabsUTZpLEDDNZE1KxobG0eGsHHU2lE5LYf0kle1PxLBUiDH68DLC6oxVGPXo-lGv6ypy3DCDI-IgaxCa1R3C414Alp5Y4rjBQcGa4dQdNN5LWbqcvD1VUx--boK4s3J1Aidj2Z1tD5jtXRiSFlTLApbIQ')"></div>
+<div class="absolute inset-0 bg-primary/40 group-hover:bg-primary/20 transition-colors duration-300"></div>
+<div class="absolute inset-0 flex flex-col justify-end p-6">
+<h3 class="font-headline-md text-white">Yapura</h3>
+<p class="text-white/90 text-sm font-label-md">Astronomía &amp; Leyendas</p>
+</div>
+</div>
+</div>
+<!-- Section: Familias Anfitrionas -->
+<section class="mb-stack-lg">
+<div class="flex justify-between items-end mb-stack-md">
+<div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Familias Anfitrionas</h2>
+<p class="font-body-md text-on-surface-variant">La verdadera esencia de Capachica en su gente.</p>
+</div>
+<button class="text-secondary font-label-md hover:underline">Ver todas</button>
+</div>
+<!-- Horizontal Scroll Familias -->
+<div class="flex gap-gutter overflow-x-auto pb-4 custom-scrollbar snap-x">
+<!-- Family Card 1 -->
+<div class="min-w-[280px] snap-center glass-card rounded-[24px] p-4 flex flex-col items-center text-center">
+<div class="relative mb-4">
+<div class="w-24 h-24 rounded-full overflow-hidden border-4 border-secondary/20 shadow-lg">
+<img class="w-full h-full object-cover" data-alt="Portrait of a smiling elderly Andean woman, Mama Julia, wearing a traditional embroidered blouse and a colorful hat. Her face shows wisdom and kindness. Behind her is a traditional kitchen with clay pots. The lighting is soft and natural, emphasizing a tactile, warm aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPoNrRKmXBdDtW6QMBauRMUQ9ph_tQEUPIc1Vifmnvf1PLbSZ9OuAJ8_lpwhcMxYiZ-35_Qr7FpRCi5huH2-D1QKIsHkk9StnifksB3qYh6dGw5Libmrn6KghsdpdLD0G-AqZkQltpTVDdWWRRGcx19oOy81icJ8bhP3anwFE752TMXGie3LLmRBpS6yVSsoPv4Qa4l2vuRWh6N9how3IIAF2tRdwa4LQrr0KkDBhI3BlQ0R7tY4X8rKu7OxcIqIdKtLQZuxzhwOw"/>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-secondary text-white w-8 h-8 rounded-full flex items-center justify-center border-2 border-white">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<h4 class="font-headline-md text-primary text-lg">Familia Quispe</h4>
+<p class="text-secondary font-label-sm mb-2">Comunidad de Llachón</p>
+<p class="text-on-surface-variant text-sm font-body-md italic mb-4">"Nuestra casa es su casa. Compartimos el sabor de la tierra."</p>
+<div class="flex gap-2 mb-4">
+<span class="text-[10px] px-2 py-1 bg-surface-container rounded-full text-on-surface-variant font-label-md">Cocina Colonial</span>
+<span class="text-[10px] px-2 py-1 bg-surface-container rounded-full text-on-surface-variant font-label-md">Textiles</span>
+</div>
+<button class="w-full py-3 bg-primary text-white rounded-xl font-label-md hover:opacity-90 transition-opacity">Contactar</button>
+</div>
+<!-- Family Card 2 -->
+<div class="min-w-[280px] snap-center glass-card rounded-[24px] p-4 flex flex-col items-center text-center">
+<div class="relative mb-4">
+<div class="w-24 h-24 rounded-full overflow-hidden border-4 border-secondary/20 shadow-lg">
+<img class="w-full h-full object-cover" data-alt="A friendly Andean family, the Coila family, standing in front of their eco-lodge in Ccotos. They are wearing traditional festive attire. The background features a vibrant garden and the blue lake. The lighting is bright and cheerful, representing 'Guided Discovery' and hospitality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYy3Nb4GFLrvUwJ-cH3_Pf5TbN4ub_tqFHEea6lFd1Z9QKmi9tLlI6VJDXKzGKvQ1Cd-HHD_uHNhHBqzrN0nHNNzIYpBeUb4nYtugFXi4WqKuN78m1Yu8hrLeMlugU020ehTuSs1SFDbsWUhp6k8a2I4EKOp3D6cUyk5GHEAbziLTu6nuHWYd2vSUhaCV6bu87TWqCvLWfry3qtQoCY8PNPScSV663Np9Fs5eLv37PemWRN9Z5E8cfWZZEtWmFD4z9MnbSwTjwa5A"/>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-secondary text-white w-8 h-8 rounded-full flex items-center justify-center border-2 border-white">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<h4 class="font-headline-md text-primary text-lg">Familia Coila</h4>
+<p class="text-secondary font-label-sm mb-2">Comunidad de Ccotos</p>
+<p class="text-on-surface-variant text-sm font-body-md italic mb-4">"Guardianes de la playa y expertos pescadores del Titicaca."</p>
+<div class="flex gap-2 mb-4">
+<span class="text-[10px] px-2 py-1 bg-surface-container rounded-full text-on-surface-variant font-label-md">Pesca Artesanal</span>
+<span class="text-[10px] px-2 py-1 bg-surface-container rounded-full text-on-surface-variant font-label-md">Fogatas</span>
+</div>
+<button class="w-full py-3 border-2 border-secondary text-secondary rounded-xl font-label-md hover:bg-secondary/5 transition-colors">Contactar</button>
+</div>
+<!-- Family Card 3 -->
+<div class="min-w-[280px] snap-center glass-card rounded-[24px] p-4 flex flex-col items-center text-center">
+<div class="relative mb-4">
+<div class="w-24 h-24 rounded-full overflow-hidden border-4 border-secondary/20 shadow-lg">
+<img class="w-full h-full object-cover" data-alt="Portrait of Don Mariano, an artisan from Chifrón, working on a stone sculpture. He has a focused expression and weathered hands. The scene is lit by golden afternoon light that picks out the textures of the stone and his wool poncho. Majestic and scholarly atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOh-7xStapa0JWgEM3-5-msbvTZp4kuOltYr9Pjbq2mFZKeJ8nRTDHXncrCfXkAwuYApYCzhzen2h8soJAKpVzpz1CPCWOZf-VnScKF8r5ExVun-ppnbRHes8dnXMuIAdOppBgcBKGXiMoDNAwj0I6hpJnRNwlq6HrE9Ca_XzrHvJFen5ERRClqFDW_Dafub6Pa0vz6stlIfSKcV5ka_ov_9jxroLOss5vi_2KQVcJ5EPAzf5Fdh6t27zTtYXsioteEYGya4Ax4C0"/>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-secondary text-white w-8 h-8 rounded-full flex items-center justify-center border-2 border-white">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<h4 class="font-headline-md text-primary text-lg">Familia Flores</h4>
+<p class="text-secondary font-label-sm mb-2">Comunidad de Chifrón</p>
+<p class="text-on-surface-variant text-sm font-body-md italic mb-4">"Maestros de la piedra y la agricultura de altura."</p>
+<div class="flex gap-2 mb-4">
+<span class="text-[10px] px-2 py-1 bg-surface-container rounded-full text-on-surface-variant font-label-md">Cantería</span>
+<span class="text-[10px] px-2 py-1 bg-surface-container rounded-full text-on-surface-variant font-label-md">Siembra</span>
+</div>
+<button class="w-full py-3 border-2 border-secondary text-secondary rounded-xl font-label-md hover:bg-secondary/5 transition-colors">Contactar</button>
+</div>
+</div>
+</section>
+<!-- Killa AI Call to Action -->
+<section class="mb-stack-lg p-container-padding rounded-[32px] bg-primary relative overflow-hidden">
+
+<div class="relative z-10 text-center">
+<span class="material-symbols-outlined text-secondary-container text-4xl mb-4" data-icon="auto_awesome">auto_awesome</span>
+<h2 class="font-headline-md text-white mb-2">¿Buscas algo específico?</h2>
+<p class="text-primary-fixed-dim font-body-md mb-6">Pregúntale a Killa AI sobre rutas personalizadas o ceremonias tradicionales disponibles hoy.</p>
+<div class="relative max-w-sm mx-auto">
+<input class="w-full py-4 px-6 rounded-full glass-card border-none text-on-background placeholder:text-on-surface-variant/50 focus:ring-2 focus:ring-secondary-container" placeholder="Ej. ¿Qué rituales hay en Llachón?" type="text"/>
+<button class="absolute right-2 top-2 bottom-2 aspect-square bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar Shell -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-surface-container-lowest/80 backdrop-blur-2xl border-t border-secondary/10 shadow-[0_-10px_30px_rgba(0,66,104,0.05)] rounded-t-xl">
+<div class="flex flex-col items-center justify-center text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm mt-1">Inicio</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span class="font-label-sm text-label-sm mt-1">Mapa</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-label-sm text-label-sm mt-1">Killa AI</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1.5 transition-all">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-label-sm text-label-sm mt-1">Experiencias</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm mt-1">Perfil</span>
+</div>
+</nav>
+<script>
+        // Micro-interaction for family cards
+        const familyCards = document.querySelectorAll('.snap-center');
+        familyCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'scale(1.02)';
+                card.style.transition = 'transform 0.3s ease';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+
+        // Floating animation for AI icon
+        const aiIcon = document.querySelector('[data-icon="auto_awesome"]');
+        if (aiIcon) {
+            let angle = 0;
+            setInterval(() => {
+                angle += 0.05;
+                const y = Math.sin(angle) * 5;
+                aiIcon.style.transform = `translateY(${y}px)`;
+            }, 30);
+        }
+    </script>
+</body></html>

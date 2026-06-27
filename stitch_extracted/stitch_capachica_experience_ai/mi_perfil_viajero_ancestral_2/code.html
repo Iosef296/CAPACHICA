@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Perfil del Viajero - Capachica</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#ac0044",
+                    "surface-variant": "#e1e2e7",
+                    "error": "#ba1a1a",
+                    "surface-container-highest": "#e1e2e7",
+                    "primary-fixed-dim": "#95ccff",
+                    "secondary-fixed": "#ffdbcf",
+                    "inverse-on-surface": "#eff1f5",
+                    "on-error-container": "#93000a",
+                    "secondary": "#9d4320",
+                    "on-error": "#ffffff",
+                    "secondary-fixed-dim": "#ffb59b",
+                    "on-tertiary-fixed": "#400014",
+                    "surface-container-high": "#e7e8ed",
+                    "surface-container": "#eceef2",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed-variant": "#004a75",
+                    "background": "#f8f9fe",
+                    "outline": "#717880",
+                    "on-secondary-fixed-variant": "#7e2c0a",
+                    "on-primary-fixed": "#001d32",
+                    "on-background": "#191c1f",
+                    "inverse-surface": "#2e3134",
+                    "on-primary": "#ffffff",
+                    "surface-bright": "#f8f9fe",
+                    "primary-fixed": "#cde5ff",
+                    "on-surface": "#191c1f",
+                    "on-surface-variant": "#41474f",
+                    "tertiary": "#810031",
+                    "outline-variant": "#c1c7d0",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-container": "#ffb8c3",
+                    "surface-dim": "#d8dadf",
+                    "on-primary-container": "#9fd0ff",
+                    "surface-container-low": "#f2f3f8",
+                    "surface": "#f8f9fe",
+                    "tertiary-fixed-dim": "#ffb2be",
+                    "surface-tint": "#166395",
+                    "secondary-container": "#fd8c63",
+                    "on-secondary-fixed": "#380d00",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-container": "#005a8c",
+                    "on-secondary-container": "#742503",
+                    "tertiary-fixed": "#ffd9de",
+                    "primary": "#004268",
+                    "inverse-primary": "#95ccff",
+                    "on-tertiary-fixed-variant": "#900038"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-lg": "40px",
+                    "gutter": "16px",
+                    "container-padding": "24px",
+                    "stack-md": "24px",
+                    "stack-sm": "12px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "label-md": ["Hanken Grotesk"],
+                    "headline-lg-mobile": ["EB Garamond"],
+                    "body-md": ["Hanken Grotesk"],
+                    "label-sm": ["Hanken Grotesk"],
+                    "headline-lg": ["EB Garamond"],
+                    "display-lg": ["EB Garamond"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "headline-md": ["EB Garamond"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md overflow-x-hidden selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- Top Navigation Bar -->
+<nav class="flex justify-between items-center px-container-padding py-base w-full sticky top-0 z-50 bg-surface/70 backdrop-blur-xl">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden border-2 border-primary-fixed">
+<img class="w-full h-full object-cover" data-alt="A portrait of a sophisticated modern traveler in her 30s, looking serenely at the camera. The lighting is soft and natural, emphasizing a high-end travel aesthetic. Behind her, a blurred soft-focus view of the Andes mountains creates a majestic and scholarly mood, blending organic earth tones with the clean light-mode UI style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8QzXhWTp1kJQH6o3nAmoW1gKCY7HHfNzA8Pr3VQ75M1AuZxUjkN3fuwshPxxx-z2Ysj7eDbXYpb-zMuSiwSPnfYBzFmhSobASDPVsU2l7l_EZRk2KlIQHxZ35MeItebmocA8CIwsxfc8QE9jHySPGm6ho-2HF3meeBvVuioPolg_qJh4dQu0cc0gw69Z3j75e_1V6DpRy4jn0iE4bC_6EjfOIDmU0uNiEG8SLLdgxYufTpiQKrNTnXsbEEEM2_-RhTphFPWdVUjM"/>
+</div>
+<span class="font-headline-md text-headline-md text-primary tracking-tight">Capachica</span>
+</div>
+<button class="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</nav>
+<main class="pb-24">
+<!-- Hero Header -->
+<header class="px-container-padding pt-stack-md pb-stack-lg">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-1">¡Jallalla, Elena!</h1>
+<p class="font-body-md text-on-surface-variant">Tu travesía por el Altiplano continúa.</p>
+</header>
+<!-- Stats Bento Grid -->
+<section class="px-container-padding mb-stack-lg">
+<div class="grid grid-cols-2 gap-4">
+<div class="glass-card p-5 rounded-[24px] shadow-[0_10px_30px_rgba(0,66,104,0.05)] border border-secondary/10 flex flex-col justify-between h-32">
+<span class="material-symbols-outlined text-secondary text-3xl">map</span>
+<div>
+<p class="font-display-lg text-primary text-[32px] leading-none mb-1">12</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Comunidades</p>
+</div>
+</div>
+<div class="glass-card p-5 rounded-[24px] shadow-[0_10px_30px_rgba(0,66,104,0.05)] border border-secondary/10 flex flex-col justify-between h-32">
+<span class="material-symbols-outlined text-secondary text-3xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<div>
+<p class="font-display-lg text-primary text-[32px] leading-none mb-1">45</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Experiencias</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Killa AI History -->
+<section class="mb-stack-lg">
+<div class="flex justify-between items-end px-container-padding mb-4">
+<h2 class="font-headline-md text-headline-md text-primary">Rutas de Killa AI</h2>
+<button class="font-label-md text-label-md text-secondary hover:underline">Ver todas</button>
+</div>
+<div class="flex gap-4 overflow-x-auto px-container-padding hide-scrollbar snap-x">
+<!-- AI Route Card 1 -->
+<div class="min-w-[280px] snap-center glass-card rounded-[24px] overflow-hidden border border-secondary/10 shadow-[0_10px_30px_rgba(0,66,104,0.05)]">
+<div class="h-32 w-full relative">
+<div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/40"></div>
+<img class="w-full h-full object-cover" data-alt="A cinematic aerial view of a winding road through the rugged Andean landscape near Lake Titicaca. The sunlight is golden and warm, casting long shadows over terraced hills. The colors are earthy terracotta and deep slate, following the modern Andean contemporary aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsQ6X-kGgqGShHwx7Boe17rKzDHJ8271P3nYM7kgS5tYRhCY0ty3J_f-equ5vntzS_boW__hDGhpLcgR2B9HpgC56P8gK57twCJ4koUEXl_TJDSQT-KG9gvqV11QOWsRKOesDPeYDDDhcmqZwVV0rz-rAyT6VqYsc4yppSWd0hA1mS4P122R6jfMwZdyS4sj5dDG_i_4oCg3N1BSym3LEsIEtSW-cWe4fLToSlciBAVBEINaMGfgEyxRgNI4ypPVEnLmWuePLr1_E"/>
+<div class="absolute top-3 left-3 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">bolt</span>
+                            NUEVO
+                        </div>
+</div>
+<div class="p-4">
+<h3 class="font-label-md text-label-md text-primary mb-1">Mística del Titicaca</h3>
+<p class="text-xs text-on-surface-variant mb-3">Ruta de 3 días • Sillustani &amp; Amantaní</p>
+<button class="w-full py-2 bg-primary text-on-primary rounded-xl font-label-md active:scale-95 transition-transform">Retomar Ruta</button>
+</div>
+</div>
+<!-- AI Route Card 2 -->
+<div class="min-w-[280px] snap-center glass-card rounded-[24px] overflow-hidden border border-secondary/10 shadow-[0_10px_30px_rgba(0,66,104,0.05)]">
+<div class="h-32 w-full relative">
+<div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/40"></div>
+<img class="w-full h-full object-cover" data-alt="A serene landscape of traditional Andean reed boats (totora) floating on the calm, crystal clear blue waters of Lake Titicaca at sunrise. The sky is a soft Textile Pink and Deep Blue. The overall mood is scholarly, peaceful and majestic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8_QfRz5FIApZiugTjInRO50Fkvf0HvxhnUkyylvv2NUHpImPeqmDYDWLvA_jNxgRF5zNpG4lHtoRvWU_IyOml1ccs35ExwBRFGOTOwrS6DNnHgJ3P6T018ygaQho2Nl8TAWC9mCdBlOUxwnUh8w9kLeYx1YViKQau6SIRcyKxTCZi-wP8yx0srMFk2ELiBrLkLcGUnAkal-n9-Ti47xTcIcFE5OmAyLPHjaRmBMWE8PNaE5WSoxcrEo_kIZ8g7pNI3jyriuJYvHM"/>
+</div>
+<div class="p-4">
+<h3 class="font-label-md text-label-md text-primary mb-1">Tejidos de Taquile</h3>
+<p class="text-xs text-on-surface-variant mb-3">Ruta Cultural • 1 día • Inmersión Textil</p>
+<button class="w-full py-2 border border-secondary text-secondary rounded-xl font-label-md active:scale-95 transition-transform">Ver Detalles</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Past Experiences & Rating -->
+<section class="px-container-padding mb-stack-lg">
+<h2 class="font-headline-md text-headline-md text-primary mb-4">Calificar Experiencias</h2>
+<div class="space-y-4">
+<div class="glass-card p-4 rounded-[24px] flex items-center gap-4 border border-secondary/10">
+<div class="w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Close up of traditional Andean pottery being hand-painted with intricate geometric motifs. The hands are weathered and experienced, belonging to a local artisan. Earthy terracotta tones dominate the palette, with a warm, tactile light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBsB3CFIvrZuI_LFPruNXRZlNzysvi6H5PQQxGJ0-slnWdDyHKOCamUjh8HjOvUQDIwczlxDA_AGgwBcOnBvoQZ2ZdkTgCTJMNQf7p_6BHfDdHzJkStSQ5qHlytnBMvs873CvLhROf-CRXkRAXB0Aa0-Y1y5-iy551QH5UanmD4ghK27O2eu61aPRBsmg0SgpsNIfXCt569MAO2CErRLihxoVfj7K1esbJqEo89IEG010UVhfhZYGGz4x-Rkav_vujgmFn3i7zCsQ"/>
+</div>
+<div class="flex-grow">
+<h4 class="font-label-md text-label-md text-primary">Taller de Cerámica Llachón</h4>
+<p class="text-xs text-on-surface-variant mb-2">Hace 2 días</p>
+<div class="flex gap-1">
+<button class="material-symbols-outlined text-secondary text-lg" onclick="this.textContent = 'star'" style="font-variation-settings: 'FILL' 0;">star</button>
+<button class="material-symbols-outlined text-secondary text-lg" onclick="this.textContent = 'star'" style="font-variation-settings: 'FILL' 0;">star</button>
+<button class="material-symbols-outlined text-secondary text-lg" onclick="this.textContent = 'star'" style="font-variation-settings: 'FILL' 0;">star</button>
+<button class="material-symbols-outlined text-secondary text-lg" onclick="this.textContent = 'star'" style="font-variation-settings: 'FILL' 0;">star</button>
+<button class="material-symbols-outlined text-secondary text-lg" style="font-variation-settings: 'FILL' 0;">star</button>
+</div>
+</div>
+<button class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary active:scale-90 transition-transform">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Favorites Section -->
+<section class="px-container-padding mb-stack-lg">
+<div class="flex justify-between items-end mb-4">
+<h2 class="font-headline-md text-headline-md text-primary">Mis Favoritos</h2>
+<div class="flex gap-2">
+<span class="px-3 py-1 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm">Todos</span>
+<span class="px-3 py-1 rounded-full border border-outline-variant text-on-surface-variant font-label-sm text-label-sm">Lugares</span>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-4">
+<div class="relative rounded-[24px] overflow-hidden h-48 group">
+<img class="w-full h-full object-cover" data-alt="A majestic view of an ancient Andean stone temple overlooking a vast blue lake. The stones are expertly fitted together without mortar. The lighting is dramatic, high-contrast afternoon sun, creating a scholarly and timeless atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjfcu_aMenbBLtwMcVRFIg93dg15XEgvEwTl0ZOENlYLJ5dyoaUnEzfmh3LbV-81ZoObR_lfqAORoF4YSNGNncVRzCxuEwGSh8m6geEd0nj92y68Xry_CYu6pKSML66fmcAOAbUJoSHcMFiHD8fBBoeeSdfiF_S6SbzE2F9bzDY9aTM1oXWjUje1JNafeyfoACIp71nv4HXHDgTa1BRzoukcFzgSJfnJ1R1OmQaaOmFMGNBYpTXe5NHXB9_v-_CvTgruWUhGLlOOY"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full flex justify-between items-end">
+<div>
+<span class="text-on-secondary-container bg-secondary-container px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest mb-2 inline-block">Arqueología</span>
+<h3 class="font-headline-md text-headline-md text-white">Chullpas de Sillustani</h3>
+</div>
+<button class="w-10 h-10 rounded-full glass-card flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-surface-container-lowest/80 backdrop-blur-2xl border-t border-secondary/10 shadow-[0_-10px_30px_rgba(0,66,104,0.05)] rounded-t-xl">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Inicio</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90">
+<span class="material-symbols-outlined">map</span>
+<span class="font-label-sm text-label-sm">Mapa</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-label-sm text-label-sm">Killa AI</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-label-sm text-label-sm">Experiencias</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1.5 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-sm text-label-sm">Perfil</span>
+</button>
+</nav>
+<script>
+        // Micro-interaction for rating stars
+        document.querySelectorAll('.material-symbols-outlined').forEach(star => {
+            star.addEventListener('click', function() {
+                if(this.parentNode.classList.contains('flex')) {
+                    const stars = this.parentNode.querySelectorAll('button');
+                    let index = Array.from(stars).indexOf(this);
+                    stars.forEach((s, i) => {
+                        s.style.fontVariationSettings = i <= index ? "'FILL' 1" : "'FILL' 0";
+                    });
+                }
+            });
+        });
+
+        // Simple scroll parallax effect for the hero image in cards
+        window.addEventListener('scroll', () => {
+            const scroll = window.pageYOffset;
+            document.querySelectorAll('header h1').forEach(el => {
+                el.style.transform = `translateY(${scroll * 0.1}px)`;
+            });
+        });
+    </script>
+</body></html>

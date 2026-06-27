@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700;800&amp;family=Hanken+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-blur: 20px;
+        }
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+        }
+        .killa-glow {
+            box-shadow: 0 0 20px rgba(253, 140, 99, 0.4);
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(253, 140, 99, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(253, 140, 99, 0.6); }
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f2f3f8",
+                        "tertiary": "#810031",
+                        "on-primary-container": "#9fd0ff",
+                        "on-secondary-fixed-variant": "#7e2c0a",
+                        "secondary-fixed-dim": "#ffb59b",
+                        "error": "#ba1a1a",
+                        "on-background": "#191c1f",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#eceef2",
+                        "on-surface": "#191c1f",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed": "#400014",
+                        "on-primary-fixed": "#001d32",
+                        "surface-dim": "#d8dadf",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#ac0044",
+                        "surface-tint": "#166395",
+                        "on-error": "#ffffff",
+                        "on-secondary-container": "#742503",
+                        "background": "#f8f9fe",
+                        "primary-fixed-dim": "#95ccff",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#ffd9de",
+                        "primary-fixed": "#cde5ff",
+                        "surface": "#f8f9fe",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e1e2e7",
+                        "outline": "#717880",
+                        "on-tertiary-container": "#ffb8c3",
+                        "tertiary-fixed-dim": "#ffb2be",
+                        "surface-container-high": "#e7e8ed",
+                        "inverse-surface": "#2e3134",
+                        "inverse-primary": "#95ccff",
+                        "secondary-container": "#fd8c63",
+                        "primary": "#004268",
+                        "inverse-on-surface": "#eff1f5",
+                        "secondary": "#9d4320",
+                        "surface-container-highest": "#e1e2e7",
+                        "on-secondary-fixed": "#380d00",
+                        "surface-bright": "#f8f9fe",
+                        "primary-container": "#005a8c",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#41474f",
+                        "secondary-fixed": "#ffdbcf",
+                        "outline-variant": "#c1c7d0",
+                        "on-primary-fixed-variant": "#004a75",
+                        "on-tertiary-fixed-variant": "#900038"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "12px",
+                        "base": "8px",
+                        "stack-md": "24px",
+                        "container-padding": "24px",
+                        "gutter": "16px",
+                        "stack-lg": "40px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["EB Garamond"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-md": ["EB Garamond"],
+                        "display-lg": ["EB Garamond"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "label-sm": ["Hanken Grotesk"],
+                        "headline-lg": ["EB Garamond"],
+                        "label-md": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-secondary/30">
+<!-- TopAppBar -->
+<nav class="flex justify-between items-center px-container-padding py-base w-full sticky top-0 z-50 bg-surface/70 backdrop-blur-xl transition-all duration-200">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
+<img class="w-full h-full object-cover" data-alt="A portrait of a smiling Andean traveler wearing a traditional woven hat, soft golden hour lighting, clean aesthetic, high-end photography style consistent with luxury travel app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDu2nRxwI3tQg99UTMoAeP9Xby8CTP2KdJ7AMbX9K3qxvWwHZe7EMFaADLFT50iEfX-Lw68hpknUJlt9EVGSAfJawLhMwdDPp72dB5Z3fN-oFoK2hPK_rU9Rzlj4Coz1H33CzauOu0j3hNcnuNEys9Nsnut5xft5UxVOS5EVS7iatsinqrhtJzRRIgiVtYAIldHGW0pkPF4dOS8bsKXZG-SBhltuhOFX_nGFd5jho4i70Mx4t1mXz_DJKkEel7Ey19ByvVrwZDksqQ"/>
+</div>
+<h1 class="font-headline-md text-headline-md-mobile text-primary tracking-tight font-extrabold">Capachica</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-primary hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</nav>
+<main class="pb-32">
+<!-- Hero Section -->
+<section class="relative h-[751px] w-full overflow-hidden flex flex-col justify-end px-container-padding pb-stack-lg">
+<div class="absolute inset-0 -z-10">
+<div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent"></div>
+<img class="w-full h-full object-cover" data-alt="A breathtaking landscape of Lake Titicaca at sunset from the peninsula of Capachica, with vibrant orange, pink, and deep blue skies reflecting on the calm water. Foreground features silhouette of local vegetation and rustic stone walls, in a majestic and scholarly photographic style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5gnYFcxUTtkEdsJJYSpKRJPnqNrbbaQKHxyYn1eqiNKLHyVgw6ow81mVfz7McHtXjtqh0LY1BdVUbni6zv4xyOcgKaSqxz7RdOiUui4B1m5SnvkYh4eET9NN90Q2qcQSpRx6FYG-778OgSN_UPzWZV9874wg24QYmYKuLRo9wXVmJZFZNHRJcxM-v16xfgPHf4vvCVnKaoed5DpHygB4zssEs26mqNK824JiWQH5J8lQ-U38bw7cV5ShxjJqwVvr6W5RtFH2QFLg"/>
+</div>
+<div class="max-w-2xl">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-surface-container-lowest mb-base leading-tight">
+                    Vive Capachica, conoce su cultura, comparte experiencias
+                </h2>
+<p class="font-body-md text-surface-container-lowest/80 mb-stack-md max-w-sm">
+                    Descubre el corazón del Titicaca a través de una lente inteligente y ancestral.
+                </p>
+<button class="killa-glow flex items-center gap-3 bg-secondary-container text-on-secondary-container px-stack-md py-4 rounded-full font-label-md transition-all active:scale-95 hover:opacity-90">
+<span class="material-symbols-outlined" data-icon="auto_awesome" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span>Crear mi experiencia con IA</span>
+</button>
+</div>
+</section>
+<!-- Historias de viajeros -->
+<section class="mt-stack-lg px-container-padding">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest mb-stack-sm">Historias de viajeros</h3>
+<div class="flex gap-gutter overflow-x-auto hide-scrollbar py-2">
+<!-- Story 1 -->
+<div class="flex-shrink-0 flex flex-col items-center gap-2 w-20">
+<div class="w-16 h-16 rounded-full p-0.5 border-2 border-secondary overflow-hidden">
+<img class="w-full h-full object-cover rounded-full" data-alt="Close-up profile photo of a traveler with a camera, blurred Andean mountains in the background, warm natural lighting, earthy slate and terracotta tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5qZaFCplLpEuyOtEI92lZBsyH0Aw6nZWpdR5y6cgI2dj2ZvOcVJQ33dlOzMMkdnoklh6PrtNUl8wY8k5Y9HRnfTSBTJKS1Q6tdEkt0gMXuhGdEEfl1Vl_RaWyvXOjKLwXevONlo8Mt-IT5tHIJReqZdAjZXNC1AWpFYFaVwhRqI1loH3tK-0Up1rPitP4tWmQvVoT3MMpADTeRLot3SmNWPgI2zGgd-skHr20YsaR9UffjxladYuLkOulF3BtjRIva50ys20C-n8"/>
+</div>
+<span class="text-[10px] font-label-md text-on-surface text-center leading-none">María P.</span>
+</div>
+<!-- Story 2 -->
+<div class="flex-shrink-0 flex flex-col items-center gap-2 w-20">
+<div class="w-16 h-16 rounded-full p-0.5 border-2 border-secondary overflow-hidden">
+<img class="w-full h-full object-cover rounded-full" data-alt="Happy traveler standing by a traditional reed boat, crystal clear blue sky, bright sunlight, vibrant textile pink accents in the clothing." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjH_q_Cjvs_GNEgTBOoQenILcRnnvj-40zd6p9eqQGtBVgx9hwkd4LZl7hEJWEZxyxiM82W_-0fRjI1fK5MR7_Srmwxe5moV8Trkca1-KBYChPnJNWCbKxlpUlTIBmz_xIIHWR5J2svfq1Ttjwo407kS6YRGq6ERRwbG5s9WqJMHe_wNOrvScretpx9falIA2ns_wnbaseJDJFoKhSIWHikBRwmzmqjYau0VBEkiGc3wlvZM1dzq5AQ505yVFLRzF2QWwG58JY6kY"/>
+</div>
+<span class="text-[10px] font-label-md text-on-surface text-center leading-none">Carlos R.</span>
+</div>
+<!-- Story 3 -->
+<div class="flex-shrink-0 flex flex-col items-center gap-2 w-20">
+<div class="w-16 h-16 rounded-full p-0.5 border-2 border-secondary overflow-hidden">
+<img class="w-full h-full object-cover rounded-full" data-alt="Portrait of a travel vlogger with a hat, soft dusk lighting over Lake Titicaca, professional photography aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUDAXVYFT4TcEcu5w9PYgMcRod9E54lTIK_qlHfoqHjqUb4SvYEE75bWQL2QBgd8mbYKJ6SOxn4R67-VEueXCBBkfKOphxyJ1XRKCEbNiT8TtMhTQNws5Hz9cUkPrDkA0al4EEY6vsox-vdgPNWFX7M_B5OvEnJf7CnmiFt0oQ_8haue27O7ZA1hEsZ5UhWGTk2zzlbVc42FW4kodAto0qg4KNmmcen5Ac9tXPwAmYPu9NWqS40qJDNmHPUfsMZZdCsQnePr5Saao"/>
+</div>
+<span class="text-[10px] font-label-md text-on-surface text-center leading-none">Elena J.</span>
+</div>
+<!-- Story 4 -->
+<div class="flex-shrink-0 flex flex-col items-center gap-2 w-20">
+<div class="w-16 h-16 rounded-full p-0.5 border-2 border-secondary overflow-hidden">
+<img class="w-full h-full object-cover rounded-full" data-alt="Traveler enjoying a traditional Andean meal indoors, soft fire-lit glow, cozy atmosphere, earth tones and warm lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBW1DyLbKp8KId55dLrgxnPeu7EY5BMki5xA7G2492QVyxR6hqjJsijoRwyXYDAp-GWlsrYEP__6GoKXhJFeSc5rjAzYmsR-GQrMX1ChKwXaKupajkqXBT6ZA0APQuXY2RvZTji6jmzoqlPY0ShARY8N8AElz9rEM_c3kW9inSCVu1M9tfXI-pim7ONR4UOIHIlNdZ1dFzpL33yrnQK5GEY_DW18xsEuJBS4sM-og0UHgeF0R08Lqml3eSpiWqaUHZmWQBUiEV9drs"/>
+</div>
+<span class="text-[10px] font-label-md text-on-surface text-center leading-none">Julian W.</span>
+</div>
+<!-- Story 5 -->
+<div class="flex-shrink-0 flex flex-col items-center gap-2 w-20">
+<div class="w-16 h-16 rounded-full p-0.5 border-2 border-secondary overflow-hidden">
+<img class="w-full h-full object-cover rounded-full" data-alt="Back view of a traveler looking at the vast horizon of Lake Titicaca, meditative mood, ethereal blue lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPPBewFtB_hu_8zFAlmTt7MGm4PlIT8a75UXoZzrGfZzO5gcdfHuOItoKDKvESZsHJxoJU4pGnqLtIlgx3yANVm7FNl2b8f_OUiJzxAcF1uvmTqLQhlom10HPCDnjMpIZ_ntvhnNQMnm5oe3MPVbNqbla2wL-4TK5x0c6GRtoeBb9ay6I18TvGsPLd7o5egerO6X4vzOJEBiV6WpKAPI3OdeyADGxEOMj4JIB7a7R2AbukAkYUnhINfu-2rIIoFhKXpNz78-PhZPw"/>
+</div>
+<span class="text-[10px] font-label-md text-on-surface text-center leading-none">Santi M.</span>
+</div>
+</div>
+</section>
+<!-- Recomendaciones para ti (Bento Grid Style Cards) -->
+<section class="mt-stack-lg px-container-padding">
+<div class="flex justify-between items-end mb-stack-sm">
+<h3 class="font-headline-md text-headline-md text-primary">Recomendaciones para ti</h3>
+<a class="font-label-sm text-label-sm text-secondary hover:underline" href="#">Ver todo</a>
+</div>
+<div class="flex gap-gutter overflow-x-auto hide-scrollbar py-2 -mx-2 px-2">
+<!-- Recommendation Card 1 -->
+<div class="flex-shrink-0 w-72 h-[380px] rounded-[24px] overflow-hidden relative shadow-[0_10px_30px_rgba(0,66,104,0.05)] border border-terracotta/10 group active:scale-[0.98] transition-transform">
+<img class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Exterior of a charming community stay house in Capachica, built with traditional stone and clay, overlook Lake Titicaca, blue skies, vibrant flowers in the yard, majestic and peaceful atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgnkeI29kBBo2SOVvIC_A7jeW7hOk6g19xw5S-k8oB5F1fSPS-w6ExRwEhBs6E-z7kf50Gnj69Zx36m9-1Zuv7duqXDOrVIQzhCkxVduFgB5u7ncNt1DIdPldyokKOHxzEPU1XqVL84n0TQ8OJlkVb7P2Run2fGdJdd62hAOuoq61zAhfdTLWDzXWIbw8EbFpEprCMoB6o4dAjuPPqW3rQ0pCiBSgu28SlMsKGYOKw1aQJ6QmIY5YWcEJh4rijN-_nBiBCRvtRdxY"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 right-0 p-stack-md glass-panel mx-4 mb-4 rounded-xl border border-white/20">
+<span class="inline-block bg-tertiary text-on-tertiary text-[10px] font-label-md px-2 py-0.5 rounded-full mb-1">CULTURA VIVA</span>
+<h4 class="font-headline-md text-headline-md text-on-background leading-tight mb-1">Estancia Inti Wara</h4>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-label-sm font-label-sm">4.9 (120 reseñas)</span>
+</div>
+</div>
+</div>
+<!-- Recommendation Card 2 -->
+<div class="flex-shrink-0 w-72 h-[380px] rounded-[24px] overflow-hidden relative shadow-[0_10px_30px_rgba(0,66,104,0.05)] border border-terracotta/10 group active:scale-[0.98] transition-transform">
+<img class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Traditional workshop where women are weaving colorful Andean textiles, bright morning light coming through a window, deep reds and pinks of the yarn, tactile and detailed." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeFBKL5dQMERCdTbShRG4gwcxv5H3zMhK1_JP8jx8LFVxXgOl085H3UaiacKiTMviMtxUg8OwgkDQUr_ReZ3bE-yHOnvEB3wLYQTFgcUnAcRC6lWk2kOdE86kUknTHk58nGqQjou2E5zfDFDf4Q7NyjBT45Q_dvtwdZhziuAplDKk8OV2s6nq1NeRKh-5BnXrgpk79m4aUUvLuKdyzc3mLVOL12W7lYXXIMdDmJk0cRIP-6kPKp9I-pwSkEeZ092qEWOCE4T8ULVI"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 right-0 p-stack-md glass-panel mx-4 mb-4 rounded-xl border border-white/20">
+<span class="inline-block bg-primary text-on-primary text-[10px] font-label-md px-2 py-0.5 rounded-full mb-1">TEXTILERÍA</span>
+<h4 class="font-headline-md text-headline-md text-on-background leading-tight mb-1">Taller de Tejido Llachón</h4>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-label-sm font-label-sm">4.8 (85 reseñas)</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Destacados del día -->
+<section class="mt-stack-lg px-container-padding">
+<h3 class="font-headline-md text-headline-md text-primary mb-stack-sm">Destacados del día</h3>
+<div class="space-y-gutter">
+<!-- Highlight Item 1 -->
+<div class="flex items-center gap-stack-md bg-surface-container-low p-base rounded-3xl border border-outline-variant/10 active:scale-[0.99] transition-transform">
+<div class="w-24 h-24 flex-shrink-0 rounded-2xl overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close up of a traditional Andean dish, Trucha a la plancha with native potatoes and fresh vegetables, artistic plating, soft natural light, warm and inviting food photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChKXD5scDmrD2jv-5BJCfOTzcztHMbCjv6WKgfXgzGIWMP4wYeih0pzUs0ym-MM6iMCMwVGSDjdF79Nu3Rwf9Uj9lW1EXkGrH0jTzN9SMV2xr7v0kcTM-gEUk9oY_eFqmS-2ubzRlGPEtFY8SaNOwuKYGnnTaZSIzG_3OHsfFEgu9M2fjdsXAum4PXzeggxcNTlICa6Hwkx7Sv5IxE7B6c9ypqvgnIQ2Z2Kcjaq7VzZ47tw3IjJQpSNprL66qA0YBXXU6qWqgcLto"/>
+</div>
+<div class="flex-grow">
+<p class="text-secondary font-label-sm text-label-sm uppercase mb-1">GASTRONOMÍA</p>
+<h4 class="font-body-lg font-bold text-on-surface leading-tight">Trucha Fresca de Ccotos</h4>
+<p class="text-label-sm text-on-surface-variant line-clamp-1">Prueba la pesca artesanal del día.</p>
+</div>
+<div class="pr-stack-sm">
+<span class="material-symbols-outlined text-outline" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+<!-- Highlight Item 2 -->
+<div class="flex items-center gap-stack-md bg-surface-container-low p-base rounded-3xl border border-outline-variant/10 active:scale-[0.99] transition-transform">
+<div class="w-24 h-24 flex-shrink-0 rounded-2xl overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A small reed boat sailing on Lake Titicaca during the golden hour, blue and golden water ripples, calm and serene atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtlxKA5QuDZmz_NfXWU9IiZVR9toVX8qU4JobcvU-3ppzUAqzJ24SDOATR6pT4s24bTGYABj0ThXXVSIGGbyiiUIlFOLR_DYx14Z6TCA1WVmLis-Z8GJxpn5D-ZIplDW-Ttk9EeLxtJ6qWkw-QKWo2zH2SELpOsdbl7PJgrbHsNHKhji2KYL4X3IwaWc_rfD0QhpS95Eu2jgJZ54mEi564tMnYnRrV2Z6RjKJp_PNK8JJaBmEyzpebSIkr35rcb7dlv0rSX3Max4c"/>
+</div>
+<div class="flex-grow">
+<p class="text-secondary font-label-sm text-label-sm uppercase mb-1">AVENTURA</p>
+<h4 class="font-body-lg font-bold text-on-surface leading-tight">Navegación Ancestral</h4>
+<p class="text-label-sm text-on-surface-variant line-clamp-1">Explora las orillas ocultas en balsa.</p>
+</div>
+<div class="pr-stack-sm">
+<span class="material-symbols-outlined text-outline" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Killa AI Floating Teaser -->
+<div class="mt-stack-lg mx-container-padding bg-primary p-container-padding rounded-[32px] relative overflow-hidden group">
+
+<div class="relative z-10">
+<div class="flex items-center gap-2 text-on-primary-container mb-2">
+<span class="material-symbols-outlined" data-icon="auto_awesome" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="font-label-md text-label-md uppercase tracking-wider">Killa AI</span>
+</div>
+<h4 class="font-headline-md text-surface-container-lowest mb-stack-sm">¿Qué quieres descubrir hoy?</h4>
+<div class="flex items-center gap-3 bg-white/10 backdrop-blur-md rounded-full p-2 border border-white/20">
+<div class="flex-grow pl-4 text-white/60 font-body-md">Pregunta por climas, rituales o rutas...</div>
+<div class="w-10 h-10 bg-secondary-container rounded-full flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-surface-container-lowest/80 backdrop-blur-2xl border-t border-secondary/10 shadow-[0_-10px_30px_rgba(0,66,104,0.05)] rounded-t-xl">
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1.5 transition-all">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm">Inicio</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span class="font-label-sm text-label-sm">Mapa</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-label-sm text-label-sm">Killa AI</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-label-sm text-label-sm">Experiencias</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant/70 px-4 py-1.5 hover:text-primary transition-colors active:scale-90">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm">Perfil</span>
+</button>
+</nav>
+<script>
+        // Micro-interaction for scroll effects on TopAppBar
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav.sticky');
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-md', 'bg-surface/95');
+                nav.classList.remove('bg-surface/70');
+            } else {
+                nav.classList.remove('shadow-md', 'bg-surface/95');
+                nav.classList.add('bg-surface/70');
+            }
+        });
+
+        // Simple button interaction feedback
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Haptic feedback simulation if supported
+                if (window.navigator && window.navigator.vibrate) {
+                    window.navigator.vibrate(5);
+                }
+            });
+        });
+    </script>
+</body></html>

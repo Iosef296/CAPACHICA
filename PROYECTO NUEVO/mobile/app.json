@@ -1,0 +1,48 @@
+{
+  "expo": {
+    "name": "Capachica Experience AI",
+    "slug": "capachica-experience-ai",
+    "scheme": "capachica",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "resizeMode": "cover",
+      "backgroundColor": "#004268"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.capachica.experienceai",
+      "config": {
+        "googleMapsApiKey": "REPLACE_WITH_GOOGLE_MAPS_KEY"
+      }
+    },
+    "android": {
+      "package": "com.capachica.experienceai",
+      "adaptiveIcon": {
+        "backgroundColor": "#004268"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "REPLACE_WITH_GOOGLE_MAPS_KEY"
+        }
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "apiBaseUrl": "https://capachica-backend-production.up.railway.app/api",
+      "iaBaseUrl": "https://capachica-ia-production.up.railway.app/api",
+      "googleClientIdAndroid": "REPLACE_WITH_GOOGLE_CLIENT_ID_ANDROID",
+      "googleClientIdIos": "REPLACE_WITH_GOOGLE_CLIENT_ID_IOS",
+      "googleClientIdWeb": "REPLACE_WITH_GOOGLE_CLIENT_ID_WEB"
+    }
+  }
+}
