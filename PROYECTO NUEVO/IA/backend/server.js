@@ -405,19 +405,28 @@ app.delete('/api/admin/destinos/:id', async (req, res) => {
 });
 
 // ── WIDGET ────────────────────────────────────────────
+const WIDGET_DEFAULTS = { bot_name:'Inti · Asistente IA', bot_subtitle:'Capachica Turismo', welcome_msg:'¡Hola! Soy Inti, tu guía virtual de Capachica 🌊\n¿En qué te puedo ayudar?', quick_prompts:['¿Qué es Capachica?','¿Cómo llegar?','Quiero reservar'], placeholder:'Escribe tu pregunta...' };
+
+// Cache en memoria: el mobile hace polling cada 8s (en produccion,
+// potencialmente miles de usuarios) — no queremos pegarle a Postgres
+// en cada poll. Solo se relee cuando el admin realmente guarda un cambio.
+let widgetCache = null; // { body, etag }
+
+function widgetEtag(body) { return `"${crypto.createHash('sha1').update(body).digest('hex')}"`; }
+
+async function poblarWidgetCache() {
+  const r = await query(`SELECT value FROM ia_config WHERE key='widget'`);
+  const cfg = { ...WIDGET_DEFAULTS, ...(r.rows[0]?.value||{}) };
+  const body = JSON.stringify(cfg);
+  widgetCache = { body, etag: widgetEtag(body) };
+}
+
 app.get('/api/widget/config', async (req, res) => {
   try {
-    const r = await query(`SELECT value FROM ia_config WHERE key='widget'`);
-    const defaults = { bot_name:'Inti · Asistente IA', bot_subtitle:'Capachica Turismo', welcome_msg:'¡Hola! Soy Inti, tu guía virtual de Capachica 🌊\n¿En qué te puedo ayudar?', quick_prompts:['¿Qué es Capachica?','¿Cómo llegar?','Quiero reservar'], placeholder:'Escribe tu pregunta...' };
-    const cfg = { ...defaults, ...(r.rows[0]?.value||{}) };
-    const body = JSON.stringify(cfg);
-    // El mobile hace polling seguido para reflejar cambios del admin sin
-    // reiniciar — con ETag el 99% de esas consultas responde 304 (sin
-    // body) en vez de repetir el JSON completo.
-    const etag = `"${crypto.createHash('sha1').update(body).digest('hex')}"`;
-    res.set('ETag', etag);
-    if (req.headers['if-none-match'] === etag) return res.status(304).end();
-    res.type('application/json').send(body);
+    if (!widgetCache) await poblarWidgetCache();
+    res.set('ETag', widgetCache.etag);
+    if (req.headers['if-none-match'] === widgetCache.etag) return res.status(304).end();
+    res.type('application/json').send(widgetCache.body);
   } catch(err) { res.status(500).json({ error:'Error' }); }
 });
 app.put('/api/admin/widget', async (req, res) => {
@@ -431,6 +440,7 @@ app.put('/api/admin/widget', async (req, res) => {
     if (quick_prompts!==undefined) current.quick_prompts = Array.isArray(quick_prompts) ? quick_prompts : String(quick_prompts).split('\n').map(s=>s.trim()).filter(Boolean);
     if (placeholder!==undefined)  current.placeholder  = placeholder;
     await query(`INSERT INTO ia_config(key,value) VALUES('widget',$1) ON CONFLICT(key) DO UPDATE SET value=$1`, [JSON.stringify(current)]);
+    widgetCache = null; // fuerza releer en el proximo GET /api/widget/config
     res.json({ mensaje:'Widget actualizado' });
   } catch(err) { res.status(500).json({ error:'Error' }); }
 });

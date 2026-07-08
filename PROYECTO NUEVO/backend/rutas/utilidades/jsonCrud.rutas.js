@@ -9,38 +9,44 @@ function crearRutasJSON(nombreArchivo, nombreRecurso) {
     const router = Router();
     const dataPath = path.join(__dirname, '../../data', nombreArchivo);
 
-    function cargarRaw() {
-        try {
-            return fs.readFileSync(dataPath, 'utf-8');
-        } catch {
-            return '[]';
-        }
+    // Cache en memoria: el polling del mobile (cada 8s, cientos/miles de
+    // usuarios en produccion) NO debe pegarle a disco en cada request.
+    // Solo se relee/reescribe cuando alguien realmente escribe (admin).
+    let cache = null; // { raw, data, etag }
+
+    function etagDe(raw) {
+        return `"${crypto.createHash('sha1').update(raw).digest('hex')}"`;
+    }
+
+    function poblarCache() {
+        let raw;
+        try { raw = fs.readFileSync(dataPath, 'utf-8'); } catch { raw = '[]'; }
+        let data;
+        try { data = JSON.parse(raw); } catch { data = []; }
+        cache = { raw, data, etag: etagDe(raw) };
     }
 
     function cargar() {
-        try {
-            return JSON.parse(cargarRaw());
-        } catch {
-            return [];
-        }
+        if (!cache) poblarCache();
+        return cache.data;
     }
 
     function guardar(data) {
-        fs.writeFileSync(dataPath, JSON.stringify(data, null, 2), 'utf-8');
+        const raw = JSON.stringify(data, null, 2);
+        fs.writeFileSync(dataPath, raw, 'utf-8');
+        cache = { raw, data, etag: etagDe(raw) };
     }
 
-    // ETag = hash del contenido. El cliente manda If-None-Match; si no
-    // cambio nada devolvemos 304 (sin body) en vez del JSON completo —
-    // asi el polling del mobile no gasta ancho de banda ni re-renderiza
-    // la pantalla cuando no hubo cambios reales en el backend.
+    // ETag = hash del contenido, servido desde memoria. El cliente manda
+    // If-None-Match; si no cambio nada devolvemos 304 (sin body, sin
+    // leer disco) en vez del JSON completo.
     router.get('/', (req, res) => {
-        const raw = cargarRaw();
-        const etag = `"${crypto.createHash('sha1').update(raw).digest('hex')}"`;
-        res.set('ETag', etag);
-        if (req.headers['if-none-match'] === etag) {
+        if (!cache) poblarCache();
+        res.set('ETag', cache.etag);
+        if (req.headers['if-none-match'] === cache.etag) {
             return res.status(304).end();
         }
-        res.type('application/json').send(raw);
+        res.type('application/json').send(cache.raw);
     });
 
     router.get('/:id', (req, res) => {
