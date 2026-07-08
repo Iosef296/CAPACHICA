@@ -1,0 +1,9 @@
+---
+import Layout from '../layouts/Layout.astro';
+import AdminPanel from '../components/AdminPanel';
+---
+<Layout title="Gestión · Panel Admin" description="Reservas, hospedajes, artesanía, festividades, maestros y guías.">
+  <div style="max-width:1100px;margin:0 auto;padding:100px 1.5rem 4rem;">
+    <AdminPanel client:load />
+  </div>
+</Layout>
