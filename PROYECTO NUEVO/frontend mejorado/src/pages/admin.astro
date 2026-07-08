@@ -1763,6 +1763,15 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     }
   };
 
+  // Todo el script va envuelto en un IIFE (define:vars de Astro) — las
+  // funciones declaradas con "function X(){}" quedan locales a esa IIFE,
+  // no llegan a window. Los onclick="" inline del HTML generado por
+  // renderSimple/las secciones estaticas necesitan acceso global.
+  window.openSimpleModal  = openSimpleModal;
+  window.closeSimpleModal = closeSimpleModal;
+  window.saveSimpleModal  = saveSimpleModal;
+  window.handleSimpleFile = handleSimpleFile;
+
   async function uploadImageFile(file) {
     const form = new FormData();
     form.append('imagen', file);
