@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const IA_URL = import.meta.env.PUBLIC_IA_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api';
 
 interface Destino {
   id: number;
@@ -24,7 +24,7 @@ export default function DestinosGrid() {
   const [loading, setLoading]   = useState(true);
 
   useEffect(() => {
-    fetch(`${IA_URL}/api/destinos`)
+    fetch(`${API_URL}/comunidades`)
       .then(r => r.json())
       .then(data => { setDestinos(data); setLoading(false); })
       .catch(() => setLoading(false));

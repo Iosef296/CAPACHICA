@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const API_URL = "http://localhost:4000";
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api';
 
 const PRECIO_POR_PERSONA_NOCHE = 120;
 
@@ -31,7 +31,7 @@ export default function FamiliasGrid() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(`${API_URL}/api/familias`)
+    fetch(`${API_URL}/hospedajes`)
       .then((res) => res.json())
       .then((data) => {
         setFamilias(data);

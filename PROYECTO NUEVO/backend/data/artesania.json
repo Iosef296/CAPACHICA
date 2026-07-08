@@ -1,5 +1,47 @@
 [
-  { "id": 1, "nombre": "Poncho Ceremonial", "precio": 240, "imagen": "https://picsum.photos/id/175/600/600" },
-  { "id": 2, "nombre": "Chumpi Tradicional", "precio": 95, "imagen": "https://picsum.photos/id/325/600/600" },
-  { "id": 3, "nombre": "Chullo de Gala", "precio": 70, "imagen": "https://picsum.photos/id/30/600/600" }
+  {
+    "id": 1,
+    "nombre": "Poncho Ceremonial",
+    "tipo": "textil",
+    "tecnica": "Telar de cintura",
+    "materiales": "Lana de alpaca teñida con tintes naturales",
+    "precio_soles": 240,
+    "precio_usd": 65,
+    "imagen_url": "https://picsum.photos/id/175/600/600",
+    "artesana_nombre": "Mamá Victoria",
+    "artesana_comunidad": "Llachón",
+    "artesana_experiencia": 28,
+    "emoji": "🧣",
+    "stock": 3
+  },
+  {
+    "id": 2,
+    "nombre": "Chumpi Tradicional",
+    "tipo": "textil",
+    "tecnica": "Tejido en telar de cintura con iconografía andina",
+    "materiales": "Lana de oveja hilada a mano",
+    "precio_soles": 95,
+    "precio_usd": 26,
+    "imagen_url": "https://picsum.photos/id/325/600/600",
+    "artesana_nombre": "Mateo Huatta",
+    "artesana_comunidad": "Chifrón",
+    "artesana_experiencia": 15,
+    "emoji": "🪢",
+    "stock": 8
+  },
+  {
+    "id": 3,
+    "nombre": "Chullo de Gala",
+    "tipo": "textil",
+    "tecnica": "Tejido a palitos con cuatro puntas",
+    "materiales": "Lana de alpaca",
+    "precio_soles": 70,
+    "precio_usd": 19,
+    "imagen_url": "https://picsum.photos/id/30/600/600",
+    "artesana_nombre": "Mamá Victoria",
+    "artesana_comunidad": "Llachón",
+    "artesana_experiencia": 28,
+    "emoji": "🧢",
+    "stock": 6
+  }
 ]

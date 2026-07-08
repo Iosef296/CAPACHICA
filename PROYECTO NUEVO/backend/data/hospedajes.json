@@ -1,5 +1,44 @@
 [
-  { "id": 1, "nombre": "Posada de Doña Paula", "comunidad": "Llachón", "precio": 120, "imagen": "https://picsum.photos/id/106/400/400" },
-  { "id": 2, "nombre": "Eco-Refugio Ccotos", "comunidad": "Ccotos", "precio": 185, "imagen": "https://picsum.photos/id/164/400/400" },
-  { "id": 3, "nombre": "Hospedaje Samary", "comunidad": "Chifrón", "precio": 95, "imagen": "https://picsum.photos/id/137/400/400" }
+  {
+    "id": 1,
+    "nombre": "Posada de Doña Paula",
+    "comunidad": "Llachón",
+    "descripcion": "Hospedaje familiar con vista al lago. Desayuno andino incluido y taller de tejido opcional con la familia anfitriona.",
+    "especialidad": "tejido",
+    "foto_url": "https://picsum.photos/id/106/400/400",
+    "habitaciones": 4,
+    "idiomas": ["Español", "Quechua"],
+    "servicios": ["Desayuno incluido", "Vista al lago", "Taller de tejido"],
+    "calificacion": "4.8",
+    "activa": true,
+    "precio": 120
+  },
+  {
+    "id": 2,
+    "nombre": "Eco-Refugio Ccotos",
+    "comunidad": "Ccotos",
+    "descripcion": "Refugio ecológico junto al lago, especializado en pesca artesanal y navegación en balsas de totora.",
+    "especialidad": "pesca",
+    "foto_url": "https://picsum.photos/id/164/400/400",
+    "habitaciones": 3,
+    "idiomas": ["Español"],
+    "servicios": ["Pesca artesanal", "Balsa de totora", "Comidas caseras"],
+    "calificacion": "4.7",
+    "activa": true,
+    "precio": 185
+  },
+  {
+    "id": 3,
+    "nombre": "Hospedaje Samary",
+    "comunidad": "Chifrón",
+    "descripcion": "Casa familiar sencilla junto a la bahía, ideal para kayak y deportes acuáticos. Cocina típica con trucha del lago.",
+    "especialidad": "cocina",
+    "foto_url": "https://picsum.photos/id/137/400/400",
+    "habitaciones": 2,
+    "idiomas": ["Español"],
+    "servicios": ["Kayak", "Trucha fresca", "Ambiente familiar"],
+    "calificacion": "4.6",
+    "activa": true,
+    "precio": 95
+  }
 ]

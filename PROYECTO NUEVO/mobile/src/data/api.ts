@@ -95,21 +95,25 @@ export const api = {
   stories: () => get('/stories', mock.stories),
   recommendations: () => get('/recommendations', mock.recommendations),
   highlights: () => get('/highlights', mock.highlights),
-  // Backend real usa nombres en español (nombre/descripcion/imagen/experiencias).
+  // Mismo endpoint que consume el frontend web (DestinosGrid) — comparten la fuente real.
   communities: () => get<any[]>('/comunidades', mock.communities).then(list =>
     (Array.isArray(list) ? list : []).map((c: any) => ({
       id: String(c.id),
       name: c.nombre ?? c.name,
-      description: c.descripcion ?? c.description,
-      image: c.imagen ?? c.image,
+      description: c.desc ?? c.descripcion ?? c.description,
+      image: c.imagen || c.image || 'https://picsum.photos/seed/' + c.id + '/800/600',
       experiencesCount: c.experiencias ?? c.experiencesCount ?? 0,
     }))
   ),
   mapPins: () => get('/map/pins', mock.mapPins),
   profile: () => get('/profile/me', mock.profile),
+  // Mismo endpoint que consume el frontend web (Artesania.tsx).
   crafts: () => get<any[]>('/artesania', mock.crafts).then(list =>
     (Array.isArray(list) ? list : []).map((c: any) => ({
-      id: String(c.id), name: c.nombre ?? c.name, price: c.precio ?? c.price, img: c.imagen ?? c.img,
+      id: String(c.id),
+      name: c.nombre ?? c.name,
+      price: c.precio_soles ?? c.precio ?? c.price,
+      img: c.imagen_url ?? c.imagen ?? c.img,
     }))
   ),
   masters: () => get<any[]>('/maestros', mock.masters).then(list =>
@@ -123,10 +127,11 @@ export const api = {
       img: g.imagen ?? g.img, type: g.tipo ?? g.type ?? 'cultural',
     }))
   ),
+  // Mismo endpoint que consume el frontend web (FamiliasGrid.tsx).
   stays: () => get<any[]>('/hospedajes', mock.stays).then(list =>
     (Array.isArray(list) ? list : []).map((s: any) => ({
       id: String(s.id), name: s.nombre ?? s.name, community: s.comunidad ?? s.community,
-      price: s.precio ?? s.price, img: s.imagen ?? s.img,
+      price: s.precio ?? s.price, img: s.foto_url ?? s.imagen ?? s.img,
     }))
   ),
   // Auth real contra /api/auth/login y /api/auth/registro (espera email/password)

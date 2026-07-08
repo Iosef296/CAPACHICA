@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLang } from "../data/LangContext";
 import type { Lang } from "../data/translations";
 
-const API_URL = "http://localhost:4000";
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api';
 
 interface CategoriaItem {
   id: string;
@@ -133,7 +133,7 @@ export default function ArtesaniaPage({ hideHero = false }: { hideHero?: boolean
   useEffect(() => {
     const fetchArtesanias = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/artesanias`);
+        const res = await fetch(`${API_URL}/artesania`);
         if (!res.ok) throw new Error("Error al cargar");
         const data = await res.json();
         setProductos(data.data || data);
