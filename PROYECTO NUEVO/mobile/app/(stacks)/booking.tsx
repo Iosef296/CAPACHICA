@@ -7,7 +7,7 @@ import { Chip } from '@/components/Chip';
 import { Button } from '@/components/Button';
 import { HeartButton } from '@/components/HeartButton';
 import { BookingModal } from '@/components/BookingModal';
-import { stays, activities as mockActivities } from '@/data/mock';
+import { stays as mockStays, activities as mockActivities } from '@/data/mock';
 import { api } from '@/data/api';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
@@ -16,6 +16,7 @@ const LOCATIONS = ['Todas', 'Llachón', 'Ccotos', 'Siale', 'Chifrón'];
 export default function Booking() {
   const [loc, setLoc] = useState('Todas');
   const [activities, setActivities] = useState(mockActivities as any[]);
+  const [stays, setStays] = useState(mockStays as any[]);
   const [reserva, setReserva] = useState<{ title: string; price: number; unit: string } | null>(null);
   useEffect(() => {
     api.actividades().then(real => {
@@ -27,6 +28,7 @@ export default function Booking() {
         })));
       }
     });
+    api.stays().then(setStays);
   }, []);
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>

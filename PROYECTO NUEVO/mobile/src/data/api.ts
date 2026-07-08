@@ -107,6 +107,28 @@ export const api = {
   ),
   mapPins: () => get('/map/pins', mock.mapPins),
   profile: () => get('/profile/me', mock.profile),
+  crafts: () => get<any[]>('/artesania', mock.crafts).then(list =>
+    (Array.isArray(list) ? list : []).map((c: any) => ({
+      id: String(c.id), name: c.nombre ?? c.name, price: c.precio ?? c.price, img: c.imagen ?? c.img,
+    }))
+  ),
+  masters: () => get<any[]>('/maestros', mock.masters).then(list =>
+    (Array.isArray(list) ? list : []).map((m: any) => ({
+      id: String(m.id), name: m.nombre ?? m.name, craft: m.oficio ?? m.craft, img: m.imagen ?? m.img,
+    }))
+  ),
+  guides: () => get<any[]>('/guias', mock.guides).then(list =>
+    (Array.isArray(list) ? list : []).map((g: any) => ({
+      id: String(g.id), title: g.titulo ?? g.title, excerpt: g.extracto ?? g.excerpt,
+      img: g.imagen ?? g.img, type: g.tipo ?? g.type ?? 'cultural',
+    }))
+  ),
+  stays: () => get<any[]>('/hospedajes', mock.stays).then(list =>
+    (Array.isArray(list) ? list : []).map((s: any) => ({
+      id: String(s.id), name: s.nombre ?? s.name, community: s.comunidad ?? s.community,
+      price: s.precio ?? s.price, img: s.imagen ?? s.img,
+    }))
+  ),
   // Auth real contra /api/auth/login y /api/auth/registro (espera email/password)
   login: (email: string, password: string) =>
     postAuth<{ usuario?: any; accessToken?: string; refreshToken?: string }>('/auth/login', { email, password }),

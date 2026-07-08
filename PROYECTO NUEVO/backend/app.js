@@ -30,6 +30,9 @@ const festividadesRoutes = require('./rutas/festividades/festividades.rutas');
 // Rutas — Comunidades
 const comunidadesRoutes = require('./rutas/comunidades/comunidades.rutas');
 
+// Rutas — Artesanía / Guías / Hospedajes
+const { artesaniaRoutes, maestrosRoutes, guiasRoutes, hospedajesRoutes } = require('./rutas/contenido/contenido.rutas');
+
 // Rutas — Upload
 const uploadRoutes = require('./rutas/upload.rutas');
 
@@ -68,6 +71,12 @@ app.use('/api/festividades', festividadesRoutes);
 
 // ── Comunidades ────────────────────────────────────
 app.use('/api/comunidades', comunidadesRoutes);
+
+// ── Artesanía / Guías / Hospedajes ─────────────────
+app.use('/api/artesania',  artesaniaRoutes);
+app.use('/api/maestros',   maestrosRoutes);
+app.use('/api/guias',      guiasRoutes);
+app.use('/api/hospedajes', hospedajesRoutes);
 
 // ── Upload ─────────────────────────────────────────
 app.use('/api/upload', uploadRoutes);

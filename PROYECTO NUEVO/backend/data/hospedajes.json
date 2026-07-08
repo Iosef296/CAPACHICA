@@ -1,0 +1,5 @@
+[
+  { "id": 1, "nombre": "Posada de Doña Paula", "comunidad": "Llachón", "precio": 120, "imagen": "https://picsum.photos/id/106/400/400" },
+  { "id": 2, "nombre": "Eco-Refugio Ccotos", "comunidad": "Ccotos", "precio": 185, "imagen": "https://picsum.photos/id/164/400/400" },
+  { "id": 3, "nombre": "Hospedaje Samary", "comunidad": "Chifrón", "precio": 95, "imagen": "https://picsum.photos/id/137/400/400" }
+]

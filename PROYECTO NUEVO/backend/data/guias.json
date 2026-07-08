@@ -1,0 +1,6 @@
+[
+  { "id": 1, "titulo": "Historia de Capachica", "extracto": "Mil años de tradición lacustre.", "imagen": "https://picsum.photos/id/1018/800/500", "tipo": "cultural" },
+  { "id": 2, "titulo": "Mitos del Titicaca", "extracto": "Manco Cápac y Mama Ocllo.", "imagen": "https://picsum.photos/id/1043/800/500", "tipo": "cultural" },
+  { "id": 3, "titulo": "Cómo llegar", "extracto": "Rutas desde Puno y Juliaca.", "imagen": "https://picsum.photos/id/1015/800/500", "tipo": "viaje" },
+  { "id": 4, "titulo": "Qué llevar a Capachica", "extracto": "Clima frío de noche, sol fuerte de día — la lista esencial.", "imagen": "https://picsum.photos/id/1039/800/500", "tipo": "viaje" }
+]

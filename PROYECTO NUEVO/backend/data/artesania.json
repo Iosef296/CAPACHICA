@@ -1,0 +1,5 @@
+[
+  { "id": 1, "nombre": "Poncho Ceremonial", "precio": 240, "imagen": "https://picsum.photos/id/175/600/600" },
+  { "id": 2, "nombre": "Chumpi Tradicional", "precio": 95, "imagen": "https://picsum.photos/id/325/600/600" },
+  { "id": 3, "nombre": "Chullo de Gala", "precio": 70, "imagen": "https://picsum.photos/id/30/600/600" }
+]
