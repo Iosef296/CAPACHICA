@@ -1635,6 +1635,8 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     const cfg = RECURSOS_SIMPLES[rec];
     const items = simpleDataCache[rec] || [];
     $(`${rec}-count`).textContent = items.length;
+    const navCount = $(`nav-${rec}-count`);
+    if (navCount) navCount.textContent = items.length;
     if (!items.length) {
       $(`${rec}-list`).innerHTML = `<div class="empty"><div class="ei">📭</div><p>No hay elementos. Agrega el primero.</p></div>`;
       return;
