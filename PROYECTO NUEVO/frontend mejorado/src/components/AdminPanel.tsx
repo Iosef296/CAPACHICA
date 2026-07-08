@@ -173,13 +173,21 @@ export default function AdminPanel() {
         const res = await fetch(`${API_URL}/api/reservas`, {
           headers: authHeaders,
         });
-        setReservas(await res.json());
+        const data = await res.json();
+        if (Array.isArray(data)) setReservas(data);
+        else if (Array.isArray(data?.reservas)) setReservas(data.reservas);
+        else {
+          setReservas([]);
+          if (!res.ok) showMsg(data?.error || "No autorizado para ver reservas", "err");
+        }
       } else if (tab === "familias") {
         const res = await fetch(`${API_URL}/api/hospedajes`);
-        setFamilias(await res.json());
+        const data = await res.json();
+        setFamilias(Array.isArray(data) ? data : []);
       } else {
         const res = await fetch(`${API_URL}/api/artesania`);
-        setArtesanias(await res.json());
+        const data = await res.json();
+        setArtesanias(Array.isArray(data) ? data : []);
       }
     } catch {
       showMsg("Error al cargar datos", "err");
@@ -1788,7 +1796,8 @@ function SimpleResourceAdmin({
     setLoading(true);
     try {
       const res = await fetch(`${API_URL}/api/${endpoint}`);
-      setItems(await res.json());
+      const data = await res.json();
+      setItems(Array.isArray(data) ? data : []);
     } catch {
       showMsg(`Error al cargar ${titulo}`, "err");
     }
