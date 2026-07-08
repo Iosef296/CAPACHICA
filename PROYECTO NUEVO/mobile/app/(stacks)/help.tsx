@@ -11,7 +11,7 @@ const FAQS = [
   { q: '¿Puedo cancelar mi reserva?', a: 'Sí, hasta 48h antes sin costo. Después aplica 30% de cargo. Escríbenos por WhatsApp.' },
   { q: '¿Las experiencias incluyen comida?', a: 'Los talleres de 4h+ incluyen almuerzo tradicional. Las actividades cortas no — pero te recomendamos lugares cerca.' },
   { q: '¿Hay ATM en Capachica?', a: 'No. Trae soles en efectivo desde Puno. La mayoría de hospedajes y talleres aceptan solo efectivo o Yape.' },
-  { q: '¿Necesito permiso para visitar las comunidades?', a: 'No. Las comunidades reciben visitantes con turismo vivencial organizado. Killa AI te puede ayudar a coordinarlo.' },
+  { q: '¿Necesito permiso para visitar las comunidades?', a: 'No. Las comunidades reciben visitantes con turismo vivencial organizado. Inti AI te puede ayudar a coordinarlo.' },
   { q: '¿La app funciona sin internet?', a: 'La navegación y datos básicos sí. El chat con Inti requiere conexión.' },
 ];
 

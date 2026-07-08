@@ -4,8 +4,8 @@ import Constants from 'expo-constants';
 const extra = (Constants.expoConfig?.extra as any) ?? {};
 const IA_BASE = (extra.iaBaseUrl ?? '').replace(/\/api\/?$/, '');
 
-// Forzamos offline mientras backend está incompleto.
-export const FORCE_OFFLINE = true;
+// Backend real de Inti IA (Railway). Si falla, cae a knowledge base local.
+export const FORCE_OFFLINE = false;
 
 export type IntiMsg = {
   role: 'user' | 'assistant';

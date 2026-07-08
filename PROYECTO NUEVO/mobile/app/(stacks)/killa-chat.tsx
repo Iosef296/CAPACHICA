@@ -1,26 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { ScreenHeader } from '@/components/ScreenHeader';
+import { colors, radii, shadows, spacing } from '@/theme';
 import { DEFAULT_CFG, fetchWidgetConfig, IntiMsg, sendChat, WidgetCfg } from '@/data/inti';
-
-// Paleta del ChatWidget web
-const C = {
-  bg0: '#0d1b2e',
-  bg1: '#070e1b',
-  text: '#f0ede8',
-  teal: '#2dd4bf',
-  cyan: '#0ea5e9',
-  pink: '#f472b6',
-  green: '#34d399',
-  textDim: 'rgba(240,237,232,0.45)',
-  tealDim: 'rgba(45,212,191,0.22)',
-  tealHint: 'rgba(45,212,191,0.08)',
-  whiteSoft: 'rgba(255,255,255,0.065)',
-  whiteBorder: 'rgba(255,255,255,0.07)',
-};
 
 export default function IntiChat() {
   const router = useRouter();
@@ -53,7 +38,6 @@ export default function IntiChat() {
     const history = msgs;
     const result = await sendChat(msg, history);
 
-    // Typewriter para simular el streaming SSE del web
     const full = result.content;
     let i = 0;
     const step = Math.max(1, Math.floor(full.length / 80));
@@ -73,9 +57,14 @@ export default function IntiChat() {
   }
 
   return (
-    <LinearGradient colors={[C.bg0, C.bg1]} style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaView edges={['top']} style={{ flex: 1 }}>
-        <Header name={cfg.bot_name} subtitle={cfg.bot_subtitle} onBack={() => router.back()} />
+        <ScreenHeader
+          eyebrow={cfg.bot_subtitle}
+          title={cfg.bot_name}
+          back
+          right={<OnlineBadge />}
+        />
 
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
           <ScrollView ref={scrollRef} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -107,29 +96,17 @@ export default function IntiChat() {
           />
         </KeyboardAvoidingView>
       </SafeAreaView>
-    </LinearGradient>
+    </View>
   );
 }
 
 /* ─────────── Subcomponentes ─────────── */
 
-function Header({ name, subtitle, onBack }: { name: string; subtitle: string; onBack: () => void }) {
+function OnlineBadge() {
   return (
-    <View style={styles.header}>
-      <Pressable onPress={onBack} hitSlop={10} style={styles.backBtn}>
-        <MaterialIcons name="arrow-back" size={20} color={C.text} />
-      </Pressable>
-      <LinearGradient colors={[C.teal, C.cyan]} style={styles.avatar}>
-        <Text style={{ fontSize: 18 }}>🤖</Text>
-      </LinearGradient>
-      <View style={{ flex: 1 }}>
-        <Text style={styles.botName}>{name}</Text>
-        <Text style={styles.botSubtitle}>{subtitle}</Text>
-      </View>
-      <View style={styles.onlineRow}>
-        <View style={styles.onlineDot} />
-        <Text style={styles.onlineText}>En línea</Text>
-      </View>
+    <View style={styles.onlineRow}>
+      <View style={styles.onlineDot} />
+      <Text style={styles.onlineText}>En línea</Text>
     </View>
   );
 }
@@ -139,23 +116,23 @@ function Bubble({ msg, streaming }: { msg: IntiMsg; streaming?: boolean }) {
   return (
     <View style={[styles.msgRow, isUser && { justifyContent: 'flex-end' }]}>
       {!isUser && (
-        <LinearGradient colors={[C.teal, C.cyan]} style={styles.miniAvatar}>
-          <Text style={{ fontSize: 11 }}>🤖</Text>
-        </LinearGradient>
+        <View style={styles.miniAvatar}>
+          <MaterialIcons name="auto-awesome" size={13} color={colors.onSecondaryContainer} />
+        </View>
       )}
       {isUser ? (
-        <LinearGradient colors={[C.teal, C.cyan]} style={[styles.bubble, styles.userBubble]}>
-          <Text style={styles.bubbleText}>{msg.content}</Text>
-        </LinearGradient>
+        <View style={[styles.bubble, styles.userBubble]}>
+          <Text style={styles.userBubbleText}>{msg.content}</Text>
+        </View>
       ) : (
-        <View style={[styles.bubble, styles.aiBubble]}>
+        <View style={[styles.bubble, styles.aiBubble, shadows.card]}>
           <Text style={styles.bubbleText}>
             {msg.content}
-            {streaming && <Text style={{ color: 'rgba(240,237,232,0.4)' }}>▊</Text>}
+            {streaming && <Text style={{ color: colors.onSurfaceVariant }}>▊</Text>}
           </Text>
           {msg.mapa_url && (
             <Pressable onPress={() => Linking.openURL(msg.mapa_url!)} style={styles.mapBtn}>
-              <MaterialIcons name="location-on" size={14} color={C.teal} />
+              <MaterialIcons name="location-on" size={14} color={colors.secondary} />
               <Text style={styles.mapText}>Ver en Google Maps →</Text>
             </Pressable>
           )}
@@ -187,10 +164,10 @@ function TypingDots() {
   }, []);
   return (
     <View style={styles.msgRow}>
-      <LinearGradient colors={[C.teal, C.cyan]} style={styles.miniAvatar}>
-        <Text style={{ fontSize: 11 }}>🤖</Text>
-      </LinearGradient>
-      <View style={[styles.bubble, styles.aiBubble, { flexDirection: 'row', gap: 5, alignItems: 'center' }]}>
+      <View style={styles.miniAvatar}>
+        <MaterialIcons name="auto-awesome" size={13} color={colors.onSecondaryContainer} />
+      </View>
+      <View style={[styles.bubble, styles.aiBubble, shadows.card, { flexDirection: 'row', gap: 5, alignItems: 'center' }]}>
         {anims.map((a, i) => (
           <Animated.View key={i} style={[styles.dot, { opacity: a }]} />
         ))}
@@ -205,24 +182,21 @@ function InputBar({ value, placeholder, disabled, onChange, onSend }: {
   const canSend = value.trim().length > 0 && !disabled;
   return (
     <View style={styles.inputBar}>
+      <Pressable style={styles.addBtn}>
+        <MaterialIcons name="add-circle-outline" size={22} color={colors.outline} />
+      </Pressable>
       <TextInput
         value={value}
         onChangeText={onChange}
         placeholder={placeholder}
-        placeholderTextColor="rgba(240,237,232,0.4)"
+        placeholderTextColor={colors.onSurfaceVariant + '80'}
         editable={!disabled}
         onSubmitEditing={onSend}
         returnKeyType="send"
         style={styles.input}
       />
-      <Pressable onPress={onSend} disabled={!canSend} style={[styles.sendBtn, !canSend && { backgroundColor: 'rgba(255,255,255,0.07)' }]}>
-        {canSend ? (
-          <LinearGradient colors={[C.teal, C.cyan]} style={styles.sendFill}>
-            <MaterialIcons name="send" size={16} color="#fff" />
-          </LinearGradient>
-        ) : (
-          <MaterialIcons name="send" size={16} color="rgba(255,255,255,0.3)" />
-        )}
+      <Pressable onPress={onSend} disabled={!canSend} style={[styles.sendBtn, !canSend && styles.sendBtnIdle]}>
+        <MaterialIcons name={canSend ? 'send' : 'mic'} size={18} color={canSend ? colors.onPrimary : colors.onSecondaryContainer} />
       </Pressable>
     </View>
   );
@@ -231,58 +205,62 @@ function InputBar({ value, placeholder, disabled, onChange, onSend }: {
 /* ─────────── Estilos ─────────── */
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row', alignItems: 'center', gap: 10,
-    paddingVertical: 12, paddingHorizontal: 14,
-    borderBottomWidth: 1, borderBottomColor: 'rgba(45,212,191,0.10)',
-    backgroundColor: 'rgba(45,212,191,0.04)',
-  },
-  backBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.06)' },
-  avatar: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
-  botName: { color: C.text, fontFamily: 'HankenGrotesk_700Bold', fontSize: 14 },
-  botSubtitle: { color: 'rgba(45,212,191,0.75)', fontSize: 11, fontFamily: 'HankenGrotesk_400Regular' },
   onlineRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  onlineDot: { width: 7, height: 7, borderRadius: 3.5, backgroundColor: C.green },
-  onlineText: { color: C.textDim, fontSize: 11, fontFamily: 'HankenGrotesk_400Regular' },
+  onlineDot: { width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#34d399' },
+  onlineText: { color: colors.onSurfaceVariant, fontSize: 11, fontFamily: 'HankenGrotesk_400Regular' },
 
-  scroll: { padding: 12, gap: 10 },
+  scroll: { padding: spacing.gutter, gap: 10 },
 
   msgRow: { flexDirection: 'row', gap: 8, alignItems: 'flex-start' },
-  miniAvatar: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', marginTop: 2 },
+  miniAvatar: {
+    width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', marginTop: 2,
+    backgroundColor: colors.secondaryContainer,
+  },
 
-  bubble: { maxWidth: '78%', paddingVertical: 9, paddingHorizontal: 13 },
-  userBubble: { borderRadius: 18, borderTopRightRadius: 4 },
+  bubble: { maxWidth: '78%', paddingVertical: 10, paddingHorizontal: 14 },
+  userBubble: { borderRadius: 18, borderTopRightRadius: 4, backgroundColor: colors.primary },
+  userBubbleText: { color: colors.onPrimary, fontSize: 14, lineHeight: 21, fontFamily: 'HankenGrotesk_400Regular' },
   aiBubble: {
     borderRadius: 18, borderTopLeftRadius: 4,
-    backgroundColor: C.whiteSoft,
-    borderWidth: 1, borderColor: C.whiteBorder,
+    backgroundColor: colors.surfaceContainerLowest,
+    borderWidth: 1, borderColor: colors.outlineVariant,
   },
-  bubbleText: { color: C.text, fontSize: 13, lineHeight: 21, fontFamily: 'HankenGrotesk_400Regular' },
+  bubbleText: { color: colors.onSurface, fontSize: 14, lineHeight: 21, fontFamily: 'HankenGrotesk_400Regular' },
 
   mapBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 8 },
-  mapText: { color: C.teal, fontSize: 12, fontFamily: 'HankenGrotesk_700Bold' },
+  mapText: { color: colors.secondary, fontSize: 12, fontFamily: 'HankenGrotesk_700Bold' },
 
-  reservaBadge: { marginTop: 8, paddingVertical: 6, paddingHorizontal: 10, backgroundColor: 'rgba(52,211,153,0.14)', borderRadius: 8, borderWidth: 1, borderColor: 'rgba(52,211,153,0.25)' },
-  reservaText: { color: C.green, fontSize: 11, fontFamily: 'HankenGrotesk_700Bold' },
+  reservaBadge: { marginTop: 8, paddingVertical: 6, paddingHorizontal: 10, backgroundColor: 'rgba(52,211,153,0.14)', borderRadius: radii.md, borderWidth: 1, borderColor: 'rgba(52,211,153,0.35)' },
+  reservaText: { color: '#0f9d6a', fontSize: 11, fontFamily: 'HankenGrotesk_700Bold' },
 
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: 'rgba(45,212,191,0.7)' },
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.secondary },
 
-  promptsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingHorizontal: 12, paddingBottom: 8 },
-  promptChip: { paddingVertical: 5, paddingHorizontal: 11, borderRadius: 100, backgroundColor: C.tealHint, borderWidth: 1, borderColor: C.tealDim },
-  promptChipText: { color: 'rgba(45,212,191,0.9)', fontSize: 11, fontFamily: 'HankenGrotesk_700Bold' },
+  promptsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: spacing.gutter, paddingBottom: 10 },
+  promptChip: {
+    paddingVertical: 8, paddingHorizontal: 14, borderRadius: radii.full,
+    backgroundColor: colors.surfaceContainerLowest,
+    borderWidth: 1, borderColor: colors.outlineVariant,
+  },
+  promptChipText: { color: colors.primary, fontSize: 12, fontFamily: 'HankenGrotesk_700Bold' },
 
   inputBar: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
-    paddingHorizontal: 10, paddingVertical: 10,
-    borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.05)',
+    marginHorizontal: spacing.gutter, marginBottom: spacing.gutter,
+    paddingHorizontal: 8, paddingVertical: 8,
+    backgroundColor: colors.surfaceContainerLowest,
+    borderRadius: radii.xl,
+    borderWidth: 1, borderColor: colors.outlineVariant,
+    ...shadows.card,
   },
+  addBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   input: {
-    flex: 1, paddingVertical: 9, paddingHorizontal: 14,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderWidth: 1, borderColor: 'rgba(45,212,191,0.15)',
-    borderRadius: 100, color: C.text, fontSize: 13,
+    flex: 1, paddingVertical: 8, paddingHorizontal: 4,
+    color: colors.onSurface, fontSize: 14,
     fontFamily: 'HankenGrotesk_400Regular',
   },
-  sendBtn: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-  sendFill: { width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' },
+  sendBtn: {
+    width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: colors.primary,
+  },
+  sendBtnIdle: { backgroundColor: colors.secondaryContainer },
 });

@@ -11,7 +11,7 @@ export function KillaTeaser({ onSend }: Props) {
     <View style={styles.wrap}>
       <View style={styles.row}>
         <MaterialIcons name="auto-awesome" size={18} color={colors.onPrimaryContainer} />
-        <Text style={[typography.labelMd, { color: colors.onPrimaryContainer }]}>KILLA AI</Text>
+        <Text style={[typography.labelMd, { color: colors.onPrimaryContainer }]}>INTI AI</Text>
       </View>
       <Text style={[typography.headlineMd, { color: colors.surfaceContainerLowest, marginBottom: spacing.stackSm }]}>
         ¿Qué quieres descubrir hoy?

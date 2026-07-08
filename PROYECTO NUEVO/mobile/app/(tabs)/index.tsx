@@ -22,7 +22,7 @@ const CATEGORIES = [
   { key: 'ar',           icon: 'view-in-ar',  label: 'AR',          path: '/(stacks)/ar' },
   { key: 'guides',       icon: 'menu-book',   label: 'Guías',       path: '/(stacks)/guides?type=cultural' },
   { key: 'map-google',   icon: 'map',         label: 'Mapa Google', path: '/(stacks)/map-google' },
-  { key: 'killa-chat',   icon: 'auto-awesome', label: 'Chat Killa',  path: '/(stacks)/killa-chat' },
+  { key: 'killa-chat',   icon: 'auto-awesome', label: 'Chat Inti',  path: '/(stacks)/killa-chat' },
   { key: 'festividades', icon: 'celebration', label: 'Festividades', path: '/(stacks)/festividades' },
 ] as const;
 

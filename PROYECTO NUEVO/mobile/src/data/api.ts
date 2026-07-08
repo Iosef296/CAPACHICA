@@ -108,7 +108,7 @@ export async function killaChat(message: string, history: { role: 'user' | 'assi
     if (data?.error) throw new Error(data.error);
     return { reply: data.respuesta ?? data.reply ?? data.message ?? data.response ?? cannedReply(message) };
   } catch (e) {
-    console.warn('Killa chat failed:', (e as Error).message);
+    console.warn('Inti chat failed:', (e as Error).message);
     return { reply: '(Sin conexión al asistente) ' + cannedReply(message) };
   }
 }

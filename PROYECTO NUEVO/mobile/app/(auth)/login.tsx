@@ -30,7 +30,7 @@ export default function Login() {
               Vive el corazón del Titicaca
             </Text>
             <Text style={[typography.bodyMd, { color: 'rgba(255,255,255,0.8)', marginTop: 6 }]}>
-              Inicia sesión para crear tu experiencia con Killa AI.
+              Inicia sesión para crear tu experiencia con Inti AI.
             </Text>
           </View>
 

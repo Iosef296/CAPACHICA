@@ -40,7 +40,7 @@ export default function Gastronomy() {
               <View style={styles.tag}>
                 <MaterialIcons name="auto-awesome" size={14} color={colors.sunGold} />
                 <Text style={[typography.labelSm, { color: colors.onPrimaryContainer }]}>
-                  Killa: Pruébalo en Asoc. Tikarani
+                  Inti: Pruébalo en Asoc. Tikarani
                 </Text>
               </View>
             </View>
