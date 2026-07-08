@@ -17,15 +17,19 @@ export default function IntiChat() {
   const [stream, setStream] = useState('');
   const scrollRef = useRef<ScrollView>(null);
 
-  // Refresca la config cada vez que se entra a la pantalla (admin panel
-  // puede cambiar nombre/mensajes en cualquier momento). No pisa una
-  // conversación ya iniciada, solo siembra el saludo la primera vez.
+  // Refresca al entrar a la pantalla y cada 8s mientras esta abierta
+  // (admin panel puede cambiar nombre/mensajes en cualquier momento).
+  // No pisa una conversación ya iniciada, solo siembra el saludo la
+  // primera vez.
   useFocusEffect(
     useCallback(() => {
-      fetchWidgetConfig().then(c => {
+      const refresh = () => fetchWidgetConfig().then(c => {
         setCfg(c);
         setMsgs(prev => (prev.length === 0 ? [{ role: 'assistant', content: c.welcome_msg }] : prev));
       });
+      refresh();
+      const id = setInterval(refresh, 8000);
+      return () => clearInterval(id);
     }, [])
   );
 

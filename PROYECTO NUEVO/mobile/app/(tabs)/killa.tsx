@@ -10,9 +10,15 @@ import { DEFAULT_CFG, fetchWidgetConfig, WidgetCfg } from '@/data/inti';
 export default function KillaTab() {
   const router = useRouter();
   const [cfg, setCfg] = useState<WidgetCfg>(DEFAULT_CFG);
-  // Refresca cada vez que se entra a la tab, asi cambios del admin panel
-  // se ven sin reiniciar la app.
-  useFocusEffect(useCallback(() => { fetchWidgetConfig().then(setCfg); }, []));
+  // Refresca al entrar a la tab y cada 8s mientras esta abierta, asi
+  // cambios del admin panel se ven sin reiniciar ni cambiar de pantalla.
+  useFocusEffect(
+    useCallback(() => {
+      fetchWidgetConfig().then(setCfg);
+      const id = setInterval(() => fetchWidgetConfig().then(setCfg), 8000);
+      return () => clearInterval(id);
+    }, [])
+  );
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
