@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "nombre": "Llachón",
+    "descripcion": "Comunidad pionera del turismo vivencial en Capachica. Conocida por sus tejidos de alpaca en telar de cintura y su vida lacustre junto al Titicaca.",
+    "imagen": "https://picsum.photos/id/1018/800/600",
+    "experiencias": 12
+  },
+  {
+    "id": 2,
+    "nombre": "Ccotos",
+    "descripcion": "Pesca artesanal de trucha y navegación tradicional en balsas de totora sobre las aguas sagradas del lago.",
+    "imagen": "https://picsum.photos/id/1043/800/600",
+    "experiencias": 8
+  },
+  {
+    "id": 3,
+    "nombre": "Siale",
+    "descripcion": "Caminatas y miradores con vistas panorámicas del Titicaca. Ideal para quienes buscan tranquilidad rural.",
+    "imagen": "https://picsum.photos/id/1015/800/600",
+    "experiencias": 6
+  },
+  {
+    "id": 4,
+    "nombre": "Chifrón",
+    "descripcion": "Playas del altiplano y talleres de tejido de chumpis tradicionales con maestros artesanos locales.",
+    "imagen": "https://picsum.photos/id/1039/800/600",
+    "experiencias": 5
+  }
+]

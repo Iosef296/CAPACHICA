@@ -27,6 +27,9 @@ const adminRoutes        = require('./rutas/actividades/admin.rutas');
 // Rutas — Festividades
 const festividadesRoutes = require('./rutas/festividades/festividades.rutas');
 
+// Rutas — Comunidades
+const comunidadesRoutes = require('./rutas/comunidades/comunidades.rutas');
+
 // Rutas — Upload
 const uploadRoutes = require('./rutas/upload.rutas');
 
@@ -62,6 +65,9 @@ app.use('/api/admin',        adminRoutes);
 
 // ── Festividades ───────────────────────────────────
 app.use('/api/festividades', festividadesRoutes);
+
+// ── Comunidades ────────────────────────────────────
+app.use('/api/comunidades', comunidadesRoutes);
 
 // ── Upload ─────────────────────────────────────────
 app.use('/api/upload', uploadRoutes);

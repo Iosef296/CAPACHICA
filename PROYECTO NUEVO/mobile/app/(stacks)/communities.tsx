@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { KillaTeaser } from '@/components/KillaTeaser';
-import { communities, hostFamilies } from '@/data/mock';
+import { communities as mockCommunities, hostFamilies, Community } from '@/data/mock';
+import { api } from '@/data/api';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
 export default function Communities() {
   const router = useRouter();
+  const [communities, setCommunities] = useState<Community[]>(mockCommunities);
+  useEffect(() => { api.communities().then(setCommunities); }, []);
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaView edges={['top']}>

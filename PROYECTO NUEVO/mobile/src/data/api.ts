@@ -95,7 +95,16 @@ export const api = {
   stories: () => get('/stories', mock.stories),
   recommendations: () => get('/recommendations', mock.recommendations),
   highlights: () => get('/highlights', mock.highlights),
-  communities: () => get('/communities', mock.communities),
+  // Backend real usa nombres en español (nombre/descripcion/imagen/experiencias).
+  communities: () => get<any[]>('/comunidades', mock.communities).then(list =>
+    (Array.isArray(list) ? list : []).map((c: any) => ({
+      id: String(c.id),
+      name: c.nombre ?? c.name,
+      description: c.descripcion ?? c.description,
+      image: c.imagen ?? c.image,
+      experiencesCount: c.experiencias ?? c.experiencesCount ?? 0,
+    }))
+  ),
   mapPins: () => get('/map/pins', mock.mapPins),
   profile: () => get('/profile/me', mock.profile),
   // Auth real contra /api/auth/login y /api/auth/registro (espera email/password)
