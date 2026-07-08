@@ -21,7 +21,29 @@ const openai = new OpenAI({
   baseURL: 'https://openrouter.ai/api/v1',
   apiKey: process.env.OPENROUTER_API_KEY,
 });
-const OR_MODEL = 'openai/gpt-oss-120b:free';
+// Modelos gratis de OpenRouter, en orden de preferencia. El free tier se satura
+// seguido (429 upstream) — si uno falla por rate-limit probamos el siguiente.
+const OR_MODEL_CHAIN = [
+  'openai/gpt-oss-120b:free',
+  'openai/gpt-oss-20b:free',
+  'meta-llama/llama-3.3-70b-instruct:free',
+  'nvidia/nemotron-3-super-120b-a12b:free',
+];
+
+async function chatComplete(messages, opts = {}) {
+  let lastErr;
+  for (const model of OR_MODEL_CHAIN) {
+    try {
+      return await openai.chat.completions.create({ model, messages, ...opts });
+    } catch (err) {
+      lastErr = err;
+      const status = err?.status ?? err?.response?.status;
+      if (status !== 429) throw err;
+      console.warn(`OpenRouter 429 en ${model}, probando siguiente modelo...`);
+    }
+  }
+  throw lastErr;
+}
 
 // ── DB HELPERS ────────────────────────────────────────
 async function loadKnowledge() {
@@ -199,7 +221,7 @@ async function extractReservaFromChat(mensaje, historial, lang='es') {
   const hoy = new Date().toISOString().split('T')[0];
   const lr = LANG_REPLY[lang]||LANG_REPLY.es;
   const prompt = `You are a tourism booking data extractor. Today: ${hoy}.\nAnalyze the ENTIRE conversation and extract available data.\n\nPrevious conversation:\n${conv||'(none)'}\nUser now: ${mensaje}\n\nGather from entire conversation:\n- nombre, contacto, fecha_llegada (YYYY-MM-DD), dias_estancia (int), personas (int), hospedaje\n\n"completo": true ONLY if ALL SIX fields have values.\n\nReturn ONLY JSON:\n{"respuesta":"...","datos":{"nombre":"...or null","contacto":"...or null","fecha_llegada":"...or null","dias_estancia":null,"personas":null,"hospedaje":"...or null"},"completo":true or false}\n\n- If completo=true: respuesta = ${lr.complete}\n- If completo=false: respuesta = ${lr.incomplete}`;
-  const result = await openai.chat.completions.create({ model: OR_MODEL, messages:[{role:'user',content:prompt}], temperature:0.1, max_tokens:600 });
+  const result = await chatComplete([{role:'user',content:prompt}], { temperature:0.1, max_tokens:900 });
   const raw = result.choices[0].message.content.trim();
   const match = raw.match(/\{[\s\S]*\}/);
   if (!match) return null;
@@ -235,7 +257,7 @@ app.post('/api/chat', async (req, res) => {
     const directMatch = findDirectMatch(mensaje, knowledge.conocimiento);
     const systemPrompt = buildSystemPrompt(knowledge, directMatch, intent, lang);
     const messages = [{ role:'system', content:systemPrompt }, ...historial.slice(-10).map(m=>({ role:m.role==='user'?'user':'assistant', content:m.content })), { role:'user', content:mensaje }];
-    const result = await openai.chat.completions.create({ model:OR_MODEL, messages, temperature:directMatch?0.3:0.4, max_tokens:500 });
+    const result = await chatComplete(messages, { temperature:directMatch?0.3:0.4, max_tokens:800 });
     const respuesta = result.choices[0].message.content;
     const payload = { respuesta };
     if (intent==='reserva') payload.accion='reserva_form';
@@ -284,7 +306,7 @@ app.post('/api/chat/stream', async (req, res) => {
     if (intent==='reserva') meta.accion='reserva_form';
     if (intent==='mapa') meta.mapa_url='https://maps.google.com/maps?q=Capachica,Puno,Peru&z=13';
     send({ type:'meta', ...meta });
-    const stream = await openai.chat.completions.create({ model:OR_MODEL, messages, temperature:directMatch?0.3:0.4, max_tokens:500, stream:true });
+    const stream = await chatComplete(messages, { temperature:directMatch?0.3:0.4, max_tokens:800, stream:true });
     let fullText='';
     for await (const chunk of stream) { const text=chunk.choices[0]?.delta?.content||''; if(text){ fullText+=text; send({type:'token',text}); } }
     send({ type:'done', fullText }); res.write('data: [DONE]\n\n'); res.end();
