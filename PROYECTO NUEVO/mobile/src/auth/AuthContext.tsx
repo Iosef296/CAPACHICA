@@ -67,24 +67,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loading,
     async signInEmail(email, password) {
       const res: any = await api.login(email, password);
-      const apiUser = res?.usuario ?? res?.user ?? {};
+      const apiUser = res?.usuario ?? {};
       const u: User = {
         id: apiUser.id?.toString() ?? 'local-' + Date.now(),
-        email: apiUser.correo ?? apiUser.email ?? email,
-        name: apiUser.nombre ?? apiUser.name ?? email.split('@')[0],
+        email: apiUser.email ?? email,
+        name: apiUser.nombre ?? email.split('@')[0],
         avatar: apiUser.avatar,
         provider: 'email',
       };
       setUser(u);
       await SecureStore.setItemAsync(KEY, JSON.stringify(u));
-      const token = res?.accessToken ?? res?.token;
-      if (token) await SecureStore.setItemAsync('capachica.token', token);
+      if (res?.accessToken) await SecureStore.setItemAsync('capachica.token', res.accessToken);
     },
     async signUpEmail(email, password, name) {
-      await api.registro(email, password, name);
-      const u: User = { id: 'local-' + Date.now(), email, name, provider: 'email' };
+      const res: any = await api.registro(email, password, name);
+      const apiUser = res?.usuario ?? {};
+      const u: User = {
+        id: apiUser.id?.toString() ?? 'local-' + Date.now(),
+        email: apiUser.email ?? email,
+        name: apiUser.nombre ?? name,
+        provider: 'email',
+      };
       setUser(u);
       await SecureStore.setItemAsync(KEY, JSON.stringify(u));
+      if (res?.accessToken) await SecureStore.setItemAsync('capachica.token', res.accessToken);
     },
     async signInGoogle() { await promptAsync(); },
     async signOut() {

@@ -12,11 +12,19 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
 
   async function submit() {
     if (!email || !password) return;
     setBusy(true);
-    try { await signInEmail(email, password); } finally { setBusy(false); }
+    setError('');
+    try {
+      await signInEmail(email, password);
+    } catch (e) {
+      setError((e as Error).message || 'No se pudo iniciar sesión.');
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -50,14 +58,14 @@ export default function Login() {
               placeholderTextColor={colors.outline}
               style={styles.input}
             />
+            {!!error && (
+              <Text style={[typography.labelSm, { color: colors.error, marginTop: spacing.gutter }]}>{error}</Text>
+            )}
             <Button label={busy ? 'Entrando…' : 'Iniciar sesión'} onPress={submit} style={{ marginTop: spacing.stackMd }} />
             <View style={styles.divider}>
               <View style={styles.line} /><Text style={[typography.labelSm, { color: colors.outline, marginHorizontal: 8 }]}>o</Text><View style={styles.line} />
             </View>
             <Button label="Continuar con Google" variant="ghost" icon="login" onPress={signInGoogle} />
-            <Text style={[typography.labelSm, { color: colors.outline, textAlign: 'center', marginTop: spacing.gutter }]}>
-              Auth de prueba — cualquier email/contraseña entra.
-            </Text>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

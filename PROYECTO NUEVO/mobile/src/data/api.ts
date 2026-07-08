@@ -35,6 +35,20 @@ async function post<T>(path: string, body: any, fallback: T): Promise<T> {
   }
 }
 
+// Como post(), pero no traga errores: los propaga para que el caller
+// (login/registro) pueda distinguir credenciales inválidas de éxito.
+async function postAuth<T>(path: string, body: any): Promise<T> {
+  if (!API_BASE) throw new Error('Backend no configurado');
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.error ?? `Error ${res.status}`);
+  return data as T;
+}
+
 export type Restaurante = {
   id: string;
   nombre: string;
@@ -84,11 +98,11 @@ export const api = {
   communities: () => get('/communities', mock.communities),
   mapPins: () => get('/map/pins', mock.mapPins),
   profile: () => get('/profile/me', mock.profile),
-  // Auth real contra /api/auth/login y /api/auth/registro
-  login: (correo: string, contrasena: string) =>
-    post<{ token?: string; usuario?: any; accessToken?: string; refreshToken?: string }>('/auth/login', { correo, contrasena }, {}),
-  registro: (correo: string, contrasena: string, nombre: string) =>
-    post('/auth/registro', { correo, contrasena, nombre }, {}),
+  // Auth real contra /api/auth/login y /api/auth/registro (espera email/password)
+  login: (email: string, password: string) =>
+    postAuth<{ usuario?: any; accessToken?: string; refreshToken?: string }>('/auth/login', { email, password }),
+  registro: (email: string, password: string, nombre: string) =>
+    postAuth<{ usuario?: any; accessToken?: string; refreshToken?: string }>('/auth/registro', { email, password, nombre }),
 };
 
 // Chat con backend IA. Soporta campos en español o inglés.
