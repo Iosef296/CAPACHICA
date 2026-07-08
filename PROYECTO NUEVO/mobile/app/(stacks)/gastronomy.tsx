@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -8,6 +8,7 @@ import { Chip } from '@/components/Chip';
 import { KillaTeaser } from '@/components/KillaTeaser';
 import { dishes } from '@/data/mock';
 import { api, Restaurante } from '@/data/api';
+import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
 const TABS = ['Todo', 'Platos Fuertes', 'Sopas', 'Tradición Viva'];
@@ -15,7 +16,7 @@ const TABS = ['Todo', 'Platos Fuertes', 'Sopas', 'Tradición Viva'];
 export default function Gastronomy() {
   const [tab, setTab] = useState('Todo');
   const [restaurantes, setRestaurantes] = useState<Restaurante[]>([]);
-  useEffect(() => { api.restaurantes().then(setRestaurantes); }, []);
+  useLiveRefresh(() => { api.restaurantes().then(setRestaurantes); });
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={styles.hero}>

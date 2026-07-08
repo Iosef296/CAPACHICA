@@ -1,24 +1,16 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 import { DEFAULT_CFG, fetchWidgetConfig, WidgetCfg } from '@/data/inti';
+import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 
 export default function KillaTab() {
   const router = useRouter();
   const [cfg, setCfg] = useState<WidgetCfg>(DEFAULT_CFG);
-  // Refresca al entrar a la tab y cada 8s mientras esta abierta, asi
-  // cambios del admin panel se ven sin reiniciar ni cambiar de pantalla.
-  useFocusEffect(
-    useCallback(() => {
-      fetchWidgetConfig().then(setCfg);
-      const id = setInterval(() => fetchWidgetConfig().then(setCfg), 8000);
-      return () => clearInterval(id);
-    }, [])
-  );
+  useLiveRefresh(() => { fetchWidgetConfig().then(setCfg); });
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>

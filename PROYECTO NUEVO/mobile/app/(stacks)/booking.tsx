@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -9,6 +9,7 @@ import { HeartButton } from '@/components/HeartButton';
 import { BookingModal } from '@/components/BookingModal';
 import { stays as mockStays, activities as mockActivities } from '@/data/mock';
 import { api } from '@/data/api';
+import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
 const LOCATIONS = ['Todas', 'Llachón', 'Ccotos', 'Siale', 'Chifrón'];
@@ -18,7 +19,7 @@ export default function Booking() {
   const [activities, setActivities] = useState(mockActivities as any[]);
   const [stays, setStays] = useState(mockStays as any[]);
   const [reserva, setReserva] = useState<{ title: string; price: number; unit: string } | null>(null);
-  useEffect(() => {
+  useLiveRefresh(() => {
     api.actividades().then(real => {
       if (real && real.length > 0) {
         setActivities(real.map((r: any) => ({
@@ -29,7 +30,7 @@ export default function Booking() {
       }
     });
     api.stays().then(setStays);
-  }, []);
+  });
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaView edges={['top']}>

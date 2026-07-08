@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { GlassPanel } from '@/components/GlassPanel';
 import { crafts as mockCrafts, masters as mockMasters } from '@/data/mock';
 import { api } from '@/data/api';
+import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
 const PALETTE = [
@@ -17,10 +18,10 @@ const PALETTE = [
 export default function Crafts() {
   const [crafts, setCrafts] = useState<any[]>(mockCrafts);
   const [masters, setMasters] = useState<any[]>(mockMasters);
-  useEffect(() => {
+  useLiveRefresh(() => {
     api.crafts().then(setCrafts);
     api.masters().then(setMasters);
-  }, []);
+  });
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaView edges={['top']}>

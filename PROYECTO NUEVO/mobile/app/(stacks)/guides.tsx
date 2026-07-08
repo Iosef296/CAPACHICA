@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { guides as mockGuides } from '@/data/mock';
 import { api } from '@/data/api';
+import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
 export default function Guides() {
   const { type } = useLocalSearchParams<{ type?: string }>();
   const isTravel = type === 'travel';
   const [allGuides, setAllGuides] = useState<any[]>(mockGuides);
-  useEffect(() => { api.guides().then(setAllGuides); }, []);
+  useLiveRefresh(() => { api.guides().then(setAllGuides); });
   const guides = allGuides.filter((g: any) => !g.type || g.type === (isTravel ? 'viaje' : 'cultural'));
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>

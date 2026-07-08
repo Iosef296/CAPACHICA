@@ -1,12 +1,12 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { colors, radii, shadows, spacing } from '@/theme';
 import { DEFAULT_CFG, fetchWidgetConfig, IntiMsg, sendChat, WidgetCfg } from '@/data/inti';
+import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 
 export default function IntiChat() {
   const router = useRouter();
@@ -17,21 +17,13 @@ export default function IntiChat() {
   const [stream, setStream] = useState('');
   const scrollRef = useRef<ScrollView>(null);
 
-  // Refresca al entrar a la pantalla y cada 8s mientras esta abierta
-  // (admin panel puede cambiar nombre/mensajes en cualquier momento).
-  // No pisa una conversación ya iniciada, solo siembra el saludo la
-  // primera vez.
-  useFocusEffect(
-    useCallback(() => {
-      const refresh = () => fetchWidgetConfig().then(c => {
-        setCfg(c);
-        setMsgs(prev => (prev.length === 0 ? [{ role: 'assistant', content: c.welcome_msg }] : prev));
-      });
-      refresh();
-      const id = setInterval(refresh, 8000);
-      return () => clearInterval(id);
-    }, [])
-  );
+  // No pisa una conversación ya iniciada, solo siembra el saludo la primera vez.
+  useLiveRefresh(() => {
+    fetchWidgetConfig().then(c => {
+      setCfg(c);
+      setMsgs(prev => (prev.length === 0 ? [{ role: 'assistant', content: c.welcome_msg }] : prev));
+    });
+  });
 
   useEffect(() => {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);

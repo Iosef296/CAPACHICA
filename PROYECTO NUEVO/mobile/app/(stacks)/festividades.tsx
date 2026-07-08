@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, FlatList, Image, ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Chip } from '@/components/Chip';
 import { api, Festividad } from '@/data/api';
+import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
 const TYPES = ['Todas', 'Religiosa', 'Cultural', 'Cívica'];
@@ -17,12 +18,12 @@ export default function Festividades() {
   const [filter, setFilter] = useState('Todas');
   const router = useRouter();
 
-  useEffect(() => {
+  useLiveRefresh(() => {
     api.festividades().then(data => {
       setItems(data);
       setLoading(false);
     });
-  }, []);
+  });
 
   const filtered = filter === 'Todas' ? items : items.filter(i => i.tipo === filter);
   const featured = items.find(i => i.destacado) ?? items[0];
