@@ -29,16 +29,6 @@ export default function KillaTab() {
           <Text style={styles.subtitle}>{cfg.bot_subtitle}</Text>
           <Text style={styles.welcome}>{cfg.welcome_msg}</Text>
 
-          <View style={styles.suggestionsCard}>
-            <Text style={styles.suggestionsLabel}>PRUEBA PREGUNTAR</Text>
-            {cfg.quick_prompts.map(p => (
-              <Pressable key={p} style={styles.suggestion} onPress={() => router.push('/(stacks)/killa-chat')}>
-                <MaterialIcons name="arrow-forward" size={18} color={colors.secondary} />
-                <Text style={styles.suggestionText}>{p}</Text>
-              </Pressable>
-            ))}
-          </View>
-
           <Pressable style={styles.cta} onPress={() => router.push('/(stacks)/killa-chat')}>
             <MaterialIcons name="chat" size={20} color={colors.onPrimary} />
             <Text style={styles.ctaText}>Iniciar conversación</Text>
@@ -73,18 +63,8 @@ const styles = StyleSheet.create({
     color: colors.onSurfaceVariant, fontSize: 16, textAlign: 'center', marginTop: 8,
     fontFamily: 'HankenGrotesk_400Regular', lineHeight: 24,
   },
-  suggestionsCard: {
-    marginTop: spacing.stackSm,
-    backgroundColor: colors.surfaceContainerLowest,
-    borderWidth: 1, borderColor: colors.outlineVariant,
-    borderRadius: radii.xl, padding: spacing.gutter, gap: 6,
-    ...shadows.card,
-  },
-  suggestionsLabel: { color: colors.secondary, fontSize: 12, fontFamily: 'HankenGrotesk_700Bold', letterSpacing: 1, marginBottom: 4 },
-  suggestion: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10 },
-  suggestionText: { color: colors.onSurface, fontSize: 14, flex: 1, fontFamily: 'HankenGrotesk_400Regular' },
   cta: {
-    marginTop: 8, borderRadius: radii.full, overflow: 'hidden',
+    marginTop: spacing.stackSm, borderRadius: radii.full, overflow: 'hidden',
     backgroundColor: colors.primary,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16,
     shadowColor: colors.primary, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.2, shadowRadius: 20, elevation: 4,
