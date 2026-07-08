@@ -598,6 +598,26 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         <span>📍</span><span class="nav-btn-text"> Destinos</span>
         <span class="nav-count" id="nav-dest-count">—</span>
       </button>
+      <button class="nav-btn" data-section="hospedajes" title="Hospedajes">
+        <span>🏠</span><span class="nav-btn-text"> Hospedajes</span>
+        <span class="nav-count" id="nav-hospedajes-count">—</span>
+      </button>
+      <button class="nav-btn" data-section="artesania" title="Artesanía">
+        <span>🎨</span><span class="nav-btn-text"> Artesanía</span>
+        <span class="nav-count" id="nav-artesania-count">—</span>
+      </button>
+      <button class="nav-btn" data-section="festividades" title="Festividades">
+        <span>🎉</span><span class="nav-btn-text"> Festividades</span>
+        <span class="nav-count" id="nav-festividades-count">—</span>
+      </button>
+      <button class="nav-btn" data-section="maestros" title="Maestros">
+        <span>🧑‍🎨</span><span class="nav-btn-text"> Maestros</span>
+        <span class="nav-count" id="nav-maestros-count">—</span>
+      </button>
+      <button class="nav-btn" data-section="guias" title="Guías">
+        <span>📖</span><span class="nav-btn-text"> Guías</span>
+        <span class="nav-count" id="nav-guias-count">—</span>
+      </button>
       <button class="nav-btn" data-section="reservas" title="Reservas">
         <span>📋</span><span class="nav-btn-text"> Reservas</span>
         <span class="nav-count" id="nav-res-count">—</span>
@@ -698,6 +718,67 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
           <button class="btn-primary" onclick="openDestinoModal(null)">＋ Nuevo destino</button>
         </div>
         <div id="destinosList"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
+      </div>
+
+      <!-- ─── SECCIONES SIMPLES (Hospedajes/Artesania/Festividades/Maestros/Guias) ─── -->
+      <div class="section" id="sec-hospedajes">
+        <div class="page-hdr">
+          <h2>Hospedajes</h2>
+          <p>Familias anfitrionas y hospedajes vivenciales</p>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <span class="count-pill" id="hospedajes-count">0</span>
+          <button class="btn-primary" onclick="openSimpleModal('hospedajes', null)">＋ Nuevo</button>
+        </div>
+        <div id="hospedajes-list"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
+      </div>
+
+      <div class="section" id="sec-artesania">
+        <div class="page-hdr">
+          <h2>Artesanía</h2>
+          <p>Productos de artesanía capachiqueña</p>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <span class="count-pill" id="artesania-count">0</span>
+          <button class="btn-primary" onclick="openSimpleModal('artesania', null)">＋ Nuevo</button>
+        </div>
+        <div id="artesania-list"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
+      </div>
+
+      <div class="section" id="sec-festividades">
+        <div class="page-hdr">
+          <h2>Festividades</h2>
+          <p>Calendario de festividades de Capachica</p>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <span class="count-pill" id="festividades-count">0</span>
+          <button class="btn-primary" onclick="openSimpleModal('festividades', null)">＋ Nueva</button>
+        </div>
+        <div id="festividades-list"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
+      </div>
+
+      <div class="section" id="sec-maestros">
+        <div class="page-hdr">
+          <h2>Maestros artesanos</h2>
+          <p>Artesanos destacados de la península</p>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <span class="count-pill" id="maestros-count">0</span>
+          <button class="btn-primary" onclick="openSimpleModal('maestros', null)">＋ Nuevo</button>
+        </div>
+        <div id="maestros-list"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
+      </div>
+
+      <div class="section" id="sec-guias">
+        <div class="page-hdr">
+          <h2>Guías</h2>
+          <p>Guías de viaje y cultura</p>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <span class="count-pill" id="guias-count">0</span>
+          <button class="btn-primary" onclick="openSimpleModal('guias', null)">＋ Nueva</button>
+        </div>
+        <div id="guias-list"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
       </div>
 
       <!-- ─── RESERVAS SECTION ─── -->
@@ -953,6 +1034,22 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
   </div>
 </div>
 
+<!-- ─── MODAL GENÉRICO: Hospedajes/Artesania/Festividades/Maestros/Guias ─── -->
+<div class="modal-overlay" id="simpleModal">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <h3 id="simpleModalTitle">Nuevo</h3>
+      <button class="modal-close" onclick="closeSimpleModal()">✕</button>
+    </div>
+    <input type="hidden" id="simple-id" value="" />
+    <div id="simpleModalFields"></div>
+    <div style="display:flex;gap:10px;margin-top:6px">
+      <button class="btn-primary" onclick="saveSimpleModal()" style="flex:1">Guardar</button>
+      <button class="btn-sm" onclick="closeSimpleModal()" style="padding:9px 18px">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <script define:vars={{ API_URL, IA_URL }}>
   let TOKEN = localStorage.getItem('admin_token') || '';
   let iaData = { conocimiento: [], contexto_base: '' };
@@ -1112,6 +1209,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       if (btn.dataset.section === 'widget')   loadWidget();
       if (btn.dataset.section === 'destinos') loadDestinos();
       if (btn.dataset.section === 'paginas')  loadPaginas();
+      if (['hospedajes','artesania','festividades','maestros','guias'].includes(btn.dataset.section)) cargarSimple(btn.dataset.section);
       if (btn.dataset.section === 'global') {
         loadSiteconfigAdmin();
         // Re-scale iframe now that section is visible
@@ -1130,6 +1228,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     if (sec === 'widget')   loadWidget();
     if (sec === 'destinos') loadDestinos();
     if (sec === 'paginas')  loadPaginas();
+    if (['hospedajes','artesania','festividades','maestros','guias'].includes(sec)) cargarSimple(sec);
   };
 
   /* ─── IA ─── */
@@ -1431,6 +1530,236 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     $('d-upload-area').style.borderColor = 'var(--border2)';
     $('d-file-input').value = '';
   }
+
+  /* ─── SECCIONES SIMPLES (Hospedajes/Artesania/Festividades/Maestros/Guias) ───
+     Un solo motor generico (config-driven) para no repetir 5 veces el mismo
+     CRUD. Cada recurso solo declara sus campos; todo lo demas (cargar,
+     listar, modal, guardar, subir foto, eliminar) es compartido. */
+  const RECURSOS_SIMPLES = {
+    hospedajes: {
+      titulo: 'Hospedaje', endpoint: 'hospedajes',
+      itemLabel: it => it.nombre, itemSub: it => it.comunidad,
+      imageField: 'foto_url',
+      campos: [
+        { key: 'nombre', label: 'Nombre *', placeholder: 'Posada de Doña Paula' },
+        { key: 'comunidad', label: 'Comunidad', placeholder: 'Llachón' },
+        { key: 'descripcion', label: 'Descripción', tipo: 'textarea', placeholder: '...' },
+        { key: 'especialidad', label: 'Especialidad', tipo: 'select', opciones: [['pesca','🎣 Pesca'],['tejido','🪡 Tejido'],['agricultura','🌿 Agricultura'],['cocina','🍲 Cocina']] },
+        { key: 'foto_url', label: 'Foto', tipo: 'imagen' },
+        { key: 'habitaciones', label: 'Habitaciones', tipo: 'numero', placeholder: '4' },
+        { key: 'precio', label: 'Precio por noche (S/)', tipo: 'numero', placeholder: '120' },
+        { key: 'idiomas', label: 'Idiomas (separados por coma)', placeholder: 'Español, Quechua' },
+        { key: 'servicios', label: 'Servicios (separados por coma)', placeholder: 'Desayuno incluido, Vista al lago' },
+        { key: 'calificacion', label: 'Calificación', placeholder: '4.8' },
+      ],
+      arrayFields: ['idiomas', 'servicios'], numberFields: ['habitaciones', 'precio'],
+    },
+    artesania: {
+      titulo: 'Producto de artesanía', endpoint: 'artesania',
+      itemLabel: it => it.nombre, itemSub: it => it.tipo,
+      imageField: 'imagen_url',
+      campos: [
+        { key: 'nombre', label: 'Nombre *', placeholder: 'Poncho Ceremonial' },
+        { key: 'tipo', label: 'Tipo', tipo: 'select', opciones: [['textil','🪡 Textil'],['bordado','🧵 Bordado'],['ceramica','🏺 Cerámica'],['joyeria','💍 Joyería']] },
+        { key: 'tecnica', label: 'Técnica', placeholder: 'Telar de cintura' },
+        { key: 'materiales', label: 'Materiales', placeholder: 'Lana de alpaca' },
+        { key: 'imagen_url', label: 'Foto', tipo: 'imagen' },
+        { key: 'precio_soles', label: 'Precio (S/)', tipo: 'numero', placeholder: '240' },
+        { key: 'precio_usd', label: 'Precio (USD)', tipo: 'numero', placeholder: '65' },
+        { key: 'artesana_nombre', label: 'Nombre de la artesana', placeholder: 'Mamá Victoria' },
+        { key: 'artesana_comunidad', label: 'Comunidad de la artesana', placeholder: 'Llachón' },
+        { key: 'artesana_experiencia', label: 'Años de experiencia', tipo: 'numero', placeholder: '28' },
+        { key: 'emoji', label: 'Emoji', placeholder: '🧣' },
+        { key: 'stock', label: 'Stock', tipo: 'numero', placeholder: '3' },
+      ],
+      numberFields: ['precio_soles', 'precio_usd', 'artesana_experiencia', 'stock'],
+    },
+    festividades: {
+      titulo: 'Festividad', endpoint: 'festividades',
+      itemLabel: it => it.nombre, itemSub: it => it.fecha,
+      imageField: 'imagen',
+      campos: [
+        { key: 'nombre', label: 'Nombre *', placeholder: 'Virgen de la Candelaria' },
+        { key: 'fecha', label: 'Fecha', placeholder: '1 al 14 de Febrero' },
+        { key: 'mes', label: 'Mes (número 1-12)', tipo: 'numero', placeholder: '2' },
+        { key: 'tipo', label: 'Tipo', placeholder: 'Religiosa' },
+        { key: 'ubicacion', label: 'Ubicación', placeholder: 'Capachica, Puno' },
+        { key: 'descripcion', label: 'Descripción', tipo: 'textarea', placeholder: '...' },
+        { key: 'imagen', label: 'Foto', tipo: 'imagen' },
+        { key: 'actividades', label: 'Actividades (separadas por coma)', placeholder: 'Procesión, Danzas' },
+        { key: 'galeria', label: 'Galería (URLs separadas por coma)', placeholder: 'https://..., https://...' },
+      ],
+      arrayFields: ['actividades', 'galeria'], numberFields: ['mes'],
+    },
+    maestros: {
+      titulo: 'Maestro artesano', endpoint: 'maestros',
+      itemLabel: it => it.nombre, itemSub: it => it.oficio,
+      imageField: 'imagen',
+      campos: [
+        { key: 'nombre', label: 'Nombre *', placeholder: 'Mamá Victoria' },
+        { key: 'oficio', label: 'Oficio', placeholder: 'Alpaca' },
+        { key: 'imagen', label: 'Foto', tipo: 'imagen' },
+      ],
+    },
+    guias: {
+      titulo: 'Guía', endpoint: 'guias',
+      itemLabel: it => it.titulo, itemSub: it => it.tipo,
+      imageField: 'imagen',
+      campos: [
+        { key: 'titulo', label: 'Título *', placeholder: 'Historia de Capachica' },
+        { key: 'extracto', label: 'Extracto', placeholder: 'Mil años de tradición lacustre.' },
+        { key: 'imagen', label: 'Foto', tipo: 'imagen' },
+        { key: 'tipo', label: 'Tipo', tipo: 'select', opciones: [['cultural','Cultural'],['viaje','Viaje']] },
+      ],
+    },
+  };
+
+  let simpleDataCache = {};
+  let simpleActivo = null;
+
+  async function cargarSimple(rec) {
+    const cfg = RECURSOS_SIMPLES[rec];
+    $(`${rec}-list`).innerHTML = '<div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div>';
+    try {
+      const res = await fetch(`${API_URL}/api/${cfg.endpoint}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      simpleDataCache[rec] = Array.isArray(data) ? data : [];
+      renderSimple(rec);
+    } catch (e) {
+      $(`${rec}-list`).innerHTML = `<div class="empty"><div class="ei">⚠️</div><p>No se pudo cargar: ${e.message}</p></div>`;
+    }
+  }
+
+  function renderSimple(rec) {
+    const cfg = RECURSOS_SIMPLES[rec];
+    const items = simpleDataCache[rec] || [];
+    $(`${rec}-count`).textContent = items.length;
+    if (!items.length) {
+      $(`${rec}-list`).innerHTML = `<div class="empty"><div class="ei">📭</div><p>No hay elementos. Agrega el primero.</p></div>`;
+      return;
+    }
+    $(`${rec}-list`).innerHTML = items.map(it => {
+      const img = cfg.imageField && it[cfg.imageField]
+        ? `<img class="dest-thumb" src="${esc(it[cfg.imageField])}" alt="" onerror="this.style.display='none'" />`
+        : `<div class="dest-emoji-box">${esc(it.emoji || '📦')}</div>`;
+      const sub = cfg.itemSub ? cfg.itemSub(it) : '';
+      return `
+        <div class="dest-item" id="${rec}-${it.id}">
+          ${img}
+          <div style="flex:1;min-width:0">
+            <div style="font-size:15px;font-weight:700;color:var(--text)">${esc(cfg.itemLabel(it))}</div>
+            ${sub ? `<div style="font-size:12px;color:var(--cyan)">${esc(String(sub))}</div>` : ''}
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+            <button onclick="openSimpleModal('${rec}', ${JSON.stringify(String(it.id))})" style="padding:6px 12px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit">✎ Editar</button>
+            <button onclick="deleteSimple('${rec}', ${JSON.stringify(String(it.id))})" style="padding:6px 12px;border-radius:7px;border:1px solid rgba(248,113,113,.22);background:transparent;color:var(--red);font-size:12px;cursor:pointer;font-family:inherit">✕ Eliminar</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function openSimpleModal(rec, id) {
+    const cfg = RECURSOS_SIMPLES[rec];
+    simpleActivo = rec;
+    const item = id ? (simpleDataCache[rec] || []).find(x => String(x.id) === String(id)) : null;
+    $('simple-id').value = item ? item.id : '';
+    $('simpleModalTitle').textContent = (item ? 'Editar ' : 'Nuevo ') + cfg.titulo.toLowerCase();
+
+    $('simpleModalFields').innerHTML = cfg.campos.map(campo => {
+      const raw = item ? item[campo.key] : undefined;
+      const value = Array.isArray(raw) ? raw.join(', ') : (raw ?? '');
+      if (campo.tipo === 'textarea') {
+        return `<div class="fg"><label>${campo.label}</label><textarea id="simple-f-${campo.key}" rows="3" placeholder="${campo.placeholder || ''}">${esc(String(value))}</textarea></div>`;
+      }
+      if (campo.tipo === 'select') {
+        const opts = campo.opciones.map(([v, l]) => `<option value="${v}" ${value === v ? 'selected' : ''}>${l}</option>`).join('');
+        return `<div class="fg"><label>${campo.label}</label><select id="simple-f-${campo.key}"><option value="">Seleccionar</option>${opts}</select></div>`;
+      }
+      if (campo.tipo === 'imagen') {
+        const imgVal = esc(String(value));
+        return `
+          <div class="fg">
+            <label>${campo.label}</label>
+            <div id="simple-upload-area-${campo.key}" style="border:2px dashed var(--border2);border-radius:10px;padding:14px;text-align:center;cursor:pointer;margin-bottom:8px" onclick="document.getElementById('simple-file-${campo.key}').click()">
+              ${value ? `<img src="${imgVal}" style="max-height:100px;border-radius:8px;object-fit:cover;margin-bottom:8px" onerror="this.style.display='none'" />` : ''}
+              <div style="color:var(--muted);font-size:13px">📁 Click para subir foto</div>
+            </div>
+            <input type="file" id="simple-file-${campo.key}" accept="image/*" style="display:none" onchange="handleSimpleFile('${campo.key}', this.files[0])" />
+            <input type="url" id="simple-f-${campo.key}" value="${imgVal}" placeholder="O pega una URL de imagen" style="margin-top:4px" />
+          </div>`;
+      }
+      return `<div class="fg"><label>${campo.label}</label><input type="${campo.tipo === 'numero' ? 'number' : 'text'}" id="simple-f-${campo.key}" value="${esc(String(value))}" placeholder="${campo.placeholder || ''}" /></div>`;
+    }).join('');
+
+    $('simpleModal').classList.add('open');
+  }
+
+  function closeSimpleModal() {
+    $('simpleModal').classList.remove('open');
+  }
+
+  async function handleSimpleFile(key, file) {
+    if (!file) return;
+    try {
+      const url = await uploadImageFile(file);
+      $(`simple-f-${key}`).value = url;
+      const area = $(`simple-upload-area-${key}`);
+      if (area) {
+        const preview = area.querySelector('img');
+        if (preview) preview.src = url;
+        else area.insertAdjacentHTML('afterbegin', `<img src="${esc(url)}" style="max-height:100px;border-radius:8px;object-fit:cover;margin-bottom:8px" />`);
+      }
+    } catch (e) {
+      showMsg(e.message, 'err');
+    }
+  }
+
+  async function saveSimpleModal() {
+    const rec = simpleActivo;
+    const cfg = RECURSOS_SIMPLES[rec];
+    const id = $('simple-id').value;
+    const body = {};
+    for (const campo of cfg.campos) {
+      let v = $(`simple-f-${campo.key}`).value.trim();
+      if ((cfg.arrayFields || []).includes(campo.key)) {
+        body[campo.key] = v ? v.split(',').map(s => s.trim()).filter(Boolean) : [];
+      } else if ((cfg.numberFields || []).includes(campo.key)) {
+        body[campo.key] = v === '' ? undefined : Number(v);
+      } else {
+        body[campo.key] = v;
+      }
+    }
+    if (!body[cfg.campos[0].key]) { showMsg(`El campo "${cfg.campos[0].label}" es obligatorio`, 'err'); return; }
+    try {
+      const res = await fetch(`${API_URL}/api/${cfg.endpoint}${id ? '/' + id : ''}`, {
+        method: id ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      closeSimpleModal();
+      showMsg(id ? `${cfg.titulo} actualizado` : `${cfg.titulo} creado`);
+      cargarSimple(rec);
+    } catch (e) {
+      showMsg('Error al guardar: ' + e.message, 'err');
+    }
+  }
+
+  window.deleteSimple = async (rec, id) => {
+    const cfg = RECURSOS_SIMPLES[rec];
+    if (!confirm(`¿Eliminar este ${cfg.titulo.toLowerCase()}?`)) return;
+    try {
+      const res = await fetch(`${API_URL}/api/${cfg.endpoint}/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      simpleDataCache[rec] = (simpleDataCache[rec] || []).filter(x => String(x.id) !== String(id));
+      renderSimple(rec);
+      showMsg(`${cfg.titulo} eliminado`);
+    } catch (e) {
+      showMsg('Error al eliminar: ' + e.message, 'err');
+    }
+  };
 
   async function uploadImageFile(file) {
     const form = new FormData();
