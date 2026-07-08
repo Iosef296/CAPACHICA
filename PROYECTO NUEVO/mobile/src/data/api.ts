@@ -5,7 +5,7 @@ const extra = (Constants.expoConfig?.extra as any) ?? {};
 export const API_BASE = extra.apiBaseUrl ?? '';
 export const IA_BASE = extra.iaBaseUrl ?? '';
 
-export const USE_MOCK = true;
+export const USE_MOCK = false;
 
 async function get<T>(path: string, fallback: T): Promise<T> {
   if (USE_MOCK || !API_BASE) return fallback;
@@ -72,8 +72,9 @@ export type Festividad = {
 export const api = {
   // Endpoints reales del backend Railway
   festividades: () => get<Festividad[]>('/festividades', []),
-  restaurantes: () => get<Restaurante[]>('/restaurantes', []),
-  actividades: () => get<Actividad[]>('/actividades', []),
+  // El backend envuelve la lista en { data: [...] } / { actividades: [...] } — desenvolvemos.
+  restaurantes: () => get<any>('/restaurantes', []).then(r => (Array.isArray(r) ? r : r?.data ?? []) as Restaurante[]),
+  actividades: () => get<any>('/actividades', []).then(r => (Array.isArray(r) ? r : r?.actividades ?? []) as Actividad[]),
   platos: () => get<any[]>('/platos', []),
   talleres: () => get<any[]>('/talleres', []),
   // Endpoints que aún no responden — fallback a mock
