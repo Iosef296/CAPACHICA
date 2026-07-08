@@ -3,6 +3,29 @@ import { useState, useEffect, useCallback } from "react";
 const API_URL = import.meta.env.PUBLIC_BACKEND_URL || "http://localhost:3000";
 const IA_URL  = import.meta.env.PUBLIC_IA_URL || "http://localhost:5000";
 
+const sharedInputStyle: React.CSSProperties = {
+  width: "100%",
+  padding: "10px 14px",
+  background: "rgba(11,60,96,0.5)",
+  border: "1px solid rgba(120,200,255,0.2)",
+  borderRadius: 10,
+  color: "#f4f7fb",
+  fontFamily: "var(--font-body)",
+  fontSize: 14,
+  outline: "none",
+};
+
+const sharedUploadBtnStyle: React.CSSProperties = {
+  marginTop: 6,
+  padding: "6px 12px",
+  borderRadius: 8,
+  border: "1px solid rgba(120,200,255,0.2)",
+  background: "transparent",
+  color: "#53d3ff",
+  fontSize: 12,
+  cursor: "pointer",
+};
+
 interface Familia {
   id: string;
   nombre: string;
@@ -55,7 +78,7 @@ interface Artesania {
 interface KnowEntry { id: number; categoria: string; pregunta: string; respuesta: string; }
 interface IAKnowledge { conocimiento: KnowEntry[]; contexto_base: string; nombre_ia: string; }
 
-type Tab = "reservas" | "familias" | "artesanias" | "ia";
+type Tab = "reservas" | "familias" | "artesanias" | "festividades" | "maestros" | "guias" | "ia";
 
 export default function AdminPanel() {
   const [token, setToken] = useState("");
@@ -557,6 +580,24 @@ export default function AdminPanel() {
               onClick={() => setTab("artesanias")}
             >
               🎨 Artesanías
+            </button>
+            <button
+              className={`admin-tab ${tab === "festividades" ? "active" : ""}`}
+              onClick={() => setTab("festividades")}
+            >
+              🎉 Festividades
+            </button>
+            <button
+              className={`admin-tab ${tab === "maestros" ? "active" : ""}`}
+              onClick={() => setTab("maestros")}
+            >
+              🧑‍🎨 Maestros
+            </button>
+            <button
+              className={`admin-tab ${tab === "guias" ? "active" : ""}`}
+              onClick={() => setTab("guias")}
+            >
+              📖 Guías
             </button>
             <button
               className={`admin-tab ${tab === "ia" ? "active" : ""}`}
@@ -1078,6 +1119,63 @@ export default function AdminPanel() {
                 ))}
               </div>
             </div>
+          )}
+          {tab === "festividades" && (
+            <SimpleResourceAdmin
+              endpoint="festividades"
+              titulo="Festividades"
+              itemLabel={(it) => it.nombre}
+              itemSubLabel={(it) => it.fecha}
+              imageField="imagen"
+              fields={[
+                { key: "nombre", label: "Nombre *", placeholder: "Virgen de la Candelaria" },
+                { key: "fecha", label: "Fecha", placeholder: "1-14 Febrero" },
+                { key: "mes", label: "Mes (número 1-12)", placeholder: "2" },
+                { key: "tipo", label: "Tipo", placeholder: "Religiosa" },
+                { key: "ubicacion", label: "Ubicación", placeholder: "Capachica, Puno" },
+                { key: "descripcion", label: "Descripción", placeholder: "..." },
+                { key: "imagen", label: "URL de imagen", placeholder: "https://..." },
+                { key: "actividades", label: "Actividades (separadas por coma)", placeholder: "Procesión, Danzas" },
+                { key: "galeria", label: "Galería (URLs separadas por coma)", placeholder: "https://..., https://..." },
+              ]}
+              arrayFields={["actividades", "galeria"]}
+              numberFields={["mes"]}
+              showMsg={showMsg}
+              uploadImage={uploadImage}
+            />
+          )}
+          {tab === "maestros" && (
+            <SimpleResourceAdmin
+              endpoint="maestros"
+              titulo="Maestros artesanos"
+              itemLabel={(it) => it.nombre}
+              itemSubLabel={(it) => it.oficio}
+              imageField="imagen"
+              fields={[
+                { key: "nombre", label: "Nombre *", placeholder: "Mamá Victoria" },
+                { key: "oficio", label: "Oficio", placeholder: "Alpaca" },
+                { key: "imagen", label: "URL de foto", placeholder: "https://..." },
+              ]}
+              showMsg={showMsg}
+              uploadImage={uploadImage}
+            />
+          )}
+          {tab === "guias" && (
+            <SimpleResourceAdmin
+              endpoint="guias"
+              titulo="Guías"
+              itemLabel={(it) => it.titulo}
+              itemSubLabel={(it) => it.tipo}
+              imageField="imagen"
+              fields={[
+                { key: "titulo", label: "Título *", placeholder: "Historia de Capachica" },
+                { key: "extracto", label: "Extracto", placeholder: "Mil años de tradición lacustre." },
+                { key: "imagen", label: "URL de imagen", placeholder: "https://..." },
+                { key: "tipo", label: "Tipo (viaje / cultural)", placeholder: "cultural" },
+              ]}
+              showMsg={showMsg}
+              uploadImage={uploadImage}
+            />
           )}
           {/* ─── IA KNOWLEDGE ─── */}
           {tab === "ia" && (
@@ -1650,5 +1748,225 @@ export default function AdminPanel() {
         </div>
       )}
     </>
+  );
+}
+
+// ── CRUD genérico para recursos simples (festividades, maestros, guías) ──
+// Mismo patrón que los tabs de Familias/Artesanía de arriba, pero sin
+// campos especiales — la lista de fields describe el formulario.
+type FieldConfig = { key: string; label: string; placeholder?: string };
+
+function SimpleResourceAdmin({
+  endpoint,
+  titulo,
+  fields,
+  itemLabel,
+  itemSubLabel,
+  imageField,
+  arrayFields = [],
+  numberFields = [],
+  showMsg,
+  uploadImage,
+}: {
+  endpoint: string;
+  titulo: string;
+  fields: FieldConfig[];
+  itemLabel: (item: any) => string;
+  itemSubLabel?: (item: any) => string;
+  imageField?: string;
+  arrayFields?: string[];
+  numberFields?: string[];
+  showMsg: (msg: string, type?: "ok" | "err") => void;
+  uploadImage: (file: File) => Promise<string>;
+}) {
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [edit, setEdit] = useState<any>({});
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/${endpoint}`);
+      setItems(await res.json());
+    } catch {
+      showMsg(`Error al cargar ${titulo}`, "err");
+    }
+    setLoading(false);
+  }, [endpoint, titulo, showMsg]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const openNew = () => {
+    setEdit({});
+    setModalOpen(true);
+  };
+
+  const openEdit = (item: any) => {
+    const copy = { ...item };
+    arrayFields.forEach((f) => {
+      if (Array.isArray(copy[f])) copy[f] = copy[f].join(", ");
+    });
+    setEdit(copy);
+    setModalOpen(true);
+  };
+
+  const save = async () => {
+    const isEdit = !!edit.id;
+    const body: any = { ...edit };
+    arrayFields.forEach((f) => {
+      if (typeof body[f] === "string") {
+        body[f] = body[f].split(",").map((s: string) => s.trim()).filter(Boolean);
+      }
+    });
+    numberFields.forEach((f) => {
+      if (body[f] !== undefined && body[f] !== "") body[f] = Number(body[f]);
+    });
+    const url = isEdit ? `${API_URL}/api/${endpoint}/${edit.id}` : `${API_URL}/api/${endpoint}`;
+    const res = await fetch(url, {
+      method: isEdit ? "PUT" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (res.ok) {
+      showMsg(`✅ ${titulo} guardado`);
+      setModalOpen(false);
+      load();
+    } else showMsg("❌ Error al guardar", "err");
+  };
+
+  const remove = async (id: any) => {
+    if (!confirm(`¿Eliminar este ítem de ${titulo}?`)) return;
+    await fetch(`${API_URL}/api/${endpoint}/${id}`, { method: "DELETE" });
+    showMsg("✅ Eliminado");
+    load();
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+        <h3 className="sec-title" style={{ fontFamily: "var(--font-display)", fontSize: 20 }}>
+          {titulo}
+        </h3>
+        <button className="btn-primary" style={{ padding: "8px 16px", fontSize: 13 }} onClick={openNew}>
+          + Nuevo
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="sec-muted">Cargando...</div>
+      ) : items.length === 0 ? (
+        <div className="sec-muted">No hay elementos todavía.</div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {items.map((it) => (
+            <div
+              key={it.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: 12,
+                borderRadius: 12,
+                background: "rgba(18,47,76,0.5)",
+                border: "1px solid rgba(120,200,255,0.12)",
+              }}
+            >
+              {imageField && it[imageField] && (
+                <img
+                  src={it[imageField]}
+                  alt=""
+                  style={{ width: 48, height: 48, borderRadius: 8, objectFit: "cover", flexShrink: 0 }}
+                />
+              )}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="sec-title" style={{ fontSize: 14, fontWeight: 700 }}>
+                  {itemLabel(it)}
+                </div>
+                {itemSubLabel && (
+                  <div className="sec-muted" style={{ fontSize: 12 }}>
+                    {itemSubLabel(it)}
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={() => openEdit(it)}
+                style={{ padding: "6px 12px", borderRadius: 7, border: "1px solid rgba(120,200,255,0.2)", background: "transparent", color: "#7f95aa", fontSize: 12, cursor: "pointer" }}
+              >
+                ✎ Editar
+              </button>
+              <button
+                onClick={() => remove(it.id)}
+                style={{ padding: "6px 12px", borderRadius: 7, border: "1px solid rgba(248,113,113,0.22)", background: "transparent", color: "#f87171", fontSize: 12, cursor: "pointer" }}
+              >
+                ✕ Eliminar
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {modalOpen && (
+        <div className="modal-overlay" onClick={() => setModalOpen(false)}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <h3 className="sec-title" style={{ fontFamily: "var(--font-display)", fontSize: 22, marginBottom: 24 }}>
+              {edit.id ? "✏️ Editar" : "+ Nuevo"} — {titulo}
+            </h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {fields.map((field) => (
+                <div key={field.key}>
+                  <label style={{ fontSize: 12, color: "#7f95aa", display: "block", marginBottom: 6 }}>
+                    {field.label}
+                  </label>
+                  <input
+                    value={edit[field.key] || ""}
+                    onChange={(e) => setEdit((p: any) => ({ ...p, [field.key]: e.target.value }))}
+                    placeholder={field.placeholder}
+                    style={sharedInputStyle}
+                  />
+                  {imageField === field.key && (
+                    <>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id={`${endpoint}-img-input`}
+                        style={{ display: "none" }}
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          try {
+                            const url = await uploadImage(file);
+                            setEdit((p: any) => ({ ...p, [field.key]: url }));
+                          } catch (err: any) {
+                            showMsg(err.message, "err");
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => document.getElementById(`${endpoint}-img-input`)?.click()}
+                        style={sharedUploadBtnStyle}
+                      >
+                        📤 Subir foto
+                      </button>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
+              <button className="btn-primary" style={{ flex: 1, justifyContent: "center" }} onClick={save}>
+                💾 Guardar
+              </button>
+              <button className="btn-outline" style={{ flex: 1, justifyContent: "center" }} onClick={() => setModalOpen(false)}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
