@@ -1351,7 +1351,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
 
   async function loadDestinos() {
     try {
-      const res = await fetch(`${IA_URL}/api/destinos`);
+      const res = await fetch(`${API_URL}/api/comunidades`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       destinosData = await res.json();
       const n = destinosData.length;
@@ -1589,12 +1589,12 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     try {
       let res;
       if (id) {
-        res = await fetch(`${IA_URL}/api/admin/destinos/${id}`, {
+        res = await fetch(`${API_URL}/api/comunidades/${id}`, {
           method: 'PUT', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });
       } else {
-        res = await fetch(`${IA_URL}/api/admin/destinos`, {
+        res = await fetch(`${API_URL}/api/comunidades`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });
@@ -1611,7 +1611,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
   window.deleteDestino = async (id) => {
     if (!confirm('¿Eliminar este destino?')) return;
     try {
-      const res = await fetch(`${IA_URL}/api/admin/destinos/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_URL}/api/comunidades/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       destinosData = destinosData.filter(d => d.id !== id);
       document.getElementById(`dest-${id}`)?.remove();

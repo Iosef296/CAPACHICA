@@ -100,6 +100,26 @@ export default function AdminPanel() {
     Authorization: `Bearer ${token}`,
   };
 
+  const uploadImage = async (file: File): Promise<string> => {
+    const form = new FormData();
+    form.append("imagen", file);
+    const res = await fetch(`${API_URL}/api/upload`, { method: "POST", body: form });
+    if (!res.ok) throw new Error("Error al subir imagen");
+    const data = await res.json();
+    return data.url;
+  };
+
+  const uploadBtnStyle: React.CSSProperties = {
+    marginTop: 6,
+    padding: "6px 12px",
+    borderRadius: 8,
+    border: "1px solid rgba(120,200,255,0.2)",
+    background: "transparent",
+    color: "#53d3ff",
+    fontSize: 12,
+    cursor: "pointer",
+  };
+
   const login = async () => {
     setLoginError("");
     try {
@@ -110,8 +130,8 @@ export default function AdminPanel() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      setToken(data.token);
-      localStorage.setItem("admin_token", data.token);
+      setToken(data.accessToken);
+      localStorage.setItem("admin_token", data.accessToken);
     } catch (err: any) {
       setLoginError(err.message);
     }
@@ -132,10 +152,10 @@ export default function AdminPanel() {
         });
         setReservas(await res.json());
       } else if (tab === "familias") {
-        const res = await fetch(`${API_URL}/api/familias`);
+        const res = await fetch(`${API_URL}/api/hospedajes`);
         setFamilias(await res.json());
       } else {
-        const res = await fetch(`${API_URL}/api/artesanias`);
+        const res = await fetch(`${API_URL}/api/artesania`);
         setArtesanias(await res.json());
       }
     } catch {
@@ -168,8 +188,8 @@ export default function AdminPanel() {
   const saveFamilia = async () => {
     const isEdit = !!familiaEdit.id;
     const url = isEdit
-      ? `${API_URL}/api/familias/${familiaEdit.id}`
-      : `${API_URL}/api/familias`;
+      ? `${API_URL}/api/hospedajes/${familiaEdit.id}`
+      : `${API_URL}/api/hospedajes`;
     const body = {
       ...familiaEdit,
       idiomas:
@@ -196,7 +216,7 @@ export default function AdminPanel() {
 
   const deleteFamilia = async (id: string) => {
     if (!confirm("¿Desactivar esta familia?")) return;
-    await fetch(`${API_URL}/api/familias/${id}`, {
+    await fetch(`${API_URL}/api/hospedajes/${id}`, {
       method: "DELETE",
       headers: authHeaders,
     });
@@ -207,8 +227,8 @@ export default function AdminPanel() {
   const saveArtesania = async () => {
     const isEdit = !!artEdit.id;
     const url = isEdit
-      ? `${API_URL}/api/artesanias/${artEdit.id}`
-      : `${API_URL}/api/artesanias`;
+      ? `${API_URL}/api/artesania/${artEdit.id}`
+      : `${API_URL}/api/artesania`;
     const res = await fetch(url, {
       method: isEdit ? "PUT" : "POST",
       headers: authHeaders,
@@ -223,7 +243,7 @@ export default function AdminPanel() {
 
   const deleteArtesania = async (id: string) => {
     if (!confirm("¿Eliminar esta artesanía?")) return;
-    await fetch(`${API_URL}/api/artesanias/${id}`, {
+    await fetch(`${API_URL}/api/artesania/${id}`, {
       method: "DELETE",
       headers: authHeaders,
     });
@@ -1266,6 +1286,35 @@ export default function AdminPanel() {
                     placeholder={field.placeholder}
                     style={inputStyle}
                   />
+                  {field.key === "foto_url" && (
+                    <>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id="familia-foto-input"
+                        style={{ display: "none" }}
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          try {
+                            const url = await uploadImage(file);
+                            setFamiliaEdit((p) => ({ ...p, foto_url: url }));
+                          } catch (err: any) {
+                            showMsg(err.message, "err");
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          document.getElementById("familia-foto-input")?.click()
+                        }
+                        style={uploadBtnStyle}
+                      >
+                        📤 Subir foto
+                      </button>
+                    </>
+                  )}
                 </div>
               ))}
               <div>
@@ -1446,6 +1495,35 @@ export default function AdminPanel() {
                     placeholder={field.placeholder}
                     style={inputStyle}
                   />
+                  {field.key === "imagen_url" && (
+                    <>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id="artesania-imagen-input"
+                        style={{ display: "none" }}
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          try {
+                            const url = await uploadImage(file);
+                            setArtEdit((p) => ({ ...p, imagen_url: url }));
+                          } catch (err: any) {
+                            showMsg(err.message, "err");
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          document.getElementById("artesania-imagen-input")?.click()
+                        }
+                        style={uploadBtnStyle}
+                      >
+                        📤 Subir foto
+                      </button>
+                    </>
+                  )}
                 </div>
               ))}
               <div>
