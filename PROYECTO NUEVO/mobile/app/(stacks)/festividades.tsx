@@ -6,7 +6,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Chip } from '@/components/Chip';
-import { api, Festividad } from '@/data/api';
+import { api, API_WS, Festividad } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
@@ -23,7 +23,7 @@ export default function Festividades() {
       setItems(data);
       setLoading(false);
     });
-  });
+  }, { url: API_WS, channels: 'festividades' });
 
   const filtered = filter === 'Todas' ? items : items.filter(i => i.tipo === filter);
   const featured = items.find(i => i.destacado) ?? items[0];

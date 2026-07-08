@@ -10,6 +10,7 @@ const path     = require('path');
 const { initializeDatabase } = require('./config/base-de-datos');
 const { waitForDB }          = require('./config/postgres');
 const { errorHandler }       = require('./middleware/error-handler');
+const { attachWS }           = require('./ws');
 
 // Rutas — Gastronomía
 const authRoutes        = require('./rutas/auth/auth.rutas');
@@ -133,9 +134,11 @@ async function start() {
         app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swagger));
         console.log('📚 Swagger: http://localhost:' + PORT + '/api-docs');
 
-        app.listen(PORT, () => {
+        const server = app.listen(PORT, () => {
             console.log('🌍 Capachica API corriendo en puerto ' + PORT);
         });
+        attachWS(server);
+        console.log('🔌 WebSocket (push real-time) en /ws');
     } catch (err) {
         console.error('❌ Error al iniciar:', err.message);
         process.exit(1);

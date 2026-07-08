@@ -2,10 +2,13 @@ const { Router } = require('express');
 const path   = require('path');
 const fs     = require('fs');
 const crypto = require('crypto');
+const { broadcast } = require('../../ws');
 
 // Fabrica un router CRUD sobre un archivo JSON plano en backend/data/.
-// Mismo patron usado por festividades y comunidades.
-function crearRutasJSON(nombreArchivo, nombreRecurso) {
+// Mismo patron usado por festividades y comunidades. `canal` es el
+// nombre que se emite por WebSocket cuando se escribe algo, para que
+// el mobile sepa que endpoint refrescar (sin tener que preguntar).
+function crearRutasJSON(nombreArchivo, nombreRecurso, canal) {
     const router = Router();
     const dataPath = path.join(__dirname, '../../data', nombreArchivo);
 
@@ -60,6 +63,7 @@ function crearRutasJSON(nombreArchivo, nombreRecurso) {
         const nuevo = { id: Date.now(), ...req.body };
         data.push(nuevo);
         guardar(data);
+        broadcast(canal);
         res.status(201).json(nuevo);
     });
 
@@ -69,6 +73,7 @@ function crearRutasJSON(nombreArchivo, nombreRecurso) {
         if (idx === -1) return res.status(404).json({ error: `${nombreRecurso} no encontrado` });
         data[idx] = { ...data[idx], ...req.body };
         guardar(data);
+        broadcast(canal);
         res.json(data[idx]);
     });
 
@@ -78,6 +83,7 @@ function crearRutasJSON(nombreArchivo, nombreRecurso) {
         if (idx === -1) return res.status(404).json({ error: `${nombreRecurso} no encontrado` });
         data.splice(idx, 1);
         guardar(data);
+        broadcast(canal);
         res.json({ success: true });
     });
 

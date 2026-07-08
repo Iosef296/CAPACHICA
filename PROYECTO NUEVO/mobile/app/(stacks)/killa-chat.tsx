@@ -5,7 +5,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { colors, radii, shadows, spacing } from '@/theme';
-import { DEFAULT_CFG, fetchWidgetConfig, IntiMsg, sendChat, WidgetCfg } from '@/data/inti';
+import { DEFAULT_CFG, fetchWidgetConfig, IA_WS, IntiMsg, sendChat, WidgetCfg } from '@/data/inti';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 
 export default function IntiChat() {
@@ -23,7 +23,7 @@ export default function IntiChat() {
       setCfg(c);
       setMsgs(prev => (prev.length === 0 ? [{ role: 'assistant', content: c.welcome_msg }] : prev));
     });
-  });
+  }, { url: IA_WS, channels: 'widget' });
 
   useEffect(() => {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);

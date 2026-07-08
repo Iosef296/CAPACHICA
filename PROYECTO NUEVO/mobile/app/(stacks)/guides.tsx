@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { guides as mockGuides } from '@/data/mock';
-import { api } from '@/data/api';
+import { api, API_WS } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
@@ -12,7 +12,7 @@ export default function Guides() {
   const { type } = useLocalSearchParams<{ type?: string }>();
   const isTravel = type === 'travel';
   const [allGuides, setAllGuides] = useState<any[]>(mockGuides);
-  useLiveRefresh(() => { api.guides().then(setAllGuides); });
+  useLiveRefresh(() => { api.guides().then(setAllGuides); }, { url: API_WS, channels: 'guias' });
   const guides = allGuides.filter((g: any) => !g.type || g.type === (isTravel ? 'viaje' : 'cultural'));
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>

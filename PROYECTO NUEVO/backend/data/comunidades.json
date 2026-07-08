@@ -6,7 +6,11 @@
     "desc": "Pionera del turismo vivencial en el Titicaca. Los miradores ofrecen vistas del lago que cortan la respiración al amanecer y al atardecer.",
     "emoji": "🏖️",
     "imagen": "",
-    "tags": ["Turismo vivencial", "Mirador", "Amanecer"],
+    "tags": [
+      "Turismo vivencial",
+      "Mirador",
+      "Amanecer"
+    ],
     "color": "#0ea5e9",
     "highlight": "Mejor destino vivencial",
     "experiencias": 12
@@ -18,7 +22,11 @@
     "desc": "Rodeada de totorales y aves acuáticas. La pesca artesanal y el tejido con técnicas quechuas de siglos son el corazón de esta comunidad.",
     "emoji": "🌿",
     "imagen": "",
-    "tags": ["Naturaleza", "Artesanía", "Pesca"],
+    "tags": [
+      "Naturaleza",
+      "Artesanía",
+      "Pesca"
+    ],
     "color": "#34d399",
     "highlight": "Biodiversidad única",
     "experiencias": 8
@@ -30,7 +38,11 @@
     "desc": "Mercados coloridos, festividades tradicionales que mezclan lo andino y lo católico. La mejor gastronomía lacustre de la región se sirve aquí.",
     "emoji": "🏛️",
     "imagen": "",
-    "tags": ["Gastronomía", "Cultura", "Mercado"],
+    "tags": [
+      "Gastronomía",
+      "Cultura",
+      "Mercado"
+    ],
     "color": "#fbbf24",
     "highlight": "Corazón cultural",
     "experiencias": 10
@@ -42,7 +54,11 @@
     "desc": "Los tejedores taquileños mantienen viva una tradición textil de más de 500 años. Las vistas del lago desde la plaza principal son incomparables.",
     "emoji": "⛵",
     "imagen": "",
-    "tags": ["Patrimonio", "Textil", "Historia"],
+    "tags": [
+      "Patrimonio",
+      "Textil",
+      "Historia"
+    ],
     "color": "#a78bfa",
     "highlight": "Patrimonio Inmaterial UNESCO",
     "experiencias": 6
@@ -54,7 +70,11 @@
     "desc": "El punto más alto de la península. Vistas panorámicas de 360° del lago Titicaca. Los atardeceres son de los más fotografiados del Perú.",
     "emoji": "🌅",
     "imagen": "",
-    "tags": ["Mirador", "Fotografía", "Trekking"],
+    "tags": [
+      "Mirador",
+      "Fotografía",
+      "Trekking"
+    ],
     "color": "#f472b6",
     "highlight": "Atardecer épico",
     "experiencias": 4
@@ -66,7 +86,11 @@
     "desc": "Aguas calmas perfectas para kayak y paddleboard. La trucha fresca del lago es el mejor desayuno después de una madrugada en el agua.",
     "emoji": "🚣",
     "imagen": "",
-    "tags": ["Kayak", "Paddleboard", "Deportes"],
+    "tags": [
+      "Kayak",
+      "Paddleboard",
+      "Deportes"
+    ],
     "color": "#38bdf8",
     "highlight": "Deportes acuáticos",
     "experiencias": 5

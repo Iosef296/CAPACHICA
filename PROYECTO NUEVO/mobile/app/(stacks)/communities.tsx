@@ -5,14 +5,14 @@ import { useRouter } from 'expo-router';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { KillaTeaser } from '@/components/KillaTeaser';
 import { communities as mockCommunities, hostFamilies, Community } from '@/data/mock';
-import { api } from '@/data/api';
+import { api, API_WS } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
 export default function Communities() {
   const router = useRouter();
   const [communities, setCommunities] = useState<Community[]>(mockCommunities);
-  useLiveRefresh(() => { api.communities().then(setCommunities); });
+  useLiveRefresh(() => { api.communities().then(setCommunities); }, { url: API_WS, channels: 'comunidades' });
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaView edges={['top']}>

@@ -4,13 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
-import { DEFAULT_CFG, fetchWidgetConfig, WidgetCfg } from '@/data/inti';
+import { DEFAULT_CFG, fetchWidgetConfig, IA_WS, WidgetCfg } from '@/data/inti';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 
 export default function KillaTab() {
   const router = useRouter();
   const [cfg, setCfg] = useState<WidgetCfg>(DEFAULT_CFG);
-  useLiveRefresh(() => { fetchWidgetConfig().then(setCfg); });
+  useLiveRefresh(() => { fetchWidgetConfig().then(setCfg); }, { url: IA_WS, channels: 'widget' });
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>

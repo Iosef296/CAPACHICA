@@ -1,8 +1,10 @@
 // Cliente Inti: intenta backend, si falla usa knowledge base local rica.
 import Constants from 'expo-constants';
+import { toWsUrl } from './ws';
 
 const extra = (Constants.expoConfig?.extra as any) ?? {};
 const IA_BASE = (extra.iaBaseUrl ?? '').replace(/\/api\/?$/, '');
+export const IA_WS = toWsUrl(IA_BASE);
 
 // Backend real de Inti IA (Railway). Si falla, cae a knowledge base local.
 export const FORCE_OFFLINE = false;

@@ -8,7 +8,7 @@ import { Button } from '@/components/Button';
 import { HeartButton } from '@/components/HeartButton';
 import { BookingModal } from '@/components/BookingModal';
 import { stays as mockStays, activities as mockActivities } from '@/data/mock';
-import { api } from '@/data/api';
+import { api, API_WS } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
@@ -30,7 +30,7 @@ export default function Booking() {
       }
     });
     api.stays().then(setStays);
-  });
+  }, { url: API_WS, channels: ['actividades', 'hospedajes'] });
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaView edges={['top']}>

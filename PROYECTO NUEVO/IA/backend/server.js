@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import OpenAI from 'openai';
 import crypto from 'crypto';
 import { query } from './db.js';
+import { attachWS, broadcast } from './ws.js';
 import { sendWhatsApp, getWAStatus, connectWhatsApp, disconnectWhatsApp } from './utils/whatsapp.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -441,6 +442,7 @@ app.put('/api/admin/widget', async (req, res) => {
     if (placeholder!==undefined)  current.placeholder  = placeholder;
     await query(`INSERT INTO ia_config(key,value) VALUES('widget',$1) ON CONFLICT(key) DO UPDATE SET value=$1`, [JSON.stringify(current)]);
     widgetCache = null; // fuerza releer en el proximo GET /api/widget/config
+    broadcast('widget');
     res.json({ mensaje:'Widget actualizado' });
   } catch(err) { res.status(500).json({ error:'Error' }); }
 });
@@ -543,7 +545,9 @@ app.get('/api/health', (_req, res) => {
   res.json({ status:'ok', modelo:'gpt-oss-120b', wa:getWAStatus().status });
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`🤖 IA Backend corriendo en http://localhost:${PORT}`);
   connectWhatsApp().catch(err => console.error('WA init error:', err.message));
 });
+attachWS(server);
+console.log('🔌 WebSocket (push real-time) en /ws');

@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { GlassPanel } from '@/components/GlassPanel';
 import { crafts as mockCrafts, masters as mockMasters } from '@/data/mock';
-import { api } from '@/data/api';
+import { api, API_WS } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
@@ -21,7 +21,7 @@ export default function Crafts() {
   useLiveRefresh(() => {
     api.crafts().then(setCrafts);
     api.masters().then(setMasters);
-  });
+  }, { url: API_WS, channels: ['artesania', 'maestros'] });
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaView edges={['top']}>

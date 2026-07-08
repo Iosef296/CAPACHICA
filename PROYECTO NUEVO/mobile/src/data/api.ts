@@ -1,9 +1,11 @@
 import Constants from 'expo-constants';
 import * as mock from './mock';
+import { toWsUrl } from './ws';
 
 const extra = (Constants.expoConfig?.extra as any) ?? {};
 export const API_BASE = extra.apiBaseUrl ?? '';
 export const IA_BASE = extra.iaBaseUrl ?? '';
+export const API_WS = toWsUrl(API_BASE);
 
 export const USE_MOCK = false;
 
