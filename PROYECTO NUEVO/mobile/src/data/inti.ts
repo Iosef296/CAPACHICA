@@ -30,16 +30,27 @@ export const DEFAULT_CFG: WidgetCfg = {
   placeholder: 'Escribe tu pregunta...',
 };
 
+// Cache por ETag: si nada cambió el backend responde 304 y devolvemos
+// la MISMA referencia — así el polling de killa.tsx/killa-chat.tsx no
+// re-renderiza la pantalla salvo que el admin haya cambiado algo real.
+let widgetCache: { etag: string; value: WidgetCfg } | null = null;
+
 export async function fetchWidgetConfig(): Promise<WidgetCfg> {
   if (FORCE_OFFLINE) return DEFAULT_CFG;
   try {
-    const res = await fetch(`${IA_BASE}/api/widget/config`);
+    const headers: Record<string, string> = {};
+    if (widgetCache?.etag) headers['If-None-Match'] = widgetCache.etag;
+    const res = await fetch(`${IA_BASE}/api/widget/config`, { headers });
+    if (res.status === 304 && widgetCache) return widgetCache.value;
     if (!res.ok) throw new Error(`${res.status}`);
     const data = await res.json();
-    if (data?.error) return DEFAULT_CFG;
-    return { ...DEFAULT_CFG, ...data };
+    if (data?.error) return widgetCache?.value ?? DEFAULT_CFG;
+    const value = { ...DEFAULT_CFG, ...data };
+    const etag = res.headers.get('ETag');
+    if (etag) widgetCache = { etag, value };
+    return value;
   } catch {
-    return DEFAULT_CFG;
+    return widgetCache?.value ?? DEFAULT_CFG;
   }
 }
 

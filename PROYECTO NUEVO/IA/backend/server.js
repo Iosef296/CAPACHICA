@@ -4,6 +4,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import OpenAI from 'openai';
+import crypto from 'crypto';
 import { query } from './db.js';
 import { sendWhatsApp, getWAStatus, connectWhatsApp, disconnectWhatsApp } from './utils/whatsapp.js';
 
@@ -404,11 +405,19 @@ app.delete('/api/admin/destinos/:id', async (req, res) => {
 });
 
 // ── WIDGET ────────────────────────────────────────────
-app.get('/api/widget/config', async (_req, res) => {
+app.get('/api/widget/config', async (req, res) => {
   try {
     const r = await query(`SELECT value FROM ia_config WHERE key='widget'`);
     const defaults = { bot_name:'Inti · Asistente IA', bot_subtitle:'Capachica Turismo', welcome_msg:'¡Hola! Soy Inti, tu guía virtual de Capachica 🌊\n¿En qué te puedo ayudar?', quick_prompts:['¿Qué es Capachica?','¿Cómo llegar?','Quiero reservar'], placeholder:'Escribe tu pregunta...' };
-    res.json({ ...defaults, ...(r.rows[0]?.value||{}) });
+    const cfg = { ...defaults, ...(r.rows[0]?.value||{}) };
+    const body = JSON.stringify(cfg);
+    // El mobile hace polling seguido para reflejar cambios del admin sin
+    // reiniciar — con ETag el 99% de esas consultas responde 304 (sin
+    // body) en vez de repetir el JSON completo.
+    const etag = `"${crypto.createHash('sha1').update(body).digest('hex')}"`;
+    res.set('ETag', etag);
+    if (req.headers['if-none-match'] === etag) return res.status(304).end();
+    res.type('application/json').send(body);
   } catch(err) { res.status(500).json({ error:'Error' }); }
 });
 app.put('/api/admin/widget', async (req, res) => {
