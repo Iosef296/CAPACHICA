@@ -189,6 +189,19 @@ async function authFetch(method: string, path: string, body?: any) {
   return data;
 }
 
+// ── Gestión de usuarios — solo admin ──
+export type UsuarioAdmin = {
+  id: string; nombre: string; email: string; telefono?: string | null;
+  rol: 'admin' | 'proveedor' | 'turista'; activo: boolean; foto?: string | null;
+};
+
+export const usuariosAdmin = {
+  listar: (): Promise<UsuarioAdmin[]> => authFetch('GET', '/usuarios'),
+  actualizar: (id: string, datos: {
+    nombre?: string; email?: string; telefono?: string; rol?: string; activo?: boolean; password?: string;
+  }) => authFetch('PUT', `/usuarios/${id}`, datos),
+};
+
 export const negocios = {
   // Trae TODO el recurso (sin transformar/cachear) y filtra por dueño en el cliente.
   listarPropios: async (tipo: TipoNegocio, usuarioId: string): Promise<any[]> => {

@@ -2,6 +2,7 @@
 const { AppDataSource } = require('../../config/base-de-datos');
 const Usuario = require('../../modelos/auth/usuario.modelo');
 const bcrypt = require('bcryptjs');
+const { broadcast } = require('../../ws');
 
 class UsuarioService {
     constructor() {
@@ -44,6 +45,7 @@ class UsuarioService {
         usuario.rol = rol;
         const actualizado = await this.usuarioRepo.save(usuario);
         const { password_hash, ...perfil } = actualizado;
+        broadcast('usuarios');
         return perfil;
     }
 
@@ -80,6 +82,7 @@ class UsuarioService {
         }
         const actualizado = await this.usuarioRepo.save(usuario);
         const { password_hash, ...perfil } = actualizado;
+        broadcast('usuarios');
         return perfil;
     }
 }
