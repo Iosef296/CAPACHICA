@@ -19,6 +19,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
+// Migracion idempotente: agrega notas a reservaciones si no existe
+// todavia. No hay herramienta de migraciones en este proyecto — esto
+// corre una vez al boot y no hace nada si la columna ya esta.
+query('ALTER TABLE ia_reservaciones ADD COLUMN IF NOT EXISTS notas TEXT')
+  .then(() => console.log('✓ Migración ia_reservaciones.notas lista'))
+  .catch(err => console.error('Migración notas falló:', err.message));
+
 const openai = new OpenAI({
   baseURL: 'https://openrouter.ai/api/v1',
   apiKey: process.env.OPENROUTER_API_KEY,
@@ -71,9 +78,9 @@ async function loadReservaciones() {
 
 async function saveReservacion(r) {
   await query(
-    `INSERT INTO ia_reservaciones (id,nombre,contacto,fecha_llegada,dias_estancia,personas,hospedaje,estado,idioma,origen,creado)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
-    [r.id, r.nombre, r.contacto, r.fecha_llegada, r.dias_estancia, r.personas, r.hospedaje, r.estado, r.idioma, r.origen, r.creado]
+    `INSERT INTO ia_reservaciones (id,nombre,contacto,fecha_llegada,dias_estancia,personas,hospedaje,estado,idioma,origen,creado,notas)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+    [r.id, r.nombre, r.contacto, r.fecha_llegada, r.dias_estancia, r.personas, r.hospedaje, r.estado, r.idioma, r.origen, r.creado, r.notas || null]
   );
 }
 
@@ -148,7 +155,7 @@ function buildConfirmMsg(reserva, lang='es') {
 async function notifyAdmin(reserva) {
   if (!ADMIN_PHONE) return;
   const origen = reserva.origen === 'chat' ? 'Chat' : 'Formulario';
-  const texto = [`🔔 *Nueva Reserva - Capachica Turismo* (${origen})`,`👤 ${reserva.nombre}`,`📞 ${reserva.contacto}`,`📅 Llegada: ${reserva.fecha_llegada} | 🌙 ${reserva.dias_estancia} día(s)`,`👥 ${reserva.personas} persona(s) | 🏠 ${reserva.hospedaje}`,`🌐 Idioma: ${reserva.idioma||'es'}`,`ID: ${reserva.id}`].join('\n');
+  const texto = [`🔔 *Nueva Reserva - Capachica Turismo* (${origen})`,`👤 ${reserva.nombre}`,`📞 ${reserva.contacto}`,`📅 Llegada: ${reserva.fecha_llegada} | 🌙 ${reserva.dias_estancia} día(s)`,`👥 ${reserva.personas} persona(s) | 🏠 ${reserva.hospedaje}`,`🌐 Idioma: ${reserva.idioma||'es'}`,...(reserva.notas ? [`📝 ${reserva.notas}`] : []),`ID: ${reserva.id}`].join('\n');
   sendWhatsApp(ADMIN_PHONE, texto).catch(err => console.error('WA admin error:', err.message));
 }
 
@@ -320,11 +327,11 @@ app.post('/api/chat/stream', async (req, res) => {
 
 // ── RESERVAR ──────────────────────────────────────────
 app.post('/api/reservar', async (req, res) => {
-  const { nombre, contacto, fecha_llegada, dias_estancia, personas, hospedaje, idioma } = req.body;
+  const { nombre, contacto, fecha_llegada, dias_estancia, personas, hospedaje, idioma, notas } = req.body;
   if (!nombre||!contacto||!fecha_llegada||!dias_estancia||!personas||!hospedaje)
     return res.status(400).json({ error: 'Faltan campos obligatorios' });
   try {
-    const nueva = { id:Date.now(), nombre, contacto, fecha_llegada, dias_estancia:Number(dias_estancia), personas:Number(personas), hospedaje, idioma:idioma||'es', estado:'pendiente', creado:new Date().toISOString(), origen:'formulario' };
+    const nueva = { id:Date.now(), nombre, contacto, fecha_llegada, dias_estancia:Number(dias_estancia), personas:Number(personas), hospedaje, idioma:idioma||'es', notas:notas||null, estado:'pendiente', creado:new Date().toISOString(), origen:'formulario' };
     await saveReservacion(nueva);
     notifyAdmin(nueva); confirmCustomer(nueva);
     res.json({ mensaje:'¡Reserva recibida! Nos pondremos en contacto pronto.', id:nueva.id });

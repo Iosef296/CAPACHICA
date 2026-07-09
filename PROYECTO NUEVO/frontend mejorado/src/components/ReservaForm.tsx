@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { familias, PRECIO_POR_PERSONA_NOCHE } from "../data/vivencial";
 
+const IA_URL = import.meta.env.PUBLIC_IA_URL || "http://localhost:5000";
+
 interface FormData {
   familia_id: string;
   nombre: string;
@@ -70,32 +72,32 @@ export default function ReservaForm() {
       const familiaElegida = familias.find(
         (f) => String(f.id) === form.familia_id,
       );
-      const notas = [
-        form.notas,
+      const notasExtra = [
         familiaElegida ? `Familia preferida: ${familiaElegida.nombre}` : "",
+        form.actividad ? `Actividad preferida: ${form.actividad}` : "",
+        form.metodo_pago ? `Método de pago: ${form.metodo_pago}` : "",
+        form.notas,
+        `Presupuesto estimado: S/. ${total.toLocaleString()}`,
       ]
         .filter(Boolean)
         .join(" | ");
       const payload = {
-        nombre_huesped: form.nombre,
-        email: form.email,
-        telefono: form.telefono,
+        nombre: form.nombre,
+        contacto: form.telefono || form.email,
         fecha_llegada: form.fecha_llegada,
-        fecha_salida: form.fecha_salida,
-        num_personas: form.num_personas,
-        actividad_preferida: form.actividad,
-        metodo_pago: form.metodo_pago || null,
-        notas,
-        precio_total: total,
+        dias_estancia: Math.max(1, noches),
+        personas: form.num_personas,
+        hospedaje: familiaElegida?.nombre ?? "Sin preferencia",
+        notas: notasExtra,
       };
-      const res = await fetch("http://localhost:4000/api/reservas", {
+      const res = await fetch(`${IA_URL}/api/reservar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      setSuccess(`¡Reserva creada! Tu código es: ${data.codigo}`);
+      setSuccess(data.mensaje || "Nos pondremos en contacto pronto.");
     } catch (err: any) {
       setError(err.message || "Error al crear la reserva. Intenta de nuevo.");
     } finally {
