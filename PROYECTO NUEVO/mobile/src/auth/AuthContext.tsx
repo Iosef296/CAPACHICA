@@ -3,11 +3,12 @@ import * as SecureStore from 'expo-secure-store';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import Constants from 'expo-constants';
-import { api } from '@/data/api';
+import { api, API_BASE } from '@/data/api';
 
 WebBrowser.maybeCompleteAuthSession();
 
-type User = { id: string; email: string; name: string; avatar?: string; provider: 'email' | 'google' };
+export type Rol = 'admin' | 'proveedor' | 'turista';
+type User = { id: string; email: string; name: string; avatar?: string; provider: 'email' | 'google'; rol: Rol };
 
 type Ctx = {
   user: User | null;
@@ -16,6 +17,7 @@ type Ctx = {
   signUpEmail: (email: string, password: string, name: string) => Promise<void>;
   signInGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 };
 
 const AuthCtx = createContext<Ctx | null>(null);
@@ -55,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const info = await res.json();
       const u: User = {
         id: info.id, email: info.email, name: info.name,
-        avatar: info.picture, provider: 'google',
+        avatar: info.picture, provider: 'google', rol: 'turista',
       };
       setUser(u);
       await SecureStore.setItemAsync(KEY, JSON.stringify(u));
@@ -74,6 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         name: apiUser.nombre ?? email.split('@')[0],
         avatar: apiUser.avatar,
         provider: 'email',
+        rol: apiUser.rol ?? 'turista',
       };
       setUser(u);
       await SecureStore.setItemAsync(KEY, JSON.stringify(u));
@@ -87,6 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email: apiUser.email ?? email,
         name: apiUser.nombre ?? name,
         provider: 'email',
+        rol: apiUser.rol ?? 'turista',
       };
       setUser(u);
       await SecureStore.setItemAsync(KEY, JSON.stringify(u));
@@ -96,6 +100,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async signOut() {
       setUser(null);
       await SecureStore.deleteItemAsync(KEY);
+      await SecureStore.deleteItemAsync('capachica.token');
+    },
+    // El admin puede promover turista -> emprendedor desde el panel web;
+    // esto vuelve a pedir el perfil real para reflejar el rol actualizado
+    // sin que el usuario tenga que cerrar sesion y volver a entrar.
+    async refreshProfile() {
+      const token = await SecureStore.getItemAsync('capachica.token').catch(() => null);
+      if (!token || !API_BASE) return;
+      try {
+        const res = await fetch(`${API_BASE}/usuarios/perfil`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) return;
+        const apiUser = await res.json();
+        setUser(prev => {
+          if (!prev) return prev;
+          const u: User = { ...prev, rol: apiUser.rol ?? prev.rol, name: apiUser.nombre ?? prev.name };
+          SecureStore.setItemAsync(KEY, JSON.stringify(u)).catch(() => {});
+          return u;
+        });
+      } catch {}
     },
   };
 

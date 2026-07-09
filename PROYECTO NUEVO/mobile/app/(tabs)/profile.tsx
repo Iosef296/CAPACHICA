@@ -59,6 +59,7 @@ export default function Profile() {
         </GlassPanel>
 
         <View style={styles.menu}>
+          <MenuItem icon="storefront" label="Mi negocio" onPress={() => router.push('/(stacks)/my-business')} />
           <MenuItem icon="auto-awesome" label="Mis rutas y favoritos" onPress={() => router.push('/(stacks)/profile-extended')} />
           <MenuItem icon="bookmark" label="Mis reservas" onPress={() => router.push('/(stacks)/my-bookings')} />
           <MenuItem icon="favorite" label="Favoritos" onPress={() => router.push('/(stacks)/favorites')} />

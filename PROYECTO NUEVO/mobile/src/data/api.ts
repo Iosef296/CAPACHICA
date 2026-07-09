@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import * as SecureStore from 'expo-secure-store';
 import * as mock from './mock';
 import { toWsUrl } from './ws';
 
@@ -167,6 +168,58 @@ export const api = {
   registro: (email: string, password: string, nombre: string) =>
     postAuth<{ usuario?: any; accessToken?: string; refreshToken?: string }>('/auth/registro', { email, password, nombre }),
 };
+
+// ── "Mi negocio" — CRUD autenticado para emprendedores/admin ──
+// Mismos 6 recursos que ya se leen arriba, pero acá con el JWT real
+// (guardado en login/registro) para crear/editar/eliminar SOLO lo
+// que uno mismo creo (o cualquier cosa, si sos admin — lo valida el
+// backend, no el mobile).
+export type TipoNegocio = 'comunidades' | 'hospedajes' | 'artesania' | 'festividades' | 'maestros' | 'guias';
+
+async function authFetch(method: string, path: string, body?: any) {
+  const token = await SecureStore.getItemAsync('capachica.token').catch(() => null);
+  if (!token) throw new Error('Debes iniciar sesión');
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.error ?? `Error ${res.status}`);
+  return data;
+}
+
+export const negocios = {
+  // Trae TODO el recurso (sin transformar/cachear) y filtra por dueño en el cliente.
+  listarPropios: async (tipo: TipoNegocio, usuarioId: string): Promise<any[]> => {
+    if (!API_BASE) return [];
+    try {
+      const res = await fetch(`${API_BASE}/${tipo}`);
+      const data = await res.json().catch(() => []);
+      return (Array.isArray(data) ? data : []).filter((it: any) => String(it.usuario_id) === String(usuarioId));
+    } catch {
+      return [];
+    }
+  },
+  crear: (tipo: TipoNegocio, datos: any) => authFetch('POST', `/${tipo}`, datos),
+  editar: (tipo: TipoNegocio, id: string | number, datos: any) => authFetch('PUT', `/${tipo}/${id}`, datos),
+  eliminar: (tipo: TipoNegocio, id: string | number) => authFetch('DELETE', `/${tipo}/${id}`),
+};
+
+// Sube una foto (URI local del picker) a Cloudinary via el backend. No
+// necesita auth — mismo endpoint publico que ya usa el panel web.
+export async function subirFoto(uri: string): Promise<string> {
+  if (!API_BASE) throw new Error('Backend no configurado');
+  const form = new FormData();
+  const filename = uri.split('/').pop() || 'foto.jpg';
+  const ext = filename.split('.').pop()?.toLowerCase();
+  const type = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg';
+  form.append('imagen', { uri, name: filename, type } as any);
+  const res = await fetch(`${API_BASE}/upload`, { method: 'POST', body: form });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.url) throw new Error(data?.error ?? 'No se pudo subir la foto');
+  return data.url;
+}
 
 // Chat con backend IA. Soporta campos en español o inglés.
 export async function killaChat(message: string, history: { role: 'user' | 'assistant'; content: string }[] = []) {
