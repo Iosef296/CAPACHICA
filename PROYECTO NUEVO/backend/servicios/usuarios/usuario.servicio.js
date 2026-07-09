@@ -26,6 +26,25 @@ class UsuarioService {
         const { password_hash, ...perfil } = actualizado;
         return perfil;
     }
+
+    async listarTodos() {
+        const usuarios = await this.usuarioRepo.find({ order: { fecha_registro: 'DESC' } });
+        return usuarios.map(({ password_hash, ...u }) => u);
+    }
+
+    async cambiarRol(id, rol) {
+        if (!['admin', 'proveedor', 'turista'].includes(rol)) {
+            throw new Error('Rol inválido');
+        }
+        const usuario = await this.usuarioRepo.findOne({ where: { id } });
+        if (!usuario) {
+            throw new Error('Usuario no encontrado');
+        }
+        usuario.rol = rol;
+        const actualizado = await this.usuarioRepo.save(usuario);
+        const { password_hash, ...perfil } = actualizado;
+        return perfil;
+    }
 }
 
 module.exports = { usuarioService: new UsuarioService() };

@@ -24,6 +24,26 @@ class UsuarioControlador {
             next(error);
         }
     }
+
+    async listarUsuarios(req, res, next) {
+        try {
+            const usuarios = await usuarioService.listarTodos();
+            res.json(usuarios);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async cambiarRol(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { rol } = req.body;
+            const resultado = await usuarioService.cambiarRol(id, rol);
+            res.json(resultado);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new UsuarioControlador();

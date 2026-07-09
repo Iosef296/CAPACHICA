@@ -67,13 +67,13 @@ class RestauranteService {
         return this._formatearRespuesta(restaurante);
     }
 
-    async actualizar(id, datos, usuarioId) {
+    async actualizar(id, datos, usuarioId, usuarioRol) {
         const restaurante = await this.restauranteRepo.findOne({ where: { id } });
         if (!restaurante) {
             throw new Error('Restaurante no encontrado');
         }
         // Verificar permisos: admin o dueño
-        if (restaurante.usuario_id !== usuarioId && req.usuario.rol !== 'admin') {
+        if (restaurante.usuario_id !== usuarioId && usuarioRol !== 'admin') {
             throw new Error('No tienes permiso para actualizar este restaurante');
         }
 
@@ -91,13 +91,13 @@ class RestauranteService {
         return this._formatearRespuesta(actualizado);
     }
 
-    async eliminar(id, usuarioId) {
+    async eliminar(id, usuarioId, usuarioRol) {
         const restaurante = await this.restauranteRepo.findOne({ where: { id } });
         if (!restaurante) {
             throw new Error('Restaurante no encontrado');
         }
         // Verificar permisos: admin o dueño
-        if (restaurante.usuario_id !== usuarioId && req.usuario.rol !== 'admin') {
+        if (restaurante.usuario_id !== usuarioId && usuarioRol !== 'admin') {
             throw new Error('No tienes permiso para eliminar este restaurante');
         }
         // Eliminación lógica

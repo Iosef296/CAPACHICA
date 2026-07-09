@@ -1150,6 +1150,7 @@ export default function AdminPanel() {
               numberFields={["mes"]}
               showMsg={showMsg}
               uploadImage={uploadImage}
+              token={token}
             />
           )}
           {tab === "maestros" && (
@@ -1166,6 +1167,7 @@ export default function AdminPanel() {
               ]}
               showMsg={showMsg}
               uploadImage={uploadImage}
+              token={token}
             />
           )}
           {tab === "guias" && (
@@ -1183,6 +1185,7 @@ export default function AdminPanel() {
               ]}
               showMsg={showMsg}
               uploadImage={uploadImage}
+              token={token}
             />
           )}
           {/* ─── IA KNOWLEDGE ─── */}
@@ -1775,12 +1778,14 @@ function SimpleResourceAdmin({
   numberFields = [],
   showMsg,
   uploadImage,
+  token,
 }: {
   endpoint: string;
   titulo: string;
   fields: FieldConfig[];
   itemLabel: (item: any) => string;
   itemSubLabel?: (item: any) => string;
+  token: string;
   imageField?: string;
   arrayFields?: string[];
   numberFields?: string[];
@@ -1836,21 +1841,30 @@ function SimpleResourceAdmin({
     const url = isEdit ? `${API_URL}/api/${endpoint}/${edit.id}` : `${API_URL}/api/${endpoint}`;
     const res = await fetch(url, {
       method: isEdit ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify(body),
     });
     if (res.ok) {
       showMsg(`✅ ${titulo} guardado`);
       setModalOpen(false);
       load();
-    } else showMsg("❌ Error al guardar", "err");
+    } else {
+      const data = await res.json().catch(() => ({}));
+      showMsg(`❌ ${data.error || "Error al guardar"}`, "err");
+    }
   };
 
   const remove = async (id: any) => {
     if (!confirm(`¿Eliminar este ítem de ${titulo}?`)) return;
-    await fetch(`${API_URL}/api/${endpoint}/${id}`, { method: "DELETE" });
-    showMsg("✅ Eliminado");
-    load();
+    const res = await fetch(`${API_URL}/api/${endpoint}/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) { showMsg("✅ Eliminado"); load(); }
+    else {
+      const data = await res.json().catch(() => ({}));
+      showMsg(`❌ ${data.error || "Error al eliminar"}`, "err");
+    }
   };
 
   return (

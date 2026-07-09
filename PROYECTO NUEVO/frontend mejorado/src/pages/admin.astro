@@ -622,6 +622,10 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         <span>📋</span><span class="nav-btn-text"> Reservas</span>
         <span class="nav-count" id="nav-res-count">—</span>
       </button>
+      <button class="nav-btn" data-section="usuarios" title="Usuarios">
+        <span>👤</span><span class="nav-btn-text"> Usuarios</span>
+        <span class="nav-count" id="nav-usuarios-count">—</span>
+      </button>
       <div class="nav-label">Sitio</div>
       <button class="nav-btn" data-section="global" title="Navbar &amp; Footer">
         <span>🎨</span><span class="nav-btn-text"> Navbar &amp; Footer</span>
@@ -799,6 +803,16 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
           <h3>Listado <span class="count-pill" id="res-count">0</span></h3>
         </div>
         <div id="reservasList"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
+      </div>
+
+      <!-- ─── USUARIOS SECTION ─── -->
+      <div class="section" id="sec-usuarios">
+        <div class="page-hdr">
+          <h2>Usuarios</h2>
+          <p>Promueve turistas a emprendedores para que puedan crear/editar su propio negocio</p>
+        </div>
+        <div style="margin-bottom:14px"><span class="count-pill" id="usuarios-count">0</span></div>
+        <div id="usuariosList"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
       </div>
 
       <!-- ─── WIDGET SECTION ─── -->
@@ -1210,6 +1224,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       if (btn.dataset.section === 'destinos') loadDestinos();
       if (btn.dataset.section === 'paginas')  loadPaginas();
       if (['hospedajes','artesania','festividades','maestros','guias'].includes(btn.dataset.section)) cargarSimple(btn.dataset.section);
+      if (btn.dataset.section === 'usuarios') loadUsuarios();
       if (btn.dataset.section === 'global') {
         loadSiteconfigAdmin();
         // Re-scale iframe now that section is visible
@@ -1229,6 +1244,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     if (sec === 'destinos') loadDestinos();
     if (sec === 'paginas')  loadPaginas();
     if (['hospedajes','artesania','festividades','maestros','guias'].includes(sec)) cargarSimple(sec);
+    if (sec === 'usuarios') loadUsuarios();
   };
 
   /* ─── IA ─── */
@@ -1737,7 +1753,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     try {
       const res = await fetch(`${API_URL}/api/${cfg.endpoint}${id ? '/' + id : ''}`, {
         method: id ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN },
         body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -1753,13 +1769,66 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     const cfg = RECURSOS_SIMPLES[rec];
     if (!confirm(`¿Eliminar este ${cfg.titulo.toLowerCase()}?`)) return;
     try {
-      const res = await fetch(`${API_URL}/api/${cfg.endpoint}/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_URL}/api/${cfg.endpoint}/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + TOKEN } });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       simpleDataCache[rec] = (simpleDataCache[rec] || []).filter(x => String(x.id) !== String(id));
       renderSimple(rec);
       showMsg(`${cfg.titulo} eliminado`);
     } catch (e) {
       showMsg('Error al eliminar: ' + e.message, 'err');
+    }
+  };
+
+  /* ─── USUARIOS (promover turista -> emprendedor) ─── */
+  let usuariosData = [];
+  const ROL_LABEL = { admin: '👑 Admin', proveedor: '💼 Emprendedor', turista: '🧳 Turista' };
+
+  async function loadUsuarios() {
+    $('usuariosList').innerHTML = '<div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div>';
+    try {
+      const res = await fetch(`${API_URL}/api/usuarios`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      usuariosData = await res.json();
+      $('usuarios-count').textContent = usuariosData.length;
+      $('nav-usuarios-count').textContent = usuariosData.length;
+      renderUsuarios();
+    } catch (e) {
+      $('usuariosList').innerHTML = `<div class="empty"><div class="ei">⚠️</div><p>No se pudo cargar: ${e.message}</p></div>`;
+    }
+  }
+
+  function renderUsuarios() {
+    if (!usuariosData.length) {
+      $('usuariosList').innerHTML = '<div class="empty"><div class="ei">👤</div><p>No hay usuarios.</p></div>';
+      return;
+    }
+    $('usuariosList').innerHTML = usuariosData.map(u => `
+      <div class="dest-item" id="user-${u.id}">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:15px;font-weight:700;color:var(--text)">${esc(u.nombre)}</div>
+          <div style="font-size:12px;color:var(--cyan)">${esc(u.email)}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${ROL_LABEL[u.rol] || u.rol}${u.activo ? '' : ' · inactivo'}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+          ${u.rol === 'turista' ? `<button onclick="cambiarRolUsuario('${u.id}','proveedor')" style="padding:6px 12px;border-radius:7px;border:1px solid rgba(74,222,128,.3);background:transparent;color:var(--green);font-size:12px;cursor:pointer;font-family:inherit">↑ Hacer emprendedor</button>` : ''}
+          ${u.rol === 'proveedor' ? `<button onclick="cambiarRolUsuario('${u.id}','turista')" style="padding:6px 12px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit">↓ Volver a turista</button>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  window.cambiarRolUsuario = async (id, rol) => {
+    try {
+      const res = await fetch(`${API_URL}/api/usuarios/${id}/rol`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN },
+        body: JSON.stringify({ rol }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      showMsg('Rol actualizado');
+      loadUsuarios();
+    } catch (e) {
+      showMsg('Error al cambiar rol: ' + e.message, 'err');
     }
   };
 
@@ -1928,14 +1997,15 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     const id = $('d-id').value;
     try {
       let res;
+      const headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN };
       if (id) {
         res = await fetch(`${API_URL}/api/comunidades/${id}`, {
-          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          method: 'PUT', headers,
           body: JSON.stringify(body)
         });
       } else {
         res = await fetch(`${API_URL}/api/comunidades`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          method: 'POST', headers,
           body: JSON.stringify(body)
         });
       }
@@ -1951,7 +2021,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
   window.deleteDestino = async (id) => {
     if (!confirm('¿Eliminar este destino?')) return;
     try {
-      const res = await fetch(`${API_URL}/api/comunidades/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_URL}/api/comunidades/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + TOKEN } });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       destinosData = destinosData.filter(d => d.id !== id);
       document.getElementById(`dest-${id}`)?.remove();

@@ -41,7 +41,7 @@ class RestauranteControlador {
             const { id } = req.params;
             const datos = ActualizarRestauranteDTO.parse(req.body);
             const usuarioId = req.usuario.id;
-            const resultado = await restauranteService.actualizar(id, datos, usuarioId);
+            const resultado = await restauranteService.actualizar(id, datos, usuarioId, req.usuario.rol);
             res.json(resultado);
         } catch (error) {
             next(error);
@@ -52,7 +52,7 @@ class RestauranteControlador {
         try {
             const { id } = req.params;
             const usuarioId = req.usuario.id;
-            await restauranteService.eliminar(id, usuarioId);
+            await restauranteService.eliminar(id, usuarioId, req.usuario.rol);
             res.status(204).send();
         } catch (error) {
             next(error);

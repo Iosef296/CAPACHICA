@@ -2,6 +2,7 @@
 const express = require('express');
 const usuarioControlador = require('../../controladores/usuarios/usuario.controlador');
 const { autenticacionMiddleware } = require('../../middleware/autenticacion.middleware');
+const { autorizacionMiddleware } = require('../../middleware/autorizacion.middleware');
 const { validacionMiddleware } = require('../../middleware/validacion.middleware');
 const { subirImagen } = require('../../middleware/subida-archivos.middleware');
 const { ActualizarUsuarioDTO } = require('../../dtos/usuarios/actualizar.dto');
@@ -16,5 +17,9 @@ router.put(
     validacionMiddleware(ActualizarUsuarioDTO),
     usuarioControlador.actualizarPerfil
 );
+
+// Solo admin: gestion de roles de usuario
+router.get('/', autenticacionMiddleware, autorizacionMiddleware(['admin']), usuarioControlador.listarUsuarios);
+router.put('/:id/rol', autenticacionMiddleware, autorizacionMiddleware(['admin']), usuarioControlador.cambiarRol);
 
 module.exports = router;
