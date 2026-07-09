@@ -44,6 +44,16 @@ class UsuarioControlador {
             next(error);
         }
     }
+
+    async actualizarComoAdmin(req, res, next) {
+        try {
+            const { id } = req.params;
+            const resultado = await usuarioService.actualizarComoAdmin(id, req.body);
+            res.json(resultado);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 module.exports = new UsuarioControlador();

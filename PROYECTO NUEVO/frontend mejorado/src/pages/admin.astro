@@ -1064,6 +1064,59 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
   </div>
 </div>
 
+<!-- ─── MODAL: Editar usuario (incluye reset de contraseña) ─── -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <h3>Editar usuario</h3>
+      <button class="modal-close" onclick="closeUserModal()">✕</button>
+    </div>
+    <input type="hidden" id="u-id" value="" />
+
+    <div class="form-row2">
+      <div class="fg" style="margin:0">
+        <label>Nombre</label>
+        <input type="text" id="u-nombre" placeholder="Nombre completo" />
+      </div>
+      <div class="fg" style="margin:0">
+        <label>Email</label>
+        <input type="email" id="u-email" placeholder="correo@ejemplo.com" />
+      </div>
+    </div>
+
+    <div class="form-row2">
+      <div class="fg" style="margin:0">
+        <label>Teléfono</label>
+        <input type="text" id="u-telefono" placeholder="+51 999 000 000" />
+      </div>
+      <div class="fg" style="margin:0">
+        <label>Rol</label>
+        <select id="u-rol">
+          <option value="turista">🧳 Turista</option>
+          <option value="proveedor">💼 Emprendedor</option>
+          <option value="admin">👑 Admin</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label>Nueva contraseña</label>
+      <input type="text" id="u-password" placeholder="Dejar en blanco para no cambiarla (mín. 8 caracteres)" />
+      <p style="font-size:11px;color:var(--dim);margin-top:4px">Usalo si el usuario olvidó su contraseña y no puede recuperarla solo.</p>
+    </div>
+
+    <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:16px;cursor:pointer">
+      <input type="checkbox" id="u-activo" style="width:auto" />
+      Cuenta activa (desmarcar para desactivar el acceso)
+    </label>
+
+    <div style="display:flex;gap:10px;margin-top:6px">
+      <button class="btn-primary" onclick="saveUserModal()" style="flex:1">Guardar cambios</button>
+      <button class="btn-sm" onclick="closeUserModal()" style="padding:9px 18px">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <script define:vars={{ API_URL, IA_URL }}>
   let TOKEN = localStorage.getItem('admin_token') || '';
   let iaData = { conocimiento: [], contexto_base: '' };
@@ -1810,12 +1863,62 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
           <div style="font-size:12px;color:var(--muted);margin-top:2px">${ROL_LABEL[u.rol] || u.rol}${u.activo ? '' : ' · inactivo'}</div>
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+          <button onclick="openUserModal('${u.id}')" style="padding:6px 12px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit">✎ Editar</button>
           ${u.rol === 'turista' ? `<button onclick="cambiarRolUsuario('${u.id}','proveedor')" style="padding:6px 12px;border-radius:7px;border:1px solid rgba(74,222,128,.3);background:transparent;color:var(--green);font-size:12px;cursor:pointer;font-family:inherit">↑ Hacer emprendedor</button>` : ''}
           ${u.rol === 'proveedor' ? `<button onclick="cambiarRolUsuario('${u.id}','turista')" style="padding:6px 12px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit">↓ Volver a turista</button>` : ''}
         </div>
       </div>
     `).join('');
   }
+
+  function openUserModal(id) {
+    const u = usuariosData.find(x => String(x.id) === String(id));
+    if (!u) return;
+    $('u-id').value = u.id;
+    $('u-nombre').value = u.nombre || '';
+    $('u-email').value = u.email || '';
+    $('u-telefono').value = u.telefono || '';
+    $('u-rol').value = u.rol;
+    $('u-password').value = '';
+    $('u-activo').checked = u.activo !== false;
+    $('userModal').classList.add('open');
+  }
+
+  function closeUserModal() {
+    $('userModal').classList.remove('open');
+  }
+
+  async function saveUserModal() {
+    const id = $('u-id').value;
+    const body = {
+      nombre: $('u-nombre').value.trim(),
+      email: $('u-email').value.trim(),
+      telefono: $('u-telefono').value.trim(),
+      rol: $('u-rol').value,
+      activo: $('u-activo').checked,
+    };
+    const pass = $('u-password').value.trim();
+    if (pass) body.password = pass;
+    if (!body.nombre || !body.email) { showMsg('Nombre y email son obligatorios', 'err'); return; }
+    try {
+      const res = await fetch(`${API_URL}/api/usuarios/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+      closeUserModal();
+      showMsg(pass ? 'Usuario actualizado, contraseña reseteada' : 'Usuario actualizado');
+      loadUsuarios();
+    } catch (e) {
+      showMsg('Error al guardar: ' + e.message, 'err');
+    }
+  }
+
+  window.openUserModal = openUserModal;
+  window.closeUserModal = closeUserModal;
+  window.saveUserModal = saveUserModal;
 
   window.cambiarRolUsuario = async (id, rol) => {
     try {

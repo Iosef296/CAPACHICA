@@ -18,8 +18,9 @@ router.put(
     usuarioControlador.actualizarPerfil
 );
 
-// Solo admin: gestion de roles de usuario
+// Solo admin: gestion de usuarios (incluye resetear contraseña)
 router.get('/', autenticacionMiddleware, autorizacionMiddleware(['admin']), usuarioControlador.listarUsuarios);
 router.put('/:id/rol', autenticacionMiddleware, autorizacionMiddleware(['admin']), usuarioControlador.cambiarRol);
+router.put('/:id', autenticacionMiddleware, autorizacionMiddleware(['admin']), usuarioControlador.actualizarComoAdmin);
 
 module.exports = router;
