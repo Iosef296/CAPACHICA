@@ -1118,7 +1118,9 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
 </div>
 
 <script define:vars={{ API_URL, IA_URL }}>
-  let TOKEN = localStorage.getItem('admin_token') || '';
+  let __usuario = {};
+  try { __usuario = JSON.parse(localStorage.getItem('usuario') || '{}'); } catch (e) {}
+  let TOKEN = __usuario.rol === 'admin' ? (localStorage.getItem('accessToken') || '') : '';
   let iaData = { conocimiento: [], contexto_base: '' };
   let resData = [];
 
@@ -1247,7 +1249,9 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       if (!res.ok) throw new Error(data.error || 'Error al iniciar sesión');
       if (data.usuario?.rol !== 'admin') throw new Error('Acceso denegado: se requiere rol admin');
       TOKEN = data.accessToken;
-      localStorage.setItem('admin_token', TOKEN);
+      localStorage.setItem('accessToken', TOKEN);
+      localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem('usuario', JSON.stringify(data.usuario));
       showPanel();
     } catch (e) {
       $('loginErr').textContent = '⚠️ ' + e.message;
@@ -1259,7 +1263,9 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
   /* ─── LOGOUT ─── */
   $('logoutBtn').onclick = () => {
     TOKEN = '';
-    localStorage.removeItem('admin_token');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('usuario');
     $('adminPanel').style.display = 'none';
     $('loginPage').style.display  = 'flex';
   };

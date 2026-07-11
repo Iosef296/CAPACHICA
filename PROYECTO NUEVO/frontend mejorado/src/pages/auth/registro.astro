@@ -1,5 +1,5 @@
 ---
-// src/pages/auth/login.astro
+// src/pages/auth/registro.astro
 import BaseLayout from '../../layouts/GastronomiaLayout.astro';
 
 const lang = Astro.cookies.get('lang')?.value || 'es';
@@ -11,67 +11,74 @@ try {
 }
 
 const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api';
-const redirect = Astro.url.searchParams.get('redirect') || '/';
 ---
 
 <BaseLayout lang={lang}>
     <div style="max-width: 400px; margin: 3rem auto; background: white; padding: 2rem; border-radius: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
         <h2 style="font-size: 1.5rem; font-weight: bold; color: var(--turquesa); margin-bottom: 1.5rem; text-align: center;">
-            {translations.inicio_sesion || 'Iniciar sesión'}
+            Crear cuenta
         </h2>
 
-        <form id="loginForm">
+        <form id="registroForm">
+            <label for="nombre" style="display:block; margin-bottom:0.25rem; font-weight:600; color:#2d3748;">Nombre</label>
+            <input type="text" id="nombre" required placeholder="Tu nombre" minlength="2"
+                style="width:100%; padding:0.6rem; margin-bottom:1rem; border:1px solid #cbd5e0; border-radius:0.375rem;" />
+
             <label for="email" style="display:block; margin-bottom:0.25rem; font-weight:600; color:#2d3748;">Correo electrónico</label>
             <input type="email" id="email" required placeholder="tu@correo.com"
                 style="width:100%; padding:0.6rem; margin-bottom:1rem; border:1px solid #cbd5e0; border-radius:0.375rem;" />
 
             <label for="password" style="display:block; margin-bottom:0.25rem; font-weight:600; color:#2d3748;">Contraseña</label>
-            <input type="password" id="password" required placeholder="Tu contraseña"
+            <input type="password" id="password" required placeholder="Mínimo 8 caracteres" minlength="8"
                 style="width:100%; padding:0.6rem; margin-bottom:1rem; border:1px solid #cbd5e0; border-radius:0.375rem;" />
 
-            <p id="loginErr" style="display:none; color:#e53e3e; font-size:0.875rem; margin-bottom:1rem;"></p>
+            <p id="regErr" style="display:none; color:#e53e3e; font-size:0.875rem; margin-bottom:1rem;"></p>
 
-            <button type="submit" id="loginBtn" class="btn btn-primary" style="font-size: 1rem; padding: 0.75rem 2rem; width: 100%;">
-                Entrar
+            <button type="submit" id="regBtn" class="btn btn-primary" style="font-size: 1rem; padding: 0.75rem 2rem; width: 100%;">
+                Crear cuenta
             </button>
         </form>
 
         <p style="margin-top: 1rem; font-size: 0.875rem; color: #718096; text-align:center;">
-            ¿No tienes cuenta? <a href="/auth/registro" style="color:var(--turquesa); font-weight:600;">Regístrate</a>
+            ¿Tienes un negocio? Regístrate igual — un administrador puede habilitarte como emprendedor después.
+        </p>
+        <p style="margin-top: 0.5rem; font-size: 0.875rem; color: #718096; text-align:center;">
+            ¿Ya tienes cuenta? <a href="/auth/login" style="color:var(--turquesa); font-weight:600;">Inicia sesión</a>
         </p>
     </div>
 </BaseLayout>
 
-<script define:vars={{ API_URL, redirect }}>
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+<script define:vars={{ API_URL }}>
+    document.getElementById('registroForm').addEventListener('submit', async (e) => {
         e.preventDefault();
+        const nombre = document.getElementById('nombre').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        const errEl = document.getElementById('loginErr');
-        const btn = document.getElementById('loginBtn');
+        const errEl = document.getElementById('regErr');
+        const btn = document.getElementById('regBtn');
         errEl.style.display = 'none';
         btn.disabled = true;
-        btn.textContent = 'Entrando...';
+        btn.textContent = 'Creando cuenta...';
 
         try {
-            const res = await fetch(`${API_URL}/auth/login`, {
+            const res = await fetch(`${API_URL}/auth/registro`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ nombre, email, password }),
             });
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Error al iniciar sesión');
+            if (!res.ok) throw new Error(data.detalles?.[0]?.mensaje || data.error || 'Error al crear la cuenta');
 
             localStorage.setItem('accessToken', data.accessToken);
             localStorage.setItem('refreshToken', data.refreshToken);
             localStorage.setItem('usuario', JSON.stringify(data.usuario));
 
-            window.location.href = data.usuario?.rol === 'admin' ? '/admin' : redirect;
+            window.location.href = '/';
         } catch (err) {
             errEl.textContent = '⚠️ ' + err.message;
             errEl.style.display = 'block';
             btn.disabled = false;
-            btn.textContent = 'Entrar';
+            btn.textContent = 'Crear cuenta';
         }
     });
 </script>

@@ -108,8 +108,10 @@ export default function AdminPanel() {
   const [artEdit, setArtEdit] = useState<Partial<Artesania>>({});
 
   useEffect(() => {
-    const saved = localStorage.getItem("admin_token");
-    if (saved) setToken(saved);
+    const saved = localStorage.getItem("accessToken");
+    let usuario: any = {};
+    try { usuario = JSON.parse(localStorage.getItem("usuario") || "{}"); } catch {}
+    if (saved && usuario.rol === "admin") setToken(saved);
   }, []);
 
   const showMsg = (text: string, type: "ok" | "err" = "ok") => {
@@ -152,7 +154,8 @@ export default function AdminPanel() {
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      if (!res.ok) throw new Error(data.error || "Error al iniciar sesión");
+      if (data.usuario?.rol !== "admin") throw new Error("Acceso denegado: se requiere rol admin");
       setToken(data.accessToken);
       localStorage.setItem("admin_token", data.accessToken);
     } catch (err: any) {

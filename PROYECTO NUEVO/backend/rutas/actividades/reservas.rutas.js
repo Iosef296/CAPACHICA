@@ -1,7 +1,22 @@
 const { Router } = require('express');
 const { query }  = require('../../config/postgres');
+const { autenticacionMiddleware } = require('../../middleware/autenticacion.middleware');
 
 const router = Router();
+
+router.get('/mias', autenticacionMiddleware, async (req, res) => {
+    try {
+        const { rows } = await query(
+            `SELECT id, nombre, fecha_visita, personas, idioma, actividad, notas,
+                    precio_total, es_paquete, actividades_paquete, estado, created_at
+             FROM reservas WHERE email = $1 ORDER BY created_at DESC`,
+            [req.usuario.email.toLowerCase()]
+        );
+        res.json({ reservas: rows });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al obtener tus reservas' });
+    }
+});
 
 router.post('/', async (req, res) => {
     try {

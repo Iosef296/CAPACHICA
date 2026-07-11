@@ -74,20 +74,24 @@ import { APP_CONFIG } from '../../config/app.config.js';
     const langSelector = document.getElementById('lang-selector');
 
     if (token) {
-      // Inyectamos las variables traducidas
+      let usuario = {};
+      try { usuario = JSON.parse(localStorage.getItem('usuario') || '{}'); } catch (e) {}
+      const cuentaLink = usuario.rol === 'admin'
+        ? `<a href="${appConfig.adminPanelUrl}" class="nav-link">${txtAdministracion}</a>`
+        : `<a href="/mis-reservas" class="nav-link">Mis reservas</a>`;
       authLinks.innerHTML = `
-        <a href="${appConfig.adminPanelUrl}" class="nav-link">${txtAdministracion}</a>
+        ${cuentaLink}
         <button id="logout-btn" class="btn-logout">${txtCerrarSesion}</button>
       `;
       document.getElementById('logout-btn').addEventListener('click', () => {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
-        window.location.href = appConfig.angularLoginUrl;
+        localStorage.removeItem('usuario');
+        window.location.href = '/';
       });
     } else {
-      // Inyectamos la variable traducida
       authLinks.innerHTML = `
-        <a href="${appConfig.angularLoginUrl}" class="btn-login">${txtIniciarSesion}</a>
+        <a href="${appConfig.loginUrl}" class="btn-login">${txtIniciarSesion}</a>
       `;
     }
 
