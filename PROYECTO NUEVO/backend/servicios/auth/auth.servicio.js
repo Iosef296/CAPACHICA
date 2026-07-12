@@ -2,7 +2,11 @@
 const { AppDataSource } = require('../../config/base-de-datos');
 const Usuario = require('../../modelos/auth/usuario.modelo');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
+const { OAuth2Client } = require('google-auth-library');
 const { generarToken, generarRefreshToken, verificarRefreshToken } = require('../../config/autenticacion');
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 class AuthService {
     constructor() {
@@ -77,6 +81,46 @@ class AuthService {
             accessToken,
             refreshToken,
         };
+    }
+
+    async iniciarSesionGoogle(idToken) {
+        if (!process.env.GOOGLE_CLIENT_ID) {
+            throw new Error('Login con Google no configurado');
+        }
+
+        const ticket = await googleClient.verifyIdToken({
+            idToken,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+        if (!payload?.email_verified) {
+            throw new Error('Correo de Google no verificado');
+        }
+
+        let usuario = await this.usuarioRepo.findOne({ where: { email: payload.email } });
+
+        if (!usuario) {
+            const password_hash = await bcrypt.hash(crypto.randomUUID(), 10);
+            usuario = this.usuarioRepo.create({
+                nombre: payload.name || payload.email.split('@')[0],
+                email: payload.email,
+                password_hash,
+                foto: payload.picture || null,
+                rol: 'turista',
+            });
+            await this.usuarioRepo.save(usuario);
+        }
+
+        if (!usuario.activo) {
+            throw new Error('Usuario inactivo');
+        }
+
+        const tokenPayload = { id: usuario.id, email: usuario.email, rol: usuario.rol };
+        const accessToken = generarToken(tokenPayload);
+        const refreshToken = generarRefreshToken(tokenPayload);
+
+        const { password_hash: _, ...usuarioSinPass } = usuario;
+        return { usuario: usuarioSinPass, accessToken, refreshToken };
     }
 
     async refrescarToken(token) {

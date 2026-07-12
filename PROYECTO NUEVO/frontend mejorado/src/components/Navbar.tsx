@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import AuthModal from "./AuthModal";
 
 const DEFAULT_LINKS = [
   { label: "Inicio",       href: "/" },
@@ -19,6 +20,9 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen]   = useState(false);
   const [path, setPath]           = useState("/");
   const [cfg, setCfg]             = useState<any>(null);
+  const [usuario, setUsuario]     = useState<any>(null);
+  const [authOpen, setAuthOpen]   = useState(false);
+  const [authTab, setAuthTab]     = useState<"login" | "registro">("login");
 
   useEffect(() => {
     const saved = localStorage.getItem("capachica-theme") || localStorage.getItem("theme");
@@ -26,6 +30,11 @@ export default function Navbar() {
     setDark(isDark);
     document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
     setPath(window.location.pathname);
+
+    try {
+      const u = JSON.parse(localStorage.getItem("usuario") || "null");
+      if (u && localStorage.getItem("accessToken")) setUsuario(u);
+    } catch {}
 
     fetch(`${import.meta.env.PUBLIC_IA_URL || 'http://localhost:5000'}/api/siteconfig`)
       .then(r => r.ok ? r.json() : null)
@@ -57,6 +66,15 @@ export default function Navbar() {
 
   const isActive = (href: string) =>
     href === "/" ? path === "/" : path.startsWith(href);
+
+  const openAuth = (t: "login" | "registro") => { setAuthTab(t); setAuthOpen(true); };
+
+  const logout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("usuario");
+    setUsuario(null);
+  };
 
   return (
     <>
@@ -156,6 +174,54 @@ export default function Navbar() {
 
           {/* Right */}
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+            {usuario ? (
+              <>
+                <a
+                  href={usuario.rol === "admin" ? "/admin" : "/mis-reservas"}
+                  style={{
+                    padding: "6px 14px", borderRadius: 999, fontSize: 13, fontWeight: 600,
+                    color: "#fff", textDecoration: "none",
+                    background: "linear-gradient(135deg,#0ea5e9,#0369a1)", whiteSpace: "nowrap",
+                  }}
+                >
+                  Mi cuenta
+                </a>
+                <button
+                  onClick={logout}
+                  style={{
+                    padding: "6px 14px", borderRadius: 999, fontSize: 13, fontWeight: 600,
+                    color: "rgba(240,237,232,0.85)", background: "rgba(255,255,255,0.08)",
+                    border: "1px solid rgba(255,255,255,0.15)", cursor: "pointer", whiteSpace: "nowrap",
+                  }}
+                >
+                  Salir
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => openAuth("login")}
+                  style={{
+                    padding: "6px 14px", borderRadius: 999, fontSize: 13, fontWeight: 600,
+                    color: "rgba(240,237,232,0.85)", background: "rgba(255,255,255,0.08)",
+                    border: "1px solid rgba(255,255,255,0.15)", cursor: "pointer", whiteSpace: "nowrap",
+                  }}
+                >
+                  Iniciar sesión
+                </button>
+                <button
+                  onClick={() => openAuth("registro")}
+                  style={{
+                    padding: "6px 14px", borderRadius: 999, fontSize: 13, fontWeight: 600,
+                    color: "#fff", background: "linear-gradient(135deg,#0ea5e9,#0369a1)",
+                    border: "none", cursor: "pointer", whiteSpace: "nowrap",
+                  }}
+                >
+                  Registrarse
+                </button>
+              </>
+            )}
+
             <button
               onClick={toggleTheme}
               aria-label="Toggle theme"
@@ -222,6 +288,13 @@ export default function Navbar() {
           </div>
         )}
       </nav>
+
+      <AuthModal
+        open={authOpen}
+        initialTab={authTab}
+        onClose={() => setAuthOpen(false)}
+        onSuccess={(u) => { setUsuario(u); setAuthOpen(false); }}
+      />
     </>
   );
 }
