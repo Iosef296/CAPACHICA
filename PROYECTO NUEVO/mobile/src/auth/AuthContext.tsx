@@ -28,7 +28,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const extra = (Constants.expoConfig?.extra as any) ?? {};
-  const [, response, promptAsync] = Google.useAuthRequest({
+  const [, response, promptAsync] = Google.useIdTokenAuthRequest({
+    clientId: extra.googleClientIdWeb,
     androidClientId: extra.googleClientIdAndroid,
     iosClientId: extra.googleClientIdIos,
     webClientId: extra.googleClientIdWeb,
@@ -44,23 +45,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (response?.type === 'success') {
-      const token = response.authentication?.accessToken;
-      if (token) hydrateGoogle(token);
+      const idToken = response.params?.id_token;
+      if (idToken) hydrateGoogle(idToken);
     }
   }, [response]);
 
-  async function hydrateGoogle(token: string) {
+  async function hydrateGoogle(idToken: string) {
     try {
-      const res = await fetch('https://www.googleapis.com/userinfo/v2/me', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const info = await res.json();
+      const res: any = await api.google(idToken);
+      const apiUser = res?.usuario ?? {};
       const u: User = {
-        id: info.id, email: info.email, name: info.name,
-        avatar: info.picture, provider: 'google', rol: 'turista',
+        id: apiUser.id?.toString() ?? 'local-' + Date.now(),
+        email: apiUser.email, name: apiUser.nombre,
+        avatar: apiUser.foto, provider: 'google', rol: apiUser.rol ?? 'turista',
       };
       setUser(u);
       await SecureStore.setItemAsync(KEY, JSON.stringify(u));
+      if (res?.accessToken) await SecureStore.setItemAsync('capachica.token', res.accessToken);
     } catch (e) { console.warn('Google hydrate failed', e); }
   }
 

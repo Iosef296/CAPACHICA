@@ -167,6 +167,8 @@ export const api = {
     postAuth<{ usuario?: any; accessToken?: string; refreshToken?: string }>('/auth/login', { email, password }),
   registro: (email: string, password: string, nombre: string) =>
     postAuth<{ usuario?: any; accessToken?: string; refreshToken?: string }>('/auth/registro', { email, password, nombre }),
+  google: (idToken: string) =>
+    postAuth<{ usuario?: any; accessToken?: string; refreshToken?: string }>('/auth/google', { idToken }),
 };
 
 // ── "Mi negocio" — CRUD autenticado para emprendedores/admin ──

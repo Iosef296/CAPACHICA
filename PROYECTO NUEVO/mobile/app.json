@@ -32,7 +32,8 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-dev-client"
     ],
     "experiments": {
       "typedRoutes": true
@@ -40,9 +41,14 @@
     "extra": {
       "apiBaseUrl": "https://capachica-backend-production.up.railway.app/api",
       "iaBaseUrl": "https://capachica-ia-production.up.railway.app/api",
-      "googleClientIdAndroid": "REPLACE_WITH_GOOGLE_CLIENT_ID_ANDROID",
-      "googleClientIdIos": "REPLACE_WITH_GOOGLE_CLIENT_ID_IOS",
-      "googleClientIdWeb": "REPLACE_WITH_GOOGLE_CLIENT_ID_WEB"
-    }
+      "googleClientIdAndroid": "936387439928-qjjka8gb17gbhmvffjmpr8jjq311epah.apps.googleusercontent.com",
+      "googleClientIdIos": "936387439928-qjjka8gb17gbhmvffjmpr8jjq311epah.apps.googleusercontent.com",
+      "googleClientIdWeb": "936387439928-gpn5ejhha3uips58ponnim3t6gc0s45e.apps.googleusercontent.com",
+      "router": {},
+      "eas": {
+        "projectId": "8d029b1e-ab0f-4b6e-91ca-7a0a7e9711c3"
+      }
+    },
+    "owner": "iosef296"
   }
 }
