@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -6,25 +6,58 @@ import { useRouter } from 'expo-router';
 import { Button } from '@/components/Button';
 import { GlassPanel } from '@/components/GlassPanel';
 import { useAuth } from '@/auth/AuthContext';
-import { profile } from '@/data/mock';
+import { reservas as reservasApi, ReservaMia, API_WS } from '@/data/api';
+import { useLiveRefresh } from '@/hooks/useLiveRefresh';
+import { useRatings } from '@/data/ratings';
 import { colors, radii, spacing, typography } from '@/theme';
+
+// Niveles derivados de la cantidad real de viajes (reservas no canceladas)
+// del usuario -- cada cuenta arranca en Nivel 1 con 0 de todo y sube sola
+// a medida que reserva experiencias.
+const NIVELES = [
+  { minViajes: 0, titulo: 'Viajero Novato' },
+  { minViajes: 3, titulo: 'Explorador del Lago' },
+  { minViajes: 6, titulo: 'Tejedor de Historias' },
+  { minViajes: 10, titulo: 'Guardián Ancestral' },
+];
+
+function calcularNivel(viajes: number) {
+  let i = 0;
+  for (let j = 0; j < NIVELES.length; j++) {
+    if (viajes >= NIVELES[j].minViajes) i = j;
+  }
+  const siguiente = NIVELES[i + 1];
+  return {
+    nivel: i + 1,
+    titulo: NIVELES[i].titulo,
+    insignias: i,
+    siguienteTitulo: siguiente?.titulo,
+    faltan: siguiente ? siguiente.minViajes - viajes : 0,
+  };
+}
 
 export default function Profile() {
   const { user, signOut } = useAuth();
   const router = useRouter();
-  const display = {
-    name: user?.name ?? profile.name,
-    avatar: user?.avatar ?? profile.avatar,
-    email: user?.email,
-  };
+  const [reservasList, setReservasList] = useState<ReservaMia[]>([]);
+  const { all: ratingsAll } = useRatings();
+
+  useLiveRefresh(() => {
+    if (!user) return;
+    reservasApi.mias().then(setReservasList).catch(() => setReservasList([]));
+  }, { url: API_WS, channels: ['reservas'] });
+
+  const viajes = reservasList.filter(r => r.estado !== 'cancelada').length;
+  const resenas = Object.keys(ratingsAll).length;
+  const { nivel, titulo, insignias, siguienteTitulo, faltan } = calcularNivel(viajes);
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaView edges={['top']}>
         <View style={styles.header}>
           <View style={styles.avatarRing}>
-            {display.avatar ? (
-              <Image source={{ uri: display.avatar }} style={styles.avatar} />
+            {user?.avatar ? (
+              <Image source={{ uri: user.avatar }} style={styles.avatar} />
             ) : (
               <View style={[styles.avatar, styles.avatarFallback]}>
                 <MaterialIcons name="person" size={56} color={colors.onPrimaryContainer} />
@@ -32,29 +65,28 @@ export default function Profile() {
             )}
           </View>
           <Text style={[typography.headlineLgMobile, { color: colors.primary, marginTop: spacing.stackSm }]}>
-            {display.name}
+            {user?.name ?? 'Viajero'}
           </Text>
           <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant }]}>
-            {display.email ?? profile.handle}
-          </Text>
-          <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, textAlign: 'center', marginTop: spacing.stackSm, paddingHorizontal: spacing.containerPadding }]}>
-            {profile.bio}
+            {user?.email}
           </Text>
         </View>
 
         <View style={styles.stats}>
-          <Stat label="Viajes" value={profile.stats.trips} />
-          <Stat label="Reseñas" value={profile.stats.reviews} />
-          <Stat label="Insignias" value={profile.stats.badges} />
+          <Stat label="Viajes" value={viajes} />
+          <Stat label="Reseñas" value={resenas} />
+          <Stat label="Insignias" value={insignias} />
         </View>
 
         <GlassPanel style={{ marginHorizontal: spacing.containerPadding, marginTop: spacing.stackMd }}>
           <Text style={[typography.labelMd, { color: colors.secondary }]}>VIAJERO ANCESTRAL</Text>
           <Text style={[typography.headlineMd, { color: colors.onSurface, marginTop: 4 }]}>
-            Nivel 2 · Explorador del Lago
+            Nivel {nivel} · {titulo}
           </Text>
           <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, marginTop: 6 }]}>
-            Completa 2 experiencias más para alcanzar el nivel Tejedor de Historias.
+            {siguienteTitulo
+              ? `Completa ${faltan} experiencia${faltan === 1 ? '' : 's'} más para alcanzar el nivel ${siguienteTitulo}.`
+              : '¡Alcanzaste el nivel máximo!'}
           </Text>
         </GlassPanel>
 
