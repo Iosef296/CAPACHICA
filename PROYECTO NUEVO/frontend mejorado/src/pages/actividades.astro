@@ -628,7 +628,10 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api';
 }
 </style>
 
-<script define:vars={{ API_URL }} is:inline>
+<script define:vars={{ API_URL }}>
+  window.__API_URL__ = API_URL;
+</script>
+<script is:inline>
 /* ── FILTERS ── */
 var activeCat = 'all';
 document.querySelectorAll('.act-pill').forEach(function(pill) {
@@ -760,7 +763,7 @@ async function submitReserva() {
   try {
     var precio = parseInt(document.getElementById('modalPrice').textContent) || 0;
     var esPaquete = actividad.includes('Paquete') || actividad.includes('paquete');
-    var res = await fetch(API_URL + '/reservas', {
+    var res = await fetch(window.__API_URL__ + '/reservas', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nombre: nombre, email: email, fecha_visita: fecha, personas: parseInt(personasEl.value) || 1, actividad: actividad, precio_total: precio, es_paquete: esPaquete, actividades_paquete: esPaquete ? pkgItems : null }),
