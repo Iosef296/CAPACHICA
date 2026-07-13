@@ -163,7 +163,7 @@ const ESTADO_LABEL = {
         }).join('');
 
         lista.querySelectorAll('.tarjetaReserva').forEach(el => {
-            el.addEventListener('click', () => abrirDetalle(Number(el.dataset.id)));
+            el.addEventListener('click', () => abrirDetalle(el.dataset.id));
         });
     }
 

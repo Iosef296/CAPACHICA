@@ -193,7 +193,7 @@ async function authFetch(method: string, path: string, body?: any) {
 
 // ── Mis reservas — mismas reservas que ve el usuario en el sitio web ──
 export type ReservaMia = {
-  id: number; nombre: string; fecha_visita: string; personas: number; idioma?: string;
+  id: string; nombre: string; fecha_visita: string; personas: number; idioma?: string;
   actividad: string; notas?: string | null; precio_total: number;
   es_paquete: boolean; actividades_paquete?: string[] | null;
   estado: 'pendiente' | 'confirmada' | 'cancelada'; created_at: string;
@@ -209,7 +209,7 @@ export const reservas = {
     nombre: string; email: string; fecha_visita: string; personas: number;
     idioma?: string; actividad: string; actividad_id?: number | string;
     notas?: string; precio_total: number;
-  }): Promise<{ success: boolean; reserva_id: number; estado: string }> => {
+  }): Promise<{ success: boolean; reserva_id: string; estado: string }> => {
     if (!API_BASE) throw new Error('Backend no configurado');
     return fetch(`${API_BASE}/reservas`, {
       method: 'POST',
@@ -223,13 +223,13 @@ export const reservas = {
   },
   // Solo mientras la reserva sigue "pendiente" — el backend recalcula el
   // precio_total proporcional a la nueva cantidad de personas.
-  editar: async (id: number, datos: {
+  editar: async (id: string, datos: {
     fecha_visita: string; personas: number; idioma?: string; notas?: string;
   }): Promise<ReservaMia> => {
     const data = await authFetch('PUT', `/reservas/${id}`, datos);
     return data.reserva;
   },
-  cancelar: async (id: number): Promise<ReservaMia> => {
+  cancelar: async (id: string): Promise<ReservaMia> => {
     const data = await authFetch('PATCH', `/reservas/${id}/cancelar`);
     return data.reserva;
   },

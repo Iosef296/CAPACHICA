@@ -18,7 +18,7 @@ export default function MyBookings() {
   const { user } = useAuth();
   const [reservas, setReservas] = useState<ReservaMia[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const router = useRouter();
 
   useLiveRefresh(() => {
