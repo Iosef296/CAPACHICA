@@ -18,7 +18,7 @@ export default function Booking() {
   const [loc, setLoc] = useState('Todas');
   const [activities, setActivities] = useState(mockActivities as any[]);
   const [stays, setStays] = useState(mockStays as any[]);
-  const [reserva, setReserva] = useState<{ title: string; price: number; unit: string } | null>(null);
+  const [reserva, setReserva] = useState<{ title: string; price: number; unit: string; id?: number | string } | null>(null);
   useLiveRefresh(() => {
     api.actividades().then(real => {
       if (real && real.length > 0) {
@@ -43,7 +43,7 @@ export default function Booking() {
         <Text style={styles.sectionTitle}>HOSPEDAJES FAMILIARES</Text>
         <View style={styles.list}>
           {stays.filter(s => loc === 'Todas' || s.community === loc).map(s => (
-            <Pressable key={s.id} style={styles.row} onPress={() => setReserva({ title: s.name, price: s.price, unit: 'noche' })}>
+            <Pressable key={s.id} style={styles.row} onPress={() => setReserva({ title: s.name, price: s.price, unit: 'noche', id: s.id })}>
               <Image source={{ uri: s.img }} style={styles.thumb} />
               <View style={{ flex: 1, gap: 2 }}>
                 <Text style={[typography.labelSm, { color: colors.secondary }]}>{s.community.toUpperCase()}</Text>
@@ -65,7 +65,7 @@ export default function Booking() {
         <Text style={styles.sectionTitle}>TOURS Y ACTIVIDADES</Text>
         <View style={styles.activityGrid}>
           {activities.map(a => (
-            <Pressable key={a.id} style={styles.activityCard} onPress={() => setReserva({ title: a.name, price: a.price, unit: 'persona' })}>
+            <Pressable key={a.id} style={styles.activityCard} onPress={() => setReserva({ title: a.name, price: a.price, unit: 'persona', id: a.id })}>
               <Image source={{ uri: a.img }} style={styles.activityImg} />
               <View style={{ padding: 12, gap: 4 }}>
                 <Text style={[typography.bodyLg, { color: colors.onSurface, fontFamily: 'HankenGrotesk_700Bold' }]} numberOfLines={1}>{a.name}</Text>
@@ -87,6 +87,7 @@ export default function Booking() {
         title={reserva?.title ?? ''}
         pricePerUnit={reserva?.price ?? 0}
         unitLabel={reserva?.unit ?? 'noche'}
+        activityId={reserva?.id}
       />
     </ScrollView>
   );

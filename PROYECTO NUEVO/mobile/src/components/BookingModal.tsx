@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Button } from './Button';
+import { useAuth } from '@/auth/AuthContext';
+import { reservas as reservasApi } from '@/data/api';
 import { colors, radii, spacing, typography } from '@/theme';
 
 type Props = {
@@ -11,23 +12,36 @@ type Props = {
   title: string;
   pricePerUnit: number;
   unitLabel?: string;
+  activityId?: number | string;
 };
 
-export function BookingModal({ visible, onClose, title, pricePerUnit, unitLabel = 'noche' }: Props) {
+export function BookingModal({ visible, onClose, title, pricePerUnit, unitLabel = 'noche', activityId }: Props) {
+  const { user } = useAuth();
   const [days, setDays] = useState(2);
   const [guests, setGuests] = useState(2);
-  const [step, setStep] = useState<'form' | 'success'>('form');
+  const [step, setStep] = useState<'form' | 'saving' | 'success' | 'error' | 'needsLogin'>('form');
 
   const total = days * guests * pricePerUnit;
 
   async function confirm() {
-    const all = JSON.parse((await AsyncStorage.getItem('capachica.reservas')) ?? '[]');
-    all.push({
-      id: Date.now(), title, days, guests, total,
-      createdAt: new Date().toISOString(),
-    });
-    await AsyncStorage.setItem('capachica.reservas', JSON.stringify(all));
-    setStep('success');
+    if (!user?.email) { setStep('needsLogin'); return; }
+    setStep('saving');
+    try {
+      const fechaVisita = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+      await reservasApi.crear({
+        nombre: user.name || user.email,
+        email: user.email,
+        fecha_visita: fechaVisita,
+        personas: guests,
+        actividad: title,
+        actividad_id: activityId,
+        precio_total: total,
+        notas: unitLabel === 'noche' ? `${days} noches` : undefined,
+      });
+      setStep('success');
+    } catch {
+      setStep('error');
+    }
   }
 
   function close() {
@@ -42,7 +56,7 @@ export function BookingModal({ visible, onClose, title, pricePerUnit, unitLabel 
       <View style={styles.sheet}>
         <View style={styles.handle} />
 
-        {step === 'form' ? (
+        {step === 'form' || step === 'saving' ? (
           <>
             <Text style={[typography.labelMd, { color: colors.secondary }]}>RESERVAR</Text>
             <Text style={[typography.headlineMd, { color: colors.onSurface }]} numberOfLines={2}>{title}</Text>
@@ -55,21 +69,49 @@ export function BookingModal({ visible, onClose, title, pricePerUnit, unitLabel 
               <Text style={[typography.headlineMd, { color: colors.primary }]}>S/ {total}</Text>
             </View>
 
-            <Button label="Confirmar reserva" icon="check" onPress={confirm} style={{ marginTop: spacing.gutter }} />
+            {step === 'saving' ? (
+              <View style={{ paddingVertical: spacing.stackSm, alignItems: 'center' }}>
+                <ActivityIndicator color={colors.primary} />
+              </View>
+            ) : (
+              <Button label="Confirmar reserva" icon="check" onPress={confirm} style={{ marginTop: spacing.gutter }} />
+            )}
             <Pressable onPress={close} style={{ alignSelf: 'center', padding: 12 }}>
               <Text style={[typography.labelMd, { color: colors.outline }]}>Cancelar</Text>
             </Pressable>
           </>
+        ) : step === 'needsLogin' ? (
+          <View style={{ alignItems: 'center', paddingVertical: spacing.stackMd }}>
+            <MaterialIcons name="lock-outline" size={48} color={colors.terracotta} />
+            <Text style={[typography.headlineMd, { color: colors.primary, marginTop: spacing.stackMd, textAlign: 'center' }]}>
+              Inicia sesión para reservar
+            </Text>
+            <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, textAlign: 'center', marginTop: 8, paddingHorizontal: spacing.containerPadding }]}>
+              Necesitas una cuenta para que tu reserva quede vinculada a "Mis Reservas".
+            </Text>
+            <Button label="Entendido" onPress={close} style={{ marginTop: spacing.stackMd, alignSelf: 'stretch' }} />
+          </View>
+        ) : step === 'error' ? (
+          <View style={{ alignItems: 'center', paddingVertical: spacing.stackMd }}>
+            <MaterialIcons name="error-outline" size={48} color={colors.error} />
+            <Text style={[typography.headlineMd, { color: colors.primary, marginTop: spacing.stackMd, textAlign: 'center' }]}>
+              No se pudo guardar la reserva
+            </Text>
+            <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, textAlign: 'center', marginTop: 8, paddingHorizontal: spacing.containerPadding }]}>
+              Revisa tu conexión e intenta de nuevo.
+            </Text>
+            <Button label="Reintentar" onPress={() => setStep('form')} style={{ marginTop: spacing.stackMd, alignSelf: 'stretch' }} />
+          </View>
         ) : (
           <View style={{ alignItems: 'center', paddingVertical: spacing.stackMd }}>
             <View style={styles.successIcon}>
               <MaterialIcons name="check" size={48} color="#fff" />
             </View>
             <Text style={[typography.headlineMd, { color: colors.primary, marginTop: spacing.stackMd }]}>
-              ¡Reserva confirmada!
+              ¡Reserva enviada!
             </Text>
             <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, textAlign: 'center', marginTop: 8, paddingHorizontal: spacing.containerPadding }]}>
-              Tu reserva de "{title}" por {days} {unitLabel}{days > 1 ? 's' : ''} ha sido registrada. Te contactaremos por WhatsApp.
+              Tu reserva de "{title}" por {days} {unitLabel}{days > 1 ? 's' : ''} quedó registrada. Te confirmaremos pronto.
             </Text>
             <Text style={[typography.headlineMd, { color: colors.terracotta, marginTop: spacing.gutter }]}>
               S/ {total}

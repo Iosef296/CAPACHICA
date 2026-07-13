@@ -1,34 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Button } from '@/components/Button';
 import { useRouter } from 'expo-router';
+import { useAuth } from '@/auth/AuthContext';
+import { reservas as reservasApi, ReservaMia } from '@/data/api';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
-type Reserva = { id: number; title: string; days: number; guests: number; total: number; createdAt: string };
+const ESTADO_LABEL: Record<string, string> = { pendiente: 'PENDIENTE', confirmada: 'CONFIRMADA', cancelada: 'CANCELADA' };
+const ESTADO_COLOR: Record<string, string> = { pendiente: colors.terracotta, confirmada: colors.secondary, cancelada: colors.error };
 
 export default function MyBookings() {
-  const [reservas, setReservas] = useState<Reserva[]>([]);
+  const { user } = useAuth();
+  const [reservas, setReservas] = useState<ReservaMia[]>([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    AsyncStorage.getItem('capachica.reservas').then(raw => setReservas(raw ? JSON.parse(raw) : []));
-  }, []);
-
-  async function clear() {
-    await AsyncStorage.removeItem('capachica.reservas');
-    setReservas([]);
-  }
+    if (!user) { setLoading(false); return; }
+    reservasApi.mias().then(setReservas).catch(() => setReservas([])).finally(() => setLoading(false));
+  }, [user]);
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaView edges={['top']}>
         <ScreenHeader eyebrow="VIAJES" title="Mis Reservas" back />
 
-        {reservas.length === 0 ? (
+        {loading ? (
+          <View style={styles.empty}>
+            <ActivityIndicator color={colors.primary} />
+          </View>
+        ) : reservas.length === 0 ? (
           <View style={styles.empty}>
             <MaterialIcons name="event-busy" size={64} color={colors.outlineVariant} />
             <Text style={[typography.headlineMd, { color: colors.onSurface, marginTop: spacing.gutter }]}>
@@ -40,24 +44,25 @@ export default function MyBookings() {
             <Button label="Ver experiencias" icon="explore" onPress={() => router.push('/(stacks)/booking')} style={{ marginTop: spacing.stackMd, alignSelf: 'stretch' }} />
           </View>
         ) : (
-          <View style={{ paddingHorizontal: spacing.containerPadding, gap: spacing.gutter, marginTop: spacing.gutter }}>
+          <View style={{ paddingHorizontal: spacing.containerPadding, gap: spacing.gutter, marginTop: spacing.gutter, marginBottom: spacing.stackLg }}>
             {reservas.map(r => (
               <View key={r.id} style={styles.card}>
                 <View style={styles.cardHead}>
-                  <Text style={[typography.labelMd, { color: colors.secondary }]}>CONFIRMADA</Text>
+                  <Text style={[typography.labelMd, { color: ESTADO_COLOR[r.estado] ?? colors.secondary }]}>
+                    {ESTADO_LABEL[r.estado] ?? r.estado.toUpperCase()}
+                  </Text>
                   <Text style={[typography.labelSm, { color: colors.onSurfaceVariant }]}>
-                    {new Date(r.createdAt).toLocaleDateString('es-PE')}
+                    {new Date(r.created_at).toLocaleDateString('es-PE')}
                   </Text>
                 </View>
-                <Text style={[typography.headlineMd, { color: colors.onSurface, marginTop: 4 }]}>{r.title}</Text>
+                <Text style={[typography.headlineMd, { color: colors.onSurface, marginTop: 4 }]}>{r.actividad}</Text>
                 <View style={styles.metaRow}>
-                  <MetaItem icon="event" label={`${r.days} días`} />
-                  <MetaItem icon="group" label={`${r.guests} personas`} />
-                  <MetaItem icon="payments" label={`S/ ${r.total}`} />
+                  <MetaItem icon="event" label={new Date(r.fecha_visita).toLocaleDateString('es-PE')} />
+                  <MetaItem icon="group" label={`${r.personas} personas`} />
+                  <MetaItem icon="payments" label={`S/ ${r.precio_total}`} />
                 </View>
               </View>
             ))}
-            <Button label="Limpiar todas" variant="ghost" icon="delete-outline" onPress={clear} style={{ marginVertical: spacing.stackMd }} />
           </View>
         )}
       </SafeAreaView>
