@@ -1,11 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import * as Google from 'expo-auth-session/providers/google';
-import * as WebBrowser from 'expo-web-browser';
+import { GoogleSignin, isSuccessResponse } from '@react-native-google-signin/google-signin';
 import Constants from 'expo-constants';
 import { api, API_BASE } from '@/data/api';
-
-WebBrowser.maybeCompleteAuthSession();
 
 export type Rol = 'admin' | 'proveedor' | 'turista';
 type User = { id: string; email: string; name: string; avatar?: string; provider: 'email' | 'google'; rol: Rol };
@@ -28,12 +25,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const extra = (Constants.expoConfig?.extra as any) ?? {};
-  const [, response, promptAsync] = Google.useIdTokenAuthRequest({
-    clientId: extra.googleClientIdWeb,
-    androidClientId: extra.googleClientIdAndroid,
-    iosClientId: extra.googleClientIdIos,
-    webClientId: extra.googleClientIdWeb,
-  });
+
+  useEffect(() => {
+    GoogleSignin.configure({ webClientId: extra.googleClientIdWeb });
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -42,13 +37,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     })();
   }, []);
-
-  useEffect(() => {
-    if (response?.type === 'success') {
-      const idToken = response.params?.id_token;
-      if (idToken) hydrateGoogle(idToken);
-    }
-  }, [response]);
 
   async function hydrateGoogle(idToken: string) {
     try {
@@ -97,7 +85,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await SecureStore.setItemAsync(KEY, JSON.stringify(u));
       if (res?.accessToken) await SecureStore.setItemAsync('capachica.token', res.accessToken);
     },
-    async signInGoogle() { await promptAsync(); },
+    async signInGoogle() {
+      await GoogleSignin.hasPlayServices();
+      const res = await GoogleSignin.signIn();
+      if (isSuccessResponse(res) && res.data.idToken) {
+        await hydrateGoogle(res.data.idToken);
+      }
+    },
     async signOut() {
       setUser(null);
       await SecureStore.deleteItemAsync(KEY);
