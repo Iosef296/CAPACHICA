@@ -39,7 +39,8 @@
       "expo-router",
       "expo-font",
       "expo-secure-store",
-      "expo-dev-client"
+      "expo-dev-client",
+      "@react-native-google-signin/google-signin"
     ],
     "experiments": {
       "typedRoutes": true

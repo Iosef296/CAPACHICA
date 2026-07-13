@@ -20,7 +20,7 @@
     },
     "production": {
       "channel": "production",
-      "android": { "buildType": "app-bundle" },
+      "android": { "buildType": "apk" },
       "autoIncrement": true
     }
   },
