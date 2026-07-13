@@ -3,6 +3,7 @@ import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/Button';
 import { useAuth } from '@/auth/AuthContext';
 import { reservas as reservasApi, ReservaMia, API_WS } from '@/data/api';
@@ -13,6 +14,7 @@ import { colors, radii, spacing, typography } from '@/theme';
 export default function Profile() {
   const { user, signOut } = useAuth();
   const router = useRouter();
+  const { t } = useTranslation();
   const [reservasList, setReservasList] = useState<ReservaMia[]>([]);
   const { all: ratingsAll } = useRatings();
 
@@ -50,28 +52,28 @@ export default function Profile() {
         </View>
 
         <View style={styles.stats}>
-          <Stat label="Viajes" value={viajes} />
-          <Stat label="Reseñas" value={resenas} />
-          <Stat label="Reservas" value={totalReservas} />
+          <Stat label={t('profile.viajes')} value={viajes} />
+          <Stat label={t('profile.resenas')} value={resenas} />
+          <Stat label={t('profile.reservas')} value={totalReservas} />
         </View>
 
         <View style={styles.menu}>
           {user?.rol === 'admin' && (
-            <MenuItem icon="admin-panel-settings" label="Usuarios" onPress={() => router.push('/(stacks)/manage-users')} />
+            <MenuItem icon="admin-panel-settings" label={t('profile.menu.usuarios')} onPress={() => router.push('/(stacks)/manage-users')} />
           )}
           {esEmprendedor && (
-            <MenuItem icon="storefront" label="Mi negocio" onPress={() => router.push('/(stacks)/my-business')} />
+            <MenuItem icon="storefront" label={t('profile.menu.miNegocio')} onPress={() => router.push('/(stacks)/my-business')} />
           )}
-          <MenuItem icon="auto-awesome" label="Mis rutas y favoritos" onPress={() => router.push('/(stacks)/profile-extended')} />
-          <MenuItem icon="bookmark" label="Mis reservas" onPress={() => router.push('/(stacks)/my-bookings')} />
-          <MenuItem icon="favorite" label="Favoritos" onPress={() => router.push('/(stacks)/favorites')} />
-          <MenuItem icon="menu-book" label="Guías de viaje" onPress={() => router.push('/(stacks)/guides?type=travel')} />
-          <MenuItem icon="settings" label="Configuración" onPress={() => router.push('/(stacks)/settings')} />
-          <MenuItem icon="help-outline" label="Ayuda" onPress={() => router.push('/(stacks)/help')} />
+          <MenuItem icon="auto-awesome" label={t('profile.menu.misRutas')} onPress={() => router.push('/(stacks)/profile-extended')} />
+          <MenuItem icon="bookmark" label={t('profile.menu.misReservas')} onPress={() => router.push('/(stacks)/my-bookings')} />
+          <MenuItem icon="favorite" label={t('profile.menu.favoritos')} onPress={() => router.push('/(stacks)/favorites')} />
+          <MenuItem icon="menu-book" label={t('profile.menu.guias')} onPress={() => router.push('/(stacks)/guides?type=travel')} />
+          <MenuItem icon="settings" label={t('profile.menu.configuracion')} onPress={() => router.push('/(stacks)/settings')} />
+          <MenuItem icon="help-outline" label={t('profile.menu.ayuda')} onPress={() => router.push('/(stacks)/help')} />
         </View>
 
         <View style={{ paddingHorizontal: spacing.containerPadding, marginTop: spacing.stackMd, marginBottom: spacing.stackLg }}>
-          <Button label="Cerrar sesión" variant="ghost" icon="logout" onPress={signOut} />
+          <Button label={t('profile.cerrarSesion')} variant="ghost" icon="logout" onPress={signOut} />
         </View>
       </SafeAreaView>
     </ScrollView>

@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from '@/auth/AuthContext';
 import { colors } from '@/theme';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { loadSavedLanguage } from '@/i18n';
 
 function Gate() {
   const { user, loading } = useAuth();
@@ -39,6 +40,10 @@ export default function RootLayout() {
     HankenGrotesk_500Medium,
     HankenGrotesk_700Bold,
   });
+
+  useEffect(() => {
+    loadSavedLanguage();
+  }, []);
 
   if (!loaded) {
     return (

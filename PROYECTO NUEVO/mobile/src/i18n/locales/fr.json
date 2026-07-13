@@ -1,0 +1,35 @@
+{
+  "langName": "Français",
+  "tabs": { "inicio": "Accueil", "mapa": "Carte", "intiAI": "Inti AI", "experiencias": "Expériences", "perfil": "Profil" },
+  "home": {
+    "brand": "CAPACHICA · AI",
+    "heroTitle": "Vivez Capachica, découvrez sa culture, partagez des expériences",
+    "heroSubtitle": "Découvrez le cœur du lac Titicaca à travers un regard intelligent et ancestral.",
+    "ctaCrear": "Créer mon expérience avec l'IA",
+    "sectionExplora": "EXPLORER",
+    "sectionHistorias": "HISTOIRES DE VOYAGEURS",
+    "sectionRecomendaciones": "Recommandé pour vous",
+    "verTodo": "Tout voir",
+    "sectionDestacados": "À la une aujourd'hui",
+    "categorias": {
+      "comunidades": "Communautés", "gastronomia": "Gastronomie", "artesania": "Artisanat",
+      "reservas": "Réservations", "ar": "RA", "guias": "Guides", "mapaGoogle": "Carte Google",
+      "chatInti": "Chat Inti", "festividades": "Festivités"
+    }
+  },
+  "settings": {
+    "eyebrow": "COMPTE", "titulo": "Paramètres",
+    "preferencias": "PRÉFÉRENCES", "notificaciones": "Notifications push",
+    "newsletter": "Newsletter mensuelle", "modoOscuro": "Mode sombre (bientôt)",
+    "idioma": "LANGUE", "acercaDe": "À PROPOS", "version": "Version", "build": "Build",
+    "copyright": "© 2026 Capachica AI"
+  },
+  "profile": {
+    "viajes": "Voyages", "resenas": "Avis", "reservas": "Réservations", "cerrarSesion": "Se déconnecter",
+    "menu": {
+      "usuarios": "Utilisateurs", "miNegocio": "Mon entreprise", "misRutas": "Mes parcours et favoris",
+      "misReservas": "Mes réservations", "favoritos": "Favoris", "guias": "Guides de voyage",
+      "configuracion": "Paramètres", "ayuda": "Aide"
+    }
+  }
+}

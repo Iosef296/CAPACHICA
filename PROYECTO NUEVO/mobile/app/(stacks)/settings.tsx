@@ -3,58 +3,67 @@ import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-nat
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { setAppLanguage, LangCode } from '@/i18n';
 import { colors, radii, spacing, typography } from '@/theme';
 
-type Settings = {
-  notifications: boolean;
-  newsletter: boolean;
-  darkMode: boolean;
-  language: string;
-};
+type Prefs = { notifications: boolean; newsletter: boolean; darkMode: boolean };
 
 const KEY = 'capachica.settings';
-const DEFAULT: Settings = { notifications: true, newsletter: false, darkMode: false, language: 'Español' };
-const LANGS = ['Español', 'English', 'Quechua', 'Aymara'];
+const DEFAULT: Prefs = { notifications: true, newsletter: false, darkMode: false };
+const LANGS: { code: LangCode; name: string }[] = [
+  { code: 'es', name: 'Español' },
+  { code: 'en', name: 'English' },
+  { code: 'fr', name: 'Français' },
+  { code: 'qu', name: 'Runasimi' },
+  { code: 'ay', name: 'Aymar aru' },
+];
 
 export default function SettingsScreen() {
-  const [s, setS] = useState<Settings>(DEFAULT);
+  const { t, i18n } = useTranslation();
+  const [p, setP] = useState<Prefs>(DEFAULT);
 
   useEffect(() => {
-    AsyncStorage.getItem(KEY).then(raw => raw && setS({ ...DEFAULT, ...JSON.parse(raw) }));
+    AsyncStorage.getItem(KEY).then(raw => raw && setP({ ...DEFAULT, ...JSON.parse(raw) }));
   }, []);
 
-  function update<K extends keyof Settings>(k: K, v: Settings[K]) {
-    const next = { ...s, [k]: v };
-    setS(next);
+  function update<K extends keyof Prefs>(k: K, v: Prefs[K]) {
+    const next = { ...p, [k]: v };
+    setP(next);
     AsyncStorage.setItem(KEY, JSON.stringify(next));
   }
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaView edges={['top']}>
-        <ScreenHeader eyebrow="CUENTA" title="Configuración" back />
+        <ScreenHeader eyebrow={t('settings.eyebrow')} title={t('settings.titulo')} back />
 
-        <Group title="PREFERENCIAS">
-          <ToggleRow icon="notifications" label="Notificaciones push" value={s.notifications} onChange={v => update('notifications', v)} />
-          <ToggleRow icon="mail-outline" label="Newsletter mensual" value={s.newsletter} onChange={v => update('newsletter', v)} />
-          <ToggleRow icon="dark-mode" label="Modo oscuro (próximamente)" value={s.darkMode} onChange={v => update('darkMode', v)} disabled />
+        <Group title={t('settings.preferencias')}>
+          <ToggleRow icon="notifications" label={t('settings.notificaciones')} value={p.notifications} onChange={v => update('notifications', v)} />
+          <ToggleRow icon="mail-outline" label={t('settings.newsletter')} value={p.newsletter} onChange={v => update('newsletter', v)} />
+          <ToggleRow icon="dark-mode" label={t('settings.modoOscuro')} value={p.darkMode} onChange={v => update('darkMode', v)} disabled />
         </Group>
 
-        <Group title="IDIOMA">
+        <Group title={t('settings.idioma')}>
           {LANGS.map(l => (
-            <Pressable key={l} style={styles.row} onPress={() => update('language', l)}>
+            <Pressable key={l.code} style={styles.row} onPress={() => setAppLanguage(l.code)}>
               <MaterialIcons name="language" size={22} color={colors.primary} />
-              <Text style={[typography.bodyLg, { color: colors.onSurface, flex: 1 }]}>{l}</Text>
-              {s.language === l && <MaterialIcons name="check" size={22} color={colors.terracotta} />}
+              <Text style={[typography.bodyLg, { color: colors.onSurface, flex: 1 }]}>{l.name}</Text>
+              {i18n.language === l.code && <MaterialIcons name="check" size={22} color={colors.terracotta} />}
             </Pressable>
           ))}
+          {(i18n.language === 'qu' || i18n.language === 'ay') && (
+            <Text style={styles.aviso}>
+              Traducción aproximada, en revisión por hablantes nativos.
+            </Text>
+          )}
         </Group>
 
-        <Group title="ACERCA DE">
-          <InfoRow icon="info" label="Versión" value="0.1.0 · MVP" />
-          <InfoRow icon="code" label="Build" value="Expo SDK 54" />
-          <InfoRow icon="copyright" label="© 2026 Capachica AI" />
+        <Group title={t('settings.acercaDe')}>
+          <InfoRow icon="info" label={t('settings.version')} value="0.1.0 · MVP" />
+          <InfoRow icon="code" label={t('settings.build')} value="Expo SDK 54" />
+          <InfoRow icon="copyright" label={t('settings.copyright')} />
         </Group>
       </SafeAreaView>
     </ScrollView>
@@ -95,4 +104,5 @@ const styles = StyleSheet.create({
   groupTitle: { ...typography.labelMd, color: colors.onSurfaceVariant, marginBottom: spacing.stackSm },
   card: { backgroundColor: colors.surfaceContainerLowest, borderRadius: radii.lg, overflow: 'hidden' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, paddingHorizontal: spacing.gutter, borderBottomWidth: 1, borderBottomColor: colors.outlineVariant },
+  aviso: { ...typography.labelSm, color: colors.onSurfaceVariant, fontStyle: 'italic', padding: spacing.gutter },
 });

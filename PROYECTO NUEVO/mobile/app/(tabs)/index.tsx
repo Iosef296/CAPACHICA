@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/Button';
 import { StoryAvatar } from '@/components/StoryAvatar';
 import { PhotoCard } from '@/components/Card';
@@ -14,20 +15,22 @@ import { stories, recommendations, highlights } from '@/data/mock';
 
 const HERO = 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1600';
 
-const CATEGORIES = [
-  { key: 'communities',  icon: 'groups',      label: 'Comunidades', path: '/(stacks)/communities' },
-  { key: 'gastronomy',   icon: 'restaurant',  label: 'Gastronomía', path: '/(stacks)/gastronomy' },
-  { key: 'crafts',       icon: 'palette',     label: 'Artesanía',   path: '/(stacks)/crafts' },
-  { key: 'booking',      icon: 'event-available', label: 'Reservas', path: '/(stacks)/booking' },
-  { key: 'ar',           icon: 'view-in-ar',  label: 'AR',          path: '/(stacks)/ar' },
-  { key: 'guides',       icon: 'menu-book',   label: 'Guías',       path: '/(stacks)/guides?type=cultural' },
-  { key: 'map-google',   icon: 'map',         label: 'Mapa Google', path: '/(stacks)/map-google' },
-  { key: 'killa-chat',   icon: 'auto-awesome', label: 'Chat Inti',  path: '/(stacks)/killa-chat' },
-  { key: 'festividades', icon: 'celebration', label: 'Festividades', path: '/(stacks)/festividades' },
-] as const;
-
 export default function Home() {
   const router = useRouter();
+  const { t } = useTranslation();
+
+  const CATEGORIES = [
+    { key: 'communities',  icon: 'groups',      label: t('home.categorias.comunidades'), path: '/(stacks)/communities' },
+    { key: 'gastronomy',   icon: 'restaurant',  label: t('home.categorias.gastronomia'), path: '/(stacks)/gastronomy' },
+    { key: 'crafts',       icon: 'palette',     label: t('home.categorias.artesania'),   path: '/(stacks)/crafts' },
+    { key: 'booking',      icon: 'event-available', label: t('home.categorias.reservas'), path: '/(stacks)/booking' },
+    { key: 'ar',           icon: 'view-in-ar',  label: t('home.categorias.ar'),          path: '/(stacks)/ar' },
+    { key: 'guides',       icon: 'menu-book',   label: t('home.categorias.guias'),       path: '/(stacks)/guides?type=cultural' },
+    { key: 'map-google',   icon: 'map',         label: t('home.categorias.mapaGoogle'), path: '/(stacks)/map-google' },
+    { key: 'killa-chat',   icon: 'auto-awesome', label: t('home.categorias.chatInti'),  path: '/(stacks)/killa-chat' },
+    { key: 'festividades', icon: 'celebration', label: t('home.categorias.festividades'), path: '/(stacks)/festividades' },
+  ] as const;
+
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }} showsVerticalScrollIndicator={false}>
       <ImageBackground source={{ uri: HERO }} style={styles.hero}>
@@ -39,24 +42,24 @@ export default function Home() {
           <View style={[styles.topBar, { marginTop: 8 }]}>
             <View style={styles.brand}>
               <MaterialIcons name="auto-awesome" color={colors.sunGold} size={20} />
-              <Text style={[typography.labelMd, { color: '#fff' }]}>CAPACHICA · AI</Text>
+              <Text style={[typography.labelMd, { color: '#fff' }]}>{t('home.brand')}</Text>
             </View>
             <MaterialIcons name="notifications-none" color="#fff" size={24} />
           </View>
 
           <View style={{ marginTop: 'auto', padding: spacing.containerPadding }}>
             <Text style={[typography.headlineLgMobile, { color: '#fff' }]}>
-              Vive Capachica, conoce su cultura, comparte experiencias
+              {t('home.heroTitle')}
             </Text>
             <Text style={[typography.bodyMd, { color: 'rgba(255,255,255,0.85)', marginTop: 8, marginBottom: spacing.stackMd }]}>
-              Descubre el corazón del Titicaca a través de una lente inteligente y ancestral.
+              {t('home.heroSubtitle')}
             </Text>
-            <Button label="Crear mi experiencia con IA" variant="killa" icon="auto-awesome" onPress={() => router.push('/(stacks)/killa-chat')} />
+            <Button label={t('home.ctaCrear')} variant="killa" icon="auto-awesome" onPress={() => router.push('/(stacks)/killa-chat')} />
           </View>
         </SafeAreaView>
       </ImageBackground>
 
-      <Section title="EXPLORA" small>
+      <Section title={t('home.sectionExplora')} small>
         <View style={styles.catGrid}>
           {CATEGORIES.map(c => (
             <Pressable key={c.key} style={styles.catCard} onPress={() => router.push(c.path as any)}>
@@ -69,13 +72,13 @@ export default function Home() {
         </View>
       </Section>
 
-      <Section title="HISTORIAS DE VIAJEROS" small>
+      <Section title={t('home.sectionHistorias')} small>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.gutter, paddingHorizontal: spacing.containerPadding }}>
           {stories.map(s => <StoryAvatar key={s.id} name={s.name} image={s.image} />)}
         </ScrollView>
       </Section>
 
-      <Section title="Recomendaciones para ti" link="Ver todo">
+      <Section title={t('home.sectionRecomendaciones')} link={t('home.verTodo')}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.gutter, paddingHorizontal: spacing.containerPadding }}>
           {recommendations.map(r => (
             <PhotoCard key={r.id}
@@ -87,7 +90,7 @@ export default function Home() {
         </ScrollView>
       </Section>
 
-      <Section title="Destacados del día">
+      <Section title={t('home.sectionDestacados')}>
         <View style={{ gap: spacing.gutter, paddingHorizontal: spacing.containerPadding }}>
           {highlights.map(h => (
             <HighlightRow key={h.id} image={h.image} category={h.category} title={h.title} subtitle={h.subtitle} />
