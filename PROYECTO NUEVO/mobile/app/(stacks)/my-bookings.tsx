@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -6,7 +6,8 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { Button } from '@/components/Button';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/auth/AuthContext';
-import { reservas as reservasApi, ReservaMia } from '@/data/api';
+import { reservas as reservasApi, ReservaMia, API_WS } from '@/data/api';
+import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
 const ESTADO_LABEL: Record<string, string> = { pendiente: 'PENDIENTE', confirmada: 'CONFIRMADA', cancelada: 'CANCELADA' };
@@ -18,10 +19,10 @@ export default function MyBookings() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
+  useLiveRefresh(() => {
     if (!user) { setLoading(false); return; }
     reservasApi.mias().then(setReservas).catch(() => setReservas([])).finally(() => setLoading(false));
-  }, [user]);
+  }, { url: API_WS, channels: ['reservas'] });
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>

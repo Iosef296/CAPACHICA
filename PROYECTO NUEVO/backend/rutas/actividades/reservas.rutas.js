@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const { query }  = require('../../config/postgres');
 const { autenticacionMiddleware } = require('../../middleware/autenticacion.middleware');
+const { broadcast } = require('../../ws');
 
 const router = Router();
 
@@ -52,6 +53,8 @@ router.post('/', async (req, res) => {
                 actividades_paquete ? JSON.stringify(actividades_paquete) : null,
             ]
         );
+
+        broadcast('reservas');
 
         res.status(201).json({
             success: true,
@@ -111,6 +114,7 @@ router.patch('/:id', async (req, res) => {
             [estado, req.params.id]
         );
         if (!rows.length) return res.status(404).json({ error: 'Reserva no encontrada' });
+        broadcast('reservas');
         res.json({ success: true, reserva: rows[0] });
     } catch (err) {
         res.status(500).json({ error: 'Error al actualizar' });
