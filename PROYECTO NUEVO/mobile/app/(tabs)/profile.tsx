@@ -50,8 +50,9 @@ export default function Profile() {
   // Una reserva "pendiente" todavia no es un viaje -- solo cuenta si un
   // admin la confirmo de verdad.
   const viajes = reservasList.filter(r => r.estado === 'confirmada').length;
+  const totalReservas = reservasList.length;
   const resenas = Object.keys(ratingsAll).length;
-  const { nivel, titulo, insignias, siguienteTitulo, faltan } = calcularNivel(viajes);
+  const { nivel, titulo, siguienteTitulo, faltan } = calcularNivel(viajes);
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
@@ -77,7 +78,7 @@ export default function Profile() {
         <View style={styles.stats}>
           <Stat label="Viajes" value={viajes} />
           <Stat label="Reseñas" value={resenas} />
-          <Stat label="Insignias" value={insignias} />
+          <Stat label="Reservas" value={totalReservas} />
         </View>
 
         <GlassPanel style={{ marginHorizontal: spacing.containerPadding, marginTop: spacing.stackMd }}>
