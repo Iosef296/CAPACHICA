@@ -70,7 +70,7 @@ export default function Login() {
             <Button label="Continuar con Google" variant="ghost" icon="login" onPress={signInGoogle} />
             <Pressable onPress={() => router.push('/(auth)/register')} style={{ marginTop: spacing.gutter, alignItems: 'center' }}>
               <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant }]}>
-                ¿No tenés cuenta? <Text style={{ color: colors.primary, fontFamily: 'HankenGrotesk_700Bold' }}>Regístrate</Text>
+                ¿No tienes cuenta? <Text style={{ color: colors.primary, fontFamily: 'HankenGrotesk_700Bold' }}>Regístrate</Text>
               </Text>
             </Pressable>
           </View>

@@ -75,11 +75,11 @@ export default function Register() {
             )}
             <Button label={busy ? 'Creando cuenta…' : 'Crear cuenta'} onPress={submit} style={{ marginTop: spacing.stackMd }} />
             <Text style={[typography.labelSm, { color: colors.onSurfaceVariant, textAlign: 'center', marginTop: spacing.gutter }]}>
-              ¿Tenés un negocio? Regístrate igual — un admin puede habilitarte como emprendedor después.
+              ¿Tienes un negocio? Regístrate igual — un admin puede habilitarte como emprendedor después.
             </Text>
             <Pressable onPress={() => router.back()} style={{ marginTop: spacing.gutter, alignItems: 'center' }}>
               <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant }]}>
-                ¿Ya tenés cuenta? <Text style={{ color: colors.primary, fontFamily: 'HankenGrotesk_700Bold' }}>Inicia sesión</Text>
+                ¿Ya tienes cuenta? <Text style={{ color: colors.primary, fontFamily: 'HankenGrotesk_700Bold' }}>Inicia sesión</Text>
               </Text>
             </Pressable>
           </View>

@@ -113,7 +113,7 @@ export default function MyBusiness() {
           <View style={{ padding: spacing.containerPadding, gap: spacing.gutter }}>
             <MaterialIcons name="storefront" size={48} color={colors.outline} style={{ alignSelf: 'center' }} />
             <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, textAlign: 'center' }]}>
-              Todavía sos turista. Pedile a un administrador que te habilite como emprendedor para poder crear y gestionar tu propio negocio en la app.
+              Todavía eres turista. Pídele a un administrador que te habilite como emprendedor para poder crear y gestionar tu propio negocio en la app.
             </Text>
             <Pressable onPress={() => refreshProfile()} style={styles.refreshBtn}>
               <MaterialIcons name="refresh" size={18} color={colors.primary} />
@@ -141,7 +141,7 @@ export default function MyBusiness() {
 
   async function pickImage() {
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!perm.granted) { Alert.alert('Permiso necesario', 'Habilitá acceso a tus fotos para subir una imagen.'); return; }
+    if (!perm.granted) { Alert.alert('Permiso necesario', 'Habilita el acceso a tus fotos para subir una imagen.'); return; }
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8 });
     if (result.canceled || !result.assets?.[0]) return;
     setUploading(true);
@@ -163,7 +163,7 @@ export default function MyBusiness() {
     (cfg.numberFields || []).forEach(f => {
       if (body[f] !== undefined && body[f] !== '') body[f] = Number(body[f]);
     });
-    if (!body[cfg.fields[0].key]) { Alert.alert('Falta información', `Completá "${cfg.fields[0].label}".`); return; }
+    if (!body[cfg.fields[0].key]) { Alert.alert('Falta información', `Completa "${cfg.fields[0].label}".`); return; }
     setSaving(true);
     try {
       if (edit.id) await negocios.editar(cfg.key, edit.id, body);

@@ -172,9 +172,9 @@ export const api = {
 };
 
 // ── "Mi negocio" — CRUD autenticado para emprendedores/admin ──
-// Mismos 6 recursos que ya se leen arriba, pero acá con el JWT real
+// Mismos 6 recursos que ya se leen arriba, pero aquí con el JWT real
 // (guardado en login/registro) para crear/editar/eliminar SOLO lo
-// que uno mismo creo (o cualquier cosa, si sos admin — lo valida el
+// que uno mismo creó (o cualquier cosa, si eres admin — lo valida el
 // backend, no el mobile).
 export type TipoNegocio = 'comunidades' | 'hospedajes' | 'artesania' | 'festividades' | 'maestros' | 'guias';
 
