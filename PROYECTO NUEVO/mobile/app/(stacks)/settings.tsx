@@ -6,12 +6,12 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { setAppLanguage, LangCode } from '@/i18n';
-import { colors, radii, spacing, typography } from '@/theme';
+import { colors, radii, spacing, typography, useThemeMode, setThemeMode } from '@/theme';
 
-type Prefs = { notifications: boolean; newsletter: boolean; darkMode: boolean };
+type Prefs = { notifications: boolean; newsletter: boolean };
 
 const KEY = 'capachica.settings';
-const DEFAULT: Prefs = { notifications: true, newsletter: false, darkMode: false };
+const DEFAULT: Prefs = { notifications: true, newsletter: false };
 const LANGS: { code: LangCode; name: string }[] = [
   { code: 'es', name: 'Español' },
   { code: 'en', name: 'English' },
@@ -23,6 +23,7 @@ const LANGS: { code: LangCode; name: string }[] = [
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
   const [p, setP] = useState<Prefs>(DEFAULT);
+  const themeMode = useThemeMode();
 
   useEffect(() => {
     AsyncStorage.getItem(KEY).then(raw => raw && setP({ ...DEFAULT, ...JSON.parse(raw) }));
@@ -42,7 +43,7 @@ export default function SettingsScreen() {
         <Group title={t('settings.preferencias')}>
           <ToggleRow icon="notifications" label={t('settings.notificaciones')} value={p.notifications} onChange={v => update('notifications', v)} />
           <ToggleRow icon="mail-outline" label={t('settings.newsletter')} value={p.newsletter} onChange={v => update('newsletter', v)} />
-          <ToggleRow icon="dark-mode" label={t('settings.modoOscuro')} value={p.darkMode} onChange={v => update('darkMode', v)} disabled />
+          <ToggleRow icon="dark-mode" label={t('settings.modoOscuro')} value={themeMode === 'dark'} onChange={(v: boolean) => setThemeMode(v ? 'dark' : 'light')} />
         </Group>
 
         <Group title={t('settings.idioma')}>

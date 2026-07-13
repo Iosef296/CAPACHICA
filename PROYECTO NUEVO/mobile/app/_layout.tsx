@@ -4,7 +4,7 @@ import { useFonts, EBGaramond_600SemiBold, EBGaramond_700Bold } from '@expo-goog
 import { HankenGrotesk_400Regular, HankenGrotesk_500Medium, HankenGrotesk_700Bold } from '@expo-google-fonts/hanken-grotesk';
 import { ActivityIndicator, View } from 'react-native';
 import { AuthProvider, useAuth } from '@/auth/AuthContext';
-import { colors } from '@/theme';
+import { colors, useThemeMode, loadSavedThemeMode } from '@/theme';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { loadSavedLanguage } from '@/i18n';
@@ -41,8 +41,11 @@ export default function RootLayout() {
     HankenGrotesk_700Bold,
   });
 
+  const themeMode = useThemeMode();
+
   useEffect(() => {
     loadSavedLanguage();
+    loadSavedThemeMode();
   }, []);
 
   if (!loaded) {
@@ -54,9 +57,9 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider key={themeMode}>
       <AuthProvider>
-        <StatusBar style="dark" />
+        <StatusBar style={themeMode === 'dark' ? 'light' : 'dark'} />
         <Gate />
       </AuthProvider>
     </SafeAreaProvider>

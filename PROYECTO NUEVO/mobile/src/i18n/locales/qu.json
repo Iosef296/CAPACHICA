@@ -1,7 +1,13 @@
 {
   "langName": "Runasimi",
   "approximate": true,
-  "tabs": { "inicio": "Qallariy", "mapa": "Mapa", "intiAI": "Inti AI", "experiencias": "Ruwaykuna", "perfil": "Perfil" },
+  "tabs": {
+    "inicio": "Qallariy",
+    "mapa": "Mapa",
+    "intiAI": "Inti AI",
+    "experiencias": "Ruwaykuna",
+    "perfil": "Perfil"
+  },
   "home": {
     "brand": "CAPACHICA · AI",
     "heroTitle": "Capachicapi kawsay, kawsayninta riqsiy, ruwaykunata rakiy",
@@ -13,24 +19,44 @@
     "verTodo": "Llapanta qhaway",
     "sectionDestacados": "Kunan p'unchaw sumaqkuna",
     "categorias": {
-      "comunidades": "Ayllukuna", "gastronomia": "Mikhuykuna", "artesania": "Ruwasqakuna",
-      "reservas": "Reservas", "ar": "AR", "guias": "Pusaqkuna", "mapaGoogle": "Google Mapa",
-      "chatInti": "Inti Rimay", "festividades": "Raymikuna"
+      "comunidades": "Ayllukuna",
+      "gastronomia": "Mikhuykuna",
+      "artesania": "Ruwasqakuna",
+      "reservas": "Reservas",
+      "ar": "AR",
+      "guias": "Pusaqkuna",
+      "mapaGoogle": "Google Mapa",
+      "chatInti": "Inti Rimay",
+      "festividades": "Raymikuna"
     }
   },
   "settings": {
-    "eyebrow": "QILLQA", "titulo": "Allichay",
-    "preferencias": "MUNASQAKUNA", "notificaciones": "Willakuykuna",
-    "newsletter": "Killantin willakuy", "modoOscuro": "Tuta rikch'ay (qhipaman)",
-    "idioma": "SIMI", "acercaDe": "CHAYMANTA", "version": "Versión", "build": "Build",
+    "eyebrow": "QILLQA",
+    "titulo": "Allichay",
+    "preferencias": "MUNASQAKUNA",
+    "notificaciones": "Willakuykuna",
+    "newsletter": "Killantin willakuy",
+    "modoOscuro": "Tuta rikch'ay",
+    "idioma": "SIMI",
+    "acercaDe": "CHAYMANTA",
+    "version": "Versión",
+    "build": "Build",
     "copyright": "© 2026 Capachica AI"
   },
   "profile": {
-    "viajes": "Puriykuna", "resenas": "Rimaykuna", "reservas": "Reservas", "cerrarSesion": "Lluqsiy",
+    "viajes": "Puriykuna",
+    "resenas": "Rimaykuna",
+    "reservas": "Reservas",
+    "cerrarSesion": "Lluqsiy",
     "menu": {
-      "usuarios": "Runakuna", "miNegocio": "Negociuy", "misRutas": "Ñankuna",
-      "misReservas": "Reservaykuna", "favoritos": "Munasqaykuna", "guias": "Purina pusaqkuna",
-      "configuracion": "Allichay", "ayuda": "Yanapay"
+      "usuarios": "Runakuna",
+      "miNegocio": "Negociuy",
+      "misRutas": "Ñankuna",
+      "misReservas": "Reservaykuna",
+      "favoritos": "Munasqaykuna",
+      "guias": "Purina pusaqkuna",
+      "configuracion": "Allichay",
+      "ayuda": "Yanapay"
     }
   }
 }

@@ -1,7 +1,13 @@
 {
   "langName": "Aymar aru",
   "approximate": true,
-  "tabs": { "inicio": "Qalltawi", "mapa": "Mapa", "intiAI": "Inti AI", "experiencias": "Luratanaka", "perfil": "Perfil" },
+  "tabs": {
+    "inicio": "Qalltawi",
+    "mapa": "Mapa",
+    "intiAI": "Inti AI",
+    "experiencias": "Luratanaka",
+    "perfil": "Perfil"
+  },
   "home": {
     "brand": "CAPACHICA · AI",
     "heroTitle": "Capachica markana jakasiña, sartawinapa uñt'aña, luratanaka lakisiña",
@@ -13,24 +19,44 @@
     "verTodo": "Taqpacha uñjaña",
     "sectionDestacados": "Jichha uru askinaka",
     "categorias": {
-      "comunidades": "Markanaka", "gastronomia": "Manq'anaka", "artesania": "Luratanaka",
-      "reservas": "Reservas", "ar": "AR", "guias": "Irpirinaka", "mapaGoogle": "Google Mapa",
-      "chatInti": "Inti Aru", "festividades": "Fiestanaka"
+      "comunidades": "Markanaka",
+      "gastronomia": "Manq'anaka",
+      "artesania": "Luratanaka",
+      "reservas": "Reservas",
+      "ar": "AR",
+      "guias": "Irpirinaka",
+      "mapaGoogle": "Google Mapa",
+      "chatInti": "Inti Aru",
+      "festividades": "Fiestanaka"
     }
   },
   "settings": {
-    "eyebrow": "QILLQAT", "titulo": "Askichawi",
-    "preferencias": "MUNATANAKA", "notificaciones": "Yatiyawinaka",
-    "newsletter": "Phaxsi sapa yatiyawi", "modoOscuro": "Ch'amaka uñnaqa (qhipuru)",
-    "idioma": "ARU", "acercaDe": "UKATXA", "version": "Versión", "build": "Build",
+    "eyebrow": "QILLQAT",
+    "titulo": "Askichawi",
+    "preferencias": "MUNATANAKA",
+    "notificaciones": "Yatiyawinaka",
+    "newsletter": "Phaxsi sapa yatiyawi",
+    "modoOscuro": "Ch'amaka uñnaqa",
+    "idioma": "ARU",
+    "acercaDe": "UKATXA",
+    "version": "Versión",
+    "build": "Build",
     "copyright": "© 2026 Capachica AI"
   },
   "profile": {
-    "viajes": "Sarnaqawinaka", "resenas": "Arsuwinaka", "reservas": "Reservas", "cerrarSesion": "Mistuña",
+    "viajes": "Sarnaqawinaka",
+    "resenas": "Arsuwinaka",
+    "reservas": "Reservas",
+    "cerrarSesion": "Mistuña",
     "menu": {
-      "usuarios": "Jaqinaka", "miNegocio": "Nayan negociojj", "misRutas": "Nayan thakinaka",
-      "misReservas": "Nayan reservanaka", "favoritos": "Munatanaka", "guias": "Sarnaqäwi irpirinaka",
-      "configuracion": "Askichawi", "ayuda": "Yanapt'awi"
+      "usuarios": "Jaqinaka",
+      "miNegocio": "Nayan negociojj",
+      "misRutas": "Nayan thakinaka",
+      "misReservas": "Nayan reservanaka",
+      "favoritos": "Munatanaka",
+      "guias": "Sarnaqäwi irpirinaka",
+      "configuracion": "Askichawi",
+      "ayuda": "Yanapt'awi"
     }
   }
 }

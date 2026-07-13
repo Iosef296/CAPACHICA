@@ -1,6 +1,12 @@
 {
   "langName": "English",
-  "tabs": { "inicio": "Home", "mapa": "Map", "intiAI": "Inti AI", "experiencias": "Experiences", "perfil": "Profile" },
+  "tabs": {
+    "inicio": "Home",
+    "mapa": "Map",
+    "intiAI": "Inti AI",
+    "experiencias": "Experiences",
+    "perfil": "Profile"
+  },
   "home": {
     "brand": "CAPACHICA · AI",
     "heroTitle": "Experience Capachica, discover its culture, share experiences",
@@ -12,24 +18,44 @@
     "verTodo": "See all",
     "sectionDestacados": "Highlights of the day",
     "categorias": {
-      "comunidades": "Communities", "gastronomia": "Food", "artesania": "Crafts",
-      "reservas": "Bookings", "ar": "AR", "guias": "Guides", "mapaGoogle": "Google Map",
-      "chatInti": "Inti Chat", "festividades": "Festivities"
+      "comunidades": "Communities",
+      "gastronomia": "Food",
+      "artesania": "Crafts",
+      "reservas": "Bookings",
+      "ar": "AR",
+      "guias": "Guides",
+      "mapaGoogle": "Google Map",
+      "chatInti": "Inti Chat",
+      "festividades": "Festivities"
     }
   },
   "settings": {
-    "eyebrow": "ACCOUNT", "titulo": "Settings",
-    "preferencias": "PREFERENCES", "notificaciones": "Push notifications",
-    "newsletter": "Monthly newsletter", "modoOscuro": "Dark mode (coming soon)",
-    "idioma": "LANGUAGE", "acercaDe": "ABOUT", "version": "Version", "build": "Build",
+    "eyebrow": "ACCOUNT",
+    "titulo": "Settings",
+    "preferencias": "PREFERENCES",
+    "notificaciones": "Push notifications",
+    "newsletter": "Monthly newsletter",
+    "modoOscuro": "Dark mode",
+    "idioma": "LANGUAGE",
+    "acercaDe": "ABOUT",
+    "version": "Version",
+    "build": "Build",
     "copyright": "© 2026 Capachica AI"
   },
   "profile": {
-    "viajes": "Trips", "resenas": "Reviews", "reservas": "Bookings", "cerrarSesion": "Sign out",
+    "viajes": "Trips",
+    "resenas": "Reviews",
+    "reservas": "Bookings",
+    "cerrarSesion": "Sign out",
     "menu": {
-      "usuarios": "Users", "miNegocio": "My business", "misRutas": "My routes & favorites",
-      "misReservas": "My bookings", "favoritos": "Favorites", "guias": "Travel guides",
-      "configuracion": "Settings", "ayuda": "Help"
+      "usuarios": "Users",
+      "miNegocio": "My business",
+      "misRutas": "My routes & favorites",
+      "misReservas": "My bookings",
+      "favoritos": "Favorites",
+      "guias": "Travel guides",
+      "configuracion": "Settings",
+      "ayuda": "Help"
     }
   }
 }
