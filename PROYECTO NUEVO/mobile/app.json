@@ -2,7 +2,7 @@
   "expo": {
     "name": "Capachica Experience AI",
     "slug": "capachica-experience-ai",
-    "scheme": "capachica",
+    "scheme": ["capachica", "com.capachica.experienceai"],
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
