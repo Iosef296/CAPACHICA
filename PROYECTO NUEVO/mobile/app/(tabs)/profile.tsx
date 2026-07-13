@@ -4,37 +4,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Button } from '@/components/Button';
-import { GlassPanel } from '@/components/GlassPanel';
 import { useAuth } from '@/auth/AuthContext';
 import { reservas as reservasApi, ReservaMia, API_WS } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { useRatings } from '@/data/ratings';
 import { colors, radii, spacing, typography } from '@/theme';
-
-// Niveles derivados de la cantidad real de viajes (reservas no canceladas)
-// del usuario -- cada cuenta arranca en Nivel 1 con 0 de todo y sube sola
-// a medida que reserva experiencias.
-const NIVELES = [
-  { minViajes: 0, titulo: 'Viajero Novato' },
-  { minViajes: 3, titulo: 'Explorador del Lago' },
-  { minViajes: 6, titulo: 'Tejedor de Historias' },
-  { minViajes: 10, titulo: 'Guardián Ancestral' },
-];
-
-function calcularNivel(viajes: number) {
-  let i = 0;
-  for (let j = 0; j < NIVELES.length; j++) {
-    if (viajes >= NIVELES[j].minViajes) i = j;
-  }
-  const siguiente = NIVELES[i + 1];
-  return {
-    nivel: i + 1,
-    titulo: NIVELES[i].titulo,
-    insignias: i,
-    siguienteTitulo: siguiente?.titulo,
-    faltan: siguiente ? siguiente.minViajes - viajes : 0,
-  };
-}
 
 export default function Profile() {
   const { user, signOut } = useAuth();
@@ -52,7 +26,7 @@ export default function Profile() {
   const viajes = reservasList.filter(r => r.estado === 'confirmada').length;
   const totalReservas = reservasList.length;
   const resenas = Object.keys(ratingsAll).length;
-  const { nivel, titulo, siguienteTitulo, faltan } = calcularNivel(viajes);
+  const esEmprendedor = user?.rol === 'admin' || user?.rol === 'proveedor';
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
@@ -81,23 +55,13 @@ export default function Profile() {
           <Stat label="Reservas" value={totalReservas} />
         </View>
 
-        <GlassPanel style={{ marginHorizontal: spacing.containerPadding, marginTop: spacing.stackMd }}>
-          <Text style={[typography.labelMd, { color: colors.secondary }]}>VIAJERO ANCESTRAL</Text>
-          <Text style={[typography.headlineMd, { color: colors.onSurface, marginTop: 4 }]}>
-            Nivel {nivel} · {titulo}
-          </Text>
-          <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, marginTop: 6 }]}>
-            {siguienteTitulo
-              ? `Completa ${faltan} experiencia${faltan === 1 ? '' : 's'} más para alcanzar el nivel ${siguienteTitulo}.`
-              : '¡Alcanzaste el nivel máximo!'}
-          </Text>
-        </GlassPanel>
-
         <View style={styles.menu}>
           {user?.rol === 'admin' && (
             <MenuItem icon="admin-panel-settings" label="Usuarios" onPress={() => router.push('/(stacks)/manage-users')} />
           )}
-          <MenuItem icon="storefront" label="Mi negocio" onPress={() => router.push('/(stacks)/my-business')} />
+          {esEmprendedor && (
+            <MenuItem icon="storefront" label="Mi negocio" onPress={() => router.push('/(stacks)/my-business')} />
+          )}
           <MenuItem icon="auto-awesome" label="Mis rutas y favoritos" onPress={() => router.push('/(stacks)/profile-extended')} />
           <MenuItem icon="bookmark" label="Mis reservas" onPress={() => router.push('/(stacks)/my-bookings')} />
           <MenuItem icon="favorite" label="Favoritos" onPress={() => router.push('/(stacks)/favorites')} />
