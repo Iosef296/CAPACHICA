@@ -47,7 +47,9 @@ export default function Profile() {
     reservasApi.mias().then(setReservasList).catch(() => setReservasList([]));
   }, { url: API_WS, channels: ['reservas'] });
 
-  const viajes = reservasList.filter(r => r.estado !== 'cancelada').length;
+  // Una reserva "pendiente" todavia no es un viaje -- solo cuenta si un
+  // admin la confirmo de verdad.
+  const viajes = reservasList.filter(r => r.estado === 'confirmada').length;
   const resenas = Object.keys(ratingsAll).length;
   const { nivel, titulo, insignias, siguienteTitulo, faltan } = calcularNivel(viajes);
 
