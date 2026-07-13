@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api';
 ---
 
 <Layout title="Actividades · Capachica Turismo" description="Aventura, cultura y naturaleza a orillas del lago más alto del mundo. Kayak, senderismo, cocina andina y más.">
@@ -627,7 +628,7 @@ import Layout from '../layouts/Layout.astro';
 }
 </style>
 
-<script is:inline>
+<script define:vars={{ API_URL }} is:inline>
 /* ── FILTERS ── */
 var activeCat = 'all';
 document.querySelectorAll('.act-pill').forEach(function(pill) {
@@ -759,7 +760,7 @@ async function submitReserva() {
   try {
     var precio = parseInt(document.getElementById('modalPrice').textContent) || 0;
     var esPaquete = actividad.includes('Paquete') || actividad.includes('paquete');
-    var res = await fetch('/api/reservas', {
+    var res = await fetch(API_URL + '/reservas', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nombre: nombre, email: email, fecha_visita: fecha, personas: parseInt(personasEl.value) || 1, actividad: actividad, precio_total: precio, es_paquete: esPaquete, actividades_paquete: esPaquete ? pkgItems : null }),
