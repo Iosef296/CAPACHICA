@@ -221,6 +221,18 @@ export const reservas = {
       return data;
     });
   },
+  // Solo mientras la reserva sigue "pendiente" — el backend recalcula el
+  // precio_total proporcional a la nueva cantidad de personas.
+  editar: async (id: number, datos: {
+    fecha_visita: string; personas: number; idioma?: string; notas?: string;
+  }): Promise<ReservaMia> => {
+    const data = await authFetch('PUT', `/reservas/${id}`, datos);
+    return data.reserva;
+  },
+  cancelar: async (id: number): Promise<ReservaMia> => {
+    const data = await authFetch('PATCH', `/reservas/${id}/cancelar`);
+    return data.reserva;
+  },
 };
 
 // ── Gestión de usuarios — solo admin ──

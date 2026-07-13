@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Button } from '@/components/Button';
+import { ReservaDetailModal } from '@/components/ReservaDetailModal';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/auth/AuthContext';
 import { reservas as reservasApi, ReservaMia, API_WS } from '@/data/api';
@@ -17,12 +18,19 @@ export default function MyBookings() {
   const { user } = useAuth();
   const [reservas, setReservas] = useState<ReservaMia[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const router = useRouter();
 
   useLiveRefresh(() => {
     if (!user) { setLoading(false); return; }
     reservasApi.mias().then(setReservas).catch(() => setReservas([])).finally(() => setLoading(false));
   }, { url: API_WS, channels: ['reservas'] });
+
+  const selected = reservas.find(r => r.id === selectedId) ?? null;
+
+  function handleUpdated(actualizada: ReservaMia) {
+    setReservas(prev => prev.map(r => (r.id === actualizada.id ? actualizada : r)));
+  }
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
@@ -47,7 +55,7 @@ export default function MyBookings() {
         ) : (
           <View style={{ paddingHorizontal: spacing.containerPadding, gap: spacing.gutter, marginTop: spacing.gutter, marginBottom: spacing.stackLg }}>
             {reservas.map(r => (
-              <View key={r.id} style={styles.card}>
+              <Pressable key={r.id} style={styles.card} onPress={() => setSelectedId(r.id)}>
                 <View style={styles.cardHead}>
                   <Text style={[typography.labelMd, { color: ESTADO_COLOR[r.estado] ?? colors.secondary }]}>
                     {ESTADO_LABEL[r.estado] ?? r.estado.toUpperCase()}
@@ -62,11 +70,17 @@ export default function MyBookings() {
                   <MetaItem icon="group" label={`${r.personas} personas`} />
                   <MetaItem icon="payments" label={`S/ ${r.precio_total}`} />
                 </View>
-              </View>
+                <View style={styles.viewMore}>
+                  <Text style={[typography.labelSm, { color: colors.primary }]}>Ver detalle</Text>
+                  <MaterialIcons name="chevron-right" size={18} color={colors.primary} />
+                </View>
+              </Pressable>
             ))}
           </View>
         )}
       </SafeAreaView>
+
+      <ReservaDetailModal reserva={selected} onClose={() => setSelectedId(null)} onUpdated={handleUpdated} />
     </ScrollView>
   );
 }
@@ -86,4 +100,5 @@ const styles = StyleSheet.create({
   cardHead: { flexDirection: 'row', justifyContent: 'space-between' },
   metaRow: { flexDirection: 'row', gap: spacing.stackMd, marginTop: spacing.stackSm, flexWrap: 'wrap' },
   meta: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  viewMore: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 2, marginTop: spacing.stackSm },
 });

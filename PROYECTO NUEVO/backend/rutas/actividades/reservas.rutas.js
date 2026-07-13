@@ -19,6 +19,59 @@ router.get('/mias', autenticacionMiddleware, async (req, res) => {
     }
 });
 
+// Editar una reserva propia (solo mientras esta pendiente) — recalcula
+// el total proporcional al cambiar la cantidad de personas.
+router.put('/:id', autenticacionMiddleware, async (req, res) => {
+    try {
+        const { fecha_visita, personas, idioma, notas } = req.body;
+        if (!fecha_visita) return res.status(400).json({ error: 'La fecha es obligatoria' });
+        const email = req.usuario.email.toLowerCase();
+        const nuevasPersonas = parseInt(personas) || 1;
+
+        const { rows: actuales } = await query(
+            `SELECT precio_total, personas, estado FROM reservas WHERE id = $1 AND email = $2`,
+            [req.params.id, email]
+        );
+        if (!actuales.length) return res.status(404).json({ error: 'Reserva no encontrada' });
+        if (actuales[0].estado !== 'pendiente') {
+            return res.status(400).json({ error: 'Solo se pueden editar reservas pendientes. Contáctanos para cambios en una reserva ya confirmada.' });
+        }
+
+        const precioUnitario = actuales[0].precio_total / (actuales[0].personas || 1);
+        const nuevoTotal = Math.round(precioUnitario * nuevasPersonas);
+
+        const { rows } = await query(
+            `UPDATE reservas SET fecha_visita = $1, personas = $2, idioma = $3, notas = $4, precio_total = $5
+             WHERE id = $6 AND email = $7
+             RETURNING id, nombre, fecha_visita, personas, idioma, actividad, notas,
+                       precio_total, es_paquete, actividades_paquete, estado, created_at`,
+            [fecha_visita, nuevasPersonas, idioma || 'Español', notas || null, nuevoTotal, req.params.id, email]
+        );
+
+        broadcast('reservas');
+        res.json({ success: true, reserva: rows[0] });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al actualizar la reserva' });
+    }
+});
+
+// Cancelar una reserva propia
+router.patch('/:id/cancelar', autenticacionMiddleware, async (req, res) => {
+    try {
+        const { rows } = await query(
+            `UPDATE reservas SET estado = 'cancelada'
+             WHERE id = $1 AND email = $2 AND estado != 'cancelada'
+             RETURNING id, estado`,
+            [req.params.id, req.usuario.email.toLowerCase()]
+        );
+        if (!rows.length) return res.status(404).json({ error: 'Reserva no encontrada o ya estaba cancelada' });
+        broadcast('reservas');
+        res.json({ success: true, reserva: rows[0] });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al cancelar la reserva' });
+    }
+});
+
 router.post('/', async (req, res) => {
     try {
         const {
