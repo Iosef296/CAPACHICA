@@ -9,6 +9,7 @@ import { Button } from '@/components/Button';
 import { GlassPanel } from '@/components/GlassPanel';
 import { HeartButton } from '@/components/HeartButton';
 import { BookingModal } from '@/components/BookingModal';
+import { MediaViewer, MediaItem } from '@/components/MediaViewer';
 import { api } from '@/data/api';
 import { colors, radii, spacing, typography } from '@/theme';
 
@@ -19,6 +20,7 @@ export default function CommunityDetail() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const [showModal, setShowModal] = useState(false);
   const [pastHero, setPastHero] = useState(false);
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [community, setCommunity] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const insets = useSafeInsets();
@@ -72,6 +74,13 @@ export default function CommunityDetail() {
     comidas || null,
   ].filter(Boolean).join(' · ');
 
+  const mediaList: MediaItem[] = [
+    { type: 'foto', url: imagen },
+    ...imagenes.map(url => ({ type: 'foto' as const, url })),
+    ...(video ? [{ type: 'video' as const, url: video }] : []),
+  ];
+  const videoIndex = video ? mediaList.length - 1 : -1;
+
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
     <ScrollView
@@ -81,6 +90,7 @@ export default function CommunityDetail() {
     >
       <ImageBackground source={{ uri: imagen }} style={styles.hero}>
         <LinearGradient colors={['rgba(0,66,104,0.1)', 'rgba(0,66,104,0.8)']} style={StyleSheet.absoluteFillObject} />
+        <Pressable style={StyleSheet.absoluteFillObject} onPress={() => setViewerIndex(0)} />
         <View style={[styles.heroTop, { marginTop: insets.top + 8 }]}>
           <Pressable onPress={() => router.back()} style={styles.iconBtn}>
             <MaterialIcons name="arrow-back" size={22} color="#fff" />
@@ -170,7 +180,9 @@ export default function CommunityDetail() {
           <Text style={[typography.headlineMd, { color: colors.primary }]}>Fotos</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.galleryRow}>
             {imagenes.map((url, i) => (
-              <Image key={url + i} source={{ uri: url }} style={styles.galleryImg} />
+              <Pressable key={url + i} onPress={() => setViewerIndex(i + 1)}>
+                <Image source={{ uri: url }} style={styles.galleryImg} />
+              </Pressable>
             ))}
           </ScrollView>
         </View>
@@ -179,7 +191,12 @@ export default function CommunityDetail() {
       {!!video && (
         <View style={styles.section}>
           <Text style={[typography.headlineMd, { color: colors.primary }]}>Video</Text>
-          <VideoView player={player} style={styles.video} contentFit="cover" nativeControls />
+          <View>
+            <VideoView player={player} style={styles.video} contentFit="cover" nativeControls />
+            <Pressable onPress={() => setViewerIndex(videoIndex)} style={styles.expandBtn}>
+              <MaterialIcons name="fullscreen" size={20} color="#fff" />
+            </Pressable>
+          </View>
         </View>
       )}
 
@@ -205,6 +222,12 @@ export default function CommunityDetail() {
       {pastHero && (
         <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: insets.top, backgroundColor: colors.background }} />
       )}
+      <MediaViewer
+        visible={viewerIndex !== null}
+        media={mediaList}
+        initialIndex={viewerIndex ?? 0}
+        onClose={() => setViewerIndex(null)}
+      />
     </View>
   );
 }
@@ -221,4 +244,8 @@ const styles = StyleSheet.create({
   galleryRow: { gap: 8, marginTop: 10 },
   galleryImg: { width: 140, height: 100, borderRadius: radii.md },
   video: { width: '100%', height: 210, borderRadius: radii.md, marginTop: 10, backgroundColor: '#000' },
+  expandBtn: {
+    position: 'absolute', top: 18, right: 8, width: 32, height: 32, borderRadius: 16,
+    backgroundColor: 'rgba(0,0,0,0.45)', alignItems: 'center', justifyContent: 'center',
+  },
 });
