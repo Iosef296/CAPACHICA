@@ -660,7 +660,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       <button class="nav-btn" data-section="global" title="Navbar &amp; Footer">
         <span>🎨</span><span class="nav-btn-text"> Navbar &amp; Footer</span>
       </button>
-      <button class="nav-btn" data-section="etiquetas" title="App Móvil">
+      <button class="nav-btn" data-section="app-movil" title="App Móvil">
         <span>📱</span><span class="nav-btn-text"> App Móvil</span>
       </button>
     </aside>
@@ -1349,7 +1349,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       if (btn.dataset.section === 'widget')   loadWidget();
       if (btn.dataset.section === 'destinos') loadDestinos();
       if (btn.dataset.section === 'paginas')  loadPaginas();
-      if (btn.dataset.section === 'etiquetas') loadAppMovil();
+      if (btn.dataset.section === 'app-movil') loadAppMovil();
       if (['hospedajes','artesania','festividades','maestros','guias'].includes(btn.dataset.section)) cargarSimple(btn.dataset.section);
       if (btn.dataset.section === 'usuarios') loadUsuarios();
       if (btn.dataset.section === 'global') {
