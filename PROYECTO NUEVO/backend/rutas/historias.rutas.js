@@ -101,13 +101,18 @@ router.delete('/:id', autenticacionMiddleware, async (req, res) => {
         const { rows } = await query('SELECT usuario_id FROM historias WHERE id = $1', [req.params.id]);
         if (!rows.length) return res.status(404).json({ error: 'Historia no encontrada' });
         if (req.usuario.rol !== 'admin' && rows[0].usuario_id !== req.usuario.id) {
-            return res.status(403).json({ error: 'No tienes permiso para eliminar esta historia' });
+            // Diagnostico temporal -- comparar exactamente que esta llegando de cada lado.
+            return res.status(403).json({
+                error: 'No tienes permiso para eliminar esta historia',
+                detalle: `dueño=${JSON.stringify(rows[0].usuario_id)} vos=${JSON.stringify(req.usuario.id)}`,
+            });
         }
         await query('DELETE FROM historias WHERE id = $1', [req.params.id]);
         broadcast('historias');
         res.json({ success: true });
     } catch (err) {
-        res.status(500).json({ error: 'Error al eliminar historia' });
+        console.error('Error al eliminar historia:', err);
+        res.status(500).json({ error: 'Error al eliminar historia', detalle: err.message });
     }
 });
 
