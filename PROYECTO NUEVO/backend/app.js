@@ -43,6 +43,9 @@ const historiasRoutes = require('./rutas/historias.rutas');
 // Rutas — Configuración de la app (etiquetas editables sin rebuild)
 const configuracionRoutes = require('./rutas/configuracion.rutas');
 
+// Rutas — Ubicaciones del mapa (pines editables por el admin desde la app)
+const ubicacionesRoutes = require('./rutas/ubicaciones.rutas');
+
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
@@ -93,6 +96,7 @@ app.use('/api/historias', historiasRoutes);
 
 // ── Configuración de la app ────────────────────────
 app.use('/api/configuracion', configuracionRoutes);
+app.use('/api/ubicaciones', ubicacionesRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {
@@ -144,6 +148,33 @@ async function start() {
                 valor TEXT NOT NULL
             )
         `).catch(err => console.warn('⚠️  No se pudo crear tabla configuracion_app:', err.message));
+
+        await query(`
+            CREATE TABLE IF NOT EXISTS ubicaciones (
+                id          BIGSERIAL PRIMARY KEY,
+                titulo      TEXT NOT NULL,
+                descripcion TEXT,
+                latitud     DOUBLE PRECISION NOT NULL,
+                longitud    DOUBLE PRECISION NOT NULL,
+                creado_por  UUID,
+                created_at  TIMESTAMPTZ DEFAULT now()
+            )
+        `).catch(err => console.warn('⚠️  No se pudo crear tabla ubicaciones:', err.message));
+
+        // Semilla única: si la tabla está vacía (primera vez), la poblamos con
+        // los pines que antes vivían hardcodeados en el mobile (src/data/mock.ts)
+        // para que el mapa no arranque vacío. De ahí en más el admin la administra.
+        await query(`
+            INSERT INTO ubicaciones (titulo, latitud, longitud)
+            SELECT * FROM (VALUES
+                ('Llachón', -15.7203, -69.7039),
+                ('Ccotos', -15.6092, -69.8261),
+                ('Capachica Centro', -15.6428, -69.8378),
+                ('Siale', -15.6717, -69.7572),
+                ('Escallani', -15.5853, -69.8156)
+            ) AS semilla(titulo, latitud, longitud)
+            WHERE NOT EXISTS (SELECT 1 FROM ubicaciones)
+        `).catch(err => console.warn('⚠️  No se pudo sembrar tabla ubicaciones:', err.message));
 
         const swaggerUi = require('swagger-ui-express');
         const YAML      = require('yamljs');
