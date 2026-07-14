@@ -624,8 +624,8 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         <span>📄</span><span class="nav-btn-text"> Páginas</span>
         <span class="nav-count" id="nav-pag-count">—</span>
       </button>
-      <button class="nav-btn" data-section="destinos" title="Destinos">
-        <span>📍</span><span class="nav-btn-text"> Destinos</span>
+      <button class="nav-btn" data-section="destinos" title="Familias">
+        <span>👪</span><span class="nav-btn-text"> Familias</span>
         <span class="nav-count" id="nav-dest-count">—</span>
       </button>
       <button class="nav-btn" data-section="hospedajes" title="Hospedajes">
@@ -676,9 +676,9 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
           <p>Entradas que usa Inti para responder turistas</p>
         </div>
 
-        <!-- ADD FORM -->
+        <!-- ADD/EDIT FORM -->
         <div class="card">
-          <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;">Agregar entrada</div>
+          <div id="iaFormTitle" style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;">Agregar entrada</div>
           <div class="form-row3">
             <div>
               <label>Categoría</label>
@@ -703,7 +703,10 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
               <input type="text" id="iaR" placeholder="El kayak cuesta S/. 30..." />
             </div>
           </div>
-          <button class="btn-primary" id="addIaBtn">✦ Agregar a Inti</button>
+          <div style="display:flex;gap:10px;align-items:center">
+            <button class="btn-primary" id="addIaBtn">✦ Agregar a Inti</button>
+            <button class="btn-sm" id="cancelIaEditBtn" style="display:none;padding:9px 18px">Cancelar edición</button>
+          </div>
         </div>
 
         <!-- LIST -->
@@ -744,15 +747,15 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         <div id="paginasList"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
       </div>
 
-      <!-- ─── DESTINOS SECTION ─── -->
+      <!-- ─── FAMILIAS SECTION (antes "Destinos") ─── -->
       <div class="section" id="sec-destinos">
         <div class="page-hdr">
-          <h2>Destinos Turísticos</h2>
-          <p>Gestiona los destinos que se muestran en la página principal</p>
+          <h2>Familias Anfitrionas</h2>
+          <p>Familias vivenciales que reciben visitantes -- se muestran en la página principal</p>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-          <span class="count-pill" id="dest-count">0 destinos</span>
-          <button class="btn-primary" onclick="openDestinoModal(null)">＋ Nuevo destino</button>
+          <span class="count-pill" id="dest-count">0 familias</span>
+          <button class="btn-primary" onclick="openDestinoModal(null)">＋ Nueva familia</button>
         </div>
         <div id="destinosList"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
       </div>
@@ -1052,25 +1055,25 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
 <div class="modal-overlay" id="destinoModal">
   <div class="modal-box">
     <div class="modal-hdr">
-      <h3 id="modalTitle">Nuevo destino</h3>
+      <h3 id="modalTitle">Nueva familia</h3>
       <button class="modal-close" onclick="closeDestinoModal()">✕</button>
     </div>
     <input type="hidden" id="d-id" value="" />
 
     <div class="form-row2">
       <div class="fg" style="margin:0">
-        <label>Nombre *</label>
-        <input type="text" id="d-nombre" placeholder="Llachón" />
+        <label>Nombre de la familia *</label>
+        <input type="text" id="d-nombre" placeholder="Familia Quispe" />
       </div>
       <div class="fg" style="margin:0">
-        <label>Comunidad / Ubicación *</label>
-        <input type="text" id="d-comunidad" placeholder="Comunidad de Llachón" />
+        <label>Comunidad *</label>
+        <input type="text" id="d-comunidad" placeholder="Llachón" />
       </div>
     </div>
 
     <div class="fg">
       <label>Descripción *</label>
-      <textarea id="d-desc" rows="3" placeholder="Breve descripción del destino..."></textarea>
+      <textarea id="d-desc" rows="3" placeholder="Ej: Familia dedicada a la pesca y el tejido. Habitaciones sencillas con vista al lago, comidas caseras con productos de su chacra."></textarea>
     </div>
 
     <div class="fg">
@@ -1087,11 +1090,11 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     <div class="form-row2" style="margin-bottom:12px">
       <div class="fg" style="margin:0">
         <label>Emoji (si no hay foto)</label>
-        <input type="text" id="d-emoji" placeholder="🏖️" maxlength="4" />
+        <input type="text" id="d-emoji" placeholder="🏡" maxlength="4" />
       </div>
       <div class="fg" style="margin:0">
-        <label>Texto destacado (badge)</label>
-        <input type="text" id="d-highlight" placeholder="Mejor destino vivencial" />
+        <label>Precio por noche (badge)</label>
+        <input type="text" id="d-highlight" placeholder="S/ 70 por persona, con comidas" />
       </div>
     </div>
 
@@ -1104,12 +1107,12 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     </div>
 
     <div class="fg">
-      <label>Etiquetas (separadas por coma)</label>
-      <input type="text" id="d-tags" placeholder="Mirador, Amanecer, Trekking" />
+      <label>Servicios y actividades (separados por coma)</label>
+      <input type="text" id="d-tags" placeholder="Desayuno incluido, Pesca artesanal, Tejido, Vista al lago" />
     </div>
 
     <div style="display:flex;gap:10px;margin-top:6px">
-      <button class="btn-primary" onclick="saveDestinoModal()" style="flex:1">Guardar destino</button>
+      <button class="btn-primary" onclick="saveDestinoModal()" style="flex:1">Guardar familia</button>
       <button class="btn-sm" onclick="closeDestinoModal()" style="padding:9px 18px">Cancelar</button>
     </div>
   </div>
@@ -1406,26 +1409,62 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
           </div>
           <div style="font-size:13px;color:#7f95aa;line-height:1.45">${esc(k.respuesta)}</div>
         </div>
-        <button onclick="deleteIA(${k.id})" style="flex-shrink:0;margin-top:2px;padding:5px 10px;border-radius:7px;border:1px solid rgba(248,113,113,.22);background:transparent;color:#f87171;font-size:12px;cursor:pointer;font-family:inherit;transition:background .15s" onmouseover="this.style.background='rgba(248,113,113,.1)'" onmouseout="this.style.background='transparent'">✕</button>
+        <div style="display:flex;gap:6px;flex-shrink:0;margin-top:2px">
+          <button onclick="editIA(${k.id})" style="padding:5px 10px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;transition:color .15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">✎ Editar</button>
+          <button onclick="deleteIA(${k.id})" style="padding:5px 10px;border-radius:7px;border:1px solid rgba(248,113,113,.22);background:transparent;color:#f87171;font-size:12px;cursor:pointer;font-family:inherit;transition:background .15s" onmouseover="this.style.background='rgba(248,113,113,.1)'" onmouseout="this.style.background='transparent'">✕</button>
+        </div>
       </div>
     `).join('');
   }
 
   $('iaSearch').oninput = renderIA;
 
+  let editingIaId = null;
+
+  function resetIaForm() {
+    editingIaId = null;
+    $('iaQ').value = ''; $('iaR').value = ''; $('iaCat').value = 'general';
+    $('iaFormTitle').textContent = 'Agregar entrada';
+    $('addIaBtn').textContent = '✦ Agregar a Inti';
+    $('cancelIaEditBtn').style.display = 'none';
+  }
+
+  window.editIA = (id) => {
+    const k = (iaData.conocimiento || []).find(x => x.id === id);
+    if (!k) return;
+    editingIaId = id;
+    $('iaCat').value = k.categoria;
+    $('iaQ').value = k.pregunta;
+    $('iaR').value = k.respuesta;
+    $('iaFormTitle').textContent = 'Editando entrada';
+    $('addIaBtn').textContent = '✓ Guardar cambios';
+    $('cancelIaEditBtn').style.display = 'inline-block';
+    $('iaQ').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
+  $('cancelIaEditBtn').onclick = resetIaForm;
+
   $('addIaBtn').onclick = async () => {
     const q = $('iaQ').value.trim();
     const r = $('iaR').value.trim();
     if (!q || !r) { showMsg('Pregunta y Respuesta son obligatorias', 'err'); return; }
     try {
-      await fetch(`${IA_URL}/api/admin/conocimiento`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ categoria: $('iaCat').value, pregunta: q, respuesta: r })
-      });
-      $('iaQ').value = ''; $('iaR').value = '';
-      showMsg('Conocimiento agregado a Inti');
+      if (editingIaId) {
+        await fetch(`${IA_URL}/api/admin/conocimiento/${editingIaId}`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ categoria: $('iaCat').value, pregunta: q, respuesta: r })
+        });
+        showMsg('Conocimiento actualizado');
+      } else {
+        await fetch(`${IA_URL}/api/admin/conocimiento`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ categoria: $('iaCat').value, pregunta: q, respuesta: r })
+        });
+        showMsg('Conocimiento agregado a Inti');
+      }
+      resetIaForm();
       loadIA();
-    } catch { showMsg('Error al agregar', 'err'); }
+    } catch { showMsg('Error al guardar', 'err'); }
   };
 
   window.deleteIA = async (id) => {
@@ -1747,7 +1786,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
 
   function renderDestinos() {
     if (!destinosData.length) {
-      $('destinosList').innerHTML = '<div class="empty"><div class="ei">📍</div><p>No hay destinos. Agrega el primero.</p></div>';
+      $('destinosList').innerHTML = '<div class="empty"><div class="ei">👪</div><p>No hay familias registradas. Agrega la primera.</p></div>';
       return;
     }
     $('destinosList').innerHTML = destinosData.map(d => {
@@ -1783,7 +1822,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
 
   function openDestinoModal(id) {
     const d = id ? destinosData.find(x => x.id === id) : null;
-    $('modalTitle').textContent = d ? 'Editar destino' : 'Nuevo destino';
+    $('modalTitle').textContent = d ? 'Editar familia' : 'Nueva familia';
     $('d-id').value         = d ? d.id : '';
     $('d-nombre').value     = d ? d.nombre    : '';
     $('d-comunidad').value  = d ? d.comunidad : '';

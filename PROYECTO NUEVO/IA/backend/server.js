@@ -368,6 +368,15 @@ app.post('/api/admin/conocimiento', async (req, res) => {
     res.json({ mensaje:'Conocimiento agregado', id:r.rows[0].id });
   } catch(err) { res.status(500).json({ error:'Error' }); }
 });
+app.put('/api/admin/conocimiento/:id', async (req, res) => {
+  const { categoria, pregunta, respuesta } = req.body;
+  if (!categoria||!pregunta||!respuesta) return res.status(400).json({ error:'Faltan campos' });
+  try {
+    const r = await query('UPDATE ia_conocimiento SET categoria=$1, pregunta=$2, respuesta=$3 WHERE id=$4 RETURNING id', [categoria, pregunta, respuesta, parseInt(req.params.id)]);
+    if (r.rowCount===0) return res.status(404).json({ error:'No encontrada' });
+    res.json({ mensaje:'Conocimiento actualizado', id:r.rows[0].id });
+  } catch(err) { res.status(500).json({ error:'Error' }); }
+});
 app.delete('/api/admin/conocimiento/:id', async (req, res) => {
   try {
     const r = await query('DELETE FROM ia_conocimiento WHERE id=$1', [parseInt(req.params.id)]);
