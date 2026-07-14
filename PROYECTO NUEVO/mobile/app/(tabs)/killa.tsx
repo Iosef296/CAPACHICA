@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { colors, radii, shadows, spacing, typography } from '@/theme';
+import { colors, radii, shadows, spacing, typography, useThemeMode } from '@/theme';
 import { DEFAULT_CFG, fetchWidgetConfig, IA_WS, WidgetCfg } from '@/data/inti';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 
@@ -11,6 +11,7 @@ export default function KillaTab() {
   const router = useRouter();
   const [cfg, setCfg] = useState<WidgetCfg>(DEFAULT_CFG);
   useLiveRefresh(() => { fetchWidgetConfig().then(setCfg); }, { url: IA_WS, channels: 'widget' });
+  useThemeMode(); // se resuscribe para repintar en vivo al cambiar tema
 
   // Recreado en cada render (no a nivel de modulo) para que los colores
   // reflejen el tema actual apenas se cambia, sin recargar la app.

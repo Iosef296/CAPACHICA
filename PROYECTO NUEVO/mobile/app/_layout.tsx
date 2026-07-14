@@ -57,7 +57,7 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaProvider key={themeMode}>
+    <SafeAreaProvider>
       <AuthProvider>
         <StatusBar style={themeMode === 'dark' ? 'light' : 'dark'} />
         <Gate />

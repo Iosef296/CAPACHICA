@@ -1,10 +1,11 @@
 import { Tabs } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { colors } from '@/theme';
+import { colors, useThemeMode } from '@/theme';
 
 export default function TabsLayout() {
   const { t } = useTranslation();
+  useThemeMode(); // se resuscribe para repintar la barra de tabs en vivo
   return (
     <Tabs
       screenOptions={({ route }) => ({

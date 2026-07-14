@@ -9,7 +9,7 @@ import { useAuth } from '@/auth/AuthContext';
 import { reservas as reservasApi, ReservaMia, API_WS } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { useRatings } from '@/data/ratings';
-import { colors, radii, spacing, typography } from '@/theme';
+import { colors, radii, spacing, typography, useThemeMode } from '@/theme';
 
 export default function Profile() {
   const { user, signOut } = useAuth();
@@ -17,6 +17,7 @@ export default function Profile() {
   const { t } = useTranslation();
   const [reservasList, setReservasList] = useState<ReservaMia[]>([]);
   const { all: ratingsAll } = useRatings();
+  useThemeMode(); // se resuscribe para repintar en vivo al cambiar tema
 
   useLiveRefresh(() => {
     if (!user) return;

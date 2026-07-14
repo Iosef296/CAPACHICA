@@ -10,7 +10,7 @@ import { StoryAvatar } from '@/components/StoryAvatar';
 import { PhotoCard } from '@/components/Card';
 import { HighlightRow } from '@/components/HighlightRow';
 import { KillaTeaser } from '@/components/KillaTeaser';
-import { colors, spacing, typography } from '@/theme';
+import { colors, spacing, typography, useThemeMode } from '@/theme';
 import { stories, recommendations, highlights } from '@/data/mock';
 
 const HERO = 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1600';
@@ -18,6 +18,7 @@ const HERO = 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=160
 export default function Home() {
   const router = useRouter();
   const { t } = useTranslation();
+  useThemeMode(); // se resuscribe para repintar en vivo al cambiar tema
 
   const CATEGORIES = [
     { key: 'communities',  icon: 'groups',      label: t('home.categorias.comunidades'), path: '/(stacks)/communities' },
