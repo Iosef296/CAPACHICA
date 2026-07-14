@@ -127,3 +127,10 @@ CREATE TABLE IF NOT EXISTS historias (
     created_at     TIMESTAMPTZ DEFAULT now(),
     expires_at     TIMESTAMPTZ NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS historia_likes (
+    historia_id BIGINT NOT NULL REFERENCES historias(id) ON DELETE CASCADE,
+    usuario_id  UUID NOT NULL,
+    created_at  TIMESTAMPTZ DEFAULT now(),
+    PRIMARY KEY (historia_id, usuario_id)
+);

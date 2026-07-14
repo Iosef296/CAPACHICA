@@ -123,6 +123,15 @@ async function start() {
             )
         `).catch(err => console.warn('⚠️  No se pudo crear tabla historias:', err.message));
 
+        await query(`
+            CREATE TABLE IF NOT EXISTS historia_likes (
+                historia_id BIGINT NOT NULL REFERENCES historias(id) ON DELETE CASCADE,
+                usuario_id  UUID NOT NULL,
+                created_at  TIMESTAMPTZ DEFAULT now(),
+                PRIMARY KEY (historia_id, usuario_id)
+            )
+        `).catch(err => console.warn('⚠️  No se pudo crear tabla historia_likes:', err.message));
+
         const swaggerUi = require('swagger-ui-express');
         const YAML      = require('yamljs');
         const swagger   = YAML.load('./swagger.yaml');

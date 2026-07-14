@@ -17,12 +17,57 @@ const DURACIONES_VALIDAS = [12, 24, 168, 720];
 router.get('/', async (_req, res) => {
     try {
         const { rows } = await query(
-            `SELECT id, usuario_id, usuario_nombre, usuario_foto, media_url, tipo, duracion_horas, created_at, expires_at
-             FROM historias WHERE expires_at > now() ORDER BY created_at DESC`
+            `SELECT h.id, h.usuario_id, h.usuario_nombre, h.usuario_foto, h.media_url, h.tipo,
+                    h.duracion_horas, h.created_at, h.expires_at,
+                    COUNT(l.usuario_id)::int AS likes_count
+             FROM historias h
+             LEFT JOIN historia_likes l ON l.historia_id = h.id
+             WHERE h.expires_at > now()
+             GROUP BY h.id
+             ORDER BY h.created_at DESC`
         );
         res.json(rows.map(r => ({ ...r, id: Number(r.id) })));
     } catch (err) {
         res.status(500).json({ error: 'Error al obtener historias' });
+    }
+});
+
+// IDs de las historias que el usuario logueado ya likeo -- se pide una vez
+// junto con el listado para saber que corazon pintar lleno sin auth opcional
+// en el GET publico de arriba.
+router.get('/mis-likes', autenticacionMiddleware, async (req, res) => {
+    try {
+        const { rows } = await query(
+            'SELECT historia_id FROM historia_likes WHERE usuario_id = $1',
+            [req.usuario.id]
+        );
+        res.json(rows.map(r => Number(r.historia_id)));
+    } catch (err) {
+        res.status(500).json({ error: 'Error al obtener tus likes' });
+    }
+});
+
+// Toggle -- si ya existe el like lo saca, si no lo pone. Devuelve el estado
+// resultante para que el mobile actualice sin tener que volver a pedir todo.
+router.post('/:id/like', autenticacionMiddleware, async (req, res) => {
+    try {
+        const { rows: existe } = await query(
+            'SELECT 1 FROM historia_likes WHERE historia_id = $1 AND usuario_id = $2',
+            [req.params.id, req.usuario.id]
+        );
+        let liked;
+        if (existe.length) {
+            await query('DELETE FROM historia_likes WHERE historia_id = $1 AND usuario_id = $2', [req.params.id, req.usuario.id]);
+            liked = false;
+        } else {
+            await query('INSERT INTO historia_likes (historia_id, usuario_id) VALUES ($1, $2)', [req.params.id, req.usuario.id]);
+            liked = true;
+        }
+        const { rows: conteo } = await query('SELECT COUNT(*)::int AS likes_count FROM historia_likes WHERE historia_id = $1', [req.params.id]);
+        broadcast('historias');
+        res.json({ liked, likes_count: conteo[0].likes_count });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al dar like' });
     }
 });
 
