@@ -2,33 +2,42 @@ import React, { useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { KillaTeaser } from '@/components/KillaTeaser';
-import { communities as mockCommunities, hostFamilies, Community } from '@/data/mock';
+import { communities as mockCommunities, Community } from '@/data/mock';
 import { api, API_WS } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
+import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
 export default function Communities() {
   const router = useRouter();
+  const cfg = useAppConfig();
   const [communities, setCommunities] = useState<Community[]>(mockCommunities);
   useLiveRefresh(() => { api.communities().then(setCommunities); }, { url: API_WS, channels: 'comunidades' });
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaView edges={['top']}>
-        <ScreenHeader eyebrow="CAPACHICA" title="Comunidades Ancestrales" back />
+      <SafeAreaView edges={['bottom']}>
+        <ScreenHeader eyebrow={cfg.text('communities.eyebrow', 'CAPACHICA')} title={cfg.text('communities.title', 'Familias Ancestrales')} back />
 
         <Text style={styles.intro}>
-          Cuatro pueblos vivos en la península del Titicaca, cada uno con su sabiduría.
+          {cfg.text('communities.intro', 'Cuatro pueblos vivos en la península del Titicaca, cada uno con su sabiduría.')}
         </Text>
 
         <View style={styles.grid}>
           {communities.map((c, i) => (
-            <Pressable key={c.id} onPress={() => router.push('/(stacks)/community-detail')}
+            <Pressable key={c.id} onPress={() => router.push({ pathname: '/(stacks)/community-detail', params: { id: c.id } })}
               style={[styles.card, i === 0 && styles.featured]}>
-              <Image source={{ uri: c.image }} style={styles.cardImg} />
+              <View>
+                <Image source={{ uri: c.image }} style={styles.cardImg} />
+                {!!(c as any).video && (
+                  <View style={styles.videoBadge}>
+                    <MaterialIcons name="play-circle-filled" size={16} color="#fff" />
+                  </View>
+                )}
+              </View>
               <View style={styles.cardBody}>
-                {i === 0 && <Text style={styles.popular}>MÁS POPULAR</Text>}
+                {i === 0 && <Text style={styles.popular}>{cfg.text('communities.badgePopular', 'MÁS POPULAR')}</Text>}
                 <Text style={[typography.headlineMd, { color: colors.onSurface }]}>{c.name}</Text>
                 <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant }]} numberOfLines={2}>
                   {c.description}
@@ -41,18 +50,6 @@ export default function Communities() {
           ))}
         </View>
 
-        <Text style={styles.sectionTitle}>FAMILIAS ANFITRIONAS</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hScroll}>
-          {hostFamilies.map(f => (
-            <View key={f.id} style={styles.familyCard}>
-              <Image source={{ uri: f.img }} style={styles.familyImg} />
-              <Text style={[typography.bodyLg, { color: colors.onSurface, fontFamily: 'HankenGrotesk_700Bold' }]}>{f.name}</Text>
-              <Text style={[typography.labelSm, { color: colors.secondary }]}>{f.community.toUpperCase()}</Text>
-            </View>
-          ))}
-        </ScrollView>
-
-        <KillaTeaser />
         <View style={{ height: spacing.stackLg }} />
       </SafeAreaView>
     </ScrollView>
@@ -65,10 +62,10 @@ const styles = StyleSheet.create({
   card: { backgroundColor: colors.surfaceContainerLowest, borderRadius: radii.xl, overflow: 'hidden', ...shadows.card },
   featured: { borderWidth: 2, borderColor: colors.terracotta },
   cardImg: { width: '100%', height: 180 },
+  videoBadge: {
+    position: 'absolute', top: 8, right: 8, width: 26, height: 26, borderRadius: 13,
+    backgroundColor: 'rgba(0,0,0,0.45)', alignItems: 'center', justifyContent: 'center',
+  },
   cardBody: { padding: spacing.gutter, gap: 4 },
   popular: { ...typography.labelSm, color: colors.textilePink, fontFamily: 'HankenGrotesk_700Bold' },
-  sectionTitle: { ...typography.labelMd, color: colors.onSurfaceVariant, paddingHorizontal: spacing.containerPadding, marginTop: spacing.stackLg, marginBottom: spacing.stackSm },
-  hScroll: { gap: spacing.gutter, paddingHorizontal: spacing.containerPadding },
-  familyCard: { width: 180, gap: 4 },
-  familyImg: { width: 180, height: 220, borderRadius: radii.lg, marginBottom: 6 },
 });
