@@ -84,11 +84,6 @@ async function saveReservacion(r) {
   );
 }
 
-async function loadDestinos() {
-  const res = await query('SELECT * FROM ia_destinos ORDER BY id');
-  return res.rows.map(r => ({ ...r, tags: r.tags || [] }));
-}
-
 async function loadPaginas() {
   const res = await query('SELECT * FROM ia_paginas ORDER BY id');
   return res.rows.map(r => ({ ...r, secciones: r.secciones || [] }));
@@ -392,33 +387,6 @@ app.put('/api/admin/contexto', async (req, res) => {
     if (descripcion!==undefined)   await query(`INSERT INTO ia_config(key,value) VALUES('descripcion',$1)   ON CONFLICT(key) DO UPDATE SET value=$1`, [JSON.stringify(descripcion)]);
     res.json({ mensaje:'Contexto actualizado' });
   } catch(err) { res.status(500).json({ error:'Error' }); }
-});
-
-// ── DESTINOS ──────────────────────────────────────────
-app.get('/api/destinos', async (_req, res) => {
-  try { res.json(await loadDestinos()); } catch(err) { res.status(500).json({ error:'Error' }); }
-});
-app.post('/api/admin/destinos', async (req, res) => {
-  try {
-    const { nombre='',comunidad='',desc='',imagen='',emoji='📍',highlight='',color='#38bdf8',tags=[] } = req.body;
-    const r = await query('INSERT INTO ia_destinos (nombre,comunidad,"desc",imagen,emoji,highlight,color,tags) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *', [nombre,comunidad,desc,imagen,emoji,highlight,color,JSON.stringify(tags)]);
-    res.json({ ...r.rows[0], tags: r.rows[0].tags||[] });
-  } catch(err) { res.status(500).json({ error:err.message }); }
-});
-app.put('/api/admin/destinos/:id', async (req, res) => {
-  try {
-    const { nombre,comunidad,desc,imagen,emoji,highlight,color,tags } = req.body;
-    const r = await query('UPDATE ia_destinos SET nombre=$1,comunidad=$2,"desc"=$3,imagen=$4,emoji=$5,highlight=$6,color=$7,tags=$8 WHERE id=$9 RETURNING *', [nombre,comunidad,desc,imagen,emoji||'📍',highlight,color||'#38bdf8',JSON.stringify(tags||[]),parseInt(req.params.id)]);
-    if (!r.rows.length) return res.status(404).json({ error:'No encontrado' });
-    res.json({ ...r.rows[0], tags:r.rows[0].tags||[] });
-  } catch(err) { res.status(500).json({ error:err.message }); }
-});
-app.delete('/api/admin/destinos/:id', async (req, res) => {
-  try {
-    const r = await query('DELETE FROM ia_destinos WHERE id=$1', [parseInt(req.params.id)]);
-    if (r.rowCount===0) return res.status(404).json({ error:'No encontrado' });
-    res.json({ mensaje:'Eliminado' });
-  } catch(err) { res.status(500).json({ error:err.message }); }
 });
 
 // ── WIDGET ────────────────────────────────────────────

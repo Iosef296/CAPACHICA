@@ -36,18 +36,6 @@ CREATE TABLE IF NOT EXISTS ia_reservaciones (
     creado        TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS ia_destinos (
-    id        SERIAL PRIMARY KEY,
-    nombre    TEXT NOT NULL DEFAULT '',
-    comunidad TEXT DEFAULT '',
-    desc      TEXT DEFAULT '',
-    imagen    TEXT DEFAULT '',
-    emoji     TEXT DEFAULT '📍',
-    highlight TEXT DEFAULT '',
-    color     TEXT DEFAULT '#38bdf8',
-    tags      JSONB DEFAULT '[]'
-);
-
 CREATE TABLE IF NOT EXISTS ia_paginas (
     id          SERIAL PRIMARY KEY,
     titulo      TEXT NOT NULL DEFAULT '',

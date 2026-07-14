@@ -1637,6 +1637,59 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     { group: 'Mi Negocio', items: [
       { key: 'myBusiness.becomeProviderMsg', label: 'Mensaje para turistas sin habilitar', multiline: true },
     ]},
+    { group: 'Home — Historias', items: [
+      { key: 'home.myStoryLabel', label: 'Etiqueta "tu historia"' },
+      { key: 'home.selfStoryLabel', label: 'Etiqueta avatar propio' },
+    ]},
+    { group: 'Artesanía', items: [
+      { key: 'crafts.wisdomLabel', label: 'Sabiduría ancestral — etiqueta' },
+      { key: 'crafts.wisdomText', label: 'Sabiduría ancestral — texto', multiline: true },
+      { key: 'crafts.sectionMaestros', label: 'Sección — Maestros del telar' },
+      { key: 'crafts.sectionGaleria', label: 'Sección — Galería' },
+      { key: 'crafts.sectionTintes', label: 'Sección — Tintes de la tierra' },
+    ]},
+    { group: 'Gastronomía', items: [
+      { key: 'gastronomy.tabs', label: 'Pestañas -- JSON: ["Todo","..."]', multiline: true, json: true },
+      { key: 'gastronomy.intiTag', label: 'Etiqueta de Inti' },
+      { key: 'gastronomy.sectionRestaurantes', label: 'Sección — Restaurantes' },
+    ]},
+    { group: 'Festividades', items: [
+      { key: 'festividades.types', label: 'Tipos -- JSON: ["Todas","..."]', multiline: true, json: true },
+      { key: 'festividades.badgeDestacada', label: 'Insignia "Destacada"' },
+    ]},
+    { group: 'Reservas (pantalla de reservar)', items: [
+      { key: 'booking.locations', label: 'Ubicaciones -- JSON: ["Todas","..."]', multiline: true, json: true },
+      { key: 'booking.sectionHospedajes', label: 'Sección — Hospedajes familiares' },
+      { key: 'booking.sectionActividades', label: 'Sección — Tours y actividades' },
+      { key: 'booking.ctaReservar', label: 'Botón — Reservar ahora' },
+      { key: 'booking.emptyHospedajes', label: 'Sin hospedajes en {loc}' },
+    ]},
+    { group: 'Familias (lista)', items: [
+      { key: 'communities.intro', label: 'Intro', multiline: true },
+      { key: 'communities.badgePopular', label: 'Insignia "Más popular"' },
+      { key: 'communities.sectionAnfitrionas', label: 'Sección — Familias anfitrionas' },
+    ]},
+    { group: 'Guías', items: [
+      { key: 'guides.readMoreLabel', label: 'Botón — Leer más' },
+    ]},
+    { group: 'Mapa', items: [
+      { key: 'map.filters', label: 'Filtros -- JSON: ["Todo","..."]', multiline: true, json: true },
+      { key: 'map.searchPlaceholder', label: 'Placeholder de búsqueda' },
+      { key: 'map.locationEyebrow', label: 'Eyebrow de ubicación' },
+    ]},
+    { group: 'Reservas (tab -- Mis reservas)', items: [
+      { key: 'reservasTab.eyebrow', label: 'Eyebrow' },
+      { key: 'reservasTab.emptyLoginTitle', label: 'Sin sesión — título' },
+      { key: 'reservasTab.emptyTitle', label: 'Sin reservas — título' },
+      { key: 'reservasTab.emptySubtitle', label: 'Sin reservas — subtítulo', multiline: true },
+      { key: 'reservasTab.emptyCta', label: 'Botón — Ver experiencias' },
+      { key: 'reservasTab.viewDetailLabel', label: 'Botón — Ver detalle' },
+    ]},
+    { group: 'Favoritos', items: [
+      { key: 'favorites.emptyTitle', label: 'Sin favoritos — título' },
+      { key: 'favorites.emptySubtitle', label: 'Sin favoritos — subtítulo', multiline: true },
+      { key: 'favorites.emptyCta', label: 'Botón — Explorar' },
+    ]},
   ];
 
   function amFieldId(key) { return 'am-' + key.replace(/\./g, '-'); }
