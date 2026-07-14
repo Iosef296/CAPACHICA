@@ -37,7 +37,7 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaView edges={['top']}>
+      <SafeAreaView edges={['bottom']}>
         <ScreenHeader eyebrow={t('settings.eyebrow')} title={t('settings.titulo')} back />
 
         <Group title={t('settings.preferencias')}>
@@ -62,8 +62,7 @@ export default function SettingsScreen() {
         </Group>
 
         <Group title={t('settings.acercaDe')}>
-          <InfoRow icon="info" label={t('settings.version')} value="0.1.0 · MVP" />
-          <InfoRow icon="code" label={t('settings.build')} value="Expo SDK 54" />
+          <InfoRow icon="info" label={t('settings.version')} value="alpha-1.0.6" />
           <InfoRow icon="copyright" label={t('settings.copyright')} />
         </Group>
       </SafeAreaView>
