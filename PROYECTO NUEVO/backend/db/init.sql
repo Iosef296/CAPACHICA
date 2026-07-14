@@ -110,3 +110,20 @@ CREATE TABLE IF NOT EXISTS hospedajes (
     data           JSONB NOT NULL,
     created_at     TIMESTAMPTZ DEFAULT now()
 );
+
+-- ── Historias (estilo WhatsApp Status) ──────────────────────────────────────
+-- El usuario elige cuánto dura su historia (duracion_horas) al subirla;
+-- expires_at se calcula una sola vez al crear. El GET filtra por
+-- expires_at > now(), así que las vencidas simplemente dejan de listarse
+-- (no hace falta un cron que las borre).
+CREATE TABLE IF NOT EXISTS historias (
+    id             BIGINT PRIMARY KEY,
+    usuario_id     UUID NOT NULL,
+    usuario_nombre TEXT NOT NULL,
+    usuario_foto   TEXT,
+    media_url      TEXT NOT NULL,
+    tipo           TEXT NOT NULL CHECK (tipo IN ('foto', 'video')),
+    duracion_horas INT NOT NULL,
+    created_at     TIMESTAMPTZ DEFAULT now(),
+    expires_at     TIMESTAMPTZ NOT NULL
+);

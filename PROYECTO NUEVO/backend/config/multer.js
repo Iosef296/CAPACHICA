@@ -21,4 +21,20 @@ const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 },
 });
 
+// Storage aparte para historias (foto o video) -- resource_type 'auto' deja
+// que Cloudinary detecte el tipo solo. Sin la transformación de imagen fija
+// de arriba porque le rompería el procesamiento a los videos.
+const storageHistorias = cloudinaryStorage({
+    cloudinary: cloudinaryLib,
+    folder: 'capachica/historias',
+    resource_type: 'auto',
+    allowedFormats: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'mp4', 'mov', 'webm'],
+});
+
+const uploadHistoria = multer({
+    storage: storageHistorias,
+    limits: { fileSize: 25 * 1024 * 1024 },
+});
+
 module.exports = upload;
+module.exports.uploadHistoria = uploadHistoria;

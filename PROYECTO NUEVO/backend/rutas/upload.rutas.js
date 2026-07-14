@@ -12,4 +12,12 @@ router.post('/', upload.single('imagen'), (req, res) => {
     res.json({ url });
 });
 
+// Foto o video para historias -- mismo contrato, storage con resource_type auto.
+router.post('/historia', upload.uploadHistoria.single('media'), (req, res) => {
+    if (!req.file) return res.status(400).json({ error: 'No se recibió archivo' });
+    const url = req.file.path || req.file.secure_url || req.file.url;
+    if (!url) return res.status(500).json({ error: 'Cloudinary no devolvió una URL' });
+    res.json({ url });
+});
+
 module.exports = router;

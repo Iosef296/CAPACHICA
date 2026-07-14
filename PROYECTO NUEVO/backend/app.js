@@ -8,7 +8,7 @@ const morgan   = require('morgan');
 const path     = require('path');
 
 const { initializeDatabase } = require('./config/base-de-datos');
-const { waitForDB }          = require('./config/postgres');
+const { waitForDB, query }   = require('./config/postgres');
 const { errorHandler }       = require('./middleware/error-handler');
 const { attachWS }           = require('./ws');
 
@@ -36,6 +36,9 @@ const { artesaniaRoutes, maestrosRoutes, guiasRoutes, hospedajesRoutes } = requi
 
 // Rutas — Upload
 const uploadRoutes = require('./rutas/upload.rutas');
+
+// Rutas — Historias (estilo WhatsApp Status)
+const historiasRoutes = require('./rutas/historias.rutas');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -82,6 +85,9 @@ app.use('/api/hospedajes', hospedajesRoutes);
 // ── Upload ─────────────────────────────────────────
 app.use('/api/upload', uploadRoutes);
 
+// ── Historias ──────────────────────────────────────
+app.use('/api/historias', historiasRoutes);
+
 // Health check
 app.get('/api/health', (_req, res) => {
     res.json({ status: 'OK', mensaje: 'Capachica API unificada', timestamp: new Date() });
@@ -98,6 +104,24 @@ async function start() {
         );
         // pg Pool (actividades/reservas) — obligatorio
         await waitForDB();
+
+        // Tabla de historias -- CREATE TABLE IF NOT EXISTS, no rompe si ya existe.
+        // No hay sistema de migraciones formal en este backend; el resto de
+        // tablas (comunidades, festividades, etc.) se crearon a mano por
+        // consola de Railway, esta se autocrea al bootear para no depender de eso.
+        await query(`
+            CREATE TABLE IF NOT EXISTS historias (
+                id             BIGINT PRIMARY KEY,
+                usuario_id     UUID NOT NULL,
+                usuario_nombre TEXT NOT NULL,
+                usuario_foto   TEXT,
+                media_url      TEXT NOT NULL,
+                tipo           TEXT NOT NULL CHECK (tipo IN ('foto', 'video')),
+                duracion_horas INT NOT NULL,
+                created_at     TIMESTAMPTZ DEFAULT now(),
+                expires_at     TIMESTAMPTZ NOT NULL
+            )
+        `).catch(err => console.warn('⚠️  No se pudo crear tabla historias:', err.message));
 
         const swaggerUi = require('swagger-ui-express');
         const YAML      = require('yamljs');
