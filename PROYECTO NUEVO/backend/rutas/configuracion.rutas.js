@@ -79,6 +79,59 @@ const DEFAULTS = {
 
     // Mi negocio -- CTA que convierte turista en emprendedor
     'myBusiness.becomeProviderMsg': 'Todavía eres turista. Pídele a un administrador que te habilite como emprendedor para poder crear y gestionar tu propio negocio en la app.',
+
+    // Home -- historias
+    'home.myStoryLabel': 'Tu historia',
+    'home.selfStoryLabel': 'Tú',
+
+    // Artesanía
+    'crafts.wisdomLabel': 'SABIDURÍA ANCESTRAL · KILLA',
+    'crafts.wisdomText': 'Cada símbolo en un tejido cuenta una historia. El Ch\'aska representa la estrella guía.',
+    'crafts.sectionMaestros': 'MAESTROS DEL TELAR',
+    'crafts.sectionGaleria': 'GALERÍA',
+    'crafts.sectionTintes': 'TINTES DE LA TIERRA',
+
+    // Gastronomía
+    'gastronomy.tabs': JSON.stringify(['Todo', 'Platos Fuertes', 'Sopas', 'Tradición Viva']),
+    'gastronomy.intiTag': 'Inti: Pruébalo en Asoc. Tikarani',
+    'gastronomy.sectionRestaurantes': 'RESTAURANTES EN CAPACHICA',
+
+    // Festividades
+    'festividades.types': JSON.stringify(['Todas', 'Religiosa', 'Cultural', 'Cívica']),
+    'festividades.badgeDestacada': 'DESTACADA',
+
+    // Reservas (pantalla de reservar hospedajes/actividades)
+    'booking.locations': JSON.stringify(['Todas', 'Llachón', 'Ccotos', 'Siale', 'Chifrón']),
+    'booking.sectionHospedajes': 'HOSPEDAJES FAMILIARES',
+    'booking.sectionActividades': 'TOURS Y ACTIVIDADES',
+    'booking.ctaReservar': 'Reservar ahora',
+    'booking.emptyHospedajes': 'No hay hospedajes en {loc} todavía.',
+
+    // Familias (lista)
+    'communities.intro': 'Cuatro pueblos vivos en la península del Titicaca, cada uno con su sabiduría.',
+    'communities.badgePopular': 'MÁS POPULAR',
+    'communities.sectionAnfitrionas': 'FAMILIAS ANFITRIONAS',
+
+    // Guías
+    'guides.readMoreLabel': 'LEER MÁS →',
+
+    // Mapa (tab)
+    'map.filters': JSON.stringify(['Todo', 'Familias', 'Gastronomía', 'Aventura', 'Cultura']),
+    'map.searchPlaceholder': 'Buscar en Capachica…',
+    'map.locationEyebrow': 'UBICACIÓN',
+
+    // Reservas (tab -- "Mis reservas")
+    'reservasTab.eyebrow': 'VIAJES',
+    'reservasTab.emptyLoginTitle': 'Inicia sesión para ver tus reservas',
+    'reservasTab.emptyTitle': 'Sin reservas aún',
+    'reservasTab.emptySubtitle': 'Explora experiencias y reserva tu próximo viaje a Capachica.',
+    'reservasTab.emptyCta': 'Ver experiencias',
+    'reservasTab.viewDetailLabel': 'Ver detalle',
+
+    // Favoritos -- estado vacío
+    'favorites.emptyTitle': 'Sin favoritos aún',
+    'favorites.emptySubtitle': 'Toca el corazón en cualquier hospedaje, comunidad o experiencia para guardarla aquí.',
+    'favorites.emptyCta': 'Explorar',
 };
 
 router.get('/', async (_req, res) => {
