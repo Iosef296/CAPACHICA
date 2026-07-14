@@ -55,8 +55,12 @@ const DEFAULTS = {
     'festividades.title': 'Festividades',
     'favorites.eyebrow': 'GUARDADOS',
     'favorites.title': 'Mis Favoritos',
+    'experiences.eyebrow': 'EXPERIENCIAS',
+    'experiences.headline': 'Vive Capachica',
+    'guides.travelEyebrow': 'GUÍA DE VIAJE',
     'guides.travelTitle': 'Cómo recorrer Capachica',
     'guides.travelIntro': 'Rutas, transporte y consejos prácticos para tu viaje.',
+    'guides.culturalEyebrow': 'GUÍA CULTURAL',
     'guides.culturalTitle': 'Capachica Cultural',
     'guides.culturalIntro': 'Historia, mitos y tradiciones vivas de la península.',
 
