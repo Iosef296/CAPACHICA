@@ -62,7 +62,7 @@ export default function SettingsScreen() {
         </Group>
 
         <Group title={t('settings.acercaDe')}>
-          <InfoRow icon="info" label={t('settings.version')} value="alpha-1.0.6" />
+          <InfoRow icon="info" label={t('settings.version')} value="alpha-1.0.7" />
           <InfoRow icon="copyright" label={t('settings.copyright')} />
         </Group>
       </SafeAreaView>
