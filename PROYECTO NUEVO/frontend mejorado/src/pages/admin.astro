@@ -539,6 +539,36 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       animation: fadeUp .18s ease;
     }
     .pag-item:hover { border-color: var(--border2); }
+
+    /* APP MOVIL — mockup de celular (vista previa del hero de Home) */
+    .phone-frame {
+      width: 300px; height: 620px; background: #111;
+      border-radius: 36px; padding: 12px; position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      flex-shrink: 0;
+    }
+    .phone-notch {
+      position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 22px; background: #111; border-radius: 0 0 14px 14px; z-index: 2;
+    }
+    .phone-screen {
+      width: 100%; height: 100%; border-radius: 26px; overflow: hidden;
+      background:
+        linear-gradient(rgba(0,66,104,0.2), rgba(0,66,104,0.88)),
+        url('https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800') center/cover;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 24px 20px;
+    }
+    .am-preview-title {
+      font-family: Georgia, 'Times New Roman', serif; font-size: 24px; font-weight: 600;
+      color: #fff; line-height: 1.25; margin-bottom: 10px; word-break: break-word;
+    }
+    .am-preview-subtitle { font-size: 13px; color: rgba(255,255,255,0.85); margin-bottom: 18px; line-height: 1.4; }
+    .am-preview-btn {
+      align-self: flex-start; background: #C05D38; color: #fff;
+      font-size: 12px; font-weight: 700; letter-spacing: .04em;
+      padding: 13px 20px; border-radius: 999px;
+    }
   </style>
 </head>
 <body>
@@ -630,8 +660,8 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       <button class="nav-btn" data-section="global" title="Navbar &amp; Footer">
         <span>🎨</span><span class="nav-btn-text"> Navbar &amp; Footer</span>
       </button>
-      <button class="nav-btn" data-section="etiquetas" title="Etiquetas App">
-        <span>🏷️</span><span class="nav-btn-text"> Etiquetas App</span>
+      <button class="nav-btn" data-section="etiquetas" title="App Móvil">
+        <span>📱</span><span class="nav-btn-text"> App Móvil</span>
       </button>
     </aside>
 
@@ -862,27 +892,37 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         </div>
       </div>
 
-      <!-- ─── ETIQUETAS APP SECTION ─── -->
-      <div class="section" id="sec-etiquetas">
-        <div class="page-hdr">
-          <h2>Etiquetas de la App</h2>
-          <p>Textos de la grilla "Explora" en el Inicio del mobile -- se ven al instante en todos los celulares, sin actualizar el APK</p>
-        </div>
-        <div class="card">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div class="fg" style="margin:0"><label>Familias / Comunidades</label><input type="text" id="et-comunidades" /></div>
-            <div class="fg" style="margin:0"><label>Gastronomía</label><input type="text" id="et-gastronomia" /></div>
-            <div class="fg" style="margin:0"><label>Artesanía</label><input type="text" id="et-artesania" /></div>
-            <div class="fg" style="margin:0"><label>Reservas</label><input type="text" id="et-reservas" /></div>
-            <div class="fg" style="margin:0"><label>AR</label><input type="text" id="et-ar" /></div>
-            <div class="fg" style="margin:0"><label>Guías</label><input type="text" id="et-guias" /></div>
-            <div class="fg" style="margin:0"><label>Mapa Google</label><input type="text" id="et-mapaGoogle" /></div>
-            <div class="fg" style="margin:0"><label>Chat Inti</label><input type="text" id="et-chatInti" /></div>
-            <div class="fg" style="margin:0"><label>Festividades</label><input type="text" id="et-festividades" /></div>
+      <!-- ─── APP MOVIL SECTION ─── -->
+      <div class="section" id="sec-app-movil" style="height:calc(100vh - 56px);margin:-28px -32px;overflow:hidden;">
+        <div style="display:flex;height:calc(100vh - 56px);">
+
+          <!-- LEFT: forms -->
+          <div id="app-movil-edit-panel" style="width:460px;flex-shrink:0;overflow-y:auto;padding:28px 24px;border-right:1px solid var(--border);background:var(--s1);">
+            <div class="page-hdr">
+              <h2>App Móvil</h2>
+              <p>Textos del mobile editables sin rebuildear el APK -- se ven al instante en todos los celulares</p>
+            </div>
+            <div id="am-fields-container"></div>
+            <div style="display:flex;gap:10px;align-items:center;padding-bottom:24px;">
+              <button class="btn-primary" id="saveAppMovilBtn">💾 Guardar todo</button>
+              <span id="app-movil-msg" style="font-size:13px;color:var(--green);display:none">✓ Guardado</span>
+            </div>
           </div>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center">
-          <button class="btn-primary" id="saveEtiquetasBtn">Guardar Etiquetas</button>
+
+          <!-- RIGHT: mockup celular (vista previa en vivo del hero de Home) -->
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0a1622;gap:14px;">
+            <span style="font-size:11px;color:var(--dim);letter-spacing:.06em;text-transform:uppercase;">Vista previa — Inicio (hero)</span>
+            <div class="phone-frame">
+              <div class="phone-notch"></div>
+              <div class="phone-screen">
+                <div class="am-preview-title" id="am-preview-title">Vive Capachica, conoce su cultura, comparte experiencias</div>
+                <div class="am-preview-subtitle" id="am-preview-subtitle">Descubre el corazón del Titicaca a través de una lente inteligente y ancestral.</div>
+                <div class="am-preview-btn" id="am-preview-btn">CREAR MI EXPERIENCIA CON IA</div>
+              </div>
+            </div>
+            <span style="font-size:10px;color:var(--dim);max-width:300px;text-align:center;">Los demás textos (Ayuda, encabezados, onboarding) no tienen mockup visual, se editan como formulario</span>
+          </div>
+
         </div>
       </div>
 
@@ -1309,7 +1349,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       if (btn.dataset.section === 'widget')   loadWidget();
       if (btn.dataset.section === 'destinos') loadDestinos();
       if (btn.dataset.section === 'paginas')  loadPaginas();
-      if (btn.dataset.section === 'etiquetas') loadEtiquetas();
+      if (btn.dataset.section === 'etiquetas') loadAppMovil();
       if (['hospedajes','artesania','festividades','maestros','guias'].includes(btn.dataset.section)) cargarSimple(btn.dataset.section);
       if (btn.dataset.section === 'usuarios') loadUsuarios();
       if (btn.dataset.section === 'global') {
@@ -1472,22 +1512,132 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
 
   $('previewWidgetBtn').onclick = () => window.open('/', '_blank');
 
-  const ETIQUETAS_KEYS = ['comunidades','gastronomia','artesania','reservas','ar','guias','mapaGoogle','chatInti','festividades'];
+  const AM_FIELDS = [
+    { group: 'Grilla "Explora" (Inicio)', items: [
+      { key: 'comunidades', label: 'Familias / Comunidades' },
+      { key: 'gastronomia', label: 'Gastronomía' },
+      { key: 'artesania', label: 'Artesanía' },
+      { key: 'reservas', label: 'Reservas' },
+      { key: 'ar', label: 'AR' },
+      { key: 'guias', label: 'Guías' },
+      { key: 'mapaGoogle', label: 'Mapa Google' },
+      { key: 'chatInti', label: 'Chat Inti' },
+      { key: 'festividades', label: 'Festividades' },
+    ]},
+    { group: 'Home — Hero', items: [
+      { key: 'home.heroTitle', label: 'Título grande', live: 'am-preview-title' },
+      { key: 'home.heroSubtitle', label: 'Subtítulo', multiline: true, live: 'am-preview-subtitle' },
+      { key: 'home.ctaCrear', label: 'Texto del botón', live: 'am-preview-btn', upper: true },
+      { key: 'home.loginAlertTitle', label: 'Alerta de login (título)' },
+      { key: 'home.loginAlertBody', label: 'Alerta de login (texto)', multiline: true },
+    ]},
+    { group: 'Inti AI (teaser en Inicio/Familias/Gastronomía)', items: [
+      { key: 'killaTeaser.headline', label: 'Pregunta' },
+      { key: 'killaTeaser.placeholder', label: 'Placeholder del input' },
+    ]},
+    { group: 'Onboarding', items: [
+      { key: 'login.headline', label: 'Login — título' },
+      { key: 'login.subtitle', label: 'Login — subtítulo', multiline: true },
+      { key: 'register.headline', label: 'Registro — título' },
+      { key: 'register.subtitle', label: 'Registro — subtítulo', multiline: true },
+      { key: 'phone.headline', label: 'Teléfono — título' },
+      { key: 'phone.subtitle', label: 'Teléfono — subtítulo', multiline: true },
+    ]},
+    { group: 'Encabezados de pantallas', items: [
+      { key: 'booking.eyebrow', label: 'Reservas — eyebrow' },
+      { key: 'booking.title', label: 'Reservas — título' },
+      { key: 'communities.eyebrow', label: 'Familias — eyebrow' },
+      { key: 'communities.title', label: 'Familias — título' },
+      { key: 'crafts.eyebrow', label: 'Artesanía — eyebrow' },
+      { key: 'crafts.title', label: 'Artesanía — título' },
+      { key: 'gastronomy.eyebrow', label: 'Gastronomía — eyebrow' },
+      { key: 'gastronomy.title', label: 'Gastronomía — título' },
+      { key: 'festividades.eyebrow', label: 'Festividades — eyebrow' },
+      { key: 'festividades.title', label: 'Festividades — título' },
+      { key: 'favorites.eyebrow', label: 'Favoritos — eyebrow' },
+      { key: 'favorites.title', label: 'Favoritos — título' },
+      { key: 'experiences.eyebrow', label: 'Experiencias — eyebrow' },
+      { key: 'experiences.headline', label: 'Experiencias — título' },
+      { key: 'guides.travelEyebrow', label: 'Guía de viaje — eyebrow' },
+      { key: 'guides.travelTitle', label: 'Guía de viaje — título' },
+      { key: 'guides.travelIntro', label: 'Guía de viaje — intro', multiline: true },
+      { key: 'guides.culturalEyebrow', label: 'Guía cultural — eyebrow' },
+      { key: 'guides.culturalTitle', label: 'Guía cultural — título' },
+      { key: 'guides.culturalIntro', label: 'Guía cultural — intro', multiline: true },
+    ]},
+    { group: 'Ayuda / Contacto', items: [
+      { key: 'help.title', label: 'Título' },
+      { key: 'help.intro', label: 'Intro', multiline: true },
+      { key: 'help.whatsappNumber', label: 'WhatsApp (con código de país, ej +51...)' },
+      { key: 'help.email', label: 'Email de contacto' },
+      { key: 'help.faqs', label: 'Preguntas frecuentes -- JSON: [{"q":"...","a":"..."}]', multiline: true, json: true },
+    ]},
+    { group: 'Mi Negocio', items: [
+      { key: 'myBusiness.becomeProviderMsg', label: 'Mensaje para turistas sin habilitar', multiline: true },
+    ]},
+  ];
 
-  async function loadEtiquetas() {
+  function amFieldId(key) { return 'am-' + key.replace(/\./g, '-'); }
+
+  function renderAppMovilForm() {
+    const container = $('am-fields-container');
+    container.innerHTML = AM_FIELDS.map(g => `
+      <div class="card">
+        <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">${g.group}</div>
+        ${g.items.map(it => `
+          <div class="fg">
+            <label>${it.label}</label>
+            ${it.multiline
+              ? `<textarea id="${amFieldId(it.key)}" rows="3"></textarea>`
+              : `<input type="text" id="${amFieldId(it.key)}" />`}
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+
+    AM_FIELDS.forEach(g => g.items.forEach(it => {
+      if (!it.live) return;
+      const el = $(amFieldId(it.key));
+      if (!el) return;
+      el.addEventListener('input', () => {
+        $(it.live).textContent = it.upper ? el.value.toUpperCase() : el.value;
+      });
+    }));
+  }
+
+  async function loadAppMovil() {
+    renderAppMovilForm();
     try {
       const res = await fetch(`${API_URL}/api/configuracion`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      ETIQUETAS_KEYS.forEach(k => { const el = $('et-' + k); if (el) el.value = data[k] || ''; });
+      AM_FIELDS.forEach(g => g.items.forEach(it => {
+        const el = $(amFieldId(it.key));
+        if (!el) return;
+        el.value = data[it.key] ?? '';
+        if (it.live) $(it.live).textContent = it.upper ? (el.value || '').toUpperCase() : el.value;
+      }));
     } catch (e) {
-      showMsg(`Error cargando etiquetas: ${e.message}`, 'err');
+      showMsg(`Error cargando App Móvil: ${e.message}`, 'err');
     }
   }
 
-  $('saveEtiquetasBtn').onclick = async () => {
+  $('saveAppMovilBtn').onclick = async () => {
     const body = {};
-    ETIQUETAS_KEYS.forEach(k => { const el = $('et-' + k); if (el) body[k] = el.value.trim(); });
+    try {
+      AM_FIELDS.forEach(g => g.items.forEach(it => {
+        const el = $(amFieldId(it.key));
+        if (!el) return;
+        if (it.json) {
+          body[it.key] = JSON.parse(el.value);
+        } else {
+          body[it.key] = el.value.trim();
+        }
+      }));
+    } catch (e) {
+      showMsg(`JSON inválido en alguno de los campos: ${e.message}`, 'err');
+      return;
+    }
     try {
       const res = await fetch(`${API_URL}/api/configuracion`, {
         method: 'PUT',
@@ -1495,7 +1645,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      showMsg('Etiquetas guardadas ✓ -- ya se ven así en el mobile');
+      showMsg('App Móvil guardada ✓ -- se ve al instante en todos los celulares');
     } catch (e) {
       showMsg(`Error al guardar: ${e.message}`, 'err');
     }
