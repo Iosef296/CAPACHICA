@@ -751,7 +751,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       <div class="section" id="sec-destinos">
         <div class="page-hdr">
           <h2>Familias Anfitrionas</h2>
-          <p>Familias vivenciales que reciben visitantes -- se muestran en la página principal</p>
+          <p>Familias que ofrecen su casa como hospedaje vivencial -- con precio, capacidad, servicios y actividades como un hospedaje real</p>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
           <span class="count-pill" id="dest-count">0 familias</span>
@@ -1087,28 +1087,51 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       <input type="url" id="d-imagen" placeholder="O pega una URL de imagen: https://..." style="margin-top:4px" />
     </div>
 
-    <div class="form-row2" style="margin-bottom:12px">
+    <div class="form-row2">
       <div class="fg" style="margin:0">
-        <label>Emoji (si no hay foto)</label>
-        <input type="text" id="d-emoji" placeholder="🏡" maxlength="4" />
+        <label>Precio por noche (S/, por persona)</label>
+        <input type="number" id="d-precio" placeholder="80" />
       </div>
       <div class="fg" style="margin:0">
-        <label>Precio por noche (badge)</label>
-        <input type="text" id="d-highlight" placeholder="S/ 70 por persona, con comidas" />
+        <label>Capacidad (huéspedes)</label>
+        <input type="number" id="d-capacidad" placeholder="4" />
+      </div>
+    </div>
+
+    <div class="form-row2">
+      <div class="fg" style="margin:0">
+        <label>Habitaciones</label>
+        <input type="number" id="d-habitaciones" placeholder="2" />
+      </div>
+      <div class="fg" style="margin:0">
+        <label>Comidas incluidas</label>
+        <select id="d-comidas">
+          <option value="">Sin comidas</option>
+          <option value="Solo desayuno">Solo desayuno</option>
+          <option value="Pensión completa">Pensión completa (desayuno, almuerzo y cena)</option>
+        </select>
       </div>
     </div>
 
     <div class="fg">
-      <label>Color del badge (hex)</label>
-      <div class="color-row">
-        <input type="color" id="d-color-picker" value="#0ea5e9" oninput="document.getElementById('d-color').value=this.value" />
-        <input type="text"  id="d-color" value="#0ea5e9" placeholder="#0ea5e9" oninput="document.getElementById('d-color-picker').value=this.value.match(/^#[0-9a-fA-F]{6}$/) ? this.value : this.value" />
-      </div>
+      <label>Servicios (separados por coma)</label>
+      <input type="text" id="d-servicios" placeholder="Baño privado, Agua caliente, Electricidad, Vista al lago" />
     </div>
 
     <div class="fg">
-      <label>Servicios y actividades (separados por coma)</label>
-      <input type="text" id="d-tags" placeholder="Desayuno incluido, Pesca artesanal, Tejido, Vista al lago" />
+      <label>Actividades que ofrecen (separadas por coma)</label>
+      <input type="text" id="d-actividades" placeholder="Pesca artesanal, Tejido, Paseo en bote, Agricultura" />
+    </div>
+
+    <div class="form-row2">
+      <div class="fg" style="margin:0">
+        <label>Idiomas (separados por coma)</label>
+        <input type="text" id="d-idiomas" placeholder="Español, Quechua" />
+      </div>
+      <div class="fg" style="margin:0">
+        <label>Contacto WhatsApp</label>
+        <input type="text" id="d-whatsapp" placeholder="+51 999 999 999" />
+      </div>
     </div>
 
     <div style="display:flex;gap:10px;margin-top:6px">
@@ -1791,18 +1814,26 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     }
     $('destinosList').innerHTML = destinosData.map(d => {
       const thumb = d.imagen
-        ? `<img class="dest-thumb" src="${esc(d.imagen)}" alt="${esc(d.nombre)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="dest-emoji-box" style="display:none;background:rgba(${hexToRgbStr(d.color)},0.12)">${esc(d.emoji||'📍')}</div>`
-        : `<div class="dest-emoji-box" style="background:rgba(${hexToRgbStr(d.color)},0.12)">${esc(d.emoji||'📍')}</div>`;
-      const tagHtml = (d.tags||[]).map(t => `<span style="padding:2px 8px;border-radius:999px;font-size:11px;background:var(--s3);color:var(--muted);border:1px solid var(--border)">${esc(t)}</span>`).join('');
+        ? `<img class="dest-thumb" src="${esc(d.imagen)}" alt="${esc(d.nombre)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" /><div class="dest-emoji-box" style="display:none;background:rgba(14,165,233,0.12)">🏡</div>`
+        : `<div class="dest-emoji-box" style="background:rgba(14,165,233,0.12)">🏡</div>`;
+      const precioTxt = d.precio ? `S/ ${d.precio} / noche` : 'Precio a consultar';
+      const metaBits = [
+        d.capacidad ? `${d.capacidad} huéspedes` : null,
+        d.habitaciones ? `${d.habitaciones} hab.` : null,
+        d.comidas || null,
+      ].filter(Boolean).join(' · ');
+      const chipsList = [...(d.servicios||[]), ...(d.actividades||[])];
+      const tagHtml = chipsList.map(t => `<span style="padding:2px 8px;border-radius:999px;font-size:11px;background:var(--s3);color:var(--muted);border:1px solid var(--border)">${esc(t)}</span>`).join('');
       return `
         <div class="dest-item" id="dest-${d.id}">
           ${thumb}
           <div style="flex:1;min-width:0">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
               <span style="font-size:15px;font-weight:700;color:var(--text)">${esc(d.nombre)}</span>
-              <span style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;background:rgba(${hexToRgbStr(d.color)},0.15);color:${esc(d.color)};border:1px solid rgba(${hexToRgbStr(d.color)},0.3)">${esc(d.highlight)}</span>
+              <span style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;background:rgba(14,165,233,0.15);color:#0ea5e9;border:1px solid rgba(14,165,233,0.3)">${esc(precioTxt)}</span>
             </div>
-            <div style="font-size:12px;color:var(--cyan);margin-bottom:5px">📍 ${esc(d.comunidad)}</div>
+            <div style="font-size:12px;color:var(--cyan);margin-bottom:2px">📍 ${esc(d.comunidad)}</div>
+            ${metaBits ? `<div style="font-size:11px;color:var(--muted);margin-bottom:5px">${esc(metaBits)}</div>` : ''}
             <div style="font-size:12px;color:var(--muted);line-height:1.4;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(d.desc)}</div>
             <div style="display:flex;flex-wrap:wrap;gap:4px">${tagHtml}</div>
           </div>
@@ -1815,25 +1846,22 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     }).join('');
   }
 
-  function hexToRgbStr(hex) {
-    const m = (hex||'#38bdf8').replace('#','').match(/.{2}/g);
-    return m ? m.map(h => parseInt(h, 16)).join(',') : '56,189,248';
-  }
-
   function openDestinoModal(id) {
     const d = id ? destinosData.find(x => x.id === id) : null;
     $('modalTitle').textContent = d ? 'Editar familia' : 'Nueva familia';
-    $('d-id').value         = d ? d.id : '';
-    $('d-nombre').value     = d ? d.nombre    : '';
-    $('d-comunidad').value  = d ? d.comunidad : '';
-    $('d-desc').value       = d ? d.desc      : '';
-    $('d-imagen').value     = d ? d.imagen    : '';
-    $('d-emoji').value      = d ? (d.emoji||'') : '';
-    $('d-highlight').value  = d ? d.highlight : '';
-    const color = (d && d.color) ? d.color : '#0ea5e9';
-    $('d-color').value         = color;
-    $('d-color-picker').value  = color;
-    $('d-tags').value       = d ? (d.tags||[]).join(', ') : '';
+    $('d-id').value           = d ? d.id : '';
+    $('d-nombre').value       = d ? d.nombre : '';
+    $('d-comunidad').value    = d ? d.comunidad : '';
+    $('d-desc').value         = d ? d.desc : '';
+    $('d-imagen').value       = d ? d.imagen : '';
+    $('d-precio').value       = d && d.precio != null ? d.precio : '';
+    $('d-capacidad').value    = d && d.capacidad != null ? d.capacidad : '';
+    $('d-habitaciones').value = d && d.habitaciones != null ? d.habitaciones : '';
+    $('d-comidas').value      = d ? (d.comidas || '') : '';
+    $('d-servicios').value    = d ? (d.servicios || []).join(', ') : '';
+    $('d-actividades').value  = d ? (d.actividades || []).join(', ') : '';
+    $('d-idiomas').value      = d ? (d.idiomas || []).join(', ') : '';
+    $('d-whatsapp').value     = d ? (d.whatsapp || '') : '';
     resetDestUpload();
     if (d && d.imagen) setDestPreview(d.imagen);
     $('destinoModal').classList.add('open');
@@ -2339,14 +2367,19 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     const desc      = $('d-desc').value.trim();
     if (!nombre || !comunidad || !desc) { showMsg('Nombre, comunidad y descripción son obligatorios', 'err'); return; }
 
-    const tags = $('d-tags').value.split(',').map(s => s.trim()).filter(Boolean);
+    const toNum = v => (v.trim() === '' ? undefined : Number(v));
+    const toList = v => v.split(',').map(s => s.trim()).filter(Boolean);
     const body = {
       nombre, comunidad, desc,
-      imagen:    $('d-imagen').value.trim(),
-      emoji:     $('d-emoji').value.trim() || '📍',
-      highlight: $('d-highlight').value.trim() || nombre,
-      color:     $('d-color').value.trim() || '#0ea5e9',
-      tags,
+      imagen:       $('d-imagen').value.trim(),
+      precio:       toNum($('d-precio').value),
+      capacidad:    toNum($('d-capacidad').value),
+      habitaciones: toNum($('d-habitaciones').value),
+      comidas:      $('d-comidas').value,
+      servicios:    toList($('d-servicios').value),
+      actividades:  toList($('d-actividades').value),
+      idiomas:      toList($('d-idiomas').value),
+      whatsapp:     $('d-whatsapp').value.trim(),
     };
 
     const id = $('d-id').value;
