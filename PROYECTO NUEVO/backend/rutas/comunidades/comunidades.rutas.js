@@ -1,3 +1,3 @@
-const { crearRutasJSON } = require('../utilidades/jsonCrud.rutas');
+const { crearRutasSQL } = require('../utilidades/sqlCrud.rutas');
 
-module.exports = crearRutasJSON('comunidades.json', 'Comunidad', 'comunidades');
+module.exports = crearRutasSQL('comunidades', 'Comunidad', 'comunidades');

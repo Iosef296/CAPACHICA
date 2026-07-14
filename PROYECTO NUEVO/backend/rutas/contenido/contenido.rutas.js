@@ -1,8 +1,8 @@
-const { crearRutasJSON } = require('../utilidades/jsonCrud.rutas');
+const { crearRutasSQL } = require('../utilidades/sqlCrud.rutas');
 
 module.exports = {
-    artesaniaRoutes:  crearRutasJSON('artesania.json',  'Producto de artesanía', 'artesania'),
-    maestrosRoutes:   crearRutasJSON('maestros.json',   'Maestro artesano',      'maestros'),
-    guiasRoutes:      crearRutasJSON('guias.json',      'Guía',                  'guias'),
-    hospedajesRoutes: crearRutasJSON('hospedajes.json', 'Hospedaje',             'hospedajes'),
+    artesaniaRoutes:  crearRutasSQL('artesania',  'Producto de artesanía', 'artesania'),
+    maestrosRoutes:   crearRutasSQL('maestros',   'Maestro artesano',      'maestros'),
+    guiasRoutes:      crearRutasSQL('guias',      'Guía',                  'guias'),
+    hospedajesRoutes: crearRutasSQL('hospedajes', 'Hospedaje',             'hospedajes'),
 };

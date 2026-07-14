@@ -54,3 +54,59 @@ DROP TRIGGER IF EXISTS reservas_updated_at ON reservas;
 CREATE TRIGGER reservas_updated_at
     BEFORE UPDATE ON reservas
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+-- ── Contenido CMS (comunidades, festividades, artesania, maestros, guias, hospedajes) ──
+-- Antes vivian como archivos JSON planos en backend/data/, escritos con
+-- fs.writeFileSync -- se perdian en cada redeploy porque el filesystem
+-- del contenedor es efimero y se reconstruye desde git. Cada item se
+-- guarda como una fila con sus campos propios en `data` (JSONB); ver
+-- rutas/utilidades/sqlCrud.rutas.js. Los archivos JSON originales
+-- quedan en backend/data/ solo como fuente de seed para entornos
+-- nuevos (backend/db/seed_contenido.js).
+CREATE TABLE IF NOT EXISTS comunidades (
+    id             BIGINT PRIMARY KEY,
+    usuario_id     UUID,
+    usuario_nombre TEXT,
+    data           JSONB NOT NULL,
+    created_at     TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS festividades (
+    id             BIGINT PRIMARY KEY,
+    usuario_id     UUID,
+    usuario_nombre TEXT,
+    data           JSONB NOT NULL,
+    created_at     TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS artesania (
+    id             BIGINT PRIMARY KEY,
+    usuario_id     UUID,
+    usuario_nombre TEXT,
+    data           JSONB NOT NULL,
+    created_at     TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS maestros (
+    id             BIGINT PRIMARY KEY,
+    usuario_id     UUID,
+    usuario_nombre TEXT,
+    data           JSONB NOT NULL,
+    created_at     TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS guias (
+    id             BIGINT PRIMARY KEY,
+    usuario_id     UUID,
+    usuario_nombre TEXT,
+    data           JSONB NOT NULL,
+    created_at     TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS hospedajes (
+    id             BIGINT PRIMARY KEY,
+    usuario_id     UUID,
+    usuario_nombre TEXT,
+    data           JSONB NOT NULL,
+    created_at     TIMESTAMPTZ DEFAULT now()
+);
