@@ -39,7 +39,7 @@ router.post('/', autenticacionMiddleware, async (req, res) => {
         const id = Date.now();
         const { rows } = await query(
             `INSERT INTO historias (id, usuario_id, usuario_nombre, usuario_foto, media_url, tipo, duracion_horas, expires_at)
-             VALUES ($1,$2,$3,$4,$5,$6,$7, now() + ($7 * INTERVAL '1 hour'))
+             VALUES ($1,$2,$3,$4,$5,$6,$7::int, now() + ($7::int * INTERVAL '1 hour'))
              RETURNING id, usuario_id, usuario_nombre, usuario_foto, media_url, tipo, duracion_horas, created_at, expires_at`,
             [id, req.usuario.id, req.usuario.nombre, req.usuario.foto ?? null, media_url, tipo, duracion]
         );
