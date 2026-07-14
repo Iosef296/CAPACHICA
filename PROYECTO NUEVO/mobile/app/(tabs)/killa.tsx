@@ -12,6 +12,41 @@ export default function KillaTab() {
   const [cfg, setCfg] = useState<WidgetCfg>(DEFAULT_CFG);
   useLiveRefresh(() => { fetchWidgetConfig().then(setCfg); }, { url: IA_WS, channels: 'widget' });
 
+  // Recreado en cada render (no a nivel de modulo) para que los colores
+  // reflejen el tema actual apenas se cambia, sin recargar la app.
+  const styles = StyleSheet.create({
+    scroll: { padding: spacing.containerPadding, paddingTop: spacing.stackLg, gap: spacing.gutter },
+    heroIcon: { alignItems: 'center', gap: 10 },
+    avatar: {
+      width: 72, height: 72, borderRadius: 36,
+      alignItems: 'center', justifyContent: 'center',
+      backgroundColor: colors.secondaryContainer,
+    },
+    statusRow: {
+      flexDirection: 'row', alignItems: 'center', gap: 6,
+      backgroundColor: 'rgba(52,211,153,0.12)', borderRadius: radii.full,
+      paddingHorizontal: 10, paddingVertical: 4,
+    },
+    greenDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#34d399' },
+    statusText: { color: '#0f9d6a', fontSize: 11, fontFamily: 'HankenGrotesk_700Bold' },
+    title: { color: colors.primary, textAlign: 'center', marginTop: 8 },
+    subtitle: {
+      color: colors.onSurfaceVariant, fontSize: 12, fontFamily: 'HankenGrotesk_700Bold',
+      textAlign: 'center', textTransform: 'uppercase', letterSpacing: 1.2, opacity: 0.8,
+    },
+    welcome: {
+      color: colors.onSurfaceVariant, fontSize: 16, textAlign: 'center', marginTop: 8,
+      fontFamily: 'HankenGrotesk_400Regular', lineHeight: 24,
+    },
+    cta: {
+      marginTop: spacing.stackSm, borderRadius: radii.full, overflow: 'hidden',
+      backgroundColor: colors.primary,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16,
+      shadowColor: colors.primary, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.2, shadowRadius: 20, elevation: 4,
+    },
+    ctaText: { color: colors.onPrimary, fontSize: 15, fontFamily: 'HankenGrotesk_700Bold', letterSpacing: 0.5 },
+  });
+
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaView edges={['top']} style={{ flex: 1 }}>
@@ -39,36 +74,3 @@ export default function KillaTab() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  scroll: { padding: spacing.containerPadding, paddingTop: spacing.stackLg, gap: spacing.gutter },
-  heroIcon: { alignItems: 'center', gap: 10 },
-  avatar: {
-    width: 72, height: 72, borderRadius: 36,
-    alignItems: 'center', justifyContent: 'center',
-    backgroundColor: colors.secondaryContainer,
-  },
-  statusRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: 'rgba(52,211,153,0.12)', borderRadius: radii.full,
-    paddingHorizontal: 10, paddingVertical: 4,
-  },
-  greenDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#34d399' },
-  statusText: { color: '#0f9d6a', fontSize: 11, fontFamily: 'HankenGrotesk_700Bold' },
-  title: { color: colors.primary, textAlign: 'center', marginTop: 8 },
-  subtitle: {
-    color: colors.onSurfaceVariant, fontSize: 12, fontFamily: 'HankenGrotesk_700Bold',
-    textAlign: 'center', textTransform: 'uppercase', letterSpacing: 1.2, opacity: 0.8,
-  },
-  welcome: {
-    color: colors.onSurfaceVariant, fontSize: 16, textAlign: 'center', marginTop: 8,
-    fontFamily: 'HankenGrotesk_400Regular', lineHeight: 24,
-  },
-  cta: {
-    marginTop: spacing.stackSm, borderRadius: radii.full, overflow: 'hidden',
-    backgroundColor: colors.primary,
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16,
-    shadowColor: colors.primary, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.2, shadowRadius: 20, elevation: 4,
-  },
-  ctaText: { color: colors.onPrimary, fontSize: 15, fontFamily: 'HankenGrotesk_700Bold', letterSpacing: 0.5 },
-});

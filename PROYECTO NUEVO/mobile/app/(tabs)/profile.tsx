@@ -34,11 +34,11 @@ export default function Profile() {
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaView edges={['top']}>
         <View style={styles.header}>
-          <View style={styles.avatarRing}>
+          <View style={[styles.avatarRing, { borderColor: colors.terracotta }]}>
             {user?.avatar ? (
               <Image source={{ uri: user.avatar }} style={styles.avatar} />
             ) : (
-              <View style={[styles.avatar, styles.avatarFallback]}>
+              <View style={[styles.avatar, styles.avatarFallback, { backgroundColor: colors.primary }]}>
                 <MaterialIcons name="person" size={56} color={colors.onPrimaryContainer} />
               </View>
             )}
@@ -91,7 +91,7 @@ function Stat({ label, value }: { label: string; value: number }) {
 
 function MenuItem({ icon, label, onPress }: { icon: keyof typeof MaterialIcons.glyphMap; label: string; onPress?: () => void }) {
   return (
-    <Pressable onPress={onPress} style={styles.menuItem}>
+    <Pressable onPress={onPress} style={[styles.menuItem, { borderBottomColor: colors.outlineVariant }]}>
       <MaterialIcons name={icon} size={22} color={colors.primary} />
       <Text style={[typography.bodyLg, { color: colors.onSurface, flex: 1 }]}>{label}</Text>
       <MaterialIcons name="chevron-right" size={22} color={colors.outline} />
@@ -101,14 +101,14 @@ function MenuItem({ icon, label, onPress }: { icon: keyof typeof MaterialIcons.g
 
 const styles = StyleSheet.create({
   header: { alignItems: 'center', paddingTop: spacing.stackMd, paddingHorizontal: spacing.containerPadding },
-  avatarRing: { padding: 3, borderRadius: 64, borderWidth: 2, borderColor: colors.terracotta },
+  avatarRing: { padding: 3, borderRadius: 64, borderWidth: 2 },
   avatar: { width: 112, height: 112, borderRadius: 56 },
-  avatarFallback: { backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
+  avatarFallback: { alignItems: 'center', justifyContent: 'center' },
   stats: { flexDirection: 'row', paddingHorizontal: spacing.containerPadding, marginTop: spacing.stackMd },
   menu: { marginTop: spacing.stackMd, paddingHorizontal: spacing.containerPadding, gap: 4 },
   menuItem: {
     flexDirection: 'row', alignItems: 'center', gap: spacing.gutter,
     paddingVertical: 18,
-    borderBottomWidth: 1, borderBottomColor: colors.outlineVariant,
+    borderBottomWidth: 1,
   },
 });

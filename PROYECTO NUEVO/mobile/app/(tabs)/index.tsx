@@ -63,7 +63,7 @@ export default function Home() {
         <View style={styles.catGrid}>
           {CATEGORIES.map(c => (
             <Pressable key={c.key} style={styles.catCard} onPress={() => router.push(c.path as any)}>
-              <View style={styles.catIcon}>
+              <View style={[styles.catIcon, { backgroundColor: colors.surfaceContainerLow, borderColor: colors.outlineVariant }]}>
                 <MaterialIcons name={c.icon as any} size={22} color={colors.primary} />
               </View>
               <Text style={[typography.labelSm, { color: colors.onSurface, textAlign: 'center' }]}>{c.label}</Text>
@@ -127,5 +127,5 @@ const styles = StyleSheet.create({
   sectionHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
   catGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: spacing.containerPadding, gap: spacing.gutter, justifyContent: 'space-between' },
   catCard: { width: '22%', alignItems: 'center', gap: 6 },
-  catIcon: { width: 56, height: 56, borderRadius: 16, backgroundColor: colors.surfaceContainerLow, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.outlineVariant },
+  catIcon: { width: 56, height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
 });

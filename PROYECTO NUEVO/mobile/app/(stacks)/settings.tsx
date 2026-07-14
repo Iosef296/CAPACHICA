@@ -48,14 +48,14 @@ export default function SettingsScreen() {
 
         <Group title={t('settings.idioma')}>
           {LANGS.map(l => (
-            <Pressable key={l.code} style={styles.row} onPress={() => setAppLanguage(l.code)}>
+            <Pressable key={l.code} style={[styles.row, { borderBottomColor: colors.outlineVariant }]} onPress={() => setAppLanguage(l.code)}>
               <MaterialIcons name="language" size={22} color={colors.primary} />
               <Text style={[typography.bodyLg, { color: colors.onSurface, flex: 1 }]}>{l.name}</Text>
               {i18n.language === l.code && <MaterialIcons name="check" size={22} color={colors.terracotta} />}
             </Pressable>
           ))}
           {(i18n.language === 'qu' || i18n.language === 'ay') && (
-            <Text style={styles.aviso}>
+            <Text style={[styles.aviso, { color: colors.onSurfaceVariant }]}>
               Traducción aproximada, en revisión por hablantes nativos.
             </Text>
           )}
@@ -74,15 +74,15 @@ export default function SettingsScreen() {
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View style={styles.group}>
-      <Text style={styles.groupTitle}>{title}</Text>
-      <View style={styles.card}>{children}</View>
+      <Text style={[styles.groupTitle, { color: colors.onSurfaceVariant }]}>{title}</Text>
+      <View style={[styles.card, { backgroundColor: colors.surfaceContainerLowest }]}>{children}</View>
     </View>
   );
 }
 
 function ToggleRow({ icon, label, value, onChange, disabled }: any) {
   return (
-    <View style={[styles.row, disabled && { opacity: 0.5 }]}>
+    <View style={[styles.row, { borderBottomColor: colors.outlineVariant }, disabled && { opacity: 0.5 }]}>
       <MaterialIcons name={icon} size={22} color={colors.primary} />
       <Text style={[typography.bodyLg, { color: colors.onSurface, flex: 1 }]}>{label}</Text>
       <Switch value={value} onValueChange={onChange} disabled={disabled} trackColor={{ true: colors.terracotta, false: colors.outlineVariant }} thumbColor="#fff" />
@@ -92,7 +92,7 @@ function ToggleRow({ icon, label, value, onChange, disabled }: any) {
 
 function InfoRow({ icon, label, value }: { icon: any; label: string; value?: string }) {
   return (
-    <View style={styles.row}>
+    <View style={[styles.row, { borderBottomColor: colors.outlineVariant }]}>
       <MaterialIcons name={icon} size={22} color={colors.primary} />
       <Text style={[typography.bodyLg, { color: colors.onSurface, flex: 1 }]}>{label}</Text>
       {value && <Text style={[typography.labelSm, { color: colors.onSurfaceVariant }]}>{value}</Text>}
@@ -102,8 +102,8 @@ function InfoRow({ icon, label, value }: { icon: any; label: string; value?: str
 
 const styles = StyleSheet.create({
   group: { marginTop: spacing.stackMd, paddingHorizontal: spacing.containerPadding },
-  groupTitle: { ...typography.labelMd, color: colors.onSurfaceVariant, marginBottom: spacing.stackSm },
-  card: { backgroundColor: colors.surfaceContainerLowest, borderRadius: radii.lg, overflow: 'hidden' },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, paddingHorizontal: spacing.gutter, borderBottomWidth: 1, borderBottomColor: colors.outlineVariant },
-  aviso: { ...typography.labelSm, color: colors.onSurfaceVariant, fontStyle: 'italic', padding: spacing.gutter },
+  groupTitle: { ...typography.labelMd, marginBottom: spacing.stackSm },
+  card: { borderRadius: radii.lg, overflow: 'hidden' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, paddingHorizontal: spacing.gutter, borderBottomWidth: 1 },
+  aviso: { ...typography.labelSm, fontStyle: 'italic', padding: spacing.gutter },
 });

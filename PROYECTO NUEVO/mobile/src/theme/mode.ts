@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
-import { DevSettings } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Updates from 'expo-updates';
 import { applyColorScheme } from './colors';
 
 export type ThemeMode = 'light' | 'dark';
@@ -28,20 +26,12 @@ export async function loadSavedThemeMode() {
 export async function setThemeMode(mode: ThemeMode) {
   await apply(mode);
   await AsyncStorage.setItem(KEY, mode);
-  // Colores fijados via StyleSheet.create() a nivel de modulo solo se
-  // recalculan si el bundle se re-ejecuta entero -- un remount de React
-  // no alcanza. Recargamos la app (colors ya quedo mutado antes de esto,
-  // asi que el nuevo bundle arranca directo con la paleta correcta).
-  try {
-    await Updates.reloadAsync();
-  } catch {
-    DevSettings.reload();
-  }
 }
 
 // Se suscribe a cambios de tema para poder forzar un remount global
-// (ver app/_layout.tsx) -- es la unica forma de repintar TODA la app
-// sin convertir cada pantalla a leer colors via contexto.
+// (ver app/_layout.tsx, key={themeMode}) -- las pantallas que ya migraron
+// sus colores de StyleSheet.create() a overrides inline se repintan solas
+// con ese remount, sin recargar la app entera.
 export function useThemeMode() {
   const [mode, setMode] = useState(currentMode);
   useEffect(() => {
