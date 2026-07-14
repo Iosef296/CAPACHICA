@@ -23,7 +23,7 @@ function crearRutasSQL(tabla, nombreRecurso, canal) {
                 `SELECT id, usuario_id, usuario_nombre, data FROM ${tabla} ORDER BY id`
             );
             res.json(rows.map(r => ({
-                id: r.id,
+                id: Number(r.id),
                 ...(r.usuario_id ? { usuario_id: r.usuario_id, usuario_nombre: r.usuario_nombre } : {}),
                 ...r.data,
             })));
@@ -41,7 +41,7 @@ function crearRutasSQL(tabla, nombreRecurso, canal) {
             if (!rows.length) return res.status(404).json({ error: `${nombreRecurso} no encontrado` });
             const r = rows[0];
             res.json({
-                id: r.id,
+                id: Number(r.id),
                 ...(r.usuario_id ? { usuario_id: r.usuario_id, usuario_nombre: r.usuario_nombre } : {}),
                 ...r.data,
             });
