@@ -11,7 +11,8 @@ const { autenticacionMiddleware } = require('../middleware/autenticacion.middlew
 
 const router = Router();
 
-const DURACIONES_VALIDAS = [1, 6, 12, 24];
+// 12h, 24h, 1 semana (168h), 1 mes (720h) -- todo en horas para no complicar la columna.
+const DURACIONES_VALIDAS = [12, 24, 168, 720];
 
 router.get('/', async (_req, res) => {
     try {
@@ -32,6 +33,9 @@ router.post('/', autenticacionMiddleware, async (req, res) => {
             return res.status(400).json({ error: 'media_url y tipo (foto|video) son requeridos' });
         }
         const duracion = DURACIONES_VALIDAS.includes(Number(duracion_horas)) ? Number(duracion_horas) : 24;
+        if (!req.usuario?.id) {
+            return res.status(401).json({ error: 'Usuario no identificado' });
+        }
         const id = Date.now();
         const { rows } = await query(
             `INSERT INTO historias (id, usuario_id, usuario_nombre, usuario_foto, media_url, tipo, duracion_horas, expires_at)
@@ -42,7 +46,8 @@ router.post('/', autenticacionMiddleware, async (req, res) => {
         broadcast('historias');
         res.status(201).json({ ...rows[0], id: Number(rows[0].id) });
     } catch (err) {
-        res.status(500).json({ error: 'Error al crear historia' });
+        console.error('Error al crear historia:', err);
+        res.status(500).json({ error: 'Error al crear historia', detalle: err.message });
     }
 });
 
