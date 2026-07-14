@@ -5,8 +5,9 @@ import { MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { useAuth } from '@/auth/AuthContext';
-import { negocios, subirFoto, API_WS, TipoNegocio } from '@/data/api';
+import { negocios, subirFoto, subirMediaHistoria, API_WS, TipoNegocio } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
+import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
 type FieldCfg = { key: string; label: string; placeholder?: string; multiline?: boolean };
@@ -97,7 +98,10 @@ export default function MyBusiness() {
   const [edit, setEdit] = useState<any>({});
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
   const cfg = TIPOS[tipoIdx];
+  const appCfg = useAppConfig();
 
   const canManage = user?.rol === 'admin' || user?.rol === 'proveedor';
 
@@ -108,12 +112,12 @@ export default function MyBusiness() {
   if (!canManage) {
     return (
       <View style={{ flex: 1, backgroundColor: colors.background }}>
-        <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+        <SafeAreaView edges={['bottom']} style={{ flex: 1 }}>
           <ScreenHeader eyebrow="MI NEGOCIO" title="Panel de emprendedor" back />
           <View style={{ padding: spacing.containerPadding, gap: spacing.gutter }}>
             <MaterialIcons name="storefront" size={48} color={colors.outline} style={{ alignSelf: 'center' }} />
             <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, textAlign: 'center' }]}>
-              Todavía eres turista. Pídele a un administrador que te habilite como emprendedor para poder crear y gestionar tu propio negocio en la app.
+              {appCfg.text('myBusiness.becomeProviderMsg', 'Todavía eres turista. Pídele a un administrador que te habilite como emprendedor para poder crear y gestionar tu propio negocio en la app.')}
             </Text>
             <Pressable onPress={() => refreshProfile()} style={styles.refreshBtn}>
               <MaterialIcons name="refresh" size={18} color={colors.primary} />
@@ -152,6 +156,43 @@ export default function MyBusiness() {
       Alert.alert('Error', (e as Error).message);
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function pickGalleryPhotos() {
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) { Alert.alert('Permiso necesario', 'Habilita el acceso a tus fotos para subir imágenes.'); return; }
+    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8, allowsMultipleSelection: true, selectionLimit: 8 });
+    if (result.canceled || !result.assets?.length) return;
+    setUploadingGallery(true);
+    try {
+      const urls: string[] = [];
+      for (const asset of result.assets) urls.push(await subirFoto(asset.uri));
+      setEdit((p: any) => ({ ...p, fotos: [...(p.fotos || []), ...urls] }));
+    } catch (e) {
+      Alert.alert('Error', (e as Error).message);
+    } finally {
+      setUploadingGallery(false);
+    }
+  }
+
+  function removeGalleryPhoto(url: string) {
+    setEdit((p: any) => ({ ...p, fotos: (p.fotos || []).filter((f: string) => f !== url) }));
+  }
+
+  async function pickVideo() {
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) { Alert.alert('Permiso necesario', 'Habilita el acceso a tus videos para subir uno.'); return; }
+    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['videos'], quality: 0.8 });
+    if (result.canceled || !result.assets?.[0]) return;
+    setUploadingVideo(true);
+    try {
+      const url = await subirMediaHistoria(result.assets[0].uri, 'video');
+      setEdit((p: any) => ({ ...p, video: url }));
+    } catch (e) {
+      Alert.alert('Error', (e as Error).message);
+    } finally {
+      setUploadingVideo(false);
     }
   }
 
@@ -195,7 +236,7 @@ export default function MyBusiness() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+      <SafeAreaView edges={['bottom']} style={{ flex: 1 }}>
         <ScreenHeader eyebrow="MI NEGOCIO" title="Gestionar mi negocio" back />
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
@@ -268,6 +309,48 @@ export default function MyBusiness() {
                 </Pressable>
               </View>
 
+              <View style={{ gap: 8 }}>
+                <Text style={[typography.labelMd, { color: colors.onSurfaceVariant }]}>Fotos adicionales</Text>
+                {!!(edit.fotos || []).length && (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                    {(edit.fotos || []).map((url: string) => (
+                      <View key={url}>
+                        <Image source={{ uri: url }} style={{ width: 72, height: 72, borderRadius: radii.md }} />
+                        <Pressable onPress={() => removeGalleryPhoto(url)} style={styles.removeBadge}>
+                          <MaterialIcons name="close" size={12} color="#fff" />
+                        </Pressable>
+                      </View>
+                    ))}
+                  </ScrollView>
+                )}
+                <Pressable onPress={pickGalleryPhotos} style={styles.photoBtn} disabled={uploadingGallery}>
+                  <MaterialIcons name="add-photo-alternate" size={18} color={colors.secondary} />
+                  <Text style={[typography.labelSm, { color: colors.secondary }]}>
+                    {uploadingGallery ? 'Subiendo…' : 'Agregar fotos'}
+                  </Text>
+                </Pressable>
+              </View>
+
+              <View style={{ gap: 8 }}>
+                <Text style={[typography.labelMd, { color: colors.onSurfaceVariant }]}>Video</Text>
+                {edit.video ? (
+                  <View style={styles.videoChip}>
+                    <MaterialIcons name="videocam" size={16} color={colors.secondary} />
+                    <Text style={[typography.labelSm, { color: colors.onSurface, flex: 1 }]} numberOfLines={1}>Video adjunto</Text>
+                    <Pressable onPress={() => setEdit((p: any) => ({ ...p, video: undefined }))}>
+                      <MaterialIcons name="close" size={16} color={colors.onSurfaceVariant} />
+                    </Pressable>
+                  </View>
+                ) : (
+                  <Pressable onPress={pickVideo} style={styles.photoBtn} disabled={uploadingVideo}>
+                    <MaterialIcons name="videocam" size={18} color={colors.secondary} />
+                    <Text style={[typography.labelSm, { color: colors.secondary }]}>
+                      {uploadingVideo ? 'Subiendo… (puede tardar)' : 'Subir video'}
+                    </Text>
+                  </Pressable>
+                )}
+              </View>
+
               {cfg.fields.map(f => (
                 <View key={f.key}>
                   <Text style={[typography.labelMd, { color: colors.onSurfaceVariant, marginBottom: 4 }]}>{f.label}</Text>
@@ -319,6 +402,14 @@ const styles = StyleSheet.create({
   modalBox: { backgroundColor: colors.surface, borderTopLeftRadius: radii.xl, borderTopRightRadius: radii.xl, padding: spacing.containerPadding, maxHeight: '88%' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.gutter },
   photoBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 8, paddingHorizontal: 14, borderRadius: radii.full, borderWidth: 1, borderColor: colors.secondary },
+  removeBadge: {
+    position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: 10,
+    backgroundColor: colors.error, alignItems: 'center', justifyContent: 'center',
+  },
+  videoChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 10, paddingHorizontal: 12,
+    borderRadius: radii.md, borderWidth: 1, borderColor: colors.outlineVariant, backgroundColor: colors.surfaceContainerLowest,
+  },
   input: {
     borderWidth: 1, borderColor: colors.outlineVariant, borderRadius: radii.md,
     padding: 12, fontFamily: 'HankenGrotesk_400Regular', fontSize: 14, color: colors.onSurface,

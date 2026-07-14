@@ -1087,6 +1087,26 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       <input type="url" id="d-imagen" placeholder="O pega una URL de imagen: https://..." style="margin-top:4px" />
     </div>
 
+    <div class="fg">
+      <label>Fotos adicionales (galería)</label>
+      <textarea id="d-imagenes" rows="4" placeholder="Una URL por línea, o subí varias fotos con el botón de abajo"></textarea>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+        <button type="button" onclick="document.getElementById('d-file-galeria').click()" style="padding:8px 14px;border-radius:7px;border:1px solid var(--border2);background:var(--s2);color:var(--cyan);font-size:12px;cursor:pointer;font-family:inherit">📁 Subir foto(s)</button>
+        <input type="file" id="d-file-galeria" accept="image/*" multiple style="display:none" onchange="handleDestGaleriaUpload(this)" />
+        <span id="d-galeria-prog" style="font-size:12px;color:var(--cyan);display:none">Subiendo...</span>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label>Video</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="url" id="d-video" placeholder="URL de video, o subí uno con el botón" style="flex:1" />
+        <button type="button" onclick="document.getElementById('d-file-video').click()" style="padding:8px 14px;border-radius:7px;border:1px solid var(--border2);background:var(--s2);color:var(--cyan);font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit">🎥 Subir video</button>
+        <input type="file" id="d-file-video" accept="video/*" style="display:none" onchange="handleDestVideoFile(this.files[0])" />
+      </div>
+      <span id="d-video-prog" style="font-size:12px;color:var(--cyan);display:none">Subiendo video... (puede tardar según el tamaño, máx 60MB)</span>
+    </div>
+
     <div class="form-row2">
       <div class="fg" style="margin:0">
         <label>Precio por noche (S/, por persona)</label>
@@ -1907,6 +1927,8 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     $('d-comunidad').value    = d ? d.comunidad : '';
     $('d-desc').value         = d ? d.desc : '';
     $('d-imagen').value       = d ? d.imagen : '';
+    $('d-imagenes').value     = d ? (d.imagenes || []).join('\n') : '';
+    $('d-video').value        = d ? (d.video || '') : '';
     $('d-precio').value       = d && d.precio != null ? d.precio : '';
     $('d-capacidad').value    = d && d.capacidad != null ? d.capacidad : '';
     $('d-habitaciones').value = d && d.habitaciones != null ? d.habitaciones : '';
@@ -1931,6 +1953,10 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     $('d-upload-prog').style.display    = 'none';
     $('d-upload-area').style.borderColor = 'var(--border2)';
     $('d-file-input').value = '';
+    $('d-galeria-prog').style.display = 'none';
+    $('d-file-galeria').value = '';
+    $('d-video-prog').style.display = 'none';
+    $('d-file-video').value = '';
   }
 
   /* ─── SECCIONES SIMPLES (Hospedajes/Artesania/Festividades/Maestros/Guias) ───
@@ -2315,6 +2341,46 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     if (file && file.type.startsWith('image/')) handleDestFile(file);
   }
 
+  async function uploadMediaFile(file) {
+    const form = new FormData();
+    form.append('media', file);
+    const res = await fetch(`${API_URL}/api/upload/historia`, { method: 'POST', body: form });
+    if (!res.ok) throw new Error('Error al subir archivo');
+    const data = await res.json();
+    return data.url;
+  }
+
+  async function handleDestGaleriaUpload(fileInput) {
+    const files = Array.from(fileInput.files);
+    if (!files.length) return;
+    const prog = $('d-galeria-prog');
+    prog.style.display = 'inline';
+    const ta = $('d-imagenes');
+    for (const file of files) {
+      try {
+        const url = await uploadImageFile(file);
+        ta.value = (ta.value.trim() ? ta.value.trim() + '\n' : '') + url;
+      } catch (e) {
+        showMsg(`Error al subir ${file.name}: ${e.message}`, 'err');
+      }
+    }
+    prog.style.display = 'none';
+    fileInput.value = '';
+  }
+
+  async function handleDestVideoFile(file) {
+    if (!file) return;
+    $('d-video-prog').style.display = 'inline';
+    try {
+      const url = await uploadMediaFile(file);
+      $('d-video').value = url;
+    } catch (e) {
+      showMsg(e.message, 'err');
+    } finally {
+      $('d-video-prog').style.display = 'none';
+    }
+  }
+
   // Sync URL field → preview
   $('d-imagen').addEventListener('input', () => {
     const v = $('d-imagen').value.trim();
@@ -2425,6 +2491,8 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     const body = {
       nombre, comunidad, desc,
       imagen:       $('d-imagen').value.trim(),
+      imagenes:     $('d-imagenes').value.split('\n').map(s => s.trim()).filter(Boolean),
+      video:        $('d-video').value.trim(),
       precio:       toNum($('d-precio').value),
       capacidad:    toNum($('d-capacidad').value),
       habitaciones: toNum($('d-habitaciones').value),
@@ -2480,6 +2548,8 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
   window.saveDestinoModal = saveDestinoModal;
   window.handleDestFile = handleDestFile;
   window.handleDestDrop = handleDestDrop;
+  window.handleDestGaleriaUpload = handleDestGaleriaUpload;
+  window.handleDestVideoFile = handleDestVideoFile;
   window.handleGenImgUpload = handleGenImgUpload;
   window.handleCardImgUpload = handleCardImgUpload;
   window.handleGaleriaUpload = handleGaleriaUpload;
