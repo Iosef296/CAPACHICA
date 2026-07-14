@@ -630,6 +630,9 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       <button class="nav-btn" data-section="global" title="Navbar &amp; Footer">
         <span>🎨</span><span class="nav-btn-text"> Navbar &amp; Footer</span>
       </button>
+      <button class="nav-btn" data-section="etiquetas" title="Etiquetas App">
+        <span>🏷️</span><span class="nav-btn-text"> Etiquetas App</span>
+      </button>
     </aside>
 
     <!-- MAIN -->
@@ -856,6 +859,30 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         <div style="display:flex;gap:10px;align-items:center">
           <button class="btn-primary" id="saveWidgetBtn">Guardar Widget</button>
           <button class="btn-sm" id="previewWidgetBtn" style="padding:9px 18px">Vista previa →</button>
+        </div>
+      </div>
+
+      <!-- ─── ETIQUETAS APP SECTION ─── -->
+      <div class="section" id="sec-etiquetas">
+        <div class="page-hdr">
+          <h2>Etiquetas de la App</h2>
+          <p>Textos de la grilla "Explora" en el Inicio del mobile -- se ven al instante en todos los celulares, sin actualizar el APK</p>
+        </div>
+        <div class="card">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="fg" style="margin:0"><label>Familias / Comunidades</label><input type="text" id="et-comunidades" /></div>
+            <div class="fg" style="margin:0"><label>Gastronomía</label><input type="text" id="et-gastronomia" /></div>
+            <div class="fg" style="margin:0"><label>Artesanía</label><input type="text" id="et-artesania" /></div>
+            <div class="fg" style="margin:0"><label>Reservas</label><input type="text" id="et-reservas" /></div>
+            <div class="fg" style="margin:0"><label>AR</label><input type="text" id="et-ar" /></div>
+            <div class="fg" style="margin:0"><label>Guías</label><input type="text" id="et-guias" /></div>
+            <div class="fg" style="margin:0"><label>Mapa Google</label><input type="text" id="et-mapaGoogle" /></div>
+            <div class="fg" style="margin:0"><label>Chat Inti</label><input type="text" id="et-chatInti" /></div>
+            <div class="fg" style="margin:0"><label>Festividades</label><input type="text" id="et-festividades" /></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="btn-primary" id="saveEtiquetasBtn">Guardar Etiquetas</button>
         </div>
       </div>
 
@@ -1282,6 +1309,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       if (btn.dataset.section === 'widget')   loadWidget();
       if (btn.dataset.section === 'destinos') loadDestinos();
       if (btn.dataset.section === 'paginas')  loadPaginas();
+      if (btn.dataset.section === 'etiquetas') loadEtiquetas();
       if (['hospedajes','artesania','festividades','maestros','guias'].includes(btn.dataset.section)) cargarSimple(btn.dataset.section);
       if (btn.dataset.section === 'usuarios') loadUsuarios();
       if (btn.dataset.section === 'global') {
@@ -1443,6 +1471,35 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
   };
 
   $('previewWidgetBtn').onclick = () => window.open('/', '_blank');
+
+  const ETIQUETAS_KEYS = ['comunidades','gastronomia','artesania','reservas','ar','guias','mapaGoogle','chatInti','festividades'];
+
+  async function loadEtiquetas() {
+    try {
+      const res = await fetch(`${API_URL}/api/configuracion`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      ETIQUETAS_KEYS.forEach(k => { const el = $('et-' + k); if (el) el.value = data[k] || ''; });
+    } catch (e) {
+      showMsg(`Error cargando etiquetas: ${e.message}`, 'err');
+    }
+  }
+
+  $('saveEtiquetasBtn').onclick = async () => {
+    const body = {};
+    ETIQUETAS_KEYS.forEach(k => { const el = $('et-' + k); if (el) body[k] = el.value.trim(); });
+    try {
+      const res = await fetch(`${API_URL}/api/configuracion`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      showMsg('Etiquetas guardadas ✓ -- ya se ven así en el mobile');
+    } catch (e) {
+      showMsg(`Error al guardar: ${e.message}`, 'err');
+    }
+  };
 
   /* ─── RESERVAS ─── */
   let resInterval = null;
