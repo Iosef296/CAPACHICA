@@ -178,14 +178,45 @@ export const api = {
 // backend, no el mobile).
 export type TipoNegocio = 'comunidades' | 'hospedajes' | 'artesania' | 'festividades' | 'maestros' | 'guias';
 
+// El accessToken dura 1h (ver backend/config/autenticacion.js). Si una
+// llamada autenticada vuelve 401, probamos renovarlo con el refreshToken
+// (7d) antes de rendirnos -- si no, cualquier pantalla con datos propios
+// se queda "vacía" en silencio pasada una hora de sesión.
+export async function tryRefreshToken(): Promise<string | null> {
+  const refreshToken = await SecureStore.getItemAsync('capachica.refreshToken').catch(() => null);
+  if (!refreshToken || !API_BASE) return null;
+  try {
+    const res = await fetch(`${API_BASE}/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data?.accessToken) return null;
+    await SecureStore.setItemAsync('capachica.token', data.accessToken);
+    return data.accessToken;
+  } catch {
+    return null;
+  }
+}
+
 async function authFetch(method: string, path: string, body?: any) {
-  const token = await SecureStore.getItemAsync('capachica.token').catch(() => null);
+  let token = await SecureStore.getItemAsync('capachica.token').catch(() => null);
   if (!token) throw new Error('Debes iniciar sesión');
-  const res = await fetch(`${API_BASE}${path}`, {
+
+  const doFetch = (tok: string) => fetch(`${API_BASE}${path}`, {
     method,
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${tok}` },
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
+
+  let res = await doFetch(token);
+  if (res.status === 401) {
+    const renovado = await tryRefreshToken();
+    if (renovado) res = await doFetch(renovado);
+  }
+
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data?.error ?? `Error ${res.status}`);
   return data;

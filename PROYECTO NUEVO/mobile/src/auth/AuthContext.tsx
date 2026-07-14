@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { GoogleSignin, isSuccessResponse } from '@react-native-google-signin/google-signin';
 import Constants from 'expo-constants';
-import { api, API_BASE } from '@/data/api';
+import { api, API_BASE, tryRefreshToken } from '@/data/api';
 
 export type Rol = 'admin' | 'proveedor' | 'turista';
 type User = { id: string; email: string; name: string; avatar?: string; provider: 'email' | 'google'; rol: Rol };
@@ -50,6 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(u);
       await SecureStore.setItemAsync(KEY, JSON.stringify(u));
       if (res?.accessToken) await SecureStore.setItemAsync('capachica.token', res.accessToken);
+      if (res?.refreshToken) await SecureStore.setItemAsync('capachica.refreshToken', res.refreshToken);
     } catch (e) { console.warn('Google hydrate failed', e); }
   }
 
@@ -70,6 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(u);
       await SecureStore.setItemAsync(KEY, JSON.stringify(u));
       if (res?.accessToken) await SecureStore.setItemAsync('capachica.token', res.accessToken);
+      if (res?.refreshToken) await SecureStore.setItemAsync('capachica.refreshToken', res.refreshToken);
     },
     async signUpEmail(email, password, name) {
       const res: any = await api.registro(email, password, name);
@@ -84,6 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(u);
       await SecureStore.setItemAsync(KEY, JSON.stringify(u));
       if (res?.accessToken) await SecureStore.setItemAsync('capachica.token', res.accessToken);
+      if (res?.refreshToken) await SecureStore.setItemAsync('capachica.refreshToken', res.refreshToken);
     },
     async signInGoogle() {
       await GoogleSignin.hasPlayServices();
@@ -96,17 +99,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       await SecureStore.deleteItemAsync(KEY);
       await SecureStore.deleteItemAsync('capachica.token');
+      await SecureStore.deleteItemAsync('capachica.refreshToken');
     },
     // El admin puede promover turista -> emprendedor desde el panel web;
     // esto vuelve a pedir el perfil real para reflejar el rol actualizado
     // sin que el usuario tenga que cerrar sesion y volver a entrar.
     async refreshProfile() {
-      const token = await SecureStore.getItemAsync('capachica.token').catch(() => null);
+      let token = await SecureStore.getItemAsync('capachica.token').catch(() => null);
       if (!token || !API_BASE) return;
       try {
-        const res = await fetch(`${API_BASE}/usuarios/perfil`, {
+        let res = await fetch(`${API_BASE}/usuarios/perfil`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        if (res.status === 401) {
+          const renovado = await tryRefreshToken();
+          if (!renovado) return;
+          res = await fetch(`${API_BASE}/usuarios/perfil`, {
+            headers: { Authorization: `Bearer ${renovado}` },
+          });
+        }
         if (!res.ok) return;
         const apiUser = await res.json();
         setUser(prev => {
