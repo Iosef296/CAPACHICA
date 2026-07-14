@@ -134,3 +134,9 @@ CREATE TABLE IF NOT EXISTS historia_likes (
     created_at  TIMESTAMPTZ DEFAULT now(),
     PRIMARY KEY (historia_id, usuario_id)
 );
+
+-- Etiquetas de la grilla "Explora" del mobile, editables sin rebuild del APK.
+CREATE TABLE IF NOT EXISTS configuracion_app (
+    clave TEXT PRIMARY KEY,
+    valor TEXT NOT NULL
+);

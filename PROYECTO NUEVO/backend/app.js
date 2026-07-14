@@ -40,6 +40,9 @@ const uploadRoutes = require('./rutas/upload.rutas');
 // Rutas — Historias (estilo WhatsApp Status)
 const historiasRoutes = require('./rutas/historias.rutas');
 
+// Rutas — Configuración de la app (etiquetas editables sin rebuild)
+const configuracionRoutes = require('./rutas/configuracion.rutas');
+
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
@@ -88,6 +91,9 @@ app.use('/api/upload', uploadRoutes);
 // ── Historias ──────────────────────────────────────
 app.use('/api/historias', historiasRoutes);
 
+// ── Configuración de la app ────────────────────────
+app.use('/api/configuracion', configuracionRoutes);
+
 // Health check
 app.get('/api/health', (_req, res) => {
     res.json({ status: 'OK', mensaje: 'Capachica API unificada', timestamp: new Date() });
@@ -131,6 +137,13 @@ async function start() {
                 PRIMARY KEY (historia_id, usuario_id)
             )
         `).catch(err => console.warn('⚠️  No se pudo crear tabla historia_likes:', err.message));
+
+        await query(`
+            CREATE TABLE IF NOT EXISTS configuracion_app (
+                clave TEXT PRIMARY KEY,
+                valor TEXT NOT NULL
+            )
+        `).catch(err => console.warn('⚠️  No se pudo crear tabla configuracion_app:', err.message));
 
         const swaggerUi = require('swagger-ui-express');
         const YAML      = require('yamljs');
