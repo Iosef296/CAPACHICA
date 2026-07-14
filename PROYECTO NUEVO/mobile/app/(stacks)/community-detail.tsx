@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, ImageBackground, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeInsets } from '@/hooks/useSafeInsets';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -58,6 +58,19 @@ export default function CommunityDetail() {
   const tags: string[] = Array.isArray(community.tags) ? community.tags : [];
   const imagen = community.imagen ?? community.image ?? COVER_FALLBACK;
   const imagenes: string[] = Array.isArray(community.imagenes) ? community.imagenes : [];
+  const precio: number | null = community.precio ?? null;
+  const capacidad: number | null = community.capacidad ?? null;
+  const habitaciones: number | null = community.habitaciones ?? null;
+  const comidas: string = community.comidas ?? '';
+  const servicios: string[] = Array.isArray(community.servicios) ? community.servicios : [];
+  const actividades: string[] = Array.isArray(community.actividades) ? community.actividades : [];
+  const idiomas: string[] = Array.isArray(community.idiomas) ? community.idiomas : [];
+  const whatsapp: string = community.whatsapp ?? '';
+  const metaBits = [
+    capacidad ? `${capacidad} huéspedes` : null,
+    habitaciones ? `${habitaciones} hab.` : null,
+    comidas || null,
+  ].filter(Boolean).join(' · ');
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -104,6 +117,54 @@ export default function CommunityDetail() {
         </View>
       )}
 
+      {(precio != null || metaBits) && (
+        <View style={styles.section}>
+          <Text style={[typography.headlineMd, { color: colors.primary }]}>Hospedaje</Text>
+          {precio != null && (
+            <Text style={[typography.headlineMd, { color: colors.secondary, marginTop: 6 }]}>
+              S/ {precio} <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant }]}>/ noche</Text>
+            </Text>
+          )}
+          {!!metaBits && (
+            <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, marginTop: 4 }]}>{metaBits}</Text>
+          )}
+          {idiomas.length > 0 && (
+            <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, marginTop: 4 }]}>
+              Idiomas: {idiomas.join(', ')}
+            </Text>
+          )}
+        </View>
+      )}
+
+      {(servicios.length > 0 || actividades.length > 0) && (
+        <View style={styles.section}>
+          {servicios.length > 0 && (
+            <>
+              <Text style={[typography.labelMd, { color: colors.onSurfaceVariant }]}>SERVICIOS</Text>
+              <View style={styles.chipsWrap}>
+                {servicios.map(s => (
+                  <View key={s} style={styles.tagChip}>
+                    <Text style={[typography.labelSm, { color: colors.primary }]}>{s}</Text>
+                  </View>
+                ))}
+              </View>
+            </>
+          )}
+          {actividades.length > 0 && (
+            <>
+              <Text style={[typography.labelMd, { color: colors.onSurfaceVariant, marginTop: servicios.length > 0 ? spacing.stackSm : 0 }]}>ACTIVIDADES</Text>
+              <View style={styles.chipsWrap}>
+                {actividades.map(a => (
+                  <View key={a} style={styles.tagChip}>
+                    <Text style={[typography.labelSm, { color: colors.primary }]}>{a}</Text>
+                  </View>
+                ))}
+              </View>
+            </>
+          )}
+        </View>
+      )}
+
       {imagenes.length > 0 && (
         <View style={styles.section}>
           <Text style={[typography.headlineMd, { color: colors.primary }]}>Fotos</Text>
@@ -122,15 +183,22 @@ export default function CommunityDetail() {
         </View>
       )}
 
-      <View style={{ paddingHorizontal: spacing.containerPadding, marginTop: spacing.stackMd, marginBottom: spacing.stackLg + insets.bottom }}>
+      <View style={{ paddingHorizontal: spacing.containerPadding, marginTop: spacing.stackMd, marginBottom: spacing.stackLg + insets.bottom, gap: spacing.stackSm }}>
         <Button label="Reservar experiencia" icon="bookmark" onPress={() => setShowModal(true)} />
+        {!!whatsapp && (
+          <Button
+            label="Contactar por WhatsApp" icon="chat"
+            onPress={() => Linking.openURL(`https://wa.me/${whatsapp.replace(/[^\d]/g, '')}`)}
+            variant="secondary"
+          />
+        )}
       </View>
 
       <BookingModal
         visible={showModal}
         onClose={() => setShowModal(false)}
         title={`Estancia en ${nombre}`}
-        pricePerUnit={120}
+        pricePerUnit={precio ?? 120}
         unitLabel="noche"
       />
     </ScrollView>
@@ -149,6 +217,7 @@ const styles = StyleSheet.create({
   tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: spacing.containerPadding, marginTop: spacing.stackMd },
   tagChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: radii.full, backgroundColor: colors.surfaceContainerLow, borderWidth: 1, borderColor: colors.outlineVariant },
   section: { paddingHorizontal: spacing.containerPadding, marginTop: spacing.stackLg },
+  chipsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 6 },
   galleryRow: { gap: 8, marginTop: 10 },
   galleryImg: { width: 140, height: 100, borderRadius: radii.md },
   video: { width: '100%', height: 210, borderRadius: radii.md, marginTop: 10, backgroundColor: '#000' },

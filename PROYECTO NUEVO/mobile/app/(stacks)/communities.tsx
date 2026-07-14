@@ -4,17 +4,29 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ScreenHeader } from '@/components/ScreenHeader';
+import { Chip } from '@/components/Chip';
 import { communities as mockCommunities, Community } from '@/data/mock';
 import { api, API_WS } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
+const TODAS = 'Todas';
+
 export default function Communities() {
   const router = useRouter();
   const cfg = useAppConfig();
   const [communities, setCommunities] = useState<Community[]>(mockCommunities);
+  const [actividad, setActividad] = useState(TODAS);
   useLiveRefresh(() => { api.communities().then(setCommunities); }, { url: API_WS, channels: 'comunidades' });
+
+  const actividades = Array.from(new Set(
+    communities.flatMap(c => Array.isArray((c as any).actividades) ? (c as any).actividades : [])
+  ));
+  const filtradas = actividad === TODAS
+    ? communities
+    : communities.filter(c => (Array.isArray((c as any).actividades) ? (c as any).actividades : []).includes(actividad));
+
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaView edges={['bottom']}>
@@ -24,8 +36,17 @@ export default function Communities() {
           {cfg.text('communities.intro', 'Cuatro pueblos vivos en la península del Titicaca, cada uno con su sabiduría.')}
         </Text>
 
+        {actividades.length > 0 && (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
+            <Chip label={TODAS} active={actividad === TODAS} onPress={() => setActividad(TODAS)} />
+            {actividades.map(a => (
+              <Chip key={a} label={a} active={actividad === a} onPress={() => setActividad(a)} />
+            ))}
+          </ScrollView>
+        )}
+
         <View style={styles.grid}>
-          {communities.map((c, i) => (
+          {filtradas.map((c, i) => (
             <Pressable key={c.id} onPress={() => router.push({ pathname: '/(stacks)/community-detail', params: { id: c.id } })}
               style={[styles.card, i === 0 && styles.featured]}>
               <View>
@@ -50,6 +71,10 @@ export default function Communities() {
           ))}
         </View>
 
+        {filtradas.length === 0 && (
+          <Text style={styles.emptyMsg}>Ninguna familia ofrece "{actividad}" todavía.</Text>
+        )}
+
         <View style={{ height: spacing.stackLg }} />
       </SafeAreaView>
     </ScrollView>
@@ -58,6 +83,8 @@ export default function Communities() {
 
 const styles = StyleSheet.create({
   intro: { ...typography.bodyMd, color: colors.onSurfaceVariant, paddingHorizontal: spacing.containerPadding, marginBottom: spacing.stackMd },
+  chips: { gap: 8, paddingHorizontal: spacing.containerPadding, marginBottom: spacing.stackMd },
+  emptyMsg: { ...typography.bodyMd, color: colors.onSurfaceVariant, textAlign: 'center', paddingHorizontal: spacing.containerPadding, paddingVertical: spacing.stackMd, fontStyle: 'italic' },
   grid: { paddingHorizontal: spacing.containerPadding, gap: spacing.gutter },
   card: { backgroundColor: colors.surfaceContainerLowest, borderRadius: radii.xl, overflow: 'hidden', ...shadows.card },
   featured: { borderWidth: 2, borderColor: colors.terracotta },
