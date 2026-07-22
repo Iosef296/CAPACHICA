@@ -1,0 +1,65 @@
+/* ─────────────────────────────────────────────────────
+ * Capachica Spacing, Radii, Shadows
+ * Rustic aesthetic: angular > round, earthy glow
+ * ───────────────────────────────────────────────────── */
+:root {
+  /* ── 4px base spacing scale ── */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:   12px;
+  --space-4:   16px;
+  --space-5:   20px;
+  --space-6:   24px;
+  --space-8:   32px;
+  --space-10:  40px;
+  --space-12:  48px;
+  --space-16:  64px;
+  --space-20:  80px;
+  --space-24:  96px;
+  --space-32:  128px;
+
+  /* ── Border radii — rustic: small & angular ── */
+  --radius-none: 0;
+  --radius-xs:   2px;
+  --radius-sm:   4px;
+  --radius:      6px;      /* default card/button */
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   20px;
+  --radius-pill: 999px;
+
+  /* ── Shadows — warm earth-tinted ── */
+  --shadow-sm:  0 1px 4px rgba(16, 8, 4, 0.45);
+  --shadow:     0 4px 16px rgba(16, 8, 4, 0.50), 0 1px 4px rgba(16, 8, 4, 0.30);
+  --shadow-md:  0 8px 32px rgba(16, 8, 4, 0.55), 0 2px 8px rgba(16, 8, 4, 0.35);
+  --shadow-lg:  0 16px 48px rgba(16, 8, 4, 0.60), 0 4px 16px rgba(16, 8, 4, 0.40);
+
+  /* ── Warm glows ── */
+  --glow-clay:  0 0 24px rgba(184, 83, 31, 0.42), 0 0 48px rgba(184, 83, 31, 0.18);
+  --glow-gold:  0 0 24px rgba(201, 144, 58, 0.36), 0 0 48px rgba(201, 144, 58, 0.14);
+  --glow-lake:  0 0 24px rgba(30, 90, 156, 0.36), 0 0 48px rgba(30, 90, 156, 0.14);
+
+  /* ── Layout ── */
+  --max-content: 1200px;
+  --max-text:    680px;
+  --max-narrow:  480px;
+
+  /* ── Z-index ── */
+  --z-base:  1;   /* @kind other */
+  --z-raised:10;  /* @kind other */
+  --z-float: 50;  /* @kind other */
+  --z-nav:   100; /* @kind other */
+  --z-modal: 200; /* @kind other */
+  --z-toast: 300; /* @kind other */
+
+  /* ── Transitions ── */
+  --ease-out:       cubic-bezier(0.16, 1, 0.3, 1); /* @kind other */
+  --ease-in:        cubic-bezier(0.7, 0, 0.84, 0);  /* @kind other */
+  --ease:           cubic-bezier(0.4, 0, 0.2, 1);   /* @kind other */
+  --duration:       0.30s;       /* @kind other */
+  --duration-slow:  0.55s;       /* @kind other */
+  --duration-fast:  0.15s;       /* @kind other */
+  --max-content:    1200px;      /* @kind spacing */
+  --max-text:       680px;       /* @kind spacing */
+  --max-narrow:     480px;       /* @kind spacing */
+}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -62,7 +63,7 @@ export default function SettingsScreen() {
         </Group>
 
         <Group title={t('settings.acercaDe')}>
-          <InfoRow icon="info" label={t('settings.version')} value="alpha-1.0.8" />
+          <InfoRow icon="info" label={t('settings.version')} value={Constants.expoConfig?.version ?? '?'} />
           <InfoRow icon="copyright" label={t('settings.copyright')} />
         </Group>
       </SafeAreaView>

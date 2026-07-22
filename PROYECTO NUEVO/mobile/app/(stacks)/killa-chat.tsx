@@ -60,7 +60,7 @@ export default function IntiChat() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+      <SafeAreaView edges={['bottom']} style={{ flex: 1 }}>
         <ScreenHeader
           eyebrow={cfg.bot_subtitle}
           title={cfg.bot_name}
@@ -68,7 +68,7 @@ export default function IntiChat() {
           right={<OnlineBadge />}
         />
 
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
           <ScrollView ref={scrollRef} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
             {msgs.map((m, i) => <Bubble key={i} msg={m} />)}
 

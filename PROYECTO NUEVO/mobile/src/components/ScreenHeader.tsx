@@ -2,14 +2,16 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useSafeInsets } from '@/hooks/useSafeInsets';
 import { colors, spacing, typography } from '@/theme';
 
 type Props = { eyebrow?: string; title: string; back?: boolean; right?: React.ReactNode };
 
 export function ScreenHeader({ eyebrow, title, back, right }: Props) {
   const router = useRouter();
+  const insets = useSafeInsets();
   return (
-    <View style={styles.wrap}>
+    <View style={[styles.wrap, { paddingTop: insets.top + spacing.gutter }]}>
       <View style={styles.row}>
         {back && (
           <Pressable onPress={() => router.back()} hitSlop={12} style={styles.back}>

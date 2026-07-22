@@ -1,0 +1,64 @@
+/* ─────────────────────────────────────────────────────
+ * Capachica Textures & Patterns
+ * Inspired by Andean woven textiles (aguayos, chullos)
+ * and the clay/stone surfaces of traditional architecture.
+ * ───────────────────────────────────────────────────── */
+:root {
+  /* ── Grain overlay (SVG noise — no external deps) ── */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E"); /* @kind other */
+
+  /* ── Andean textile weave border (repeating gradient) ──
+   * Use as: background-image: var(--weave-border); height: 4px;
+   */
+  --weave-border: repeating-linear-gradient(
+    90deg,
+    #B8531F 0px, #B8531F 4px,
+    #C9903A 4px, #C9903A 8px,
+    #7C2D0C 8px, #7C2D0C 12px,
+    #C9903A 12px, #C9903A 16px,
+    #5A8E20 16px, #5A8E20 20px,
+    #C9903A 20px, #C9903A 24px,
+    #B8531F 24px, #B8531F 28px
+  ); /* @kind other */
+
+  /* ── Diamond divider (zigzag) ── */
+  --weave-zigzag: repeating-linear-gradient(
+    -45deg,
+    #B8531F 0px, #B8531F 2px,
+    transparent 2px, transparent 8px,
+    #C9903A 8px, #C9903A 10px,
+    transparent 10px, transparent 16px
+  ); /* @kind other */
+
+  /* ── Pattern accent colors ── */
+  --pattern-clay:   #B8531F;
+  --pattern-gold:   #C9903A;
+  --pattern-lake:   #2A74B8;
+  --pattern-reed:   #5A8E20;
+  --pattern-alpaca: #EAD5B0;
+}
+
+/* ── Utility: grain overlay on an element ── */
+.textured {
+  position: relative;
+}
+.textured::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain);
+  background-size: 200px 200px;
+  opacity: 0.5;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* ── Weave stripe accent (top/bottom border) ── */
+.weave-top {
+  border-top: 4px solid transparent;
+  border-image: var(--weave-border) 1;
+}
+.weave-bottom {
+  border-bottom: 4px solid transparent;
+  border-image: var(--weave-border) 1;
+}

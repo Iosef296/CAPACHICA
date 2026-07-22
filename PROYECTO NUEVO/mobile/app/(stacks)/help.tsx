@@ -4,45 +4,51 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Button } from '@/components/Button';
+import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
-const FAQS = [
+const FAQS_DEFAULT = [
   { q: '¿Cómo reservo una experiencia?', a: 'Entra a Reservas, selecciona el hospedaje o tour, ajusta fechas y personas, y toca "Confirmar reserva". Te contactaremos por WhatsApp.' },
   { q: '¿Puedo cancelar mi reserva?', a: 'Sí, hasta 48h antes sin costo. Después aplica 30% de cargo. Escríbenos por WhatsApp.' },
   { q: '¿Las experiencias incluyen comida?', a: 'Los talleres de 4h+ incluyen almuerzo tradicional. Las actividades cortas no — pero te recomendamos lugares cerca.' },
   { q: '¿Hay ATM en Capachica?', a: 'No. Trae soles en efectivo desde Puno. La mayoría de hospedajes y talleres aceptan solo efectivo o Yape.' },
-  { q: '¿Necesito permiso para visitar las comunidades?', a: 'No. Las comunidades reciben visitantes con turismo vivencial organizado. Inti AI te puede ayudar a coordinarlo.' },
+  { q: '¿Necesito permiso para visitar las familias?', a: 'No. Las familias reciben visitantes con turismo vivencial organizado. Inti AI te puede ayudar a coordinarlo.' },
   { q: '¿La app funciona sin internet?', a: 'La navegación y datos básicos sí. El chat con Inti requiere conexión.' },
 ];
 
 export default function Help() {
   const [open, setOpen] = useState<number | null>(0);
+  const cfg = useAppConfig();
+  const faqs: typeof FAQS_DEFAULT = cfg.json('help.faqs', FAQS_DEFAULT);
+  const whatsapp = cfg.text('help.whatsappNumber', '+51 999 999 999');
+  const email = cfg.text('help.email', 'hola@capachica.com');
+  const whatsappDigits = whatsapp.replace(/\D/g, '');
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaView edges={['top']}>
-        <ScreenHeader eyebrow="SOPORTE" title="Centro de Ayuda" back />
+      <SafeAreaView edges={['bottom']}>
+        <ScreenHeader eyebrow="SOPORTE" title={cfg.text('help.title', 'Centro de Ayuda')} back />
 
         <Text style={styles.intro}>
-          Encuentra respuestas rápidas o contáctanos directamente.
+          {cfg.text('help.intro', 'Encuentra respuestas rápidas o contáctanos directamente.')}
         </Text>
 
         <View style={styles.actions}>
-          <Pressable style={styles.actionCard} onPress={() => Linking.openURL('https://wa.me/51999999999?text=Hola%20Capachica')}>
+          <Pressable style={styles.actionCard} onPress={() => Linking.openURL(`https://wa.me/${whatsappDigits}?text=Hola%20Capachica`)}>
             <MaterialIcons name="chat" size={28} color={colors.terracotta} />
             <Text style={[typography.bodyLg, { color: colors.onSurface, fontFamily: 'HankenGrotesk_700Bold' }]}>WhatsApp</Text>
-            <Text style={[typography.labelSm, { color: colors.onSurfaceVariant }]}>+51 999 999 999</Text>
+            <Text style={[typography.labelSm, { color: colors.onSurfaceVariant }]}>{whatsapp}</Text>
           </Pressable>
-          <Pressable style={styles.actionCard} onPress={() => Linking.openURL('mailto:hola@capachica.com')}>
+          <Pressable style={styles.actionCard} onPress={() => Linking.openURL(`mailto:${email}`)}>
             <MaterialIcons name="mail" size={28} color={colors.primary} />
             <Text style={[typography.bodyLg, { color: colors.onSurface, fontFamily: 'HankenGrotesk_700Bold' }]}>Email</Text>
-            <Text style={[typography.labelSm, { color: colors.onSurfaceVariant }]}>hola@capachica.com</Text>
+            <Text style={[typography.labelSm, { color: colors.onSurfaceVariant }]}>{email}</Text>
           </Pressable>
         </View>
 
         <Text style={styles.faqTitle}>PREGUNTAS FRECUENTES</Text>
         <View style={{ paddingHorizontal: spacing.containerPadding, gap: 8, marginBottom: spacing.stackLg }}>
-          {FAQS.map((f, i) => (
+          {faqs.map((f, i) => (
             <View key={i} style={styles.faqCard}>
               <Pressable style={styles.faqHeader} onPress={() => setOpen(open === i ? null : i)}>
                 <Text style={[typography.bodyLg, { color: colors.onSurface, flex: 1, fontFamily: 'HankenGrotesk_700Bold' }]}>{f.q}</Text>

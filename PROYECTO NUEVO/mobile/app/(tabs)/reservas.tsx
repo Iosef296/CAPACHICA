@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Button } from '@/components/Button';
 import { ReservaDetailModal } from '@/components/ReservaDetailModal';
@@ -9,13 +10,16 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '@/auth/AuthContext';
 import { reservas as reservasApi, ReservaMia, API_WS } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
+import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
 const ESTADO_LABEL: Record<string, string> = { pendiente: 'PENDIENTE', confirmada: 'CONFIRMADA', cancelada: 'CANCELADA' };
 const ESTADO_COLOR: Record<string, string> = { pendiente: colors.terracotta, confirmada: colors.secondary, cancelada: colors.error };
 
-export default function MyBookings() {
+export default function Reservas() {
+  const { t } = useTranslation();
   const { user } = useAuth();
+  const cfg = useAppConfig();
   const [reservas, setReservas] = useState<ReservaMia[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -34,10 +38,18 @@ export default function MyBookings() {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaView edges={['top']}>
-        <ScreenHeader eyebrow="VIAJES" title="Mis Reservas" back />
+      <SafeAreaView edges={['bottom']}>
+        <ScreenHeader eyebrow={cfg.text('reservasTab.eyebrow', 'VIAJES')} title={t('tabs.reservas')} />
 
-        {loading ? (
+        {!user ? (
+          <View style={styles.empty}>
+            <MaterialIcons name="lock-outline" size={64} color={colors.outlineVariant} />
+            <Text style={[typography.headlineMd, { color: colors.onSurface, marginTop: spacing.gutter }]}>
+              {cfg.text('reservasTab.emptyLoginTitle', 'Inicia sesión para ver tus reservas')}
+            </Text>
+            <Button label="Iniciar sesión" icon="login" onPress={() => router.replace('/(auth)/login')} style={{ marginTop: spacing.stackMd, alignSelf: 'stretch' }} />
+          </View>
+        ) : loading ? (
           <View style={styles.empty}>
             <ActivityIndicator color={colors.primary} />
           </View>
@@ -45,12 +57,12 @@ export default function MyBookings() {
           <View style={styles.empty}>
             <MaterialIcons name="event-busy" size={64} color={colors.outlineVariant} />
             <Text style={[typography.headlineMd, { color: colors.onSurface, marginTop: spacing.gutter }]}>
-              Sin reservas aún
+              {cfg.text('reservasTab.emptyTitle', 'Sin reservas aún')}
             </Text>
             <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, textAlign: 'center', marginTop: 6 }]}>
-              Explora experiencias y reserva tu próximo viaje a Capachica.
+              {cfg.text('reservasTab.emptySubtitle', 'Explora experiencias y reserva tu próximo viaje a Capachica.')}
             </Text>
-            <Button label="Ver experiencias" icon="explore" onPress={() => router.push('/(stacks)/booking')} style={{ marginTop: spacing.stackMd, alignSelf: 'stretch' }} />
+            <Button label={cfg.text('reservasTab.emptyCta', 'Ver experiencias')} icon="explore" onPress={() => router.push('/(stacks)/booking')} style={{ marginTop: spacing.stackMd, alignSelf: 'stretch' }} />
           </View>
         ) : (
           <View style={{ paddingHorizontal: spacing.containerPadding, gap: spacing.gutter, marginTop: spacing.gutter, marginBottom: spacing.stackLg }}>
@@ -71,7 +83,7 @@ export default function MyBookings() {
                   <MetaItem icon="payments" label={`S/ ${r.precio_total}`} />
                 </View>
                 <View style={styles.viewMore}>
-                  <Text style={[typography.labelSm, { color: colors.primary }]}>Ver detalle</Text>
+                  <Text style={[typography.labelSm, { color: colors.primary }]}>{cfg.text('reservasTab.viewDetailLabel', 'Ver detalle')}</Text>
                   <MaterialIcons name="chevron-right" size={18} color={colors.primary} />
                 </View>
               </Pressable>

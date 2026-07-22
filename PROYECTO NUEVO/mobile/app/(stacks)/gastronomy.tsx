@@ -1,30 +1,39 @@
 import React, { useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeInsets } from '@/hooks/useSafeInsets';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Chip } from '@/components/Chip';
-import { KillaTeaser } from '@/components/KillaTeaser';
 import { dishes } from '@/data/mock';
 import { api, API_WS, Restaurante } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
+import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
-const TABS = ['Todo', 'Platos Fuertes', 'Sopas', 'Tradición Viva'];
+const TABS_DEFAULT = ['Todo', 'Platos Fuertes', 'Sopas', 'Tradición Viva'];
 
 export default function Gastronomy() {
+  const cfg = useAppConfig();
+  const TABS: string[] = cfg.json('gastronomy.tabs', TABS_DEFAULT);
   const [tab, setTab] = useState('Todo');
   const [restaurantes, setRestaurantes] = useState<Restaurante[]>([]);
+  const [pastHero, setPastHero] = useState(false);
+  const insets = useSafeInsets();
   useLiveRefresh(() => { api.restaurantes().then(setRestaurantes); }, { url: API_WS, channels: 'restaurantes' });
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <ScrollView
+      style={{ flex: 1 }}
+      scrollEventThrottle={16}
+      onScroll={e => setPastHero(e.nativeEvent.contentOffset.y > styles.hero.height - insets.top)}
+    >
       <View style={styles.hero}>
         <Image source={{ uri: 'https://picsum.photos/id/292/1200/600' }} style={StyleSheet.absoluteFillObject as any} />
         <LinearGradient colors={['transparent', 'rgba(0,66,104,0.85)']} style={StyleSheet.absoluteFillObject} />
-        <SafeAreaView edges={['top']} style={{ flex: 1, padding: spacing.containerPadding, justifyContent: 'flex-end' }}>
-          <ScreenHeader eyebrow="GASTRONOMÍA" title="El Legado de la Tierra" back />
-        </SafeAreaView>
+        <View style={{ flex: 1, padding: spacing.containerPadding, justifyContent: 'flex-end' }}>
+          <ScreenHeader eyebrow={cfg.text('gastronomy.eyebrow', 'GASTRONOMÍA')} title={cfg.text('gastronomy.title', 'El Legado de la Tierra')} back />
+        </View>
       </View>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabs}>
@@ -41,7 +50,7 @@ export default function Gastronomy() {
               <View style={styles.tag}>
                 <MaterialIcons name="auto-awesome" size={14} color={colors.sunGold} />
                 <Text style={[typography.labelSm, { color: colors.onPrimaryContainer }]}>
-                  Inti: Pruébalo en Asoc. Tikarani
+                  {cfg.text('gastronomy.intiTag', 'Inti: Pruébalo en Asoc. Tikarani')}
                 </Text>
               </View>
             </View>
@@ -51,7 +60,7 @@ export default function Gastronomy() {
 
       {restaurantes.length > 0 && (
         <View style={{ marginTop: spacing.stackLg }}>
-          <Text style={styles.sectionLabel}>RESTAURANTES EN CAPACHICA</Text>
+          <Text style={styles.sectionLabel}>{cfg.text('gastronomy.sectionRestaurantes', 'RESTAURANTES EN CAPACHICA')}</Text>
           <View style={styles.list}>
             {restaurantes.slice(0, 5).map(r => (
               <View key={r.id} style={[styles.card, { flexDirection: 'row', alignItems: 'center' }]}>
@@ -66,9 +75,12 @@ export default function Gastronomy() {
         </View>
       )}
 
-      <KillaTeaser />
-      <View style={{ height: spacing.stackLg }} />
+      <View style={{ height: spacing.stackLg + insets.bottom }} />
     </ScrollView>
+      {pastHero && (
+        <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: insets.top, backgroundColor: colors.background }} />
+      )}
+    </View>
   );
 }
 

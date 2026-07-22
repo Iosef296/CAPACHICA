@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { ImageBackground, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Button } from '@/components/Button';
 import { useAuth } from '@/auth/AuthContext';
+import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, radii, spacing, typography } from '@/theme';
 
 const HERO = 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1200';
@@ -11,9 +13,11 @@ const HERO = 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=120
 export default function Register() {
   const router = useRouter();
   const { signUpEmail } = useAuth();
+  const cfg = useAppConfig();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
@@ -24,7 +28,6 @@ export default function Register() {
     setError('');
     try {
       await signUpEmail(email, password, name);
-      router.replace('/(tabs)');
     } catch (e) {
       setError((e as Error).message || 'No se pudo crear la cuenta.');
     } finally {
@@ -35,15 +38,15 @@ export default function Register() {
   return (
     <ImageBackground source={{ uri: HERO }} style={{ flex: 1 }}>
       <LinearGradient colors={['rgba(0,66,104,0.3)', colors.primary]} style={StyleSheet.absoluteFillObject} />
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           <View style={styles.header}>
             <Text style={[typography.labelMd, { color: colors.onPrimaryContainer }]}>CAPACHICA EXPERIENCE AI</Text>
             <Text style={[typography.headlineLgMobile, { color: '#fff', marginTop: 8 }]}>
-              Crea tu cuenta
+              {cfg.text('register.headline', 'Crea tu cuenta')}
             </Text>
             <Text style={[typography.bodyMd, { color: 'rgba(255,255,255,0.8)', marginTop: 6 }]}>
-              Explora Capachica, guarda favoritos y reserva experiencias.
+              {cfg.text('register.subtitle', 'Explora Capachica, guarda favoritos y reserva experiencias.')}
             </Text>
           </View>
 
@@ -64,12 +67,17 @@ export default function Register() {
               style={styles.input}
             />
             <Text style={[typography.labelMd, { color: colors.onSurfaceVariant, marginTop: spacing.gutter }]}>CONTRASEÑA</Text>
-            <TextInput
-              value={password} onChangeText={setPassword}
-              secureTextEntry placeholder="Mínimo 8 caracteres"
-              placeholderTextColor={colors.outline}
-              style={styles.input}
-            />
+            <View>
+              <TextInput
+                value={password} onChangeText={setPassword}
+                secureTextEntry={!showPassword} placeholder="Mínimo 8 caracteres"
+                placeholderTextColor={colors.outline}
+                style={[styles.input, { paddingRight: 44 }]}
+              />
+              <Pressable onPress={() => setShowPassword(v => !v)} style={styles.eyeBtn} hitSlop={10}>
+                <MaterialIcons name={showPassword ? 'visibility-off' : 'visibility'} size={20} color={colors.onSurfaceVariant} />
+              </Pressable>
+            </View>
             {!!error && (
               <Text style={[typography.labelSm, { color: colors.error, marginTop: spacing.gutter }]}>{error}</Text>
             )}
@@ -103,4 +111,5 @@ const styles = StyleSheet.create({
     borderRadius: radii.md, padding: 14,
     fontFamily: 'HankenGrotesk_400Regular', fontSize: 16, color: colors.onSurface,
   },
+  eyeBtn: { position: 'absolute', right: 12, top: 0, bottom: 0, justifyContent: 'center' },
 });

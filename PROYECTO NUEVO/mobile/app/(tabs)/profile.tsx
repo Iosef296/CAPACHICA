@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeInsets } from '@/hooks/useSafeInsets';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/Button';
 import { useAuth } from '@/auth/AuthContext';
@@ -12,12 +12,19 @@ import { useRatings } from '@/data/ratings';
 import { colors, radii, spacing, typography, useThemeMode } from '@/theme';
 
 export default function Profile() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, refreshProfile } = useAuth();
   const router = useRouter();
   const { t } = useTranslation();
   const [reservasList, setReservasList] = useState<ReservaMia[]>([]);
   const { all: ratingsAll } = useRatings();
+  const insets = useSafeInsets();
   useThemeMode(); // se resuscribe para repintar en vivo al cambiar tema
+
+  useFocusEffect(
+    React.useCallback(() => {
+      refreshProfile();
+    }, [refreshProfile])
+  );
 
   useLiveRefresh(() => {
     if (!user) return;
@@ -33,7 +40,7 @@ export default function Profile() {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaView edges={['top']}>
+      <View style={{ paddingTop: insets.top }}>
         <View style={styles.header}>
           <View style={[styles.avatarRing, { borderColor: colors.terracotta }]}>
             {user?.avatar ? (
@@ -62,11 +69,13 @@ export default function Profile() {
           {user?.rol === 'admin' && (
             <MenuItem icon="admin-panel-settings" label={t('profile.menu.usuarios')} onPress={() => router.push('/(stacks)/manage-users')} />
           )}
+          {user?.rol === 'admin' && (
+            <MenuItem icon="edit-note" label="Textos de la app" onPress={() => router.push('/(stacks)/config-etiquetas')} />
+          )}
           {esEmprendedor && (
             <MenuItem icon="storefront" label={t('profile.menu.miNegocio')} onPress={() => router.push('/(stacks)/my-business')} />
           )}
           <MenuItem icon="auto-awesome" label={t('profile.menu.misRutas')} onPress={() => router.push('/(stacks)/profile-extended')} />
-          <MenuItem icon="bookmark" label={t('profile.menu.misReservas')} onPress={() => router.push('/(stacks)/my-bookings')} />
           <MenuItem icon="favorite" label={t('profile.menu.favoritos')} onPress={() => router.push('/(stacks)/favorites')} />
           <MenuItem icon="menu-book" label={t('profile.menu.guias')} onPress={() => router.push('/(stacks)/guides?type=travel')} />
           <MenuItem icon="settings" label={t('profile.menu.configuracion')} onPress={() => router.push('/(stacks)/settings')} />
@@ -76,7 +85,7 @@ export default function Profile() {
         <View style={{ paddingHorizontal: spacing.containerPadding, marginTop: spacing.stackMd, marginBottom: spacing.stackLg }}>
           <Button label={t('profile.cerrarSesion')} variant="ghost" icon="logout" onPress={signOut} />
         </View>
-      </SafeAreaView>
+      </View>
     </ScrollView>
   );
 }

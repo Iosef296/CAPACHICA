@@ -6,6 +6,7 @@ import { GlassPanel } from '@/components/GlassPanel';
 import { crafts as mockCrafts, masters as mockMasters } from '@/data/mock';
 import { api, API_WS } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
+import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
 const PALETTE = [
@@ -16,6 +17,7 @@ const PALETTE = [
 ];
 
 export default function Crafts() {
+  const cfg = useAppConfig();
   const [crafts, setCrafts] = useState<any[]>(mockCrafts);
   const [masters, setMasters] = useState<any[]>(mockMasters);
   useLiveRefresh(() => {
@@ -24,13 +26,13 @@ export default function Crafts() {
   }, { url: API_WS, channels: ['artesania', 'maestros'] });
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaView edges={['top']}>
-        <ScreenHeader eyebrow="ARTESANÍA" title="El Arte del Tejido Capachiqueño" back />
+      <SafeAreaView edges={['bottom']}>
+        <ScreenHeader eyebrow={cfg.text('crafts.eyebrow', 'ARTESANÍA')} title={cfg.text('crafts.title', 'El Arte del Tejido Capachiqueño')} back />
 
         <GlassPanel style={{ marginHorizontal: spacing.containerPadding, marginBottom: spacing.stackMd }}>
-          <Text style={[typography.labelMd, { color: colors.secondary }]}>SABIDURÍA ANCESTRAL · KILLA</Text>
+          <Text style={[typography.labelMd, { color: colors.secondary }]}>{cfg.text('crafts.wisdomLabel', 'SABIDURÍA ANCESTRAL · KILLA')}</Text>
           <Text style={[typography.bodyMd, { color: colors.onSurface, marginTop: 4 }]}>
-            Cada símbolo en un tejido cuenta una historia. El Ch'aska representa la estrella guía.
+            {cfg.text('crafts.wisdomText', "Cada símbolo en un tejido cuenta una historia. El Ch'aska representa la estrella guía.")}
           </Text>
           <View style={styles.topicRow}>
             {['Cóndor', 'Chakana', 'Hanan/Hurin'].map(t => (
@@ -41,7 +43,7 @@ export default function Crafts() {
           </View>
         </GlassPanel>
 
-        <Text style={styles.sectionTitle}>MAESTROS DEL TELAR</Text>
+        <Text style={styles.sectionTitle}>{cfg.text('crafts.sectionMaestros', 'MAESTROS DEL TELAR')}</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hScroll}>
           {masters.map(m => (
             <View key={m.id} style={styles.master}>
@@ -52,7 +54,7 @@ export default function Crafts() {
           ))}
         </ScrollView>
 
-        <Text style={styles.sectionTitle}>GALERÍA</Text>
+        <Text style={styles.sectionTitle}>{cfg.text('crafts.sectionGaleria', 'GALERÍA')}</Text>
         <View style={styles.grid}>
           {crafts.map(c => (
             <View key={c.id} style={styles.craftCard}>
@@ -65,7 +67,7 @@ export default function Crafts() {
           ))}
         </View>
 
-        <Text style={styles.sectionTitle}>TINTES DE LA TIERRA</Text>
+        <Text style={styles.sectionTitle}>{cfg.text('crafts.sectionTintes', 'TINTES DE LA TIERRA')}</Text>
         <View style={[styles.palette, { paddingHorizontal: spacing.containerPadding }]}>
           {PALETTE.map(p => (
             <View key={p.name} style={{ alignItems: 'center', gap: 6 }}>

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, FlatList, Image, ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -8,15 +7,22 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { Chip } from '@/components/Chip';
 import { api, API_WS, Festividad } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
+import { useSafeInsets } from '@/hooks/useSafeInsets';
+import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
-const TYPES = ['Todas', 'Religiosa', 'Cultural', 'Cívica'];
+const TYPES_DEFAULT = ['Todas', 'Religiosa', 'Cultural', 'Cívica'];
 
 export default function Festividades() {
+  const cfg = useAppConfig();
+  const TYPES: string[] = cfg.json('festividades.types', TYPES_DEFAULT);
   const [items, setItems] = useState<Festividad[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('Todas');
   const router = useRouter();
+  const insets = useSafeInsets();
+  const [headerH, setHeaderH] = useState(0);
+  const [pastHeader, setPastHeader] = useState(false);
 
   useLiveRefresh(() => {
     api.festividades().then(data => {
@@ -37,21 +43,22 @@ export default function Festividades() {
   }
 
   return (
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
     <FlatList
-      style={{ backgroundColor: colors.background }}
+      style={{ flex: 1 }}
       data={filtered}
       keyExtractor={(item, idx) => `${item.id ?? idx}`}
+      scrollEventThrottle={16}
+      onScroll={e => setPastHeader(headerH > 0 && e.nativeEvent.contentOffset.y > headerH - insets.top)}
       ListHeaderComponent={
-        <View>
-          <SafeAreaView edges={['top']}>
-            <ScreenHeader eyebrow="CULTURA VIVA" title="Festividades" back />
-          </SafeAreaView>
+        <View onLayout={e => setHeaderH(e.nativeEvent.layout.height)}>
+          <ScreenHeader eyebrow={cfg.text('festividades.eyebrow', 'CULTURA VIVA')} title={cfg.text('festividades.title', 'Festividades')} back />
 
           {featured && (
             <ImageBackground source={{ uri: featured.imagen }} style={styles.hero} imageStyle={{ borderRadius: radii.xl }}>
               <LinearGradient colors={['transparent', 'rgba(0,66,104,0.9)']} style={[StyleSheet.absoluteFillObject, { borderRadius: radii.xl }]} />
               <View style={styles.heroBody}>
-                <Text style={[typography.labelMd, { color: colors.sunGold }]}>DESTACADA</Text>
+                <Text style={[typography.labelMd, { color: colors.sunGold }]}>{cfg.text('festividades.badgeDestacada', 'DESTACADA')}</Text>
                 <Text style={[typography.headlineLg, { color: '#fff', marginTop: 4 }]}>{featured.nombre}</Text>
                 <Text style={[typography.bodyMd, { color: 'rgba(255,255,255,0.85)' }]}>
                   📅 {featured.fecha}  ·  📍 {featured.ubicacion}
@@ -83,9 +90,13 @@ export default function Festividades() {
           </View>
         </Pressable>
       )}
-      contentContainerStyle={{ paddingBottom: spacing.stackLg, gap: spacing.gutter }}
+      contentContainerStyle={{ paddingBottom: spacing.stackLg + insets.bottom, gap: spacing.gutter }}
       ItemSeparatorComponent={() => <View style={{ height: 0 }} />}
     />
+      {pastHeader && (
+        <View pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: insets.top, backgroundColor: colors.background }} />
+      )}
+    </View>
   );
 }
 

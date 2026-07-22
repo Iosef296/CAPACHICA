@@ -1,0 +1,575 @@
+<!-- @dsCard group="Turismo" viewport="1280x720" name="Homepage — Turismo" subtitle="Página principal con diseño rústico andino de Capachica, Puno" -->
+<!-- @startingPoint section="UI Kits" subtitle="Homepage completo para turismo en Capachica" viewport="1280x800" -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capachica Turismo — La Joya del Lago Titicaca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Lora',Georgia,serif;background:#100806;color:#F5EDD8;overflow-x:hidden;min-height:100vh}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:#100806}
+::-webkit-scrollbar-thumb{background:rgba(184,83,31,0.5);border-radius:2px}
+
+/* ── LAYOUT ── */
+.container{max-width:1200px;margin:0 auto;padding:0 1.5rem}
+section{padding:90px 0}
+@media(max-width:768px){section{padding:60px 0}.container{padding:0 1rem}}
+
+/* ── SECTION LABEL ── */
+.section-label{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:4px;background:rgba(201,144,58,0.10);border:1px solid rgba(201,144,58,0.38);color:#C9903A;font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.20em;text-transform:uppercase;margin-bottom:1.1rem}
+.section-label.clay{background:rgba(184,83,31,0.10);border-color:rgba(184,83,31,0.38);color:#DE8649}
+.section-label.lake{background:rgba(42,116,184,0.10);border-color:rgba(42,116,184,0.38);color:#5096D4}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,3rem);font-weight:800;line-height:1.1;margin-bottom:0.8rem}
+.section-title em{font-style:italic;color:#C9903A}
+.divider{width:44px;height:3px;border-radius:0;background:linear-gradient(90deg,#B8531F,transparent);margin:0.9rem 0}
+.text-center{text-align:center}
+.text-center .divider{margin:0.9rem auto}
+
+/* ── WEAVE STRIPE ── */
+.weave{height:5px;background:repeating-linear-gradient(90deg,#B8531F 0,#B8531F 4px,#C9903A 4px,#C9903A 8px,#7C2D0C 8px,#7C2D0C 12px,#C9903A 12px,#C9903A 16px,#5A8E20 16px,#5A8E20 20px,#C9903A 20px,#C9903A 24px,#B8531F 24px,#B8531F 28px)}
+
+/* ── GRAIN OVERLAY ── */
+.grain::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");background-size:200px 200px;pointer-events:none;z-index:0;border-radius:inherit}
+
+/* ── NAVBAR ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 1.5rem;transition:all 0.35s ease}
+nav.scrolled{background:rgba(14,6,2,0.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(184,83,31,0.18);box-shadow:0 4px 24px rgba(0,0,0,0.12)}
+.nav-inner{max-width:1200px;margin:0 auto;height:66px;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+.nav-logo-icon{width:36px;height:36px;border-radius:6px;background:linear-gradient(135deg,#B8531F,#7C2D0C);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:800;font-size:17px;color:#F5EDD8;box-shadow:0 0 18px rgba(184,83,31,0.40)}
+.nav-logo-text .name{font-family:'Playfair Display',serif;font-weight:700;font-size:15px;color:#F5EDD8;line-height:1}
+.nav-logo-text .tagline{font-family:'Josefin Sans',sans-serif;font-size:8px;color:rgba(201,144,58,0.65);letter-spacing:0.18em;text-transform:uppercase;margin-top:1px}
+.nav-links{display:flex;gap:2px;flex:1;justify-content:center}
+.nav-link{padding:6px 12px;border-radius:4px;font-family:'Josefin Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.06em;color:rgba(245,237,216,0.82);text-decoration:none;transition:all 0.22s;text-transform:uppercase}
+.nav-link:hover{color:#F5EDD8;background:rgba(255,255,255,0.08)}
+.nav-link.active{background:linear-gradient(135deg,#B8531F,#7C2D0C);color:#F5EDD8;box-shadow:0 2px 12px rgba(184,83,31,0.38)}
+.nav-scroll-bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#B8531F,#C9903A,#7C2D0C);z-index:200;transition:width 0.08s linear;border-radius:0 2px 2px 0}
+@media(max-width:960px){.nav-links{display:none}}
+
+/* ── HERO ── */
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;padding-top:66px}
+.hero-sky{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 120% 60% at 50% 100%,rgba(184,83,31,0.14) 0%,transparent 60%),radial-gradient(ellipse 80% 50% at 30% 20%,rgba(201,144,58,0.06) 0%,transparent 55%),linear-gradient(180deg,#060402 0%,#0E0602 25%,#140804 50%,#1C0C06 75%,#201008 100%)}
+.hero-grain{position:absolute;inset:0;z-index:1;opacity:0.5;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.09'/%3E%3C/svg%3E");background-size:200px 200px;pointer-events:none}
+.hero-stars{position:absolute;inset:0;z-index:2;pointer-events:none}
+.star{position:absolute;border-radius:50%;animation:twinkle var(--d,3s) ease-in-out infinite var(--delay,0s)}
+@keyframes twinkle{0%,100%{opacity:var(--oa,0.6)}50%{opacity:var(--ob,0.15)}}
+.hero-content{position:relative;z-index:5;text-align:center;display:flex;flex-direction:column;align-items:center;padding:clamp(100px,14vh,160px) 1.5rem 0;margin-bottom:200px}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:4px;border:1px solid rgba(201,144,58,0.42);background:rgba(201,144,58,0.10);font-family:'Josefin Sans',sans-serif;font-size:10px;letter-spacing:0.20em;color:#C9903A;text-transform:uppercase;margin-bottom:1.4rem;animation:fadeUp 0.8s ease both}
+.hero-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:#C9903A;animation:blink 2.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(3.5rem,9vw,7rem);font-weight:800;line-height:1.0;color:#F5EDD8;animation:fadeUp 0.8s 0.1s ease both;margin-bottom:0.3rem}
+.hero-title em{display:block;font-style:italic;color:#C9903A;font-size:0.58em;font-weight:600;line-height:1.2}
+.hero-desc{font-family:'Lora',serif;font-size:clamp(1rem,2vw,1.15rem);color:rgba(245,237,216,0.72);max-width:520px;margin:1.1rem auto 0;line-height:1.85;animation:fadeUp 0.8s 0.2s ease both}
+.hero-ctas{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem;animation:fadeUp 0.8s 0.3s ease both}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#B8531F,#7C2D0C);border:1px solid rgba(255,255,255,0.10);color:#F5EDD8;border-radius:6px;padding:13px 28px;font-family:'Josefin Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 20px rgba(184,83,31,0.40);transition:all 0.28s ease;text-decoration:none}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(184,83,31,0.58);background:linear-gradient(135deg,#C96832,#9A3F14)}
+.btn-outline{display:inline-flex;align-items:center;gap:8px;background:transparent;color:#C9903A;border:1.5px solid rgba(201,144,58,0.50);border-radius:6px;padding:12px 26px;font-family:'Josefin Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.25s;text-decoration:none}
+.btn-outline:hover{background:rgba(201,144,58,0.12);border-color:rgba(201,144,58,0.80);transform:translateY(-2px)}
+.hero-stats{position:relative;z-index:5;display:flex;background:rgba(26,10,4,0.80);border:1px solid rgba(184,83,31,0.28);border-radius:6px;overflow:hidden;margin-top:2rem;animation:fadeUp 0.8s 0.4s ease both}
+.stat-item{padding:12px 22px;text-align:center;border-right:1px solid rgba(184,83,31,0.18)}
+.stat-item:last-child{border-right:none}
+.stat-val{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:#C9903A;line-height:1}
+.stat-lbl{font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:0.12em;color:rgba(245,237,216,0.45);text-transform:uppercase;margin-top:3px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── HERO MOUNTAIN ── */
+.hero-mountain{position:absolute;bottom:0;left:0;right:0;z-index:3;pointer-events:none;height:220px}
+.hero-mountain svg{width:100%;height:100%;display:block}
+.hero-weave{position:absolute;bottom:0;left:0;right:0;z-index:4;height:5px;background:repeating-linear-gradient(90deg,#B8531F 0,#B8531F 4px,#C9903A 4px,#C9903A 8px,#7C2D0C 8px,#7C2D0C 12px,#C9903A 12px,#C9903A 16px,#5A8E20 16px,#5A8E20 20px,#C9903A 20px,#C9903A 24px)}
+
+/* ── CARDS ── */
+.card{background:rgba(26,10,4,0.88);border:1px solid rgba(184,83,31,0.22);border-radius:6px;padding:1.75rem;transition:all 0.30s ease;position:relative;overflow:hidden;cursor:pointer;text-decoration:none;display:block;color:inherit}
+.card:hover{transform:translateY(-4px);border-color:rgba(201,144,58,0.45);box-shadow:0 16px 40px rgba(16,8,4,0.55),0 4px 12px rgba(184,83,31,0.18)}
+.card-orb{position:absolute;top:-30px;right:-30px;width:110px;height:110px;border-radius:50%;pointer-events:none}
+.card-icon{font-size:2rem;margin-bottom:0.85rem;line-height:1}
+.card-badge{display:inline-block;padding:3px 10px;border-radius:4px;font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.7rem}
+.card-title{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:#F5EDD8;margin-bottom:0.55rem;line-height:1.3}
+.card-desc{font-family:'Lora',serif;font-size:0.84rem;color:rgba(245,237,216,0.62);line-height:1.75;margin-bottom:0.9rem}
+.card-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:0.8rem}
+.tag{padding:3px 9px;border-radius:4px;font-family:'Josefin Sans',sans-serif;font-size:10px;background:rgba(255,255,255,0.06);color:rgba(245,237,216,0.55);border:1px solid rgba(255,255,255,0.10)}
+.card-link{font-family:'Josefin Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;display:flex;align-items:center;gap:5px}
+.feature-card{background:rgba(26,10,4,0.72);border:1px solid rgba(184,83,31,0.18);border-radius:6px;padding:1.4rem 1.2rem;transition:border-color 0.25s}
+.feature-card:hover{border-color:rgba(201,144,58,0.35)}
+.feature-icon{font-size:1.6rem;margin-bottom:0.6rem}
+.feature-title{font-family:'Playfair Display',serif;font-weight:700;font-size:0.88rem;color:#F5EDD8;margin-bottom:0.4rem;line-height:1.3}
+.feature-text{font-family:'Lora',serif;font-size:0.80rem;color:rgba(245,237,216,0.55);line-height:1.65}
+.info-card{background:rgba(26,10,4,0.72);border:1px solid rgba(184,83,31,0.18);border-radius:6px;padding:2rem;transition:border-color 0.28s}
+.info-card:hover{border-color:rgba(201,144,58,0.38)}
+.info-card li{font-family:'Lora',serif;font-size:0.87rem;color:rgba(245,237,216,0.70);line-height:2.0;list-style:none;padding:0}
+.info-card a{color:#DE8649;font-size:12px;font-weight:600;font-family:'Josefin Sans',sans-serif;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none}
+.info-card a:hover{color:#C9903A}
+
+/* ── CTA BANNER ── */
+.cta-banner{background:rgba(26,10,4,0.80);border:1px solid rgba(184,83,31,0.28);border-radius:6px;padding:3.5rem 2.5rem;text-align:center;position:relative;overflow:hidden}
+.cta-banner::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:400px;height:200px;background:radial-gradient(ellipse,rgba(184,83,31,0.10) 0%,transparent 70%);pointer-events:none}
+
+/* ── FOOTER ── */
+footer{background:linear-gradient(180deg,#2C160A 0%,#1C0E06 40%,#120A04 80%,#0C0602 100%);border-top:1px solid rgba(184,83,31,0.18);padding:56px 0 0;position:relative}
+footer::after{content:'';position:absolute;bottom:0;left:0;right:0;height:280px;background:radial-gradient(ellipse 300px 220px at 6% 95%,rgba(255,120,10,0.22) 0%,transparent 70%),radial-gradient(ellipse 300px 220px at 94% 95%,rgba(255,120,10,0.22) 0%,transparent 70%);pointer-events:none;animation:fireGlow 2.2s ease-in-out infinite}
+@keyframes fireGlow{0%,100%{opacity:1}40%{opacity:1.25}70%{opacity:0.72}}
+.footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:2.5rem;padding-bottom:2.5rem;border-bottom:1px solid rgba(184,83,31,0.15)}
+.footer-brand-icon{width:40px;height:40px;border-radius:6px;background:linear-gradient(135deg,#B8531F,#7C2D0C);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:800;font-size:18px;color:#F5EDD8;margin-bottom:0.9rem}
+.footer-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:rgba(245,237,216,0.92);line-height:1}
+.footer-tagline{font-family:'Josefin Sans',sans-serif;font-size:9px;color:rgba(201,144,58,0.60);letter-spacing:0.20em;text-transform:uppercase;margin-top:2px}
+.footer-desc{font-family:'Lora',serif;font-size:13px;color:rgba(245,237,216,0.48);line-height:1.75;max-width:230px;margin:1rem 0 1.2rem}
+.footer-chips{display:flex;flex-wrap:wrap;gap:5px}
+.footer-chip{padding:3px 10px;border-radius:4px;background:rgba(184,83,31,0.10);border:1px solid rgba(184,83,31,0.24);color:rgba(201,144,58,0.75);font-family:'Josefin Sans',sans-serif;font-size:10px;letter-spacing:0.06em}
+.footer-heading{font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:rgba(201,144,58,0.70);margin-bottom:1rem}
+.footer-link{display:block;font-family:'Lora',serif;font-size:13.5px;color:rgba(245,237,216,0.50);text-decoration:none;margin-bottom:8px;transition:color 0.2s,padding-left 0.2s;line-height:1.5}
+.footer-link:hover{color:rgba(245,237,216,0.92);padding-left:4px}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding:20px 0}
+@media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.footer-grid{grid-template-columns:1fr}}
+
+/* ── REVEAL ── */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity 0.65s ease,transform 0.65s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- Scroll progress -->
+<div class="nav-scroll-bar" id="scrollBar"></div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-icon">C</div>
+      <div class="nav-logo-text">
+        <div class="name">Capachica</div>
+        <div class="tagline">Turismo Vivencial</div>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="/" class="nav-link active">Inicio</a>
+      <a href="/destinos" class="nav-link">Destinos</a>
+      <a href="vivencial.html" class="nav-link">Vivencial</a>
+      <a href="/actividades" class="nav-link">Actividades</a>
+      <a href="gastronomia.html" class="nav-link">Gastronomía</a>
+      <a href="festividades.html" class="nav-link">Festividades</a>
+      <a href="/artesania" class="nav-link">Artesanía</a>
+    </div>
+    <a href="vivencial.html#reservar" class="btn-primary" style="padding:9px 18px;font-size:11px">Reservar →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-sky"></div>
+  <div class="hero-grain"></div>
+  <canvas class="hero-stars" id="starCanvas"></canvas>
+
+  <div class="hero-content">
+    <div class="hero-badge">✦ Puno, Perú · 3,820 msnm</div>
+    <h1 class="hero-title">
+      Capachica
+      <em>La Joya del Lago Titicaca</em>
+    </h1>
+    <p class="hero-desc">
+      Una península quechua a orillas del lago navegable más alto del mundo.
+      Tradiciones ancestrales, paisajes únicos y turismo que beneficia directamente a sus comunidades.
+    </p>
+    <div class="hero-ctas">
+      <a href="#destinos" class="btn-primary">Ver destinos →</a>
+      <a href="vivencial.html" class="btn-outline">Reservar vivencia</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item"><div class="stat-val">80</div><div class="stat-lbl">km desde Puno</div></div>
+      <div class="stat-item"><div class="stat-val">8+</div><div class="stat-lbl">Comunidades</div></div>
+      <div class="stat-item"><div class="stat-val">500+</div><div class="stat-lbl">Años de historia</div></div>
+      <div class="stat-item"><div class="stat-val">3,820</div><div class="stat-lbl">msnm</div></div>
+    </div>
+  </div>
+
+  <!-- Mountain silhouette -->
+  <div class="hero-mountain">
+    <svg viewBox="0 0 1440 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="mtnGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1C0C06" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#100806" stop-opacity="1"/>
+        </linearGradient>
+      </defs>
+      <!-- Far mountains (lighter) -->
+      <path d="M0,180 L60,140 L130,160 L200,110 L280,135 L360,95 L440,120 L520,80 L600,105 L680,65 L760,90 L840,55 L920,80 L1000,45 L1080,70 L1160,38 L1240,62 L1320,42 L1380,55 L1440,50 L1440,220 L0,220 Z" fill="#2A1408" opacity="0.7"/>
+      <!-- Mid mountains -->
+      <path d="M0,200 L80,158 L160,178 L240,138 L320,165 L400,125 L480,148 L560,108 L640,132 L720,98 L800,120 L880,88 L960,110 L1040,75 L1120,100 L1200,68 L1280,90 L1360,78 L1440,85 L1440,220 L0,220 Z" fill="#1C0C06" opacity="0.88"/>
+      <!-- Near mountains (darkest) -->
+      <path d="M0,220 L0,205 L80,185 L150,195 L220,172 L300,188 L380,168 L440,178 L500,162 L570,175 L640,158 L710,170 L780,155 L850,165 L920,148 L990,160 L1060,145 L1130,158 L1200,142 L1270,155 L1340,148 L1440,155 L1440,220 Z" fill="#100806"/>
+      <!-- Lake shimmer -->
+      <ellipse cx="720" cy="212" rx="340" ry="10" fill="rgba(42,116,184,0.12)"/>
+    </svg>
+  </div>
+  <div class="hero-weave"></div>
+</section>
+
+<!-- SECTION 1: Bienvenido -->
+<section style="padding:90px 0;border-bottom:1px solid rgba(184,83,31,0.16)">
+  <div class="container">
+    <div class="reveal" style="text-align:center;margin-bottom:3.5rem">
+      <div class="section-label">✦ La Joya Escondida</div>
+      <h2 class="section-title">Bienvenido a <em>Capachica</em></h2>
+      <div class="divider" style="margin:0.9rem auto"></div>
+      <p style="color:rgba(245,237,216,0.75);max-width:580px;margin:0 auto;line-height:1.85;font-size:1rem">
+        En el corazón del altiplano peruano, a orillas del lago más alto del mundo, se esconde
+        una de las experiencias más auténticas del Perú.
+      </p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:3rem;align-items:center">
+      <div class="reveal">
+        <p style="color:rgba(245,237,216,0.82);line-height:1.9;margin-bottom:1.4rem;font-size:1rem">
+          Capachica es una <strong style="color:#DE8649">península quechua</strong> ubicada en la región
+          Puno, Perú — a solo 80 km de la ciudad de Puno. Sus ocho comunidades conservan vivas las
+          tradiciones andinas que preceden incluso al Imperio Inca.
+        </p>
+        <p style="color:rgba(245,237,216,0.68);line-height:1.9;margin-bottom:2rem;font-size:0.94rem">
+          Aquí el turismo vivencial no es una escenificación: es la vida real de sus habitantes.
+          Dormirás en casas familiares, aprenderás a tejer con lana de alpaca y contemplarás atardeceres
+          que transforman el Titicaca en un espejo de oro y terracota.
+        </p>
+        <div style="display:flex;gap:2rem;flex-wrap:wrap">
+          <div>
+            <div style="color:#DE8649;font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;line-height:1">3,820</div>
+            <div style="color:rgba(245,237,216,0.45);font-family:'Josefin Sans',sans-serif;font-size:10px;letter-spacing:0.10em;text-transform:uppercase;margin-top:4px">metros sobre el mar</div>
+          </div>
+          <div>
+            <div style="color:#C9903A;font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;line-height:1">8+</div>
+            <div style="color:rgba(245,237,216,0.45);font-family:'Josefin Sans',sans-serif;font-size:10px;letter-spacing:0.10em;text-transform:uppercase;margin-top:4px">comunidades</div>
+          </div>
+          <div>
+            <div style="color:#5096D4;font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;line-height:1">500+</div>
+            <div style="color:rgba(245,237,216,0.45);font-family:'Josefin Sans',sans-serif;font-size:10px;letter-spacing:0.10em;text-transform:uppercase;margin-top:4px">años de historia</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem" class="reveal">
+        <div class="feature-card">
+          <div class="feature-icon">🌊</div>
+          <div class="feature-title">Lago navegable más alto del mundo</div>
+          <div class="feature-text">El Titicaca tiene 8,372 km² a 3,812 msnm — un océano interior en los Andes.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🌿</div>
+          <div class="feature-title">Turismo 100% comunitario</div>
+          <div class="feature-text">Los ingresos van directamente a las familias locales. Sin intermediarios.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⭐</div>
+          <div class="feature-title">Cielos sin contaminación</div>
+          <div class="feature-text">La Vía Láctea visible a simple vista. Noches perfectas para astronomía.</div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎨</div>
+          <div class="feature-title">Cultura viva y auténtica</div>
+          <div class="feature-text">Tradiciones quechuas pre-incaicas y textiles ancestrales únicos en el mundo.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 2: Destinos -->
+<section style="padding:90px 0;background:#180C06;border-bottom:1px solid rgba(184,83,31,0.16)">
+  <div class="container">
+    <div class="reveal text-center" style="margin-bottom:3.5rem">
+      <div class="section-label clay">◆ Lugares que visitar</div>
+      <h2 class="section-title">Destinos <em>imperdibles</em></h2>
+      <div class="divider" style="margin:0.9rem auto"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.4rem">
+      <a href="/destinos" class="card reveal">
+        <div class="card-orb" style="background:radial-gradient(circle,rgba(42,116,184,0.18) 0%,transparent 70%)"></div>
+        <div class="card-icon">🏖️</div>
+        <div class="card-badge" style="background:rgba(42,116,184,0.14);border:1px solid rgba(42,116,184,0.30);color:#5096D4">La única playa</div>
+        <div class="card-title">Playa Llachón</div>
+        <div class="card-desc">Arena blanca y aguas turquesas a 3,820 msnm. Un milagro geológico en el corazón del altiplano peruano.</div>
+        <div class="card-link" style="color:#5096D4">Ver destino <span>→</span></div>
+      </a>
+      <a href="/destinos" class="card reveal">
+        <div class="card-orb" style="background:radial-gradient(circle,rgba(90,142,32,0.18) 0%,transparent 70%)"></div>
+        <div class="card-icon">🏝️</div>
+        <div class="card-badge" style="background:rgba(90,142,32,0.14);border:1px solid rgba(90,142,32,0.30);color:#7AAF38">Isla sagrada</div>
+        <div class="card-title">Isla Ticonata</div>
+        <div class="card-desc">A 40 minutos en bote, Ticonata guarda secretos ancestrales y ofrece una vista privilegiada del Titicaca.</div>
+        <div class="card-link" style="color:#7AAF38">Ver destino <span>→</span></div>
+      </a>
+      <a href="/destinos" class="card reveal">
+        <div class="card-orb" style="background:radial-gradient(circle,rgba(201,144,58,0.16) 0%,transparent 70%)"></div>
+        <div class="card-icon">🏔️</div>
+        <div class="card-badge" style="background:rgba(201,144,58,0.12);border:1px solid rgba(201,144,58,0.30);color:#C9903A">360° del lago</div>
+        <div class="card-title">Mirador del Amaru</div>
+        <div class="card-desc">Desde la cima del cerro Amaru, el Titicaca se despliega infinito. El mejor punto para los atardeceres.</div>
+        <div class="card-link" style="color:#C9903A">Ver destino <span>→</span></div>
+      </a>
+      <a href="/destinos" class="card reveal">
+        <div class="card-orb" style="background:radial-gradient(circle,rgba(184,83,31,0.18) 0%,transparent 70%)"></div>
+        <div class="card-icon">🏘️</div>
+        <div class="card-badge" style="background:rgba(184,83,31,0.12);border:1px solid rgba(184,83,31,0.30);color:#DE8649">Corazón andino</div>
+        <div class="card-title">Comunidad Capachica</div>
+        <div class="card-desc">Mercados artesanales, iglesia colonial y la calidez de las familias quechuas que llevan 500 años aquí.</div>
+        <div class="card-link" style="color:#DE8649">Ver destino <span>→</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 3: Planifica -->
+<section style="padding:90px 0;border-bottom:1px solid rgba(184,83,31,0.16)">
+  <div class="container">
+    <div class="reveal text-center" style="margin-bottom:3rem">
+      <div class="section-label">✦ Planifica tu viaje</div>
+      <h2 class="section-title">Todo lo que <em>necesitas saber</em></h2>
+      <div class="divider" style="margin:0.9rem auto"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.4rem">
+      <div class="info-card reveal">
+        <div style="font-size:1.8rem;margin-bottom:1rem">🚌</div>
+        <h3 style="font-family:'Playfair Display',serif;color:#F5EDD8;font-size:1.1rem;margin-bottom:0.9rem">Cómo llegar</h3>
+        <ul style="margin-bottom:1.2rem">
+          <li>✈️ Lima → Juliaca (1h 30min vuelo)</li>
+          <li>🚌 Juliaca → Puno (35 min bus)</li>
+          <li>🚗 Puno → Capachica (1h 30min)</li>
+          <li style="color:#DE8649;font-weight:600">Total: ~3.5h desde Lima</li>
+        </ul>
+        <a href="/como-llegar">Ver ruta completa →</a>
+      </div>
+      <div class="info-card reveal">
+        <div style="font-size:1.8rem;margin-bottom:1rem">📅</div>
+        <h3 style="font-family:'Playfair Display',serif;color:#F5EDD8;font-size:1.1rem;margin-bottom:0.9rem">Mejor época para visitar</h3>
+        <ul style="margin-bottom:1.2rem">
+          <li>☀️ <strong style="color:#C9903A">Mayo – Octubre</strong>: temporada seca</li>
+          <li>🌧️ Nov – Abril: lluvias, verde intenso</li>
+          <li>🎊 Febrero: Virgen de la Candelaria</li>
+          <li>🌅 Todo el año: atardeceres únicos</li>
+        </ul>
+        <a href="/festividades" style="color:#C9903A">Ver calendario →</a>
+      </div>
+      <div class="info-card reveal">
+        <div style="font-size:1.8rem;margin-bottom:1rem">🤝</div>
+        <h3 style="font-family:'Playfair Display',serif;color:#F5EDD8;font-size:1.1rem;margin-bottom:0.9rem">Turismo responsable</h3>
+        <ul style="margin-bottom:1.2rem">
+          <li>💚 100% ingresos a comunidades locales</li>
+          <li>♻️ Residuos manejados responsablemente</li>
+          <li>🌱 Cultivos orgánicos ancestrales</li>
+          <li>📸 Respeto pleno a la cultura local</li>
+        </ul>
+        <a href="/vivencial" style="color:#7AAF38">Conocer familias →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4: Experiencias -->
+<section style="padding:90px 0;background:#180C06">
+  <div class="container">
+    <div class="reveal text-center" style="margin-bottom:3.5rem">
+      <div class="section-label clay">◆ Todo en un lugar</div>
+      <h2 class="section-title">Descubre <em>Capachica</em></h2>
+      <div class="divider" style="margin:0.9rem auto"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.4rem">
+      <a href="/vivencial" class="card reveal">
+        <div class="card-orb" style="background:radial-gradient(circle,rgba(184,83,31,0.14) 0%,transparent 70%)"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem">
+          <span style="font-size:2.2rem">🏠</span>
+          <div class="card-badge" style="background:rgba(184,83,31,0.12);border:1px solid rgba(184,83,31,0.28);color:#DE8649">Vivencial</div>
+        </div>
+        <div class="card-title">Vive con familias quechuas</div>
+        <div class="card-desc">Cocina con las familias, aprende sobre la cosmovisión andina y duerme bajo las estrellas del Titicaca.</div>
+        <div class="card-tags"><span class="tag">Familia anfitriona</span><span class="tag">Cocina andina</span><span class="tag">Tejido</span></div>
+        <div class="card-link" style="color:#DE8649">Explorar <span>→</span></div>
+      </a>
+      <a href="/actividades" class="card reveal">
+        <div class="card-orb" style="background:radial-gradient(circle,rgba(90,142,32,0.14) 0%,transparent 70%)"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem">
+          <span style="font-size:2.2rem">🚣</span>
+          <div class="card-badge" style="background:rgba(90,142,32,0.12);border:1px solid rgba(90,142,32,0.28);color:#7AAF38">Actividades</div>
+        </div>
+        <div class="card-title">Aventura en el Titicaca</div>
+        <div class="card-desc">Kayak al amanecer, pesca artesanal, cabalgata entre totorales y escalada con vista panorámica al lago.</div>
+        <div class="card-tags"><span class="tag">Kayak</span><span class="tag">Pesca</span><span class="tag">Escalada</span></div>
+        <div class="card-link" style="color:#7AAF38">Explorar <span>→</span></div>
+      </a>
+      <a href="/gastronomia" class="card reveal">
+        <div class="card-orb" style="background:radial-gradient(circle,rgba(201,144,58,0.14) 0%,transparent 70%)"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem">
+          <span style="font-size:2.2rem">🍽️</span>
+          <div class="card-badge" style="background:rgba(201,144,58,0.12);border:1px solid rgba(201,144,58,0.28);color:#C9903A">Gastronomía</div>
+        </div>
+        <div class="card-title">Sabores del altiplano</div>
+        <div class="card-desc">Trucha del lago, quinua nativa, chuño ancestral. Cocina que lleva cinco siglos de historia andina.</div>
+        <div class="card-tags"><span class="tag">Trucha</span><span class="tag">Quinua</span><span class="tag">Chuño</span></div>
+        <div class="card-link" style="color:#C9903A">Explorar <span>→</span></div>
+      </a>
+      <a href="/festividades" class="card reveal">
+        <div class="card-orb" style="background:radial-gradient(circle,rgba(184,83,31,0.12) 0%,transparent 70%)"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem">
+          <span style="font-size:2.2rem">🎊</span>
+          <div class="card-badge" style="background:rgba(184,83,31,0.10);border:1px solid rgba(184,83,31,0.25);color:#DE8649">Festividades</div>
+        </div>
+        <div class="card-title">Fiestas ancestrales</div>
+        <div class="card-desc">Virgen Candelaria, Inti Raymi, Todos los Santos. Cosmovisión andina y devoción en explosiones de color.</div>
+        <div class="card-tags"><span class="tag">Candelaria</span><span class="tag">Inti Raymi</span><span class="tag">Danzas</span></div>
+        <div class="card-link" style="color:#DE8649">Explorar <span>→</span></div>
+      </a>
+      <a href="/artesania" class="card reveal">
+        <div class="card-orb" style="background:radial-gradient(circle,rgba(201,144,58,0.12) 0%,transparent 70%)"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem">
+          <span style="font-size:2.2rem">🧶</span>
+          <div class="card-badge" style="background:rgba(201,144,58,0.10);border:1px solid rgba(201,144,58,0.25);color:#C9903A">Artesanía</div>
+        </div>
+        <div class="card-title">Textiles con historia</div>
+        <div class="card-desc">Aguayos, chullos y mantas tejidas con técnicas ancestrales que las comunidades han preservado por generaciones.</div>
+        <div class="card-tags"><span class="tag">Aguayo</span><span class="tag">Chullo</span><span class="tag">Bordado</span></div>
+        <div class="card-link" style="color:#C9903A">Explorar <span>→</span></div>
+      </a>
+      <a href="/alojamiento" class="card reveal">
+        <div class="card-orb" style="background:radial-gradient(circle,rgba(42,116,184,0.12) 0%,transparent 70%)"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem">
+          <span style="font-size:2.2rem">🏔️</span>
+          <div class="card-badge" style="background:rgba(42,116,184,0.10);border:1px solid rgba(42,116,184,0.25);color:#5096D4">Destinos</div>
+        </div>
+        <div class="card-title">Paisajes que quitan el aliento</div>
+        <div class="card-desc">Miradores con vistas del Titicaca, islas flotantes y los atardeceres más fotogénicos del Perú.</div>
+        <div class="card-tags"><span class="tag">Llachón</span><span class="tag">Taquile</span><span class="tag">Miradores</span></div>
+        <div class="card-link" style="color:#5096D4">Explorar <span>→</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- WEAVE DIVIDER -->
+<div class="weave"></div>
+
+<!-- CTA -->
+<section style="padding:80px 0;background:#100806">
+  <div class="container">
+    <div class="cta-banner reveal">
+      <div class="section-label" style="margin-bottom:1.4rem">🌊 Reserva tu viaje</div>
+      <h2 class="section-title" style="margin-bottom:1rem">¿Listo para vivir <em>Capachica</em>?</h2>
+      <p style="font-family:'Lora',serif;color:rgba(245,237,216,0.78);max-width:480px;margin:0 auto 2rem;line-height:1.8">
+        Contacta con nosotros y te ayudamos a diseñar el itinerario perfecto según tus intereses y fechas.
+      </p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <a href="vivencial.html#reservar" class="btn-primary">Ver actividades →</a>
+        <a href="vivencial.html" class="btn-outline">Turismo vivencial</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WEAVE DIVIDER -->
+<div class="weave"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container" style="position:relative;z-index:2">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand-icon">C</div>
+        <div class="footer-name">Capachica</div>
+        <div class="footer-tagline">Turismo Vivencial · Puno, Perú</div>
+        <p class="footer-desc">
+          La joya escondida del Lago Titicaca. Conectamos viajeros con las comunidades quechuas de la península de Capachica.
+        </p>
+        <div class="footer-chips">
+          <span class="footer-chip">Titicaca</span>
+          <span class="footer-chip">3820 msnm</span>
+          <span class="footer-chip">🇵🇪 Puno</span>
+        </div>
+      </div>
+      <div>
+        <div class="footer-heading">Destinos</div>
+        <a class="footer-link" href="/destinos">Llachón</a>
+        <a class="footer-link" href="/destinos">Isla Ticonata</a>
+        <a class="footer-link" href="/destinos">Isla Taquile</a>
+        <a class="footer-link" href="/destinos">Bahía de Chifrón</a>
+      </div>
+      <div>
+        <div class="footer-heading">Experiencias</div>
+        <a class="footer-link" href="/vivencial">Turismo Vivencial</a>
+        <a class="footer-link" href="/actividades">Actividades</a>
+        <a class="footer-link" href="/gastronomia">Gastronomía</a>
+        <a class="footer-link" href="/festividades">Festividades</a>
+        <a class="footer-link" href="/artesania">Artesanía</a>
+      </div>
+      <div>
+        <div class="footer-heading">Planifica</div>
+        <a class="footer-link" href="/alojamiento">Alojamiento</a>
+        <a class="footer-link" href="/como-llegar">Cómo Llegar</a>
+        <a class="footer-link" href="/terminos">Términos</a>
+        <a class="footer-link" href="/privacidad">Privacidad</a>
+        <a class="footer-link" href="/cancelaciones">Cancelaciones</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="font-family:'Josefin Sans',sans-serif;font-size:11px;color:rgba(245,237,216,0.30);letter-spacing:0.06em">© 2026 Capachica Turismo · Todos los derechos reservados</span>
+      <span style="font-family:'Josefin Sans',sans-serif;font-size:11px;color:rgba(201,144,58,0.55);letter-spacing:0.06em">Hecho con ❤️ a orillas del Lago Titicaca</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Navbar scroll
+const nav = document.getElementById('navbar');
+const bar = document.getElementById('scrollBar');
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  nav.classList.toggle('scrolled', y > 24);
+  const total = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  if (total > 0) bar.style.width = (y / total * 100) + '%';
+}, { passive: true });
+
+// Stars
+const canvas = document.getElementById('starCanvas');
+const ctx = canvas.getContext('2d');
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = document.getElementById('hero').offsetHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+const stars = Array.from({ length: 140 }, () => ({
+  x: Math.random(), y: Math.random() * 0.75,
+  r: Math.random() * 1.2 + 0.3,
+  a: Math.random() * 0.8 + 0.2,
+  d: Math.random() * 2000 + 1500,
+  t: Math.random() * 3000,
+  warm: Math.random() > 0.6,
+}));
+let t = 0;
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  t += 16;
+  stars.forEach(s => {
+    const pulse = 0.5 + 0.5 * Math.sin((t + s.t) / s.d);
+    const alpha = s.a * (0.6 + 0.4 * pulse);
+    ctx.beginPath();
+    ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = s.warm
+      ? `rgba(245,220,160,${alpha})`
+      : `rgba(235,228,210,${alpha})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+drawStars();
+
+// Reveal on scroll
+const reveals = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+}, { threshold: 0.10, rootMargin: '0px 0px -40px 0px' });
+reveals.forEach(el => io.observe(el));
+</script>
+</body>
+</html>

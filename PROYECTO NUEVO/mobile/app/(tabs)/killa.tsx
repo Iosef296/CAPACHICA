@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { colors, radii, shadows, spacing, typography, useThemeMode } from '@/theme';
 import { DEFAULT_CFG, fetchWidgetConfig, IA_WS, WidgetCfg } from '@/data/inti';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
+import { useSafeInsets } from '@/hooks/useSafeInsets';
 
 export default function KillaTab() {
   const router = useRouter();
   const [cfg, setCfg] = useState<WidgetCfg>(DEFAULT_CFG);
+  const insets = useSafeInsets();
   useLiveRefresh(() => { fetchWidgetConfig().then(setCfg); }, { url: IA_WS, channels: 'widget' });
   useThemeMode(); // se resuscribe para repintar en vivo al cambiar tema
 
@@ -50,7 +51,7 @@ export default function KillaTab() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+      <View style={{ flex: 1, paddingTop: insets.top }}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           <View style={styles.heroIcon}>
             <View style={[styles.avatar, shadows.card]}>
@@ -71,7 +72,7 @@ export default function KillaTab() {
             <Text style={styles.ctaText}>Iniciar conversación</Text>
           </Pressable>
         </ScrollView>
-      </SafeAreaView>
+      </View>
     </View>
   );
 }

@@ -7,11 +7,13 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { Button } from '@/components/Button';
 import { useFavorites } from '@/data/favorites';
 import { stays, activities, communities } from '@/data/mock';
+import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
 export default function Favorites() {
   const { favorites } = useFavorites();
   const router = useRouter();
+  const cfg = useAppConfig();
 
   const stayItems = stays.filter(s => favorites.has(`stay-${s.id}`));
   const activityItems = activities.filter(a => favorites.has(`act-${a.id}`));
@@ -21,25 +23,25 @@ export default function Favorites() {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaView edges={['top']}>
-        <ScreenHeader eyebrow="GUARDADOS" title="Mis Favoritos" back />
+      <SafeAreaView edges={['bottom']}>
+        <ScreenHeader eyebrow={cfg.text('favorites.eyebrow', 'GUARDADOS')} title={cfg.text('favorites.title', 'Mis Favoritos')} back />
 
         {isEmpty ? (
           <View style={styles.empty}>
             <MaterialIcons name="favorite-border" size={64} color={colors.outlineVariant} />
             <Text style={[typography.headlineMd, { color: colors.onSurface, marginTop: spacing.gutter }]}>
-              Sin favoritos aún
+              {cfg.text('favorites.emptyTitle', 'Sin favoritos aún')}
             </Text>
             <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, textAlign: 'center', marginTop: 6 }]}>
-              Toca el corazón en cualquier hospedaje, comunidad o experiencia para guardarla aquí.
+              {cfg.text('favorites.emptySubtitle', 'Toca el corazón en cualquier hospedaje, comunidad o experiencia para guardarla aquí.')}
             </Text>
-            <Button label="Explorar" icon="explore" onPress={() => router.push('/(stacks)/communities')} style={{ marginTop: spacing.stackMd, alignSelf: 'stretch' }} />
+            <Button label={cfg.text('favorites.emptyCta', 'Explorar')} icon="explore" onPress={() => router.push('/(stacks)/communities')} style={{ marginTop: spacing.stackMd, alignSelf: 'stretch' }} />
           </View>
         ) : (
           <View style={{ paddingHorizontal: spacing.containerPadding, gap: spacing.gutter, marginTop: spacing.gutter }}>
             {stayItems.map(s => <FavCard key={s.id} title={s.name} subtitle={s.community} price={`S/ ${s.price}/noche`} icon="hotel" />)}
             {hasFavExp && <FavCard title="Taller de Tejido" subtitle="Mamá Victoria · Llachón" price="S/ 60" icon="palette" />}
-            {hasFavComm && <FavCard title="Llachón" subtitle="Comunidad ancestral" price="12 experiencias" icon="groups" />}
+            {hasFavComm && <FavCard title="Llachón" subtitle="Familia ancestral" price="12 experiencias" icon="groups" />}
           </View>
         )}
       </SafeAreaView>

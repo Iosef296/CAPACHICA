@@ -1,0 +1,22 @@
+<!-- @dsCard group="Brand" viewport="700x140" name="Textures & Patterns" subtitle="Grain overlay, Andean weave border, zigzag divider" -->
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { background: var(--bg); margin: 0; padding: 20px 28px; font-family: var(--font-ui); color: var(--text); }
+  .row { display: flex; gap: 14px; margin-bottom: 14px; align-items: center; }
+  .swatch { width: 80px; height: 48px; border-radius: 4px; position: relative; overflow: hidden; flex-shrink: 0; }
+  .swatch::after { content:''; position:absolute; inset:0; background-image:var(--grain); background-size:200px 200px; opacity:0.5; }
+  .lbl { font-size: 9px; color: var(--text-3); letter-spacing: 0.1em; text-transform: uppercase; }
+  .val { font-size: 8px; color: var(--text-3); margin-top: 2px; }
+</style>
+</head><body>
+<div class="row">
+  <div class="swatch" style="background:var(--accent)"></div>
+  <div><div class="lbl">Grain overlay</div><div class="val">--grain · SVG fractalNoise 0.85 · 4 octaves · 5–8% opacity</div></div>
+</div>
+<div style="height:6px;background:var(--weave-border);border-radius:0;margin-bottom:8px"></div>
+<div style="font-size:9px;color:var(--text-3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px">↑ Andean Weave Border — --weave-border · clay · gold · reed · 28px repeat</div>
+<div style="height:3px;background:repeating-linear-gradient(-45deg,#B8531F 0px,#B8531F 2px,transparent 2px,transparent 8px,#C9903A 8px,#C9903A 10px,transparent 10px,transparent 16px);margin-bottom:6px"></div>
+<div style="font-size:9px;color:var(--text-3);letter-spacing:0.1em;text-transform:uppercase">↑ Zigzag / Diamond divider — --weave-zigzag · 16px repeat</div>
+</body></html>

@@ -1,0 +1,333 @@
+<!-- @dsCard group="Turismo" viewport="1280x720" name="Gastronomía" subtitle="Platos andinos y restaurantes de Capachica con estilo rústico" -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gastronomía — Capachica Turismo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,400;1,600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Josefin+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Lora',Georgia,serif;background:#100806;color:#F5EDD8;overflow-x:hidden}
+.container{max-width:1200px;margin:0 auto;padding:0 1.5rem}
+@media(max-width:768px){.container{padding:0 1rem}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(14,6,2,0.88);backdrop-filter:blur(20px);border-bottom:1px solid rgba(184,83,31,0.18)}
+.nav-inner{max-width:1200px;margin:0 auto;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem}
+.nav-logo{font-family:'Playfair Display',serif;font-weight:800;font-size:16px;color:#F5EDD8;text-decoration:none}
+.nav-logo em{font-style:italic;color:#C9903A}
+.nav-links{display:flex;gap:2px}
+.nav-link{padding:6px 12px;border-radius:4px;font-family:'Josefin Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.06em;color:rgba(245,237,216,0.70);text-decoration:none;transition:all 0.2s;text-transform:uppercase}
+.nav-link:hover{color:#F5EDD8;background:rgba(255,255,255,0.08)}
+.nav-link.active{color:#DE8649}
+.btn-sm{background:linear-gradient(135deg,#B8531F,#7C2D0C);color:#F5EDD8;border:none;border-radius:4px;padding:8px 16px;font-family:'Josefin Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;text-decoration:none}
+
+/* HERO */
+.hero{padding:140px 0 80px;position:relative;overflow:hidden;text-align:center;background:linear-gradient(180deg,#0C0604 0%,#140806 60%,#100806 100%)}
+.hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(201,144,58,0.10) 0%,transparent 70%);pointer-events:none}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:4px;background:rgba(201,144,58,0.10);border:1px solid rgba(201,144,58,0.38);color:#C9903A;font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.20em;text-transform:uppercase;margin-bottom:1.2rem}
+h1{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,6vw,5rem);font-weight:800;line-height:1.05;margin-bottom:.8rem}
+h1 em{font-style:italic;color:#C9903A}
+.hero-desc{font-size:1rem;color:rgba(245,237,216,0.70);max-width:520px;margin:0 auto 2rem;line-height:1.85}
+
+/* WEAVE */
+.weave{height:5px;background:repeating-linear-gradient(90deg,#B8531F 0,#B8531F 4px,#C9903A 4px,#C9903A 8px,#7C2D0C 8px,#7C2D0C 12px,#C9903A 12px,#C9903A 16px,#5A8E20 16px,#5A8E20 20px,#C9903A 20px,#C9903A 24px)}
+
+/* FILTER TABS */
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:2.5rem;justify-content:center}
+.filter-btn{padding:7px 18px;border-radius:4px;font-family:'Josefin Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;border:1px solid rgba(184,83,31,0.28);background:rgba(26,10,4,0.60);color:rgba(245,237,216,0.55);transition:all 0.22s}
+.filter-btn:hover,.filter-btn.active{background:rgba(184,83,31,0.18);border-color:rgba(184,83,31,0.55);color:#DE8649}
+
+/* GRID */
+.grid-3{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.4rem}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.4rem}
+
+/* PLATO CARD */
+.plato-card{background:rgba(26,10,4,0.88);border:1px solid rgba(184,83,31,0.22);border-radius:6px;overflow:hidden;transition:all 0.30s ease;cursor:pointer}
+.plato-card:hover{transform:translateY(-4px);border-color:rgba(201,144,58,0.45);box-shadow:0 16px 40px rgba(16,8,4,0.55)}
+.plato-img{height:180px;background:linear-gradient(135deg,rgba(201,144,58,0.14),rgba(26,10,4,0.95));display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative;overflow:hidden}
+.plato-badge{position:absolute;top:10px;right:10px;padding:3px 10px;border-radius:4px;font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase}
+.plato-body{padding:1.2rem}
+.plato-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:#F5EDD8;margin-bottom:.4rem;line-height:1.25}
+.plato-desc{font-size:.82rem;color:rgba(245,237,216,0.60);line-height:1.70;margin-bottom:.8rem}
+.plato-footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(184,83,31,0.18);padding-top:.8rem}
+.plato-price{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:#C9903A}
+.plato-btn{background:transparent;border:none;color:#DE8649;cursor:pointer;font-size:18px;transition:transform .2s}
+.plato-card:hover .plato-btn{transform:translateX(4px)}
+
+/* REST CARD */
+.rest-card{background:rgba(26,10,4,0.80);border:1px solid rgba(184,83,31,0.20);border-radius:6px;padding:1.5rem;transition:all 0.28s;cursor:pointer}
+.rest-card:hover{border-color:rgba(201,144,58,0.42);box-shadow:0 12px 32px rgba(16,8,4,0.50)}
+.rest-header{display:flex;gap:12px;align-items:center;margin-bottom:1rem}
+.rest-icon{width:48px;height:48px;border-radius:6px;background:rgba(184,83,31,0.14);border:1px solid rgba(184,83,31,0.28);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.rest-name{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:#F5EDD8;margin-bottom:2px}
+.rest-sub{font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:.12em;color:rgba(245,237,216,0.42);text-transform:uppercase}
+.star-row{display:flex;gap:2px;margin-bottom:.6rem}
+.star{color:#C9903A;font-size:12px}
+.rest-desc{font-size:.82rem;color:rgba(245,237,216,0.58);line-height:1.70}
+.rest-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:.7rem}
+.tag{padding:3px 8px;border-radius:3px;font-family:'Josefin Sans',sans-serif;font-size:9px;background:rgba(255,255,255,0.06);color:rgba(245,237,216,0.48);border:1px solid rgba(255,255,255,0.08);text-transform:uppercase;letter-spacing:.04em}
+
+/* SECTION HEADER */
+.sec-head{text-align:center;margin-bottom:2.5rem}
+.sec-label{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:4px;font-family:'Josefin Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:.9rem}
+.sec-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.1}
+.sec-title em{font-style:italic;color:#C9903A}
+.divider{width:44px;height:3px;background:linear-gradient(90deg,#B8531F,transparent);margin:.8rem auto}
+
+section{padding:80px 0}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity 0.60s ease,transform 0.60s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* INFO STRIP */
+.info-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;background:rgba(26,10,4,0.80);border:1px solid rgba(184,83,31,0.20);border-radius:6px;padding:1.5rem;margin-bottom:3rem}
+.info-item{text-align:center}
+.info-val{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:#C9903A;line-height:1}
+.info-lbl{font-family:'Josefin Sans',sans-serif;font-size:9px;letter-spacing:.12em;color:rgba(245,237,216,0.42);text-transform:uppercase;margin-top:4px}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Capachica <em>Turismo</em></a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Inicio</a>
+      <a href="vivencial.html" class="nav-link">Vivencial</a>
+      <a href="gastronomia.html" class="nav-link active">Gastronomía</a>
+      <a href="festividades.html" class="nav-link">Festividades</a>
+    </div>
+    <a href="index.html#reservar" class="btn-sm">Reservar →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="container">
+    <div class="hero-tag">🍽️ Cocina andina</div>
+    <h1>Sabores del <em>Altiplano</em></h1>
+    <p class="hero-desc">Trucha del lago, quinua nativa, chuño ancestral. Una cocina que lleva cinco siglos de historia en los Andes del Perú.</p>
+    <div class="filter-row">
+      <button class="filter-btn active">Todos</button>
+      <button class="filter-btn">Trucha</button>
+      <button class="filter-btn">Quinua</button>
+      <button class="filter-btn">Sopas</button>
+      <button class="filter-btn">Bebidas</button>
+      <button class="filter-btn">Postres</button>
+    </div>
+  </div>
+</div>
+<div class="weave"></div>
+
+<!-- INFO STRIP -->
+<section style="padding:40px 0">
+  <div class="container">
+    <div class="info-strip reveal">
+      <div class="info-item"><div class="info-val">12+</div><div class="info-lbl">platos típicos</div></div>
+      <div class="info-item"><div class="info-val">5</div><div class="info-lbl">restaurantes locales</div></div>
+      <div class="info-item"><div class="info-val">500+</div><div class="info-lbl">años de tradición</div></div>
+      <div class="info-item"><div class="info-val">100%</div><div class="info-lbl">ingredientes locales</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PLATOS -->
+<section style="padding:0 0 80px">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="sec-label" style="background:rgba(184,83,31,0.10);border:1px solid rgba(184,83,31,0.36);color:#DE8649">◆ Platos principales</div>
+      <h2 class="sec-title">La mesa <em>andina</em></h2>
+      <div class="divider"></div>
+    </div>
+    <div class="grid-3">
+      <!-- Trucha -->
+      <div class="plato-card reveal">
+        <div class="plato-img" style="background:linear-gradient(135deg,rgba(42,116,184,0.18),rgba(26,10,4,0.95))">
+          🐟
+          <div class="plato-badge" style="background:rgba(42,116,184,0.18);border:1px solid rgba(42,116,184,0.40);color:#5096D4">Plato estrella</div>
+        </div>
+        <div class="plato-body">
+          <div class="plato-title">Trucha frita del Titicaca</div>
+          <div class="plato-desc">Trucha fresca criada en las aguas del lago a 3,820 msnm. Frita en aceite de oliva con hierbas andinas y papa nativa.</div>
+          <div class="plato-footer">
+            <span class="plato-price">S/. 28</span>
+            <button class="plato-btn">→</button>
+          </div>
+        </div>
+      </div>
+      <!-- Sopa de Quinua -->
+      <div class="plato-card reveal">
+        <div class="plato-img" style="background:linear-gradient(135deg,rgba(201,144,58,0.18),rgba(26,10,4,0.95))">
+          🥣
+          <div class="plato-badge" style="background:rgba(201,144,58,0.14);border:1px solid rgba(201,144,58,0.38);color:#C9903A">Ancestral</div>
+        </div>
+        <div class="plato-body">
+          <div class="plato-title">Sopa de quinua real</div>
+          <div class="plato-desc">Quinua cultivada en los altiplanos de Capachica, con verduras de temporada, hierbas aromáticas y chalona de alpaca.</div>
+          <div class="plato-footer">
+            <span class="plato-price">S/. 15</span>
+            <button class="plato-btn">→</button>
+          </div>
+        </div>
+      </div>
+      <!-- Chuño -->
+      <div class="plato-card reveal">
+        <div class="plato-img" style="background:linear-gradient(135deg,rgba(184,83,31,0.18),rgba(26,10,4,0.95))">
+          🥔
+          <div class="plato-badge" style="background:rgba(184,83,31,0.14);border:1px solid rgba(184,83,31,0.38);color:#DE8649">Técnica inca</div>
+        </div>
+        <div class="plato-body">
+          <div class="plato-title">Guiso de chuño negro</div>
+          <div class="plato-desc">El chuño es papa deshidratada por el método andino de exposición al frío nocturno. Técnica pre-inca de conservación.</div>
+          <div class="plato-footer">
+            <span class="plato-price">S/. 18</span>
+            <button class="plato-btn">→</button>
+          </div>
+        </div>
+      </div>
+      <!-- Estofado -->
+      <div class="plato-card reveal">
+        <div class="plato-img" style="background:linear-gradient(135deg,rgba(90,142,32,0.18),rgba(26,10,4,0.95))">
+          🍖
+          <div class="plato-badge" style="background:rgba(90,142,32,0.14);border:1px solid rgba(90,142,32,0.38);color:#7AAF38">De temporada</div>
+        </div>
+        <div class="plato-body">
+          <div class="plato-title">Estofado de alpaca</div>
+          <div class="plato-desc">Carne tierna de alpaca en salsa de hierbas andinas, acompañada de moraya y maíz chullpi tostado.</div>
+          <div class="plato-footer">
+            <span class="plato-price">S/. 32</span>
+            <button class="plato-btn">→</button>
+          </div>
+        </div>
+      </div>
+      <!-- Chicha -->
+      <div class="plato-card reveal">
+        <div class="plato-img" style="background:linear-gradient(135deg,rgba(201,144,58,0.16),rgba(26,10,4,0.95))">
+          🫙
+          <div class="plato-badge" style="background:rgba(201,144,58,0.12);border:1px solid rgba(201,144,58,0.35);color:#C9903A">Bebida</div>
+        </div>
+        <div class="plato-body">
+          <div class="plato-title">Chicha de jora artesanal</div>
+          <div class="plato-desc">Bebida ancestral fermentada de maíz jora, elaborada por las familias de la comunidad siguiendo recetas pre-coloniales.</div>
+          <div class="plato-footer">
+            <span class="plato-price">S/. 8</span>
+            <button class="plato-btn">→</button>
+          </div>
+        </div>
+      </div>
+      <!-- Mazamorra -->
+      <div class="plato-card reveal">
+        <div class="plato-img" style="background:linear-gradient(135deg,rgba(184,83,31,0.14),rgba(26,10,4,0.95))">
+          🍮
+          <div class="plato-badge" style="background:rgba(184,83,31,0.12);border:1px solid rgba(184,83,31,0.32);color:#DE8649">Postre</div>
+        </div>
+        <div class="plato-body">
+          <div class="plato-title">Mazamorra morada</div>
+          <div class="plato-desc">Postre tradicional de maíz morado con membrillo, pera, durazno y canela. Símbolo de la gastronomía andina.</div>
+          <div class="plato-footer">
+            <span class="plato-price">S/. 10</span>
+            <button class="plato-btn">→</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="weave"></div>
+
+<!-- RESTAURANTES -->
+<section style="background:#180C06;padding:80px 0">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="sec-label" style="background:rgba(201,144,58,0.10);border:1px solid rgba(201,144,58,0.36);color:#C9903A">✦ Dónde comer</div>
+      <h2 class="sec-title">Restaurantes <em>locales</em></h2>
+      <div class="divider"></div>
+      <p style="color:rgba(245,237,216,0.60);max-width:480px;margin:0 auto;line-height:1.80;font-size:.94rem">Todos manejados por familias de la comunidad. Comer aquí es apoyar directamente a la economía local.</p>
+    </div>
+    <div class="grid-2 reveal">
+      <div class="rest-card">
+        <div class="rest-header">
+          <div class="rest-icon">🏡</div>
+          <div><div class="rest-name">Restaurante Familiar Titicaca</div><div class="rest-sub">Comunidad Llachón · Vista al lago</div></div>
+        </div>
+        <div class="star-row"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+        <div class="rest-desc">Cocina familiar en una terraza con vista directa al lago. Especialidad en trucha recién sacada del Titicaca y chicha de jora artesanal.</div>
+        <div class="rest-tags"><span class="tag">Trucha</span><span class="tag">Vista al lago</span><span class="tag">Chicha</span><span class="tag">Familiar</span></div>
+      </div>
+      <div class="rest-card">
+        <div class="rest-header">
+          <div class="rest-icon">🌾</div>
+          <div><div class="rest-name">La Chakra Andina</div><div class="rest-sub">Centro de Capachica · Huerto propio</div></div>
+        </div>
+        <div class="star-row"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+        <div class="rest-desc">Del huerto a la mesa. Todos los ingredientes son cultivados orgánicamente en la misma chacra. Menú de temporada con quinua real y moraya.</div>
+        <div class="rest-tags"><span class="tag">Orgánico</span><span class="tag">Quinua</span><span class="tag">Menú del día</span></div>
+      </div>
+      <div class="rest-card">
+        <div class="rest-header">
+          <div class="rest-icon">🔥</div>
+          <div><div class="rest-name">Fogón del Altiplano</div><div class="rest-sub">Comunidad Chifrón · Fogón de leña</div></div>
+        </div>
+        <div class="star-row"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span style="color:rgba(201,144,58,0.30)">★</span></div>
+        <div class="rest-desc">Cocina en fogón de leña ancestral. Parrilla de trucha y estofado de alpaca al estilo tradicional. Ambiente rústico auténtico.</div>
+        <div class="rest-tags"><span class="tag">Fogón de leña</span><span class="tag">Alpaca</span><span class="tag">Rústico</span></div>
+      </div>
+      <div class="rest-card">
+        <div class="rest-header">
+          <div class="rest-icon">🌅</div>
+          <div><div class="rest-name">Mirador del Amaru</div><div class="rest-sub">Cerro Amaru · Panorámica 360°</div></div>
+        </div>
+        <div class="star-row"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+        <div class="rest-desc">La mejor vista del Titicaca con una taza de mate de muña. Menú ligero con papa rellena, queso fresco y mazamorra morada.</div>
+        <div class="rest-tags"><span class="tag">Vista 360°</span><span class="tag">Mate</span><span class="tag">Merienda</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="weave"></div>
+
+<!-- CTA -->
+<section style="padding:70px 0;text-align:center">
+  <div class="container">
+    <div class="reveal" style="max-width:540px;margin:0 auto">
+      <div class="hero-tag" style="margin-bottom:1.2rem">🍽️ ¿Con hambre?</div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:800;margin-bottom:1rem">Reserva tu <em style="color:#C9903A">experiencia gastronómica</em></h2>
+      <p style="color:rgba(245,237,216,0.68);line-height:1.80;margin-bottom:2rem">Incluye clase de cocina andina con una familia local y almuerzo con vista al lago Titicaca.</p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <a href="index.html" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#B8531F,#7C2D0C);color:#F5EDD8;border-radius:6px;padding:13px 28px;font-family:'Josefin Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;box-shadow:0 4px 20px rgba(184,83,31,0.38)">Reservar experiencia →</a>
+        <a href="vivencial.html" style="display:inline-flex;align-items:center;gap:8px;background:transparent;color:#C9903A;border:1.5px solid rgba(201,144,58,0.50);border-radius:6px;padding:12px 24px;font-family:'Josefin Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none">Ver turismo vivencial</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer style="background:#0C0602;border-top:1px solid rgba(184,83,31,0.16);padding:24px 0;text-align:center">
+  <div style="font-family:'Josefin Sans',sans-serif;font-size:11px;color:rgba(245,237,216,0.28);letter-spacing:0.06em">© 2026 Capachica Turismo · Hecho con ❤️ a orillas del Lago Titicaca</div>
+</footer>
+
+<script>
+// Filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+// Reveal
+const reveals = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+}, { threshold: 0.08 });
+reveals.forEach(el => io.observe(el));
+</script>
+</body>
+</html>

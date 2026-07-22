@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeInsets } from '@/hooks/useSafeInsets';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { GlassPanel } from '@/components/GlassPanel';
@@ -15,6 +15,7 @@ export default function MapGoogle() {
   const router = useRouter();
   const [active, setActive] = useState('Todos');
   const [selected, setSelected] = useState(mapPins[2].id);
+  const insets = useSafeInsets();
 
   return (
     <View style={{ flex: 1 }}>
@@ -27,7 +28,7 @@ export default function MapGoogle() {
         ))}
       </MapView>
 
-      <SafeAreaView edges={['top']} style={styles.top} pointerEvents="box-none">
+      <View style={[styles.top, { paddingTop: insets.top + spacing.base }]} pointerEvents="box-none">
         <View style={styles.topRow}>
           <Pressable onPress={() => router.back()} style={styles.iconBtn}>
             <MaterialIcons name="arrow-back" size={22} color={colors.primary} />
@@ -42,13 +43,13 @@ export default function MapGoogle() {
         <View style={styles.chipsRow}>
           {FILTERS.map(f => <Chip key={f} label={f} active={f === active} onPress={() => setActive(f)} />)}
         </View>
-      </SafeAreaView>
+      </View>
 
       <Pressable style={styles.fab}>
         <MaterialIcons name="my-location" size={24} color="#fff" />
       </Pressable>
 
-      <GlassPanel style={styles.previewCard}>
+      <GlassPanel style={[styles.previewCard, { bottom: spacing.stackLg + insets.bottom }]}>
         <View style={{ flexDirection: 'row', gap: spacing.gutter }}>
           <Image source={{ uri: 'https://picsum.photos/id/137/400/400' }} style={styles.previewImg} />
           <View style={{ flex: 1, gap: 2 }}>

@@ -1,0 +1,65 @@
+<!-- @dsCard group="Colors" viewport="700x220" name="Semantic Tokens" subtitle="Design-intent aliases — use these in components" -->
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { background: var(--bg); margin: 0; padding: 20px; font-family: var(--font-ui); }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .token { border-radius: 4px; overflow: hidden; }
+  .swatch { height: 40px; }
+  .info { padding: 6px 8px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-top: none; }
+  .name { font-size: 9px; color: var(--text-2); letter-spacing: 0.05em; font-weight: 600; }
+  .val  { font-size: 8px; color: var(--text-3); margin-top: 1px; }
+</style>
+</head><body>
+<div class="grid">
+  <div class="token">
+    <div class="swatch" style="background:var(--accent)"></div>
+    <div class="info"><div class="name">--accent</div><div class="val">clay-500 #B8531F</div></div>
+  </div>
+  <div class="token">
+    <div class="swatch" style="background:var(--warm)"></div>
+    <div class="info"><div class="name">--warm</div><div class="val">gold-400 #C9903A</div></div>
+  </div>
+  <div class="token">
+    <div class="swatch" style="background:var(--info)"></div>
+    <div class="info"><div class="name">--info</div><div class="val">lake-400 #2A74B8</div></div>
+  </div>
+  <div class="token">
+    <div class="swatch" style="background:var(--success)"></div>
+    <div class="info"><div class="name">--success</div><div class="val">reed-400 #5A8E20</div></div>
+  </div>
+  <div class="token">
+    <div class="swatch" style="background:var(--bg)"></div>
+    <div class="info"><div class="name">--bg</div><div class="val">night-900 #100806</div></div>
+  </div>
+  <div class="token">
+    <div class="swatch" style="background:var(--bg-2)"></div>
+    <div class="info"><div class="name">--bg-2</div><div class="val">night-800 #180C06</div></div>
+  </div>
+  <div class="token">
+    <div class="swatch" style="background:var(--surface);border:1px solid var(--border)"></div>
+    <div class="info"><div class="name">--surface</div><div class="val">rgba(30,12,6,.90)</div></div>
+  </div>
+  <div class="token">
+    <div class="swatch" style="background:var(--text);border-radius:4px 4px 0 0"></div>
+    <div class="info"><div class="name">--text</div><div class="val">alpaca-100 #F5EDD8</div></div>
+  </div>
+  <div class="token">
+    <div class="swatch" style="background:var(--border);border-radius:4px 4px 0 0"></div>
+    <div class="info"><div class="name">--border</div><div class="val">clay rgba .24</div></div>
+  </div>
+  <div class="token">
+    <div class="swatch" style="background:var(--border-warm)"></div>
+    <div class="info"><div class="name">--border-warm</div><div class="val">gold rgba .30</div></div>
+  </div>
+  <div class="token">
+    <div class="swatch" style="background:var(--accent-glow)"></div>
+    <div class="info"><div class="name">--accent-glow</div><div class="val">clay rgba .32</div></div>
+  </div>
+  <div class="token">
+    <div class="swatch" style="background:var(--warm-glow)"></div>
+    <div class="info"><div class="name">--warm-glow</div><div class="val">gold rgba .28</div></div>
+  </div>
+</div>
+</body></html>

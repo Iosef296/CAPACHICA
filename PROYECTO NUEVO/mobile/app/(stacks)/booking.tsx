@@ -10,11 +10,14 @@ import { BookingModal } from '@/components/BookingModal';
 import { stays as mockStays, activities as mockActivities } from '@/data/mock';
 import { api, API_WS } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
+import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
-const LOCATIONS = ['Todas', 'Llachón', 'Ccotos', 'Siale', 'Chifrón'];
+const LOCATIONS_DEFAULT = ['Todas', 'Llachón', 'Ccotos', 'Siale', 'Chifrón'];
 
 export default function Booking() {
+  const cfg = useAppConfig();
+  const LOCATIONS: string[] = cfg.json('booking.locations', LOCATIONS_DEFAULT);
   const [loc, setLoc] = useState('Todas');
   const [activities, setActivities] = useState(mockActivities as any[]);
   const [stays, setStays] = useState(mockStays as any[]);
@@ -33,14 +36,14 @@ export default function Booking() {
   }, { url: API_WS, channels: ['actividades', 'hospedajes'] });
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaView edges={['top']}>
-        <ScreenHeader eyebrow="RESERVAS" title="Tu Escapada Ancestral" back />
+      <SafeAreaView edges={['bottom']}>
+        <ScreenHeader eyebrow={cfg.text('booking.eyebrow', 'RESERVAS')} title={cfg.text('booking.title', 'Tu Escapada Ancestral')} back />
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
           {LOCATIONS.map(l => <Chip key={l} label={l} active={l === loc} onPress={() => setLoc(l)} />)}
         </ScrollView>
 
-        <Text style={styles.sectionTitle}>HOSPEDAJES FAMILIARES</Text>
+        <Text style={styles.sectionTitle}>{cfg.text('booking.sectionHospedajes', 'HOSPEDAJES FAMILIARES')}</Text>
         <View style={styles.list}>
           {stays.filter(s => loc === 'Todas' || s.community === loc).map(s => (
             <Pressable key={s.id} style={styles.row} onPress={() => setReserva({ title: s.name, price: s.price, unit: 'noche', id: s.id })}>
@@ -59,10 +62,12 @@ export default function Booking() {
         </View>
 
         {stays.filter(s => loc === 'Todas' || s.community === loc).length === 0 && (
-          <Text style={[styles.emptyMsg]}>No hay hospedajes en {loc} todavía.</Text>
+          <Text style={[styles.emptyMsg]}>
+            {cfg.text('booking.emptyHospedajes', 'No hay hospedajes en {loc} todavía.').replace('{loc}', loc)}
+          </Text>
         )}
 
-        <Text style={styles.sectionTitle}>TOURS Y ACTIVIDADES</Text>
+        <Text style={styles.sectionTitle}>{cfg.text('booking.sectionActividades', 'TOURS Y ACTIVIDADES')}</Text>
         <View style={styles.activityGrid}>
           {activities.map(a => (
             <Pressable key={a.id} style={styles.activityCard} onPress={() => setReserva({ title: a.name, price: a.price, unit: 'persona', id: a.id })}>
@@ -77,7 +82,7 @@ export default function Booking() {
         </View>
 
         <View style={{ paddingHorizontal: spacing.containerPadding, marginTop: spacing.stackLg, marginBottom: spacing.stackLg }}>
-          <Button label="Reservar ahora" icon="event-available" onPress={() => setReserva({ title: 'Reserva personalizada', price: 120, unit: 'noche' })} />
+          <Button label={cfg.text('booking.ctaReservar', 'Reservar ahora')} icon="event-available" onPress={() => setReserva({ title: 'Reserva personalizada', price: 120, unit: 'noche' })} />
         </View>
       </SafeAreaView>
 

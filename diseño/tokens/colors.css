@@ -1,0 +1,147 @@
+/* ─────────────────────────────────────────────────────
+ * Capachica Color System
+ *
+ * Palette sources:
+ *   • Arcilla / Clay    — the terracotta-red earth of the Andes
+ *   • Oro Andino / Gold — Andean sunset light over Titicaca
+ *   • Titicaca / Lake   — the world's highest navigable lake
+ *   • Totora / Reed     — the iconic lakeside reed plant
+ *   • Alpaca / Cream    — natural wool and woven textiles
+ *   • Tierra / Earth    — deep soil and adobe walls
+ *   • Piedra / Stone    — Andean rock and ruins
+ * ───────────────────────────────────────────────────── */
+
+:root {
+  /* ── ARCILLA / CLAY (primary action) ── */
+  --clay-50:  #FDF0E8;
+  --clay-100: #F8D5BA;
+  --clay-200: #EEB080;
+  --clay-300: #DE8649;
+  --clay-400: #C96832;
+  --clay-500: #B8531F;   /* ← primary */
+  --clay-600: #9A3F14;
+  --clay-700: #7C2D0C;
+  --clay-800: #5C1E08;
+  --clay-900: #3A1004;
+
+  /* ── ORO ANDINO / GOLD (warm accent) ── */
+  --gold-100: #F8EDCF;
+  --gold-200: #EDD898;
+  --gold-300: #DEB85A;
+  --gold-400: #C9903A;   /* ← warm accent */
+  --gold-500: #B07828;
+  --gold-600: #8C601A;
+  --gold-700: #6A4810;
+
+  /* ── TITICACA / LAKE BLUE ── */
+  --lake-100: #C8DFF5;
+  --lake-200: #8BBCE8;
+  --lake-300: #5096D4;
+  --lake-400: #2A74B8;   /* ← lake */
+  --lake-500: #1E5A9C;
+  --lake-600: #154480;
+  --lake-700: #0E3060;
+
+  /* ── TOTORA / REED GREEN ── */
+  --reed-100: #D4E8B0;
+  --reed-200: #A8D068;
+  --reed-300: #7AAF38;
+  --reed-400: #5A8E20;   /* ← totora */
+  --reed-500: #3F6C14;
+  --reed-600: #2A4C0A;
+  --reed-700: #183008;
+
+  /* ── ALPACA / CREAM (text on dark) ── */
+  --alpaca-50:  #FAF6F0;
+  --alpaca-100: #F5EDD8;
+  --alpaca-200: #EAD5B0;
+  --alpaca-300: #D8BC88;
+  --alpaca-400: #C4A068;
+  --alpaca-500: #A88048;
+
+  /* ── TIERRA / EARTH BACKGROUNDS ── */
+  --earth-100: #C4A880;
+  --earth-200: #8B6445;
+  --earth-300: #70482C;
+  --earth-400: #5C3418;
+  --earth-500: #42220A;
+  --earth-600: #2E1306;
+  --earth-700: #1E0C04;
+
+  /* ── PIEDRA / STONE ── */
+  --stone-200: #CEC0A8;
+  --stone-300: #B0987C;
+  --stone-400: #8E7458;
+  --stone-500: #705440;
+  --stone-600: #543C2C;
+
+  /* ── NIGHT BACKGROUNDS ── */
+  --night-900: #100806;
+  --night-800: #180C06;
+  --night-700: #201008;
+  --night-600: #2C160A;
+  --night-500: #3A1E0C;
+  --night-400: #4A2810;
+
+  /* ════════════════════════════════════
+   * SEMANTIC ALIASES (use these in UI)
+   * ════════════════════════════════════ */
+
+  /* Backgrounds */
+  --bg:           var(--night-900);
+  --bg-2:         var(--night-800);
+  --bg-3:         var(--night-700);
+  --surface:      rgba(30, 12, 6, 0.90);
+  --surface-2:    rgba(42, 20, 10, 0.72);
+  --surface-card: rgba(26, 10, 4, 0.85);
+
+  /* Text */
+  --text:          var(--alpaca-100);
+  --text-2:        rgba(245, 237, 216, 0.70);
+  --text-3:        rgba(245, 237, 216, 0.42);
+  --text-inverse:  var(--night-900);
+
+  /* Primary */
+  --accent:        var(--clay-500);
+  --accent-light:  var(--clay-400);
+  --accent-dark:   var(--clay-700);
+  --accent-glow:   rgba(184, 83, 31, 0.32);
+
+  /* Warm */
+  --warm:          var(--gold-400);
+  --warm-light:    var(--gold-300);
+  --warm-dark:     var(--gold-600);
+  --warm-glow:     rgba(201, 144, 58, 0.28);
+
+  /* Borders */
+  --border:        rgba(184, 83, 31, 0.24);
+  --border-warm:   rgba(201, 144, 58, 0.30);
+  --border-hover:  rgba(201, 144, 58, 0.58);
+  --border-stone:  rgba(112, 84, 64, 0.38);
+
+  /* Status */
+  --success:       var(--reed-400);
+  --info:          var(--lake-400);
+  --warning:       var(--gold-400);
+  --danger:        var(--clay-500);
+}
+
+/* ── Light mode ── */
+[data-theme="light"] {
+  --bg:           var(--alpaca-50);
+  --bg-2:         var(--alpaca-100);
+  --bg-3:         var(--alpaca-200);
+  --surface:      rgba(255, 250, 242, 0.96);
+  --surface-card: rgba(255, 252, 246, 0.99);
+
+  --text:         var(--night-900);
+  --text-2:       rgba(16, 8, 4, 0.68);
+  --text-3:       rgba(16, 8, 4, 0.42);
+
+  --accent:       var(--clay-600);
+  --accent-light: var(--clay-500);
+  --accent-dark:  var(--clay-800);
+
+  --border:       rgba(112, 72, 44, 0.22);
+  --border-warm:  rgba(176, 120, 40, 0.28);
+}

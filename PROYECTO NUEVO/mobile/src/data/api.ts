@@ -124,8 +124,12 @@ export const api = {
   recommendations: () => get('/recommendations', mock.recommendations),
   highlights: () => get('/highlights', mock.highlights),
   // Mismo endpoint que consume el frontend web (DestinosGrid) — comparten la fuente real.
+  // Spread de los campos crudos (comunidad/highlight/tags/nombre/desc/imagen) ADEMÁS
+  // de los normalizados (name/description/image/experiencesCount) -- community-detail.tsx
+  // necesita los crudos, communities.tsx (la lista) usa los normalizados.
   communities: () => cachedGet<any[]>('/comunidades', mock.communities, list =>
     (Array.isArray(list) ? list : []).map((c: any) => ({
+      ...c,
       id: String(c.id),
       name: c.nombre ?? c.name,
       description: c.desc ?? c.descripcion ?? c.description,
@@ -169,6 +173,10 @@ export const api = {
     postAuth<{ usuario?: any; accessToken?: string; refreshToken?: string }>('/auth/registro', { email, password, nombre }),
   google: (idToken: string) =>
     postAuth<{ usuario?: any; accessToken?: string; refreshToken?: string }>('/auth/google', { idToken }),
+  // Actualiza el propio perfil (nombre/telefono/foto) -- PUT /usuarios/perfil,
+  // cualquier usuario autenticado puede llamarlo (no solo admin).
+  actualizarPerfil: (datos: { nombre?: string; telefono?: string; foto?: string }) =>
+    authFetch('PUT', '/usuarios/perfil', datos),
 };
 
 // ── "Mi negocio" — CRUD autenticado para emprendedores/admin ──
@@ -218,7 +226,7 @@ async function authFetch(method: string, path: string, body?: any) {
   }
 
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data?.error ?? `Error ${res.status}`);
+  if (!res.ok) throw new Error(data?.detalle ?? data?.error ?? `Error ${res.status}`);
   return data;
 }
 
@@ -310,6 +318,83 @@ export async function subirFoto(uri: string): Promise<string> {
   if (!res.ok || !data.url) throw new Error(data?.error ?? 'No se pudo subir la foto');
   return data.url;
 }
+
+// Foto o video de una historia -- mismo patrón que subirFoto pero pega al
+// endpoint aparte (/upload/historia) que sí acepta video (resource_type auto).
+export async function subirMediaHistoria(uri: string, tipo: 'foto' | 'video'): Promise<string> {
+  if (!API_BASE) throw new Error('Backend no configurado');
+  const form = new FormData();
+  const filename = uri.split('/').pop() || (tipo === 'video' ? 'video.mp4' : 'foto.jpg');
+  const ext = filename.split('.').pop()?.toLowerCase();
+  const type = tipo === 'video'
+    ? (ext === 'mov' ? 'video/quicktime' : 'video/mp4')
+    : (ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg');
+  form.append('media', { uri, name: filename, type } as any);
+  const res = await fetch(`${API_BASE}/upload/historia`, { method: 'POST', body: form });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.url) throw new Error(data?.error ?? 'No se pudo subir el archivo');
+  return data.url;
+}
+
+// Historias estilo WhatsApp Status -- el usuario elige cuánto duran al subirlas.
+export type Historia = {
+  id: number; usuario_id: string; usuario_nombre: string; usuario_foto?: string | null;
+  media_url: string; tipo: 'foto' | 'video'; duracion_horas: number;
+  created_at: string; expires_at: string; likes_count: number;
+};
+
+export const historias = {
+  listar: async (): Promise<Historia[]> => {
+    if (!API_BASE) return [];
+    try {
+      const res = await fetch(`${API_BASE}/historias`);
+      const data = await res.json().catch(() => []);
+      return Array.isArray(data) ? data : [];
+    } catch { return []; }
+  },
+  // Ids de historias que el usuario logueado ya likeo -- para pintar el
+  // corazón lleno al cargar sin depender de auth opcional en el listado.
+  misLikes: async (): Promise<number[]> => {
+    try {
+      const data = await authFetch('GET', '/historias/mis-likes');
+      return Array.isArray(data) ? data : [];
+    } catch { return []; }
+  },
+  crear: (datos: { media_url: string; tipo: 'foto' | 'video'; duracion_horas: number }): Promise<Historia> =>
+    authFetch('POST', '/historias', datos),
+  like: (id: number): Promise<{ liked: boolean; likes_count: number }> =>
+    authFetch('POST', `/historias/${id}/like`),
+  eliminar: (id: number) => authFetch('DELETE', `/historias/${id}`),
+};
+
+// Etiquetas de la grilla "Explora" del Home -- editables desde el admin web
+// o la pestaña de admin del propio mobile, sin rebuild del APK.
+export type ConfigApp = Record<string, string>;
+
+export const configuracion = {
+  listar: async (): Promise<Partial<ConfigApp>> => {
+    if (!API_BASE) return {};
+    try {
+      const res = await fetch(`${API_BASE}/configuracion`);
+      return await res.json().catch(() => ({}));
+    } catch { return {}; }
+  },
+  actualizar: (datos: Partial<ConfigApp>): Promise<ConfigApp> =>
+    authFetch('PUT', '/configuracion', datos),
+};
+
+// Pines del mapa -- el admin los agrega/mueve/borra tocando el mapa
+// directamente desde la app, sin rebuild.
+export type Ubicacion = { id: number; titulo: string; descripcion?: string | null; latitud: number; longitud: number };
+
+export const ubicaciones = {
+  listar: (): Promise<Ubicacion[]> => get('/ubicaciones', []),
+  crear: (datos: { titulo: string; descripcion?: string; latitud: number; longitud: number }): Promise<Ubicacion> =>
+    authFetch('POST', '/ubicaciones', datos),
+  actualizar: (id: number, datos: Partial<{ titulo: string; descripcion: string; latitud: number; longitud: number }>): Promise<Ubicacion> =>
+    authFetch('PUT', `/ubicaciones/${id}`, datos),
+  eliminar: (id: number) => authFetch('DELETE', `/ubicaciones/${id}`),
+};
 
 // Chat con backend IA. Soporta campos en español o inglés.
 export async function killaChat(message: string, history: { role: 'user' | 'assistant'; content: string }[] = []) {

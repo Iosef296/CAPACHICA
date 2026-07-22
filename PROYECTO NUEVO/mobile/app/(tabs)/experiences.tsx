@@ -1,35 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { PhotoCard } from '@/components/Card';
-import { recommendations } from '@/data/mock';
+import { api, Actividad, API_WS } from '@/data/api';
+import { useLiveRefresh } from '@/hooks/useLiveRefresh';
+import { useAppConfig } from '@/data/AppConfigContext';
+import { useSafeInsets } from '@/hooks/useSafeInsets';
 import { colors, spacing, typography } from '@/theme';
 
 export default function Experiences() {
   const router = useRouter();
+  const insets = useSafeInsets();
+  const cfg = useAppConfig();
+  const [items, setItems] = useState<Actividad[]>([]);
+  useLiveRefresh(() => { api.actividades().then(setItems); }, { url: API_WS, channels: 'actividades' });
+
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaView edges={['top']}>
+      <View style={{ paddingTop: insets.top }}>
         <View style={styles.header}>
-          <Text style={[typography.labelMd, { color: colors.secondary }]}>EXPERIENCIAS</Text>
+          <Text style={[typography.labelMd, { color: colors.secondary }]}>
+            {cfg.text('experiences.eyebrow', 'EXPERIENCIAS')}
+          </Text>
           <Text style={[typography.headlineLgMobile, { color: colors.primary, marginTop: 4 }]}>
-            Vive Capachica
+            {cfg.text('experiences.headline', 'Vive Capachica')}
           </Text>
         </View>
         <View style={styles.grid}>
-          {recommendations.map(r => (
-            <PhotoCard key={r.id}
-              image={r.image} title={r.title}
-              badge={{ label: r.badge, tone: r.badgeTone }}
-              rating={r.rating}
+          {items.map(a => (
+            <PhotoCard key={a.id}
+              image={a.imagen || 'https://picsum.photos/seed/' + a.id + '/600/400'}
+              title={a.nombre}
+              badge={a.ubicacion ? { label: a.ubicacion.toUpperCase(), tone: 'primary' } : undefined}
               width={undefined as any}
               height={280}
-              onPress={() => router.push('/(stacks)/experience-detail')}
+              onPress={() => router.push({ pathname: '/(stacks)/experience-detail', params: { id: String(a.id) } })}
             />
           ))}
         </View>
-      </SafeAreaView>
+      </View>
     </ScrollView>
   );
 }

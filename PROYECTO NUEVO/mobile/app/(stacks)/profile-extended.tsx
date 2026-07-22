@@ -17,11 +17,11 @@ const ROUTES = [
 export default function ProfileExtended() {
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaView edges={['top']}>
+      <SafeAreaView edges={['bottom']}>
         <ScreenHeader eyebrow="MI VIAJE" title="¡Jallalla, Elena!" back />
 
         <View style={styles.statsBento}>
-          <BentoStat icon="groups" value="12" label="Comunidades exploradas" big />
+          <BentoStat icon="groups" value="12" label="Familias exploradas" big />
           <BentoStat icon="explore" value="45" label="Experiencias" />
         </View>
 

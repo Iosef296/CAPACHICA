@@ -1,0 +1,41 @@
+<!-- @dsCard group="Spacing" viewport="700x180" name="Spacing Scale" subtitle="4px base unit · --space-1 through --space-32" -->
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { background: var(--bg); margin: 0; padding: 20px; font-family: var(--font-ui); }
+  .row { display: flex; align-items: flex-end; gap: 6px; flex-wrap: wrap; }
+  .item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar { background: linear-gradient(180deg, var(--accent-light), var(--accent-dark)); border-radius: 2px; width: 22px; }
+  .lbl { font-size: 8px; color: var(--text-3); text-align: center; letter-spacing: 0.04em; }
+  .val { font-size: 7.5px; color: var(--text-3); }
+  .radii { display: flex; gap: 10px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+  .rad { width: 36px; height: 36px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
+  .rad span { font-size: 7px; color: var(--text-3); }
+</style>
+</head><body>
+<div class="row">
+  <div class="item"><div class="bar" style="height:4px"></div><div class="lbl">1</div><div class="val">4px</div></div>
+  <div class="item"><div class="bar" style="height:8px"></div><div class="lbl">2</div><div class="val">8px</div></div>
+  <div class="item"><div class="bar" style="height:12px"></div><div class="lbl">3</div><div class="val">12px</div></div>
+  <div class="item"><div class="bar" style="height:16px"></div><div class="lbl">4</div><div class="val">16px</div></div>
+  <div class="item"><div class="bar" style="height:20px"></div><div class="lbl">5</div><div class="val">20px</div></div>
+  <div class="item"><div class="bar" style="height:24px"></div><div class="lbl">6</div><div class="val">24px</div></div>
+  <div class="item"><div class="bar" style="height:32px"></div><div class="lbl">8</div><div class="val">32px</div></div>
+  <div class="item"><div class="bar" style="height:40px"></div><div class="lbl">10</div><div class="val">40px</div></div>
+  <div class="item"><div class="bar" style="height:48px"></div><div class="lbl">12</div><div class="val">48px</div></div>
+  <div class="item"><div class="bar" style="height:64px"></div><div class="lbl">16</div><div class="val">64px</div></div>
+  <div class="item"><div class="bar" style="height:80px"></div><div class="lbl">20</div><div class="val">80px</div></div>
+  <div class="item"><div class="bar" style="height:96px"></div><div class="lbl">24</div><div class="val">96px</div></div>
+</div>
+<div class="radii">
+  <div class="rad" style="border-radius:0"><span>0</span></div>
+  <div class="rad" style="border-radius:2px"><span>xs·2</span></div>
+  <div class="rad" style="border-radius:4px"><span>sm·4</span></div>
+  <div class="rad" style="border-radius:6px"><span>6px</span></div>
+  <div class="rad" style="border-radius:10px"><span>md·10</span></div>
+  <div class="rad" style="border-radius:14px"><span>lg·14</span></div>
+  <div class="rad" style="border-radius:20px"><span>xl·20</span></div>
+  <div class="rad" style="border-radius:999px"><span>pill</span></div>
+</div>
+</body></html>

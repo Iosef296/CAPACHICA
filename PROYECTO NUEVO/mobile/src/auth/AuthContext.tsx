@@ -5,23 +5,28 @@ import Constants from 'expo-constants';
 import { api, API_BASE, tryRefreshToken } from '@/data/api';
 
 export type Rol = 'admin' | 'proveedor' | 'turista';
-type User = { id: string; email: string; name: string; avatar?: string; provider: 'email' | 'google'; rol: Rol };
+type User = { id: string; email: string; name: string; avatar?: string; provider: 'email' | 'google'; rol: Rol; telefono?: string | null };
 
 type Ctx = {
   user: User | null;
+  guest: boolean;
   loading: boolean;
   signInEmail: (email: string, password: string) => Promise<void>;
   signUpEmail: (email: string, password: string, name: string) => Promise<void>;
   signInGoogle: () => Promise<void>;
+  continueAsGuest: () => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  setPhone: (telefono: string) => Promise<void>;
 };
 
 const AuthCtx = createContext<Ctx | null>(null);
 const KEY = 'capachica.user';
+const GUEST_KEY = 'capachica.guest';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [guest, setGuest] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const extra = (Constants.expoConfig?.extra as any) ?? {};
@@ -34,6 +39,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     (async () => {
       const raw = await SecureStore.getItemAsync(KEY).catch(() => null);
       if (raw) setUser(JSON.parse(raw));
+      else {
+        const g = await SecureStore.getItemAsync(GUEST_KEY).catch(() => null);
+        if (g === '1') setGuest(true);
+      }
       setLoading(false);
     })();
   }, []);
@@ -46,6 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         id: apiUser.id?.toString() ?? 'local-' + Date.now(),
         email: apiUser.email, name: apiUser.nombre,
         avatar: apiUser.foto, provider: 'google', rol: apiUser.rol ?? 'turista',
+        telefono: apiUser.telefono ?? null,
       };
       setUser(u);
       await SecureStore.setItemAsync(KEY, JSON.stringify(u));
@@ -56,6 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value: Ctx = {
     user,
+    guest,
     loading,
     async signInEmail(email, password) {
       const res: any = await api.login(email, password);
@@ -67,6 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         avatar: apiUser.avatar,
         provider: 'email',
         rol: apiUser.rol ?? 'turista',
+        telefono: apiUser.telefono ?? null,
       };
       setUser(u);
       await SecureStore.setItemAsync(KEY, JSON.stringify(u));
@@ -82,6 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         name: apiUser.nombre ?? name,
         provider: 'email',
         rol: apiUser.rol ?? 'turista',
+        telefono: apiUser.telefono ?? null,
       };
       setUser(u);
       await SecureStore.setItemAsync(KEY, JSON.stringify(u));
@@ -90,14 +103,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
     async signInGoogle() {
       await GoogleSignin.hasPlayServices();
+      // Sin esto, GoogleSignin recuerda la última cuenta y entra directo
+      // sin preguntar -- signOut() solo limpia la sesión local del SDK
+      // (no revoca el acceso), fuerza a que vuelva a mostrar el selector.
+      await GoogleSignin.signOut().catch(() => {});
       const res = await GoogleSignin.signIn();
       if (isSuccessResponse(res) && res.data.idToken) {
         await hydrateGoogle(res.data.idToken);
       }
     },
+    async continueAsGuest() {
+      setGuest(true);
+      await SecureStore.setItemAsync(GUEST_KEY, '1');
+    },
     async signOut() {
       setUser(null);
+      setGuest(false);
       await SecureStore.deleteItemAsync(KEY);
+      await SecureStore.deleteItemAsync(GUEST_KEY);
       await SecureStore.deleteItemAsync('capachica.token');
       await SecureStore.deleteItemAsync('capachica.refreshToken');
     },
@@ -122,11 +145,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const apiUser = await res.json();
         setUser(prev => {
           if (!prev) return prev;
-          const u: User = { ...prev, rol: apiUser.rol ?? prev.rol, name: apiUser.nombre ?? prev.name };
+          const u: User = { ...prev, rol: apiUser.rol ?? prev.rol, name: apiUser.nombre ?? prev.name, telefono: apiUser.telefono ?? prev.telefono };
           SecureStore.setItemAsync(KEY, JSON.stringify(u)).catch(() => {});
           return u;
         });
       } catch {}
+    },
+    async setPhone(telefono: string) {
+      await api.actualizarPerfil({ telefono });
+      setUser(prev => {
+        if (!prev) return prev;
+        const u: User = { ...prev, telefono };
+        SecureStore.setItemAsync(KEY, JSON.stringify(u)).catch(() => {});
+        return u;
+      });
     },
   };
 

@@ -1,21 +1,22 @@
 import React from 'react';
 import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { GlassPanel } from '@/components/GlassPanel';
+import { useSafeInsets } from '@/hooks/useSafeInsets';
 import { colors, radii, spacing, typography } from '@/theme';
 
 const SKY = 'https://picsum.photos/id/1015/1600/900';
 
 export default function AR() {
   const router = useRouter();
+  const insets = useSafeInsets();
   return (
     <ImageBackground source={{ uri: SKY }} style={{ flex: 1 }}>
       <LinearGradient colors={['rgba(192,93,56,0.4)', 'rgba(129,0,49,0.6)']} style={StyleSheet.absoluteFillObject} />
 
-      <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+      <View style={{ flex: 1, paddingTop: insets.top, paddingBottom: insets.bottom }}>
         <View style={styles.topRow}>
           <Pressable onPress={() => router.back()} style={styles.iconBtn}>
             <MaterialIcons name="arrow-back" size={22} color="#fff" />
@@ -60,7 +61,7 @@ export default function AR() {
           <MaterialIcons name="qr-code-scanner" size={24} color="#fff" />
           <Text style={[typography.labelMd, { color: '#fff' }]}>ESCANEAR</Text>
         </Pressable>
-      </SafeAreaView>
+      </View>
     </ImageBackground>
   );
 }

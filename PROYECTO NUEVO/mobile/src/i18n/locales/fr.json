@@ -5,7 +5,8 @@
     "mapa": "Carte",
     "intiAI": "Inti AI",
     "experiencias": "Expériences",
-    "perfil": "Profil"
+    "perfil": "Profil",
+    "reservas": "Réservations"
   },
   "home": {
     "brand": "CAPACHICA · AI",
@@ -18,7 +19,7 @@
     "verTodo": "Tout voir",
     "sectionDestacados": "À la une aujourd'hui",
     "categorias": {
-      "comunidades": "Communautés",
+      "comunidades": "Familles",
       "gastronomia": "Gastronomie",
       "artesania": "Artisanat",
       "reservas": "Réservations",

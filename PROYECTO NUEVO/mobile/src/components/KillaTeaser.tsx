@@ -1,12 +1,14 @@
 import React from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, radii, spacing, typography } from '@/theme';
 
 type Props = { onSend?: (q: string) => void };
 
 export function KillaTeaser({ onSend }: Props) {
   const [q, setQ] = React.useState('');
+  const cfg = useAppConfig();
   return (
     <View style={styles.wrap}>
       <View style={styles.row}>
@@ -14,13 +16,13 @@ export function KillaTeaser({ onSend }: Props) {
         <Text style={[typography.labelMd, { color: colors.onPrimaryContainer }]}>INTI AI</Text>
       </View>
       <Text style={[typography.headlineMd, { color: colors.surfaceContainerLowest, marginBottom: spacing.stackSm }]}>
-        ¿Qué quieres descubrir hoy?
+        {cfg.text('killaTeaser.headline', '¿Qué quieres descubrir hoy?')}
       </Text>
       <View style={styles.inputRow}>
         <TextInput
           value={q}
           onChangeText={setQ}
-          placeholder="Pregunta por climas, rituales o rutas..."
+          placeholder={cfg.text('killaTeaser.placeholder', 'Pregunta por climas, rituales o rutas...')}
           placeholderTextColor="rgba(255,255,255,0.6)"
           style={styles.input}
           returnKeyType="send"

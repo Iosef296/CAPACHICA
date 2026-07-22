@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 import { ImageBackground, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Button } from '@/components/Button';
 import { useAuth } from '@/auth/AuthContext';
+import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, radii, spacing, typography } from '@/theme';
 
 const HERO = 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1200';
 
 export default function Login() {
   const router = useRouter();
-  const { signInEmail, signInGoogle } = useAuth();
+  const { signInEmail, signInGoogle, continueAsGuest } = useAuth();
+  const cfg = useAppConfig();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
@@ -32,15 +36,15 @@ export default function Login() {
   return (
     <ImageBackground source={{ uri: HERO }} style={{ flex: 1 }}>
       <LinearGradient colors={['rgba(0,66,104,0.3)', colors.primary]} style={StyleSheet.absoluteFillObject} />
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           <View style={styles.header}>
             <Text style={[typography.labelMd, { color: colors.onPrimaryContainer }]}>CAPACHICA EXPERIENCE AI</Text>
             <Text style={[typography.headlineLgMobile, { color: '#fff', marginTop: 8 }]}>
-              Vive el corazón del Titicaca
+              {cfg.text('login.headline', 'Vive el corazón del Titicaca')}
             </Text>
             <Text style={[typography.bodyMd, { color: 'rgba(255,255,255,0.8)', marginTop: 6 }]}>
-              Inicia sesión para crear tu experiencia con Inti AI.
+              {cfg.text('login.subtitle', 'Inicia sesión para crear tu experiencia con Inti AI.')}
             </Text>
           </View>
 
@@ -54,12 +58,17 @@ export default function Login() {
               style={styles.input}
             />
             <Text style={[typography.labelMd, { color: colors.onSurfaceVariant, marginTop: spacing.gutter }]}>CONTRASEÑA</Text>
-            <TextInput
-              value={password} onChangeText={setPassword}
-              secureTextEntry placeholder="••••••••"
-              placeholderTextColor={colors.outline}
-              style={styles.input}
-            />
+            <View>
+              <TextInput
+                value={password} onChangeText={setPassword}
+                secureTextEntry={!showPassword} placeholder="••••••••"
+                placeholderTextColor={colors.outline}
+                style={[styles.input, { paddingRight: 44 }]}
+              />
+              <Pressable onPress={() => setShowPassword(v => !v)} style={styles.eyeBtn} hitSlop={10}>
+                <MaterialIcons name={showPassword ? 'visibility-off' : 'visibility'} size={20} color={colors.onSurfaceVariant} />
+              </Pressable>
+            </View>
             {!!error && (
               <Text style={[typography.labelSm, { color: colors.error, marginTop: spacing.gutter }]}>{error}</Text>
             )}
@@ -71,6 +80,11 @@ export default function Login() {
             <Pressable onPress={() => router.push('/(auth)/register')} style={{ marginTop: spacing.gutter, alignItems: 'center' }}>
               <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant }]}>
                 ¿No tienes cuenta? <Text style={{ color: colors.primary, fontFamily: 'HankenGrotesk_700Bold' }}>Regístrate</Text>
+              </Text>
+            </Pressable>
+            <Pressable onPress={continueAsGuest} style={{ marginTop: spacing.stackSm, alignItems: 'center' }}>
+              <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, textDecorationLine: 'underline' }]}>
+                Continuar como invitado
               </Text>
             </Pressable>
           </View>
@@ -96,4 +110,5 @@ const styles = StyleSheet.create({
   },
   divider: { flexDirection: 'row', alignItems: 'center', marginVertical: spacing.gutter },
   line: { flex: 1, height: 1, backgroundColor: colors.outlineVariant },
+  eyeBtn: { position: 'absolute', right: 12, top: 0, bottom: 0, justifyContent: 'center' },
 });

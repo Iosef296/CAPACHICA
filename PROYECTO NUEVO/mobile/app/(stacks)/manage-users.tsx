@@ -27,7 +27,7 @@ export default function ManageUsers() {
   if (!isAdmin) {
     return (
       <View style={{ flex: 1, backgroundColor: colors.background }}>
-        <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+        <SafeAreaView edges={['bottom']} style={{ flex: 1 }}>
           <ScreenHeader eyebrow="ADMIN" title="Usuarios" back />
           <View style={{ padding: spacing.containerPadding, gap: spacing.gutter }}>
             <MaterialIcons name="lock" size={48} color={colors.outline} style={{ alignSelf: 'center' }} />
@@ -73,7 +73,7 @@ export default function ManageUsers() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+      <SafeAreaView edges={['bottom']} style={{ flex: 1 }}>
         <ScreenHeader eyebrow="ADMIN" title="Gestionar usuarios" back />
 
         <ScrollView contentContainerStyle={{ padding: spacing.containerPadding, gap: spacing.gutter }}>

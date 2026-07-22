@@ -6,27 +6,29 @@ import { ScreenHeader } from '@/components/ScreenHeader';
 import { guides as mockGuides } from '@/data/mock';
 import { api, API_WS } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
+import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
 export default function Guides() {
   const { type } = useLocalSearchParams<{ type?: string }>();
   const isTravel = type === 'travel';
+  const cfg = useAppConfig();
   const [allGuides, setAllGuides] = useState<any[]>(mockGuides);
   useLiveRefresh(() => { api.guides().then(setAllGuides); }, { url: API_WS, channels: 'guias' });
   const guides = allGuides.filter((g: any) => !g.type || g.type === (isTravel ? 'viaje' : 'cultural'));
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
-      <SafeAreaView edges={['top']}>
+      <SafeAreaView edges={['bottom']}>
         <ScreenHeader
-          eyebrow={isTravel ? 'GUÍA DE VIAJE' : 'GUÍA CULTURAL'}
-          title={isTravel ? 'Cómo recorrer Capachica' : 'Capachica Cultural'}
+          eyebrow={isTravel ? cfg.text('guides.travelEyebrow', 'GUÍA DE VIAJE') : cfg.text('guides.culturalEyebrow', 'GUÍA CULTURAL')}
+          title={isTravel ? cfg.text('guides.travelTitle', 'Cómo recorrer Capachica') : cfg.text('guides.culturalTitle', 'Capachica Cultural')}
           back
         />
 
         <Text style={styles.intro}>
           {isTravel
-            ? 'Rutas, transporte y consejos prácticos para tu viaje.'
-            : 'Historia, mitos y tradiciones vivas de la península.'}
+            ? cfg.text('guides.travelIntro', 'Rutas, transporte y consejos prácticos para tu viaje.')
+            : cfg.text('guides.culturalIntro', 'Historia, mitos y tradiciones vivas de la península.')}
         </Text>
 
         <View style={styles.list}>
@@ -39,7 +41,7 @@ export default function Guides() {
                   {g.excerpt}
                 </Text>
                 <Text style={[typography.labelMd, { color: colors.secondary, marginTop: spacing.stackSm }]}>
-                  LEER MÁS →
+                  {cfg.text('guides.readMoreLabel', 'LEER MÁS →')}
                 </Text>
               </View>
             </View>
