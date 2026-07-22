@@ -56,6 +56,7 @@ class AuthService {
                 rol: true,
                 password_hash: true,
                 activo: true,
+                telefono: true,
             },
         });
 
