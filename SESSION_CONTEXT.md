@@ -1,5 +1,130 @@
 # Session Context — Capachica Turismo
 
+## SESIÓN 17 ago 2026 — fix pantalla negra Historias, gastronomía real (CRUD restaurantes/platos), fix sesión trabada
+
+### Contexto de arranque
+- App mobile se corrió desde `C:\APLICACIONES MOVILES\capachica\mobile` (SSD, no la
+  ruta `F:\...\PROYECTO NUEVO\mobile` que es solo junction NTFS a la misma carpeta —
+  ver `mobile/BUILD_LOCAL_SETUP.md`). Emulador `Capachica_Emulator`, Metro con
+  `npx expo start --dev-client`.
+- **Truco de reload que funcionó**: Fast Refresh normal a veces no aplicaba los cambios
+  (bundle viejo seguía corriendo). Fix confiable: `adb shell am force-stop
+  com.capachica.experienceai` + `am start -n .../.MainActivity` → vuelve a la pantalla
+  del Dev Launcher → tocar el servidor detectado (`http://10.0.2.2:8081`, verde) →
+  fetch de bundle 100% fresco.
+- **`adb shell input keyevent 111` (ESCAPE) cierra modales Y navega atrás en la stack**
+  — evitarlo al automatizar taps; usar `input tap` sobre el botón real o `keyevent 4`
+  (BACK) con cuidado.
+
+### Hecho y pusheado (`main`, commits `e7cdc631` y `140dc01d`)
+1. **Pantalla negra al abrir una Historia** (`StoryViewer.tsx`, `app/(tabs)/index.tsx`)
+   — causa real: una historia en la base tenía `media_url` vacío (dato viejo, de antes
+   de que el backend validara `media_url` no vacío en `POST /historias`). El
+   `<Image source={{uri:''}}>` rendereaba negro sin ningún error visible, solo quedaba
+   la X de cerrar. Fix: `index.tsx` filtra historias con `media_url` vacío antes de
+   listarlas; `StoryViewer.tsx` además maneja `onError` de imagen/video rota (URL
+   presente pero que falla al cargar) mostrando un aviso "No se pudo cargar este
+   contenido" y avanzando sola en vez de trabarse.
+2. **Badge "MÁS POPULAR" hardcodeado** (`communities.tsx`) — antes salía siempre en la
+   primera card del listado (`i === 0`), sin relación con popularidad real. Ahora lee
+   un campo real `destacado` (booleano) del backend; como ninguna comunidad lo tiene
+   seteado todavía, no aparece en ninguna por ahora — hay que agregarlo a mano en la
+   base o exponer un toggle en "Mi negocio" cuando se quiera usar.
+3. **Chips duplicados en detalle de Familia** (`community-detail.tsx`) — arriba salían
+   `tags` (etiquetas genéricas tipo "Turismo vivencial/Mirador/Amanecer", sin relación
+   con la casa) y más abajo un bloque separado "ACTIVIDADES" con las actividades
+   reales. Ahora los chips de arriba muestran las actividades reales directamente y se
+   sacó el bloque "ACTIVIDADES" duplicado de abajo (queda solo "SERVICIOS" si aplica).
+4. **Gastronomía era 100% inventada** — la pantalla `gastronomy.tsx` mostraba platos
+   hardcodeados en `src/data/mock.ts` (`dishes`), sin ningún vínculo a datos reales,
+   pese a que el backend YA tiene un dominio TypeORM real y completo para esto
+   (`backend/modelos/gastronomia/{restaurante,plato}.modelo.js` + DTOs Zod + rutas
+   `/api/restaurantes`, `/api/platos`) que simplemente no estaba conectado a nada.
+   Conectado de punta a punta:
+   - `api.ts`: `TipoNegocio` suma `'restaurantes' | 'platos'`. `negocios.listarPropios`
+     maneja la forma real paginada de `/restaurantes` (`{total,data,limit,offset}`,
+     default `limit=10` del backend — pedimos `?limit=200`) y arma "mis platos"
+     iterando los restaurantes propios + `GET /platos/restaurante/:id` (no existe
+     `GET /platos` global en el backend). `api.platos()` hace lo mismo pero para
+     TODOS los restaurantes aprobados (uso público en `gastronomy.tsx`). Tipo
+     `Restaurante` corregido — tenía campos inventados (`imagen`, `galeria`, `rating`)
+     que no existen en el backend real; ahora `fotos: string[]`, `tipo_comida`,
+     `precio_promedio`.
+   - `my-business.tsx`: pestañas nuevas "Restaurante" y "Plato" en el motor genérico
+     de CRUD (mismo patrón que Hospedajes/Artesanía/etc., pero con hooks nuevos porque
+     estos dos NO son el CRUD genérico JSONB — son TypeORM con su propio DTO): select
+     por enum para `tipo_comida`/`categoria`/`temporada` (evita mandar valores fuera
+     del enum que el backend rechaza), campos lat/lng (el backend exige
+     `ubicacion:{latitud,longitud}` al crear un restaurante), picker de a qué
+     restaurante propio pertenece un plato (obligatorio, un plato no existe sin
+     restaurante).
+   - `gastronomy.tsx`: ya no usa `mock.dishes`; trae platos y restaurantes reales.
+     Las pestañas de filtro se arman con las categorías reales presentes en los
+     platos (antes eran rótulos fijos — "Platos Fuertes/Sopas/Tradición Viva" — que no
+     correspondían a ningún dato real). El config CMS `gastronomy.tabs` (editable
+     desde "Textos de la app") quedó sin uso — ya no tiene sentido con categorías
+     reales, no se tocó/borró ese key por las dudas.
+5. **Bug real en backend** (`plato.servicio.js` + `plato.controlador.js`) — `crear`/
+   `actualizar`/`eliminar` usaban `req.usuario.rol` DENTRO del servicio, donde `req`
+   no existe (`ReferenceError`, 500 crudo) cada vez que alguien no-dueño (admin
+   incluido) tocaba un plato ajeno. El rol ahora se pasa como parámetro desde el
+   controlador.
+6. **`admin.astro` (panel web) — mismo problema que mobile, ahora resuelto también
+   ahí**: agregadas secciones "Restaurantes" y "Platos" al motor genérico
+   `RECURSOS_SIMPLES` (mismo patrón que Hospedajes/Artesanía/etc.), con los mismos
+   hooks nuevos (`listResponseKey`, `transformItem`/`transformBody` para armar
+   `ubicacion`/`fotos`, `cargarPersonalizado` para platos ya que no hay listado
+   global, `opcionesDinamicas` para el picker de restaurante).
+   - **Bug de paso, corregido**: los botones Editar/Eliminar interpolaban el `id` SIN
+     comillas en el `onclick` (`onclick="openSimpleModal('rec', ${it.id})"`) — con los
+     IDs numéricos viejos (`Date.now()`) no se notaba, pero con UUID (restaurantes/
+     platos) rompía el JS al hacer click (`3fa85f64-... ` se parsea como resta).
+     Ahora siempre van entre comillas.
+   - Mejorado el error de guardado para mostrar el mensaje real del backend (antes
+     solo "HTTP 400" sin detalle).
+7. **Sesión mobile quedaba trabada** (`AuthContext.tsx`) — si el access token Y el
+   refresh token vencían los dos juntos, el usuario quedaba atrapado con los datos
+   cacheados viejos, sin ninguna forma de volver a la pantalla de login. Ahora, al
+   arrancar, si `refreshProfile()` falla del todo se limpia la sesión sola
+   (`clearSession()`, reusa la misma lógica que `signOut`). De paso sumó
+   `expo-splash-screen` como dependencia (`package.json`/`package-lock.json`).
+
+### Verificación hecha
+- Mobile: probado en vivo en el emulador (force-stop+relaunch para bundle fresco) —
+  Historias sin pantalla negra, badge "MÁS POPULAR" ya no sale en ninguna, chips de
+  actividades correctos en detalle de Familia, formulario "Nuevo restaurante" en Mi
+  Negocio renderiza todos los campos bien.
+- Backend real (producción, Railway): `GET /api/restaurantes` confirmado devuelve
+  `{total:0,data:[],...}` — coincide exacto con el unwrap codeado. No se cargó ningún
+  dato de prueba en producción para no ensuciarla.
+- `admin.astro`: el bloque `<script>` completo (208KB) pasa `node -e "new
+  Function(script)"` sin error de sintaxis. NO se pudo probar visualmente en
+  navegador — sin tool de browser control disponible en esta sesión de Claude Code.
+
+### PENDIENTE — Railway no había re-deployado al cierre de esta sesión
+- Confirmado con `WebFetch` (fetch fresco al servidor, no cache de navegador) que
+  `https://capachica-frontend-production.up.railway.app/admin` seguía sirviendo el
+  build viejo (sin "Restaurantes"/"Platos" en el sidebar) DESPUÉS de pushear
+  `e7cdc631`.
+- No hay Railway CLI instalado en esta máquina, ni sesión/token para el dashboard
+  desde esta sesión de Claude Code → no se pudo disparar ni diagnosticar el deploy
+  directamente.
+- Se intentó habilitar la extensión "Claude in Chrome" (Brave) para darle a Claude
+  Code acceso al navegador logueado del usuario y revisar el dashboard de Railway
+  directamente — **quedó sin resolver**: `/chrome` mostraba "Status: disabled" pese a
+  "Installed", y no aparecía ninguna opción "Enable" en el menú interactivo. Sugerido
+  al usuario reiniciar la sesión de Claude Code con `claude --chrome` (o confirmar
+  auth por `/login`, no API key/Bedrock/Vertex, que bloquea la integración por
+  diseño). **Sin confirmar si eso lo resuelve.**
+- Próximo paso pendiente: usuario debe entrar al dashboard de Railway → servicio del
+  frontend → pestaña "Deployments" y confirmar si hay un deploy con el commit
+  `e7cdc631`/`140dc01d` corriendo, fallado, o si no hay nada nuevo ahí (→ revisar
+  "Auto Deploy" en Settings → Source, y que el "Root Directory" apunte a
+  `PROYECTO NUEVO/frontend mejorado`).
+- Backend (`https://capachica-backend-production.up.railway.app`) no se volvió a
+  chequear después del segundo push — confirmar que el fix de `plato.servicio.js`
+  también haya llegado.
+
 ## SESIÓN 14 jul 2026 (noche) — galería/video en Familias, filtros, visor fullscreen
 
 ### Hecho y pusheado (todo en `main`, verificar Railway redeploy del frontend)
