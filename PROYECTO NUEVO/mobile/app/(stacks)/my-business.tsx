@@ -23,12 +23,32 @@ type TipoCfg = {
   // Linea chica debajo del nombre en la lista (ej. comunidad + precio).
   // Sin esto la card queda con una sola linea, bastante pelada.
   itemSub?: (it: any) => string;
-  // Override de genero para los textos generados ("Nuevo X" / "ningún X")
-  // -- por default se arma en masculino a partir de cfg.label.
-  nuevoLabel?: string; vacioLabel?: string;
+  // Override de genero para los textos generados ("Nuevo X" / "ningún X" /
+  // "Editar X") -- por default se arman en masculino a partir de cfg.label.
+  // singular se usa para "Editar {singular}" (sin problema de genero ahi).
+  nuevoLabel?: string; vacioLabel?: string; singular?: string;
 };
 
 const TIPOS: TipoCfg[] = [
+  {
+    key: 'comunidades', label: 'Familias', icon: 'home', imageField: 'imagen', itemLabel: it => it.nombre,
+    nuevoLabel: 'Nueva familia', vacioLabel: 'ninguna familia', singular: 'familia',
+    itemSub: it => [it.comunidad, it.precio ? `S/ ${it.precio}/noche` : null].filter(Boolean).join(' · '),
+    fields: [
+      { key: 'nombre', label: 'Nombre', placeholder: 'Llachón' },
+      { key: 'comunidad', label: 'Comunidad / ubicación', placeholder: 'Comunidad de Llachón' },
+      { key: 'desc', label: 'Descripción', multiline: true },
+      { key: 'precio', label: 'Precio por noche (S/, por persona)', placeholder: '80' },
+      { key: 'capacidad', label: 'Capacidad (huéspedes)', placeholder: '4' },
+      { key: 'habitaciones', label: 'Habitaciones', placeholder: '2' },
+      { key: 'comidas', label: 'Comidas incluidas', options: ['Solo desayuno', 'Pensión completa'] },
+      { key: 'servicios', label: 'Servicios (separados por coma)', placeholder: 'Baño privado, Agua caliente, Vista al lago' },
+      { key: 'actividades', label: 'Actividades que ofrecen (separadas por coma)', placeholder: 'Pesca artesanal, Tejido, Paseo en bote' },
+      { key: 'idiomas', label: 'Idiomas (separados por coma)', placeholder: 'Español, Quechua' },
+      { key: 'whatsapp', label: 'Contacto WhatsApp', placeholder: '+51 999 999 999' },
+    ],
+    arrayFields: ['servicios', 'actividades', 'idiomas'], numberFields: ['precio', 'capacidad', 'habitaciones'],
+  },
   {
     key: 'artesania', label: 'Artesanía', icon: 'palette', imageField: 'imagen_url', itemLabel: it => it.nombre,
     fields: [
@@ -73,25 +93,6 @@ const TIPOS: TipoCfg[] = [
       { key: 'extracto', label: 'Extracto' },
       { key: 'tipo', label: 'Tipo (viaje / cultural)', placeholder: 'cultural' },
     ],
-  },
-  {
-    key: 'comunidades', label: 'Familia', icon: 'home', imageField: 'imagen', itemLabel: it => it.nombre,
-    nuevoLabel: 'Nueva familia', vacioLabel: 'ninguna familia',
-    itemSub: it => [it.comunidad, it.precio ? `S/ ${it.precio}/noche` : null].filter(Boolean).join(' · '),
-    fields: [
-      { key: 'nombre', label: 'Nombre', placeholder: 'Llachón' },
-      { key: 'comunidad', label: 'Comunidad / ubicación', placeholder: 'Comunidad de Llachón' },
-      { key: 'desc', label: 'Descripción', multiline: true },
-      { key: 'precio', label: 'Precio por noche (S/, por persona)', placeholder: '80' },
-      { key: 'capacidad', label: 'Capacidad (huéspedes)', placeholder: '4' },
-      { key: 'habitaciones', label: 'Habitaciones', placeholder: '2' },
-      { key: 'comidas', label: 'Comidas incluidas', options: ['Solo desayuno', 'Pensión completa'] },
-      { key: 'servicios', label: 'Servicios (separados por coma)', placeholder: 'Baño privado, Agua caliente, Vista al lago' },
-      { key: 'actividades', label: 'Actividades que ofrecen (separadas por coma)', placeholder: 'Pesca artesanal, Tejido, Paseo en bote' },
-      { key: 'idiomas', label: 'Idiomas (separados por coma)', placeholder: 'Español, Quechua' },
-      { key: 'whatsapp', label: 'Contacto WhatsApp', placeholder: '+51 999 999 999' },
-    ],
-    arrayFields: ['servicios', 'actividades', 'idiomas'], numberFields: ['precio', 'capacidad', 'habitaciones'],
   },
   {
     key: 'restaurantes', label: 'Restaurante', icon: 'restaurant', itemLabel: it => it.nombre,
@@ -312,7 +313,7 @@ export default function MyBusiness() {
       <SafeAreaView edges={['bottom']} style={{ flex: 1 }}>
         <ScreenHeader eyebrow="MI NEGOCIO" title="Gestionar mi negocio" back />
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsScroll} contentContainerStyle={styles.chipsRow}>
           {TIPOS.map((t, i) => (
             <Pressable key={t.key} onPress={() => setTipoIdx(i)} style={[styles.chip, i === tipoIdx && styles.chipActive]}>
               <MaterialIcons name={t.icon} size={16} color={i === tipoIdx ? colors.onPrimary : colors.onSurfaceVariant} />
@@ -371,7 +372,7 @@ export default function MyBusiness() {
           <View style={styles.modalBox}>
             <View style={styles.modalHeader}>
               <Text style={[typography.headlineMd, { color: colors.primary }]}>
-                {edit.id ? 'Editar' : 'Nuevo'} {cfg.label.toLowerCase()}
+                {edit.id ? `Editar ${cfg.singular || cfg.label.toLowerCase()}` : (cfg.nuevoLabel || `Nuevo ${cfg.label.toLowerCase()}`)}
               </Text>
               <Pressable onPress={() => setModalOpen(false)}>
                 <MaterialIcons name="close" size={24} color={colors.onSurfaceVariant} />
@@ -497,9 +498,14 @@ export default function MyBusiness() {
 }
 
 const styles = StyleSheet.create({
-  chipsRow: { gap: 8, paddingHorizontal: spacing.containerPadding, paddingVertical: spacing.stackSm },
+  // ScrollView horizontal sin alto fijo a veces queda con flex ambiguo en
+  // Android (el layout se "resuelve" recien al primer scroll/render extra)
+  // y estira los chips a toda la altura restante de la pantalla en el
+  // primer paint. Alto fijo aca + en el chip mismo lo evita de raiz.
+  chipsScroll: { flexGrow: 0, height: 52 },
+  chipsRow: { gap: 8, paddingHorizontal: spacing.containerPadding, paddingVertical: spacing.stackSm, alignItems: 'center' },
   chip: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
+    flexDirection: 'row', alignItems: 'center', gap: 6, height: 36,
     paddingHorizontal: 14, paddingVertical: 8, borderRadius: radii.full,
     backgroundColor: colors.surfaceContainerLowest, borderWidth: 1, borderColor: colors.outlineVariant,
   },
