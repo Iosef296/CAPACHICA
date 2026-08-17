@@ -38,14 +38,55 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     (async () => {
       const raw = await SecureStore.getItemAsync(KEY).catch(() => null);
-      if (raw) setUser(JSON.parse(raw));
-      else {
+      if (raw) {
+        setUser(JSON.parse(raw));
+        const ok = await refreshProfile();
+        // Token y refresh token ambos vencidos: la sesión guardada ya no
+        // sirve. Sin esto el usuario queda atrapado pidiendo el teléfono
+        // (con el dato viejo en cache) sin forma de volver al login.
+        if (!ok) await clearSession();
+      } else {
         const g = await SecureStore.getItemAsync(GUEST_KEY).catch(() => null);
         if (g === '1') setGuest(true);
       }
       setLoading(false);
     })();
   }, []);
+
+  async function clearSession() {
+    setUser(null);
+    setGuest(false);
+    await SecureStore.deleteItemAsync(KEY);
+    await SecureStore.deleteItemAsync(GUEST_KEY);
+    await SecureStore.deleteItemAsync('capachica.token');
+    await SecureStore.deleteItemAsync('capachica.refreshToken');
+  }
+
+  async function refreshProfile(): Promise<boolean> {
+    let token = await SecureStore.getItemAsync('capachica.token').catch(() => null);
+    if (!token || !API_BASE) return false;
+    try {
+      let res = await fetch(`${API_BASE}/usuarios/perfil`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.status === 401) {
+        const renovado = await tryRefreshToken();
+        if (!renovado) return false;
+        res = await fetch(`${API_BASE}/usuarios/perfil`, {
+          headers: { Authorization: `Bearer ${renovado}` },
+        });
+      }
+      if (!res.ok) return false;
+      const apiUser = await res.json();
+      setUser(prev => {
+        if (!prev) return prev;
+        const u: User = { ...prev, rol: apiUser.rol ?? prev.rol, name: apiUser.nombre ?? prev.name, telefono: apiUser.telefono ?? prev.telefono };
+        SecureStore.setItemAsync(KEY, JSON.stringify(u)).catch(() => {});
+        return u;
+      });
+      return true;
+    } catch { return false; }
+  }
 
   async function hydrateGoogle(idToken: string) {
     try {
@@ -116,41 +157,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setGuest(true);
       await SecureStore.setItemAsync(GUEST_KEY, '1');
     },
-    async signOut() {
-      setUser(null);
-      setGuest(false);
-      await SecureStore.deleteItemAsync(KEY);
-      await SecureStore.deleteItemAsync(GUEST_KEY);
-      await SecureStore.deleteItemAsync('capachica.token');
-      await SecureStore.deleteItemAsync('capachica.refreshToken');
-    },
+    signOut: clearSession,
     // El admin puede promover turista -> emprendedor desde el panel web;
     // esto vuelve a pedir el perfil real para reflejar el rol actualizado
     // sin que el usuario tenga que cerrar sesion y volver a entrar.
-    async refreshProfile() {
-      let token = await SecureStore.getItemAsync('capachica.token').catch(() => null);
-      if (!token || !API_BASE) return;
-      try {
-        let res = await fetch(`${API_BASE}/usuarios/perfil`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.status === 401) {
-          const renovado = await tryRefreshToken();
-          if (!renovado) return;
-          res = await fetch(`${API_BASE}/usuarios/perfil`, {
-            headers: { Authorization: `Bearer ${renovado}` },
-          });
-        }
-        if (!res.ok) return;
-        const apiUser = await res.json();
-        setUser(prev => {
-          if (!prev) return prev;
-          const u: User = { ...prev, rol: apiUser.rol ?? prev.rol, name: apiUser.nombre ?? prev.name, telefono: apiUser.telefono ?? prev.telefono };
-          SecureStore.setItemAsync(KEY, JSON.stringify(u)).catch(() => {});
-          return u;
-        });
-      } catch {}
-    },
+    refreshProfile,
     async setPhone(telefono: string) {
       await api.actualizarPerfil({ telefono });
       setUser(prev => {
