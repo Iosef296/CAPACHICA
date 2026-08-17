@@ -24,20 +24,6 @@ type TipoCfg = {
 
 const TIPOS: TipoCfg[] = [
   {
-    key: 'hospedajes', label: 'Hospedaje', icon: 'home', imageField: 'foto_url', itemLabel: it => it.nombre,
-    fields: [
-      { key: 'nombre', label: 'Nombre', placeholder: 'Posada de Doña Paula' },
-      { key: 'comunidad', label: 'Comunidad', placeholder: 'Llachón' },
-      { key: 'descripcion', label: 'Descripción', multiline: true },
-      { key: 'habitaciones', label: 'Habitaciones', placeholder: '4' },
-      { key: 'precio', label: 'Precio por noche (S/)', placeholder: '120' },
-      { key: 'idiomas', label: 'Idiomas (separados por coma)', placeholder: 'Español, Quechua' },
-      { key: 'servicios', label: 'Servicios (separados por coma)', placeholder: 'Desayuno, Vista al lago' },
-      { key: 'calificacion', label: 'Calificación', placeholder: '4.8' },
-    ],
-    arrayFields: ['idiomas', 'servicios'], numberFields: ['habitaciones', 'precio'],
-  },
-  {
     key: 'artesania', label: 'Artesanía', icon: 'palette', imageField: 'imagen_url', itemLabel: it => it.nombre,
     fields: [
       { key: 'nombre', label: 'Nombre', placeholder: 'Poncho Ceremonial' },
@@ -83,15 +69,21 @@ const TIPOS: TipoCfg[] = [
     ],
   },
   {
-    key: 'comunidades', label: 'Destino', icon: 'place', imageField: 'imagen', itemLabel: it => it.nombre,
+    key: 'comunidades', label: 'Familia', icon: 'place', imageField: 'imagen', itemLabel: it => it.nombre,
     fields: [
       { key: 'nombre', label: 'Nombre', placeholder: 'Llachón' },
       { key: 'comunidad', label: 'Comunidad / ubicación', placeholder: 'Comunidad de Llachón' },
       { key: 'desc', label: 'Descripción', multiline: true },
-      { key: 'highlight', label: 'Texto destacado', placeholder: 'Mejor destino vivencial' },
-      { key: 'tags', label: 'Etiquetas (separadas por coma)' },
+      { key: 'precio', label: 'Precio por noche (S/, por persona)', placeholder: '80' },
+      { key: 'capacidad', label: 'Capacidad (huéspedes)', placeholder: '4' },
+      { key: 'habitaciones', label: 'Habitaciones', placeholder: '2' },
+      { key: 'comidas', label: 'Comidas incluidas', options: ['Solo desayuno', 'Pensión completa'] },
+      { key: 'servicios', label: 'Servicios (separados por coma)', placeholder: 'Baño privado, Agua caliente, Vista al lago' },
+      { key: 'actividades', label: 'Actividades que ofrecen (separadas por coma)', placeholder: 'Pesca artesanal, Tejido, Paseo en bote' },
+      { key: 'idiomas', label: 'Idiomas (separados por coma)', placeholder: 'Español, Quechua' },
+      { key: 'whatsapp', label: 'Contacto WhatsApp', placeholder: '+51 999 999 999' },
     ],
-    arrayFields: ['tags'],
+    arrayFields: ['servicios', 'actividades', 'idiomas'], numberFields: ['precio', 'capacidad', 'habitaciones'],
   },
   {
     key: 'restaurantes', label: 'Restaurante', icon: 'restaurant', itemLabel: it => it.nombre,

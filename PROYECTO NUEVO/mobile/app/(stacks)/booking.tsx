@@ -33,7 +33,7 @@ export default function Booking() {
       }
     });
     api.stays().then(setStays);
-  }, { url: API_WS, channels: ['actividades', 'hospedajes'] });
+  }, { url: API_WS, channels: ['actividades', 'comunidades'] });
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaView edges={['bottom']}>

@@ -98,7 +98,7 @@ const decoGifs: DecoGif[] = Array.isArray(ft.footer_gifs) && ft.footer_gifs.leng
                 <>
                   <div class="arena-heading" style={mt}>Destinos</div>
                   <ul class="arena-link-list" data-footer-section="destinos">
-                    {(ft.destinos_links?.length ? ft.destinos_links : [{label:'Playa Llachón',href:'/destinos'},{label:'Mirador del Amaru',href:'/destinos'},{label:'Isla Ticonata',href:'/destinos'},{label:'Comunidad Capachica',href:'/destinos'},{label:'Ver todos →',href:'/destinos'}]).map((l: any) => (
+                    {(ft.destinos_links?.length ? ft.destinos_links : [{label:'Playa Llachón',href:'/vivencial'},{label:'Mirador del Amaru',href:'/vivencial'},{label:'Isla Ticonata',href:'/vivencial'},{label:'Comunidad Capachica',href:'/vivencial'},{label:'Ver todos →',href:'/vivencial'}]).map((l: any) => (
                       <li><a href={l.href} class="arena-link footer-link">{l.label}</a></li>
                     ))}
                   </ul>

@@ -2,27 +2,19 @@ import { useState, useEffect } from "react";
 
 const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api';
 
-const PRECIO_POR_PERSONA_NOCHE = 120;
-
-const iconMap: Record<string, string> = {
-  pesca: "🎣",
-  tejido: "🪡",
-  agricultura: "🌿",
-  cocina: "🍲",
-};
-
 interface Familia {
   id: string;
   nombre: string;
   comunidad: string;
-  descripcion: string;
-  especialidad: string;
-  foto_url: string | null;
-  habitaciones: number;
+  desc: string;
+  imagen: string | null;
+  precio: number | null;
+  capacidad: number | null;
+  habitaciones: number | null;
+  comidas: string;
   idiomas: string[];
   servicios: string[];
-  calificacion: string;
-  activa: boolean;
+  actividades: string[];
 }
 
 export default function FamiliasGrid() {
@@ -31,7 +23,7 @@ export default function FamiliasGrid() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(`${API_URL}/hospedajes`)
+    fetch(`${API_URL}/comunidades`)
       .then((res) => res.json())
       .then((data) => {
         setFamilias(data);
@@ -139,127 +131,126 @@ export default function FamiliasGrid() {
           {/* Grid */}
           {!loading && !error && (
             <div className="familias-grid">
-              {familias.map((f) => (
-                <div key={f.id} className="familia-card">
-                  {/* Foto */}
-                  <div
-                    style={{
-                      height: 200,
-                      background: f.foto_url
-                        ? `url(${f.foto_url}) center/cover`
-                        : "linear-gradient(135deg, #0b3c60 0%, #1f6e9c 100%)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      position: "relative",
-                    }}
-                  >
-                    {!f.foto_url && (
-                      <div style={{ fontSize: 64, opacity: 0.35 }}>
-                        {iconMap[f.especialidad] || "🏠"}
-                      </div>
-                    )}
+              {familias.map((f) => {
+                const servicios = f.servicios || [];
+                const idiomas = f.idiomas || [];
+                const metaBits = [
+                  f.capacidad ? `${f.capacidad} huéspedes` : null,
+                  f.habitaciones ? `${f.habitaciones} hab.` : null,
+                  f.comidas || null,
+                ].filter(Boolean);
+                return (
+                  <div key={f.id} className="familia-card">
+                    {/* Foto */}
                     <div
                       style={{
-                        position: "absolute",
-                        top: 12,
-                        right: 12,
-                        background: "rgba(0,0,0,0.5)",
-                        color: "#fff",
-                        padding: "4px 10px",
-                        borderRadius: 20,
-                        fontSize: 12,
-                        fontWeight: 600,
-                      }}
-                    >
-                      ⭐ {parseFloat(f.calificacion).toFixed(1)}
-                    </div>
-                  </div>
-
-                  {/* Info */}
-                  <div style={{ padding: "20px 20px 24px" }}>
-                    <div style={{ marginBottom: 10 }}>
-                      <span className="badge badge-cyan">Disponible</span>
-                    </div>
-                    <h3
-                      className="familia-nombre"
-                      style={{ fontSize: 22, fontWeight: 700, marginBottom: 6 }}
-                    >
-                      {f.nombre}
-                    </h3>
-                    <p
-                      className="familia-desc"
-                      style={{
-                        fontSize: 13,
-                        marginBottom: 12,
-                        lineHeight: 1.6,
-                      }}
-                    >
-                      {f.descripcion}
-                    </p>
-
-                    <div
-                      style={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        gap: 4,
-                        marginBottom: 12,
-                      }}
-                    >
-                      {f.servicios.map((s) => (
-                        <span
-                          key={s}
-                          className="familia-servicio"
-                          style={{
-                            fontSize: 11,
-                            padding: "2px 8px",
-                            borderRadius: 20,
-                          }}
-                        >
-                          {s}
-                        </span>
-                      ))}
-                    </div>
-
-                    <p
-                      className="familia-info"
-                      style={{ fontSize: 12, marginBottom: 16 }}
-                    >
-                      🗣️ {f.idiomas.join(" · ")}
-                    </p>
-
-                    <div
-                      style={{
+                        height: 200,
+                        background: f.imagen
+                          ? `url(${f.imagen}) center/cover`
+                          : "linear-gradient(135deg, #0b3c60 0%, #1f6e9c 100%)",
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "space-between",
-                        flexWrap: "wrap",
-                        gap: 8,
+                        justifyContent: "center",
                       }}
                     >
-                      <div>
-                        <span
-                          className="familia-precio"
-                          style={{ fontSize: 22, fontWeight: 700 }}
-                        >
-                          S/. {PRECIO_POR_PERSONA_NOCHE}
-                        </span>
-                        <span className="familia-info" style={{ fontSize: 12 }}>
-                          {" "}
-                          /persona/noche
-                        </span>
+                      {!f.imagen && (
+                        <div style={{ fontSize: 64, opacity: 0.35 }}>🏠</div>
+                      )}
+                    </div>
+
+                    {/* Info */}
+                    <div style={{ padding: "20px 20px 24px" }}>
+                      <div style={{ marginBottom: 10 }}>
+                        <span className="badge badge-cyan">📍 {f.comunidad}</span>
                       </div>
-                      <a
-                        href="#reservar"
-                        className="btn-outline"
-                        style={{ padding: "8px 18px", fontSize: 13 }}
+                      <h3
+                        className="familia-nombre"
+                        style={{ fontSize: 22, fontWeight: 700, marginBottom: 6 }}
                       >
-                        Explorar →
-                      </a>
+                        {f.nombre}
+                      </h3>
+                      <p
+                        className="familia-desc"
+                        style={{
+                          fontSize: 13,
+                          marginBottom: 12,
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        {f.desc}
+                      </p>
+
+                      {servicios.length > 0 && (
+                        <div
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: 4,
+                            marginBottom: 12,
+                          }}
+                        >
+                          {servicios.map((s) => (
+                            <span
+                              key={s}
+                              className="familia-servicio"
+                              style={{
+                                fontSize: 11,
+                                padding: "2px 8px",
+                                borderRadius: 20,
+                              }}
+                            >
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {(metaBits.length > 0 || idiomas.length > 0) && (
+                        <p
+                          className="familia-info"
+                          style={{ fontSize: 12, marginBottom: 16 }}
+                        >
+                          {metaBits.join(" · ")}
+                          {metaBits.length > 0 && idiomas.length > 0 && " · "}
+                          {idiomas.length > 0 && `🗣️ ${idiomas.join(", ")}`}
+                        </p>
+                      )}
+
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          flexWrap: "wrap",
+                          gap: 8,
+                        }}
+                      >
+                        <div>
+                          <span
+                            className="familia-precio"
+                            style={{ fontSize: 22, fontWeight: 700 }}
+                          >
+                            {f.precio != null ? `S/. ${f.precio}` : "Consultar precio"}
+                          </span>
+                          {f.precio != null && (
+                            <span className="familia-info" style={{ fontSize: 12 }}>
+                              {" "}
+                              /persona/noche
+                            </span>
+                          )}
+                        </div>
+                        <a
+                          href="#reservar"
+                          className="btn-outline"
+                          style={{ padding: "8px 18px", fontSize: 13 }}
+                        >
+                          Explorar →
+                        </a>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 

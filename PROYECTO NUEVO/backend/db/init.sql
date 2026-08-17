@@ -55,7 +55,7 @@ CREATE TRIGGER reservas_updated_at
     BEFORE UPDATE ON reservas
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
--- ── Contenido CMS (comunidades, festividades, artesania, maestros, guias, hospedajes) ──
+-- ── Contenido CMS (comunidades, festividades, artesania, maestros, guias) ──
 -- Antes vivian como archivos JSON planos en backend/data/, escritos con
 -- fs.writeFileSync -- se perdian en cada redeploy porque el filesystem
 -- del contenedor es efimero y se reconstruye desde git. Cada item se
@@ -96,14 +96,6 @@ CREATE TABLE IF NOT EXISTS maestros (
 );
 
 CREATE TABLE IF NOT EXISTS guias (
-    id             BIGINT PRIMARY KEY,
-    usuario_id     UUID,
-    usuario_nombre TEXT,
-    data           JSONB NOT NULL,
-    created_at     TIMESTAMPTZ DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS hospedajes (
     id             BIGINT PRIMARY KEY,
     usuario_id     UUID,
     usuario_nombre TEXT,

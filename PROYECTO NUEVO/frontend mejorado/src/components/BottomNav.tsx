@@ -2,14 +2,13 @@ import { useState, useEffect } from "react";
 
 const TABS: Array<{ label: string; href: string | null; icon: string }> = [
   { label: "Inicio",      href: "/",             icon: "home"     },
-  { label: "Destinos",    href: "/destinos",     icon: "pin"      },
+  { label: "Vivencial",   href: "/vivencial",    icon: "pin"      },
   { label: "Gastronomía", href: "/gastronomia",  icon: "fork"     },
   { label: "Festivid.",   href: "/festividades", icon: "calendar" },
   { label: "Más",         href: null,            icon: "grid"     },
 ];
 
 const MORE = [
-  { label: "Vivencial",   href: "/vivencial",   emoji: "🌿" },
   { label: "Actividades", href: "/actividades", emoji: "🏔️" },
   { label: "Artesanía",   href: "/artesania",   emoji: "🎨" },
   { label: "Alojamiento", href: "/alojamiento", emoji: "🏡" },

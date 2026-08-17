@@ -628,10 +628,6 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         <span>👪</span><span class="nav-btn-text"> Familias</span>
         <span class="nav-count" id="nav-dest-count">—</span>
       </button>
-      <button class="nav-btn" data-section="hospedajes" title="Hospedajes">
-        <span>🏠</span><span class="nav-btn-text"> Hospedajes</span>
-        <span class="nav-count" id="nav-hospedajes-count">—</span>
-      </button>
       <button class="nav-btn" data-section="artesania" title="Artesanía">
         <span>🎨</span><span class="nav-btn-text"> Artesanía</span>
         <span class="nav-count" id="nav-artesania-count">—</span>
@@ -768,19 +764,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         <div id="destinosList"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
       </div>
 
-      <!-- ─── SECCIONES SIMPLES (Hospedajes/Artesania/Festividades/Maestros/Guias) ─── -->
-      <div class="section" id="sec-hospedajes">
-        <div class="page-hdr">
-          <h2>Hospedajes</h2>
-          <p>Familias anfitrionas y hospedajes vivenciales</p>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-          <span class="count-pill" id="hospedajes-count">0</span>
-          <button class="btn-primary" onclick="openSimpleModal('hospedajes', null)">＋ Nuevo</button>
-        </div>
-        <div id="hospedajes-list"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
-      </div>
-
+      <!-- ─── SECCIONES SIMPLES (Artesania/Festividades/Maestros/Guias) ─── -->
       <div class="section" id="sec-artesania">
         <div class="page-hdr">
           <h2>Artesanía</h2>
@@ -1428,7 +1412,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       if (btn.dataset.section === 'destinos') loadDestinos();
       if (btn.dataset.section === 'paginas')  loadPaginas();
       if (btn.dataset.section === 'app-movil') loadAppMovil();
-      if (['hospedajes','artesania','festividades','maestros','guias','restaurantes','platos'].includes(btn.dataset.section)) cargarSimple(btn.dataset.section);
+      if (['artesania','festividades','maestros','guias','restaurantes','platos'].includes(btn.dataset.section)) cargarSimple(btn.dataset.section);
       if (btn.dataset.section === 'usuarios') loadUsuarios();
       if (btn.dataset.section === 'global') {
         loadSiteconfigAdmin();
@@ -1448,7 +1432,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     if (sec === 'widget')   loadWidget();
     if (sec === 'destinos') loadDestinos();
     if (sec === 'paginas')  loadPaginas();
-    if (['hospedajes','artesania','festividades','maestros','guias','restaurantes','platos'].includes(sec)) cargarSimple(sec);
+    if (['artesania','festividades','maestros','guias','restaurantes','platos'].includes(sec)) cargarSimple(sec);
     if (sec === 'usuarios') loadUsuarios();
   };
 
@@ -1991,29 +1975,16 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     $('d-file-video').value = '';
   }
 
-  /* ─── SECCIONES SIMPLES (Hospedajes/Artesania/Festividades/Maestros/Guias) ───
+  /* ─── SECCIONES SIMPLES (Artesania/Festividades/Maestros/Guias) ───
      Un solo motor generico (config-driven) para no repetir 5 veces el mismo
      CRUD. Cada recurso solo declara sus campos; todo lo demas (cargar,
-     listar, modal, guardar, subir foto, eliminar) es compartido. */
+     listar, modal, guardar, subir foto, eliminar) es compartido.
+     Nota: Hospedajes se elimino como recurso separado -- era una tabla
+     JSONB genérica con datos de demo, redundante con "Familias" (tabla
+     comunidades, editada mas abajo via openDestinoModal) que ya cubre
+     hospedaje vivencial con campos reales (precio/capacidad/servicios/
+     actividades/etc). Familias es ahora la unica fuente de hospedaje. */
   const RECURSOS_SIMPLES = {
-    hospedajes: {
-      titulo: 'Hospedaje', endpoint: 'hospedajes',
-      itemLabel: it => it.nombre, itemSub: it => it.comunidad,
-      imageField: 'foto_url',
-      campos: [
-        { key: 'nombre', label: 'Nombre *', placeholder: 'Posada de Doña Paula' },
-        { key: 'comunidad', label: 'Comunidad', placeholder: 'Llachón' },
-        { key: 'descripcion', label: 'Descripción', tipo: 'textarea', placeholder: '...' },
-        { key: 'especialidad', label: 'Especialidad', tipo: 'select', opciones: [['pesca','🎣 Pesca'],['tejido','🪡 Tejido'],['agricultura','🌿 Agricultura'],['cocina','🍲 Cocina']] },
-        { key: 'foto_url', label: 'Foto', tipo: 'imagen' },
-        { key: 'habitaciones', label: 'Habitaciones', tipo: 'numero', placeholder: '4' },
-        { key: 'precio', label: 'Precio por noche (S/)', tipo: 'numero', placeholder: '120' },
-        { key: 'idiomas', label: 'Idiomas (separados por coma)', placeholder: 'Español, Quechua' },
-        { key: 'servicios', label: 'Servicios (separados por coma)', placeholder: 'Desayuno incluido, Vista al lago' },
-        { key: 'calificacion', label: 'Calificación', placeholder: '4.8' },
-      ],
-      arrayFields: ['idiomas', 'servicios'], numberFields: ['habitaciones', 'precio'],
-    },
     artesania: {
       titulo: 'Producto de artesanía', endpoint: 'artesania',
       itemLabel: it => it.nombre, itemSub: it => it.tipo,

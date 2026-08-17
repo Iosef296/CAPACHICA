@@ -1,5 +1,5 @@
 // Corre una sola vez para poblar comunidades/festividades/artesania/
-// maestros/guias/hospedajes en Postgres a partir de los JSON originales
+// maestros/guias en Postgres a partir de los JSON originales
 // (backend/data/*.json) -- pensado para levantar un entorno nuevo desde
 // cero. Idempotente (ON CONFLICT DO NOTHING): correrlo de nuevo no
 // duplica filas. Ejecutar desde backend/: `node db/seed_contenido.js`.
@@ -13,7 +13,6 @@ const RECURSOS = [
   { archivo: 'artesania.json', tabla: 'artesania' },
   { archivo: 'maestros.json', tabla: 'maestros' },
   { archivo: 'guias.json', tabla: 'guias' },
-  { archivo: 'hospedajes.json', tabla: 'hospedajes' },
 ];
 
 async function crearTabla(tabla) {

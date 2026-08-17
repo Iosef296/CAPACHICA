@@ -176,11 +176,13 @@ export const api = {
       img: g.imagen ?? g.img, type: g.tipo ?? g.type ?? 'cultural',
     }))
   ),
-  // Mismo endpoint que consume el frontend web (FamiliasGrid.tsx).
-  stays: () => cachedGet<any[]>('/hospedajes', mock.stays, list =>
+  // Mismo endpoint que consume el frontend web (FamiliasGrid.tsx) -- las
+  // familias anfitrionas (tabla comunidades) SON el hospedaje, ya no hay
+  // un recurso "hospedajes" separado.
+  stays: () => cachedGet<any[]>('/comunidades', mock.stays, list =>
     (Array.isArray(list) ? list : []).map((s: any) => ({
       id: String(s.id), name: s.nombre ?? s.name, community: s.comunidad ?? s.community,
-      price: s.precio ?? s.price, img: s.foto_url ?? s.imagen ?? s.img,
+      price: s.precio ?? s.price, img: s.imagen ?? s.foto_url ?? s.img,
     }))
   ),
   // Auth real contra /api/auth/login y /api/auth/registro (espera email/password)
@@ -201,7 +203,7 @@ export const api = {
 // (guardado en login/registro) para crear/editar/eliminar SOLO lo
 // que uno mismo creó (o cualquier cosa, si eres admin — lo valida el
 // backend, no el mobile).
-export type TipoNegocio = 'comunidades' | 'hospedajes' | 'artesania' | 'festividades' | 'maestros' | 'guias' | 'restaurantes' | 'platos';
+export type TipoNegocio = 'comunidades' | 'artesania' | 'festividades' | 'maestros' | 'guias' | 'restaurantes' | 'platos';
 
 // El accessToken dura 1h (ver backend/config/autenticacion.js). Si una
 // llamada autenticada vuelve 401, probamos renovarlo con el refreshToken
@@ -307,7 +309,7 @@ export const usuariosAdmin = {
 export const negocios = {
   // Trae TODO el recurso (sin transformar/cachear) y filtra por dueño en el cliente.
   // 'restaurantes' es la excepción -- backend TypeORM real con DTOs propios,
-  // no el CRUD genérico sobre JSONB que usan comunidades/hospedajes/etc.
+  // no el CRUD genérico sobre JSONB que usan comunidades/artesania/etc.
   listarPropios: async (tipo: TipoNegocio, usuarioId: string): Promise<any[]> => {
     if (!API_BASE) return [];
     try {

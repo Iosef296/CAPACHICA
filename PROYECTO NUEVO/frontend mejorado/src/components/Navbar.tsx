@@ -3,7 +3,6 @@ import AuthModal from "./AuthModal";
 
 const DEFAULT_LINKS = [
   { label: "Inicio",       href: "/" },
-  { label: "Destinos",     href: "/destinos" },
   { label: "Vivencial",    href: "/vivencial" },
   { label: "Actividades",  href: "/actividades" },
   { label: "Gastronomía",  href: "/gastronomia" },

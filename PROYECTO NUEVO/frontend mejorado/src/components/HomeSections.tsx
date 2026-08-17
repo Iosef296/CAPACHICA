@@ -54,17 +54,6 @@ const sections = [
     tags: ["Aguayo","Chullo","Bordado"],
     delay: 0.4,
   },
-  {
-    emoji: "🏔️",
-    label: "Destinos",
-    title: "Paisajes que quitan el aliento",
-    desc: "Miradores con vistas del Titicaca, comunidades a orillas del lago, islas flotantes y la magia de los atardeceres más fotogénicos del Perú.",
-    href: "/destinos",
-    color: "#38bdf8",
-    bg: "linear-gradient(135deg,#060f1a,#0c1e30)",
-    tags: ["Llachón","Taquile","Miradores"],
-    delay: 0.5,
-  },
 ];
 
 const destinations = [

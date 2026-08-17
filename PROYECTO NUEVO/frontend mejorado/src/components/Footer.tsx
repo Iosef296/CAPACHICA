@@ -24,10 +24,10 @@ export default function Footer() {
     {
       title: "Destinos",
       links: [
-        { label: "Llachón",        href: "/destinos" },
-        { label: "Escallani",      href: "/destinos" },
-        { label: "Isla Taquile",   href: "/destinos" },
-        { label: "Bahía de Chifrón", href: "/destinos" },
+        { label: "Llachón",        href: "/vivencial" },
+        { label: "Escallani",      href: "/vivencial" },
+        { label: "Isla Taquile",   href: "/vivencial" },
+        { label: "Bahía de Chifrón", href: "/vivencial" },
       ],
       dynamic: false,
     },
