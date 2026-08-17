@@ -20,6 +20,12 @@ type TipoCfg = {
   // 'platos' no existe suelto -- pertenece a un restaurante propio, hay
   // que elegir cuál antes de poder guardar.
   needsRestauranteId?: boolean;
+  // Linea chica debajo del nombre en la lista (ej. comunidad + precio).
+  // Sin esto la card queda con una sola linea, bastante pelada.
+  itemSub?: (it: any) => string;
+  // Override de genero para los textos generados ("Nuevo X" / "ningún X")
+  // -- por default se arma en masculino a partir de cfg.label.
+  nuevoLabel?: string; vacioLabel?: string;
 };
 
 const TIPOS: TipoCfg[] = [
@@ -69,7 +75,9 @@ const TIPOS: TipoCfg[] = [
     ],
   },
   {
-    key: 'comunidades', label: 'Familia', icon: 'place', imageField: 'imagen', itemLabel: it => it.nombre,
+    key: 'comunidades', label: 'Familia', icon: 'home', imageField: 'imagen', itemLabel: it => it.nombre,
+    nuevoLabel: 'Nueva familia', vacioLabel: 'ninguna familia',
+    itemSub: it => [it.comunidad, it.precio ? `S/ ${it.precio}/noche` : null].filter(Boolean).join(' · '),
     fields: [
       { key: 'nombre', label: 'Nombre', placeholder: 'Llachón' },
       { key: 'comunidad', label: 'Comunidad / ubicación', placeholder: 'Comunidad de Llachón' },
@@ -317,36 +325,44 @@ export default function MyBusiness() {
           <Pressable style={styles.newBtn} onPress={openNew}>
             <MaterialIcons name="add-circle" size={20} color={colors.onPrimary} />
             <Text style={[typography.bodyMd, { color: colors.onPrimary, fontFamily: 'HankenGrotesk_700Bold' }]}>
-              Nuevo {cfg.label.toLowerCase()}
+              {cfg.nuevoLabel || `Nuevo ${cfg.label.toLowerCase()}`}
             </Text>
           </Pressable>
 
           {items.length === 0 ? (
             <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, textAlign: 'center', marginTop: spacing.stackMd }]}>
-              Todavía no creaste ningún {cfg.label.toLowerCase()}.
+              Todavía no creaste {cfg.vacioLabel || `ningún ${cfg.label.toLowerCase()}`}.
             </Text>
-          ) : items.map(item => (
-            <View key={item.id} style={[styles.card, shadows.card]}>
-              {coverUrl(item) ? (
-                <Image source={{ uri: coverUrl(item) }} style={styles.thumb} />
-              ) : (
-                <View style={[styles.thumb, styles.thumbFallback]}>
-                  <MaterialIcons name={cfg.icon} size={24} color={colors.onSurfaceVariant} />
+          ) : items.map(item => {
+            const sub = cfg.itemSub?.(item);
+            return (
+              <View key={item.id} style={[styles.card, shadows.card]}>
+                {coverUrl(item) ? (
+                  <Image source={{ uri: coverUrl(item) }} style={styles.thumb} />
+                ) : (
+                  <View style={[styles.thumb, styles.thumbFallback]}>
+                    <MaterialIcons name={cfg.icon} size={26} color={colors.onSurfaceVariant} />
+                  </View>
+                )}
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <Text style={[typography.bodyLg, { color: colors.onSurface, fontFamily: 'HankenGrotesk_700Bold' }]} numberOfLines={1}>
+                    {cfg.itemLabel(item)}
+                  </Text>
+                  {!!sub && (
+                    <Text style={[typography.labelSm, { color: colors.onSurfaceVariant, marginTop: 2 }]} numberOfLines={1}>
+                      {sub}
+                    </Text>
+                  )}
                 </View>
-              )}
-              <View style={{ flex: 1, minWidth: 0 }}>
-                <Text style={[typography.bodyLg, { color: colors.onSurface, fontFamily: 'HankenGrotesk_700Bold' }]} numberOfLines={1}>
-                  {cfg.itemLabel(item)}
-                </Text>
+                <Pressable onPress={() => openEdit(item)} style={styles.iconBtn}>
+                  <MaterialIcons name="edit" size={18} color={colors.primary} />
+                </Pressable>
+                <Pressable onPress={() => remove(item)} style={styles.iconBtn}>
+                  <MaterialIcons name="delete" size={18} color={colors.error} />
+                </Pressable>
               </View>
-              <Pressable onPress={() => openEdit(item)} style={styles.iconBtn}>
-                <MaterialIcons name="edit" size={18} color={colors.primary} />
-              </Pressable>
-              <Pressable onPress={() => remove(item)} style={styles.iconBtn}>
-                <MaterialIcons name="delete" size={18} color={colors.error} />
-              </Pressable>
-            </View>
-          ))}
+            );
+          })}
         </ScrollView>
       </SafeAreaView>
 
@@ -501,7 +517,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: spacing.gutter,
     backgroundColor: colors.surfaceContainerLowest, borderRadius: radii.lg, padding: spacing.base,
   },
-  thumb: { width: 56, height: 56, borderRadius: radii.md },
+  thumb: { width: 68, height: 68, borderRadius: radii.md },
   thumbFallback: { backgroundColor: colors.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' },
   iconBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceContainerLow },
   refreshBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: spacing.gutter },
