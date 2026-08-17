@@ -648,6 +648,14 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         <span>📖</span><span class="nav-btn-text"> Guías</span>
         <span class="nav-count" id="nav-guias-count">—</span>
       </button>
+      <button class="nav-btn" data-section="restaurantes" title="Restaurantes">
+        <span>🍽️</span><span class="nav-btn-text"> Restaurantes</span>
+        <span class="nav-count" id="nav-restaurantes-count">—</span>
+      </button>
+      <button class="nav-btn" data-section="platos" title="Platos">
+        <span>🍲</span><span class="nav-btn-text"> Platos</span>
+        <span class="nav-count" id="nav-platos-count">—</span>
+      </button>
       <button class="nav-btn" data-section="reservas" title="Reservas">
         <span>📋</span><span class="nav-btn-text"> Reservas</span>
         <span class="nav-count" id="nav-res-count">—</span>
@@ -819,6 +827,30 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
           <button class="btn-primary" onclick="openSimpleModal('guias', null)">＋ Nueva</button>
         </div>
         <div id="guias-list"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
+      </div>
+
+      <div class="section" id="sec-restaurantes">
+        <div class="page-hdr">
+          <h2>Restaurantes</h2>
+          <p>Restaurantes de la península -- backend real con ubicación geográfica y aprobación</p>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <span class="count-pill" id="restaurantes-count">0</span>
+          <button class="btn-primary" onclick="openSimpleModal('restaurantes', null)">＋ Nuevo</button>
+        </div>
+        <div id="restaurantes-list"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
+      </div>
+
+      <div class="section" id="sec-platos">
+        <div class="page-hdr">
+          <h2>Platos</h2>
+          <p>Platos de cada restaurante -- primero creá el restaurante</p>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <span class="count-pill" id="platos-count">0</span>
+          <button class="btn-primary" onclick="openSimpleModal('platos', null)">＋ Nuevo</button>
+        </div>
+        <div id="platos-list"><div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div></div>
       </div>
 
       <!-- ─── RESERVAS SECTION ─── -->
@@ -1396,7 +1428,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       if (btn.dataset.section === 'destinos') loadDestinos();
       if (btn.dataset.section === 'paginas')  loadPaginas();
       if (btn.dataset.section === 'app-movil') loadAppMovil();
-      if (['hospedajes','artesania','festividades','maestros','guias'].includes(btn.dataset.section)) cargarSimple(btn.dataset.section);
+      if (['hospedajes','artesania','festividades','maestros','guias','restaurantes','platos'].includes(btn.dataset.section)) cargarSimple(btn.dataset.section);
       if (btn.dataset.section === 'usuarios') loadUsuarios();
       if (btn.dataset.section === 'global') {
         loadSiteconfigAdmin();
@@ -1416,7 +1448,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     if (sec === 'widget')   loadWidget();
     if (sec === 'destinos') loadDestinos();
     if (sec === 'paginas')  loadPaginas();
-    if (['hospedajes','artesania','festividades','maestros','guias'].includes(sec)) cargarSimple(sec);
+    if (['hospedajes','artesania','festividades','maestros','guias','restaurantes','platos'].includes(sec)) cargarSimple(sec);
     if (sec === 'usuarios') loadUsuarios();
   };
 
@@ -2040,6 +2072,68 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         { key: 'tipo', label: 'Tipo', tipo: 'select', opciones: [['cultural','Cultural'],['viaje','Viaje']] },
       ],
     },
+    // 'restaurantes' y 'platos' NO son SQL genérico sobre JSONB como los de
+    // arriba -- son entidades TypeORM reales con su propio DTO (Zod), por
+    // eso necesitan los hooks listResponseKey/transformItem/transformBody
+    // que el resto de recursos simples no usa.
+    restaurantes: {
+      titulo: 'Restaurante', endpoint: 'restaurantes', listQuery: '?limit=200', listResponseKey: 'data',
+      itemLabel: it => it.nombre, itemSub: it => it.direccion,
+      imageField: '_foto',
+      campos: [
+        { key: 'nombre', label: 'Nombre *', placeholder: 'Restaurante Qhantati' },
+        { key: 'descripcion', label: 'Descripción', tipo: 'textarea', placeholder: '...' },
+        { key: '_foto', label: 'Foto', tipo: 'imagen' },
+        { key: 'direccion', label: 'Dirección *', placeholder: 'Av. Titicaca 123, Llachón' },
+        { key: 'latitud', label: 'Latitud *', tipo: 'numero', placeholder: '-15.6407' },
+        { key: 'longitud', label: 'Longitud *', tipo: 'numero', placeholder: '-69.8321' },
+        { key: 'whatsapp', label: 'WhatsApp', placeholder: '+51 987654321' },
+        { key: 'telefono', label: 'Teléfono', placeholder: '+51 987654321' },
+        { key: 'email_contacto', label: 'Correo de contacto', placeholder: 'contacto@restaurante.com' },
+        { key: 'tipo_comida', label: 'Tipo de comida', tipo: 'select', opciones: [['del_lago','🐟 Del lago'],['ancestral','🏺 Ancestral'],['productos_locales','🌿 Productos locales'],['bebidas','🍹 Bebidas']] },
+        { key: 'especialidades', label: 'Especialidades (separadas por coma)', placeholder: 'Trucha, Pachamanca' },
+        { key: 'precio_promedio', label: 'Precio promedio (S/)', tipo: 'numero', placeholder: '35' },
+        { key: 'capacidad_mesas', label: 'Capacidad de mesas', tipo: 'numero', placeholder: '20' },
+      ],
+      arrayFields: ['especialidades'], numberFields: ['precio_promedio', 'capacidad_mesas', 'latitud', 'longitud'],
+      transformItem: it => ({ ...it, _foto: it.fotos && it.fotos[0], latitud: it.ubicacion && it.ubicacion.latitud, longitud: it.ubicacion && it.ubicacion.longitud }),
+      transformBody: body => {
+        const { _foto, latitud, longitud, ...resto } = body;
+        if (_foto) resto.fotos = [_foto];
+        if (latitud !== undefined && longitud !== undefined) resto.ubicacion = { latitud, longitud };
+        return resto;
+      },
+    },
+    platos: {
+      titulo: 'Plato', endpoint: 'platos', needsRestauranteId: true,
+      itemLabel: it => it.nombre, itemSub: it => [it._restauranteNombre, it.categoria].filter(Boolean).join(' · '),
+      imageField: 'foto',
+      campos: [
+        { key: 'restaurante_id', label: 'Restaurante *', tipo: 'select', opcionesDinamicas: 'restaurantes' },
+        { key: 'nombre', label: 'Nombre *', placeholder: 'Trucha a la Plancha' },
+        { key: 'descripcion', label: 'Descripción', tipo: 'textarea', placeholder: '...' },
+        { key: 'precio', label: 'Precio (S/) *', tipo: 'numero', placeholder: '35' },
+        { key: 'foto', label: 'Foto', tipo: 'imagen' },
+        { key: 'categoria', label: 'Categoría', tipo: 'select', opciones: [['del_lago','🐟 Del lago'],['ancestral','🏺 Ancestral'],['bebidas','🍹 Bebidas'],['postres','🍰 Postres']] },
+        { key: 'temporada', label: 'Temporada', tipo: 'select', opciones: [['todo_el_año','Todo el año'],['verano','☀️ Verano'],['invierno','❄️ Invierno']] },
+        { key: 'ingredientes', label: 'Ingredientes (separados por coma)', placeholder: 'Trucha, papa nativa, limón' },
+      ],
+      arrayFields: ['ingredientes'], numberFields: ['precio'],
+      cargarPersonalizado: async () => {
+        const restRes = await fetch(`${API_URL}/api/restaurantes?limit=200`);
+        const restData = await restRes.json().catch(() => ({}));
+        const restaurantes = Array.isArray(restData.data) ? restData.data : [];
+        simpleDataCache.restaurantes = restaurantes;
+        const listas = await Promise.all(restaurantes.map(async r => {
+          try {
+            const res = await fetch(`${API_URL}/api/platos/restaurante/${r.id}`);
+            const data = await res.json().catch(() => []);
+            return Array.isArray(data) ? data.map(p => ({ ...p, _restauranteNombre: r.nombre })) : [];
+          } catch { return []; }
+        }));
+        return listas.flat();
+      },
+    },
   };
 
   let simpleDataCache = {};
@@ -2049,10 +2143,16 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     const cfg = RECURSOS_SIMPLES[rec];
     $(`${rec}-list`).innerHTML = '<div class="empty"><div class="ei">⏳</div><p>Cargando...</p></div>';
     try {
-      const res = await fetch(`${API_URL}/api/${cfg.endpoint}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      simpleDataCache[rec] = Array.isArray(data) ? data : [];
+      let items;
+      if (cfg.cargarPersonalizado) {
+        items = await cfg.cargarPersonalizado();
+      } else {
+        const res = await fetch(`${API_URL}/api/${cfg.endpoint}${cfg.listQuery || ''}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        items = cfg.listResponseKey ? (data[cfg.listResponseKey] || []) : (Array.isArray(data) ? data : []);
+      }
+      simpleDataCache[rec] = cfg.transformItem ? items.map(cfg.transformItem) : items;
       renderSimple(rec);
     } catch (e) {
       $(`${rec}-list`).innerHTML = `<div class="empty"><div class="ei">⚠️</div><p>No se pudo cargar: ${e.message}</p></div>`;
@@ -2082,8 +2182,8 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
             ${sub ? `<div style="font-size:12px;color:var(--cyan)">${esc(String(sub))}</div>` : ''}
           </div>
           <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
-            <button onclick="openSimpleModal('${rec}', ${it.id})" style="padding:6px 12px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit">✎ Editar</button>
-            <button onclick="deleteSimple('${rec}', ${it.id})" style="padding:6px 12px;border-radius:7px;border:1px solid rgba(248,113,113,.22);background:transparent;color:var(--red);font-size:12px;cursor:pointer;font-family:inherit">✕ Eliminar</button>
+            <button onclick="openSimpleModal('${rec}', '${it.id}')" style="padding:6px 12px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit">✎ Editar</button>
+            <button onclick="deleteSimple('${rec}', '${it.id}')" style="padding:6px 12px;border-radius:7px;border:1px solid rgba(248,113,113,.22);background:transparent;color:var(--red);font-size:12px;cursor:pointer;font-family:inherit">✕ Eliminar</button>
           </div>
         </div>
       `;
@@ -2092,6 +2192,10 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
 
   function openSimpleModal(rec, id) {
     const cfg = RECURSOS_SIMPLES[rec];
+    if (!id && cfg.needsRestauranteId && !(simpleDataCache.restaurantes || []).length) {
+      showMsg('Primero creá un restaurante en la sección "Restaurantes".', 'err');
+      return;
+    }
     simpleActivo = rec;
     const item = id ? (simpleDataCache[rec] || []).find(x => String(x.id) === String(id)) : null;
     $('simple-id').value = item ? item.id : '';
@@ -2104,7 +2208,10 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         return `<div class="fg"><label>${campo.label}</label><textarea id="simple-f-${campo.key}" rows="3" placeholder="${campo.placeholder || ''}">${esc(String(value))}</textarea></div>`;
       }
       if (campo.tipo === 'select') {
-        const opts = campo.opciones.map(([v, l]) => `<option value="${v}" ${value === v ? 'selected' : ''}>${l}</option>`).join('');
+        const opciones = campo.opcionesDinamicas
+          ? (simpleDataCache[campo.opcionesDinamicas] || []).map(x => [x.id, x.nombre])
+          : campo.opciones;
+        const opts = opciones.map(([v, l]) => `<option value="${v}" ${String(value) === String(v) ? 'selected' : ''}>${l}</option>`).join('');
         return `<div class="fg"><label>${campo.label}</label><select id="simple-f-${campo.key}"><option value="">Seleccionar</option>${opts}</select></div>`;
       }
       if (campo.tipo === 'imagen') {
@@ -2162,13 +2269,18 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       }
     }
     if (!body[cfg.campos[0].key]) { showMsg(`El campo "${cfg.campos[0].label}" es obligatorio`, 'err'); return; }
+    if (rec === 'restaurantes' && !id && (!body.latitud || !body.longitud)) {
+      showMsg('Latitud y longitud son obligatorias para crear un restaurante', 'err'); return;
+    }
+    const bodyFinal = cfg.transformBody ? cfg.transformBody(body) : body;
     try {
       const res = await fetch(`${API_URL}/api/${cfg.endpoint}${id ? '/' + id : ''}`, {
         method: id ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN },
-        body: JSON.stringify(body),
+        body: JSON.stringify(bodyFinal),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || data.mensaje || `HTTP ${res.status}`);
       closeSimpleModal();
       showMsg(id ? `${cfg.titulo} actualizado` : `${cfg.titulo} creado`);
       cargarSimple(rec);

@@ -9,7 +9,7 @@ class PlatoControlador {
         try {
             const datos = CrearPlatoDTO.parse(req.body);
             const usuarioId = req.usuario.id;
-            const resultado = await platoService.crear(datos, usuarioId);
+            const resultado = await platoService.crear(datos, usuarioId, req.usuario.rol);
             res.status(201).json(resultado);
         } catch (error) {
             next(error);
@@ -41,7 +41,7 @@ class PlatoControlador {
             const { id } = req.params;
             const datos = ActualizarPlatoDTO.parse(req.body);
             const usuarioId = req.usuario.id;
-            const resultado = await platoService.actualizar(id, datos, usuarioId);
+            const resultado = await platoService.actualizar(id, datos, usuarioId, req.usuario.rol);
             res.json(resultado);
         } catch (error) {
             next(error);
@@ -52,7 +52,7 @@ class PlatoControlador {
         try {
             const { id } = req.params;
             const usuarioId = req.usuario.id;
-            await platoService.eliminar(id, usuarioId);
+            await platoService.eliminar(id, usuarioId, req.usuario.rol);
             res.status(204).send();
         } catch (error) {
             next(error);

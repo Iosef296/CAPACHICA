@@ -82,9 +82,9 @@ export type Restaurante = {
   nombre: string;
   descripcion?: string;
   direccion?: string;
-  imagen?: string;
-  galeria?: string[];
-  rating?: number;
+  fotos?: string[];
+  tipo_comida?: string;
+  precio_promedio?: number;
 };
 
 export type Actividad = {
@@ -117,7 +117,24 @@ export const api = {
   // El backend envuelve la lista en { data: [...] } / { actividades: [...] } — desenvolvemos.
   restaurantes: () => cachedGet<Restaurante[]>('/restaurantes', [], r => (Array.isArray(r) ? r : r?.data ?? [])),
   actividades: () => cachedGet<Actividad[]>('/actividades', [], r => (Array.isArray(r) ? r : r?.actividades ?? [])),
-  platos: () => get<any[]>('/platos', []),
+  // No hay GET /platos global en el backend -- solo por restaurante. Traemos
+  // los restaurantes reales y juntamos sus platos.
+  platos: async (): Promise<any[]> => {
+    if (!API_BASE) return [];
+    try {
+      const restRes = await fetch(`${API_BASE}/restaurantes?limit=200`);
+      const restData = await restRes.json().catch(() => ({}));
+      const restaurantes = Array.isArray(restData?.data) ? restData.data : [];
+      const listas = await Promise.all(restaurantes.map(async (r: any) => {
+        try {
+          const res = await fetch(`${API_BASE}/platos/restaurante/${r.id}`);
+          const data = await res.json().catch(() => []);
+          return Array.isArray(data) ? data.map((p: any) => ({ ...p, restaurante_nombre: r.nombre })) : [];
+        } catch { return []; }
+      }));
+      return listas.flat();
+    } catch { return []; }
+  },
   talleres: () => get<any[]>('/talleres', []),
   // Endpoints que aún no responden — fallback a mock
   stories: () => get('/stories', mock.stories),
@@ -184,7 +201,7 @@ export const api = {
 // (guardado en login/registro) para crear/editar/eliminar SOLO lo
 // que uno mismo creó (o cualquier cosa, si eres admin — lo valida el
 // backend, no el mobile).
-export type TipoNegocio = 'comunidades' | 'hospedajes' | 'artesania' | 'festividades' | 'maestros' | 'guias';
+export type TipoNegocio = 'comunidades' | 'hospedajes' | 'artesania' | 'festividades' | 'maestros' | 'guias' | 'restaurantes' | 'platos';
 
 // El accessToken dura 1h (ver backend/config/autenticacion.js). Si una
 // llamada autenticada vuelve 401, probamos renovarlo con el refreshToken
@@ -289,9 +306,30 @@ export const usuariosAdmin = {
 
 export const negocios = {
   // Trae TODO el recurso (sin transformar/cachear) y filtra por dueño en el cliente.
+  // 'restaurantes' es la excepción -- backend TypeORM real con DTOs propios,
+  // no el CRUD genérico sobre JSONB que usan comunidades/hospedajes/etc.
   listarPropios: async (tipo: TipoNegocio, usuarioId: string): Promise<any[]> => {
     if (!API_BASE) return [];
     try {
+      if (tipo === 'restaurantes') {
+        const res = await fetch(`${API_BASE}/restaurantes?limit=200`);
+        const data = await res.json().catch(() => ({}));
+        const lista = Array.isArray(data?.data) ? data.data : [];
+        return lista.filter((it: any) => String(it.usuario_id) === String(usuarioId));
+      }
+      // Los platos no tienen listado global -- solo por restaurante. Buscamos
+      // los restaurantes propios y juntamos sus platos.
+      if (tipo === 'platos') {
+        const misRestaurantes = await negocios.listarPropios('restaurantes', usuarioId);
+        const listas = await Promise.all(misRestaurantes.map(async (r: any) => {
+          try {
+            const res = await fetch(`${API_BASE}/platos/restaurante/${r.id}`);
+            const data = await res.json().catch(() => []);
+            return Array.isArray(data) ? data : [];
+          } catch { return []; }
+        }));
+        return listas.flat();
+      }
       const res = await fetch(`${API_BASE}/${tipo}`);
       const data = await res.json().catch(() => []);
       return (Array.isArray(data) ? data : []).filter((it: any) => String(it.usuario_id) === String(usuarioId));

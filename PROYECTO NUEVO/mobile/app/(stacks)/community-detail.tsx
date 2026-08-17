@@ -57,7 +57,6 @@ export default function CommunityDetail() {
   const ubicacion = community.comunidad ?? 'Península de Capachica';
   const descripcion = community.desc ?? community.description ?? '';
   const highlight = community.highlight ?? '';
-  const tags: string[] = Array.isArray(community.tags) ? community.tags : [];
   const imagen = community.imagen ?? community.image ?? COVER_FALLBACK;
   const imagenes: string[] = Array.isArray(community.imagenes) ? community.imagenes : [];
   const precio: number | null = community.precio ?? null;
@@ -108,11 +107,11 @@ export default function CommunityDetail() {
         </View>
       </ImageBackground>
 
-      {tags.length > 0 && (
+      {actividades.length > 0 && (
         <View style={styles.tagsRow}>
-          {tags.map(tag => (
-            <View key={tag} style={styles.tagChip}>
-              <Text style={[typography.labelSm, { color: colors.primary }]}>{tag}</Text>
+          {actividades.map(a => (
+            <View key={a} style={styles.tagChip}>
+              <Text style={[typography.labelSm, { color: colors.primary }]}>{a}</Text>
             </View>
           ))}
         </View>
@@ -146,32 +145,16 @@ export default function CommunityDetail() {
         </View>
       )}
 
-      {(servicios.length > 0 || actividades.length > 0) && (
+      {servicios.length > 0 && (
         <View style={styles.section}>
-          {servicios.length > 0 && (
-            <>
-              <Text style={[typography.labelMd, { color: colors.onSurfaceVariant }]}>SERVICIOS</Text>
-              <View style={styles.chipsWrap}>
-                {servicios.map(s => (
-                  <View key={s} style={styles.tagChip}>
-                    <Text style={[typography.labelSm, { color: colors.primary }]}>{s}</Text>
-                  </View>
-                ))}
+          <Text style={[typography.labelMd, { color: colors.onSurfaceVariant }]}>SERVICIOS</Text>
+          <View style={styles.chipsWrap}>
+            {servicios.map(s => (
+              <View key={s} style={styles.tagChip}>
+                <Text style={[typography.labelSm, { color: colors.primary }]}>{s}</Text>
               </View>
-            </>
-          )}
-          {actividades.length > 0 && (
-            <>
-              <Text style={[typography.labelMd, { color: colors.onSurfaceVariant, marginTop: servicios.length > 0 ? spacing.stackSm : 0 }]}>ACTIVIDADES</Text>
-              <View style={styles.chipsWrap}>
-                {actividades.map(a => (
-                  <View key={a} style={styles.tagChip}>
-                    <Text style={[typography.labelSm, { color: colors.primary }]}>{a}</Text>
-                  </View>
-                ))}
-              </View>
-            </>
-          )}
+            ))}
+          </View>
         </View>
       )}
 

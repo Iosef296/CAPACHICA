@@ -35,7 +35,10 @@ export default function Home() {
   useThemeMode(); // se resuscribe para repintar en vivo al cambiar tema
 
   function refreshHistorias() {
-    historiasApi.listar().then(setHistoriasList);
+    // Filtra historias con media_url vacío -- datos corruptos (upload
+    // fallido, fila vieja sin la validación del backend) no deben ni
+    // aparecer en el feed, mucho menos abrirse en pantalla negra.
+    historiasApi.listar().then(list => setHistoriasList(list.filter(h => !!h.media_url)));
     if (user) historiasApi.misLikes().then(setLikedIds);
   }
 

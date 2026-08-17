@@ -9,13 +9,13 @@ class PlatoService {
         this.restauranteRepo = AppDataSource.getRepository(Restaurante);
     }
 
-    async crear(datos, usuarioId) {
+    async crear(datos, usuarioId, usuarioRol) {
         // Verificar que el usuario sea dueño del restaurante o admin
         const restaurante = await this.restauranteRepo.findOne({ where: { id: datos.restaurante_id } });
         if (!restaurante) {
             throw new Error('Restaurante no encontrado');
         }
-        if (restaurante.usuario_id !== usuarioId && req.usuario.rol !== 'admin') {
+        if (restaurante.usuario_id !== usuarioId && usuarioRol !== 'admin') {
             throw new Error('No tienes permiso para crear platos en este restaurante');
         }
 
@@ -39,14 +39,14 @@ class PlatoService {
         return this._formatearRespuesta(plato);
     }
 
-    async actualizar(id, datos, usuarioId) {
+    async actualizar(id, datos, usuarioId, usuarioRol) {
         const plato = await this.platoRepo.findOne({ where: { id } });
         if (!plato) {
             throw new Error('Plato no encontrado');
         }
         // Verificar dueño o admin
         const restaurante = await this.restauranteRepo.findOne({ where: { id: plato.restaurante_id } });
-        if (restaurante.usuario_id !== usuarioId && req.usuario.rol !== 'admin') {
+        if (restaurante.usuario_id !== usuarioId && usuarioRol !== 'admin') {
             throw new Error('No tienes permiso para actualizar este plato');
         }
 
@@ -56,13 +56,13 @@ class PlatoService {
         return this._formatearRespuesta(actualizado);
     }
 
-    async eliminar(id, usuarioId) {
+    async eliminar(id, usuarioId, usuarioRol) {
         const plato = await this.platoRepo.findOne({ where: { id } });
         if (!plato) {
             throw new Error('Plato no encontrado');
         }
         const restaurante = await this.restauranteRepo.findOne({ where: { id: plato.restaurante_id } });
-        if (restaurante.usuario_id !== usuarioId && req.usuario.rol !== 'admin') {
+        if (restaurante.usuario_id !== usuarioId && usuarioRol !== 'admin') {
             throw new Error('No tienes permiso para eliminar este plato');
         }
         await this.platoRepo.remove(plato);

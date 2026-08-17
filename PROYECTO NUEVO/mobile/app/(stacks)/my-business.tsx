@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -10,11 +10,16 @@ import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
-type FieldCfg = { key: string; label: string; placeholder?: string; multiline?: boolean };
+type FieldCfg = { key: string; label: string; placeholder?: string; multiline?: boolean; options?: string[] };
 type TipoCfg = {
   key: TipoNegocio; label: string; icon: keyof typeof MaterialIcons.glyphMap;
-  imageField: string; itemLabel: (it: any) => string; fields: FieldCfg[];
+  // Sin imageField (caso de 'restaurantes') el negocio no tiene foto de
+  // portada propia -- se usa la galería `fotos` como reemplazo.
+  imageField?: string; itemLabel: (it: any) => string; fields: FieldCfg[];
   arrayFields?: string[]; numberFields?: string[];
+  // 'platos' no existe suelto -- pertenece a un restaurante propio, hay
+  // que elegir cuál antes de poder guardar.
+  needsRestauranteId?: boolean;
 };
 
 const TIPOS: TipoCfg[] = [
@@ -88,12 +93,44 @@ const TIPOS: TipoCfg[] = [
     ],
     arrayFields: ['tags'],
   },
+  {
+    key: 'restaurantes', label: 'Restaurante', icon: 'restaurant', itemLabel: it => it.nombre,
+    fields: [
+      { key: 'nombre', label: 'Nombre', placeholder: 'Restaurante Qhantati' },
+      { key: 'descripcion', label: 'Descripción', multiline: true },
+      { key: 'direccion', label: 'Dirección', placeholder: 'Av. Titicaca 123, Llachón' },
+      { key: 'latitud', label: 'Latitud', placeholder: '-15.6407' },
+      { key: 'longitud', label: 'Longitud', placeholder: '-69.8321' },
+      { key: 'whatsapp', label: 'WhatsApp', placeholder: '+51 987654321' },
+      { key: 'telefono', label: 'Teléfono', placeholder: '+51 987654321' },
+      { key: 'email_contacto', label: 'Correo de contacto', placeholder: 'contacto@restaurante.com' },
+      { key: 'tipo_comida', label: 'Tipo de comida', options: ['del_lago', 'ancestral', 'productos_locales', 'bebidas'] },
+      { key: 'especialidades', label: 'Especialidades (separadas por coma)', placeholder: 'Trucha, Pachamanca' },
+      { key: 'precio_promedio', label: 'Precio promedio (S/)', placeholder: '35' },
+      { key: 'capacidad_mesas', label: 'Capacidad de mesas', placeholder: '20' },
+    ],
+    arrayFields: ['especialidades'], numberFields: ['precio_promedio', 'capacidad_mesas'],
+  },
+  {
+    key: 'platos', label: 'Plato', icon: 'lunch-dining', imageField: 'foto', itemLabel: it => it.nombre,
+    needsRestauranteId: true,
+    fields: [
+      { key: 'nombre', label: 'Nombre', placeholder: 'Trucha a la Plancha' },
+      { key: 'descripcion', label: 'Descripción', multiline: true },
+      { key: 'precio', label: 'Precio (S/)', placeholder: '35' },
+      { key: 'categoria', label: 'Categoría', options: ['del_lago', 'ancestral', 'bebidas', 'postres'] },
+      { key: 'temporada', label: 'Temporada', options: ['todo_el_año', 'verano', 'invierno'] },
+      { key: 'ingredientes', label: 'Ingredientes (separados por coma)', placeholder: 'Trucha, papa nativa, limón' },
+    ],
+    arrayFields: ['ingredientes'], numberFields: ['precio'],
+  },
 ];
 
 export default function MyBusiness() {
   const { user, refreshProfile } = useAuth();
   const [tipoIdx, setTipoIdx] = useState(0);
   const [items, setItems] = useState<any[]>([]);
+  const [misRestaurantes, setMisRestaurantes] = useState<any[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [edit, setEdit] = useState<any>({});
   const [saving, setSaving] = useState(false);
@@ -105,9 +142,17 @@ export default function MyBusiness() {
 
   const canManage = user?.rol === 'admin' || user?.rol === 'proveedor';
 
-  useLiveRefresh(() => {
-    if (canManage && user) negocios.listarPropios(cfg.key, user.id).then(setItems);
-  }, { url: API_WS, channels: TIPOS.map(t => t.key) });
+  function refreshItems() {
+    if (!canManage || !user) return;
+    negocios.listarPropios(cfg.key, user.id).then(setItems);
+    if (cfg.needsRestauranteId) negocios.listarPropios('restaurantes', user.id).then(setMisRestaurantes);
+  }
+
+  // Recarga al cambiar de pestaña -- useLiveRefresh de abajo solo dispara
+  // al enfocar la pantalla o por WS, no en cada tap de TIPOS.
+  useEffect(refreshItems, [tipoIdx, user?.id]);
+
+  useLiveRefresh(refreshItems, { url: API_WS, channels: TIPOS.map(t => t.key) });
 
   if (!canManage) {
     return (
@@ -132,18 +177,31 @@ export default function MyBusiness() {
   }
 
   function openNew() {
-    setEdit({});
+    if (cfg.needsRestauranteId && misRestaurantes.length === 0) {
+      Alert.alert('Primero creá un restaurante', 'Andá a la pestaña "Restaurante" y creá uno antes de agregar platos.');
+      return;
+    }
+    setEdit(cfg.needsRestauranteId ? { restaurante_id: misRestaurantes[0]?.id } : {});
     setModalOpen(true);
   }
 
   function openEdit(item: any) {
     const copy = { ...item };
+    if (cfg.key === 'restaurantes' && item.ubicacion) {
+      copy.latitud = item.ubicacion.latitud ?? '';
+      copy.longitud = item.ubicacion.longitud ?? '';
+    }
     (cfg.arrayFields || []).forEach(f => { if (Array.isArray(copy[f])) copy[f] = copy[f].join(', '); });
     setEdit(copy);
     setModalOpen(true);
   }
 
+  function coverUrl(item: any): string | undefined {
+    return cfg.imageField ? item[cfg.imageField] : item.fotos?.[0];
+  }
+
   async function pickImage() {
+    if (!cfg.imageField) return;
     const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!perm.granted) { Alert.alert('Permiso necesario', 'Habilita el acceso a tus fotos para subir una imagen.'); return; }
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8 });
@@ -151,7 +209,7 @@ export default function MyBusiness() {
     setUploading(true);
     try {
       const url = await subirFoto(result.assets[0].uri);
-      setEdit((p: any) => ({ ...p, [cfg.imageField]: url }));
+      setEdit((p: any) => ({ ...p, [cfg.imageField as string]: url }));
     } catch (e) {
       Alert.alert('Error', (e as Error).message);
     } finally {
@@ -204,13 +262,28 @@ export default function MyBusiness() {
     (cfg.numberFields || []).forEach(f => {
       if (body[f] !== undefined && body[f] !== '') body[f] = Number(body[f]);
     });
+    if (cfg.key === 'restaurantes') {
+      if (!edit.id && (!body.latitud || !body.longitud)) {
+        Alert.alert('Falta la ubicación', 'Completa latitud y longitud.');
+        return;
+      }
+      if (body.latitud && body.longitud) {
+        body.ubicacion = { latitud: Number(body.latitud), longitud: Number(body.longitud) };
+      }
+      delete body.latitud;
+      delete body.longitud;
+    }
+    if (cfg.needsRestauranteId && !body.restaurante_id) {
+      Alert.alert('Falta el restaurante', 'Elegí a qué restaurante pertenece este plato.');
+      return;
+    }
     if (!body[cfg.fields[0].key]) { Alert.alert('Falta información', `Completa "${cfg.fields[0].label}".`); return; }
     setSaving(true);
     try {
       if (edit.id) await negocios.editar(cfg.key, edit.id, body);
       else await negocios.crear(cfg.key, body);
       setModalOpen(false);
-      if (user) negocios.listarPropios(cfg.key, user.id).then(setItems);
+      refreshItems();
     } catch (e) {
       Alert.alert('Error al guardar', (e as Error).message);
     } finally {
@@ -262,8 +335,8 @@ export default function MyBusiness() {
             </Text>
           ) : items.map(item => (
             <View key={item.id} style={[styles.card, shadows.card]}>
-              {item[cfg.imageField] ? (
-                <Image source={{ uri: item[cfg.imageField] }} style={styles.thumb} />
+              {coverUrl(item) ? (
+                <Image source={{ uri: coverUrl(item) }} style={styles.thumb} />
               ) : (
                 <View style={[styles.thumb, styles.thumbFallback]}>
                   <MaterialIcons name={cfg.icon} size={24} color={colors.onSurfaceVariant} />
@@ -297,17 +370,38 @@ export default function MyBusiness() {
               </Pressable>
             </View>
             <ScrollView contentContainerStyle={{ gap: spacing.gutter, paddingBottom: spacing.stackMd }}>
-              <View style={{ alignItems: 'center', gap: 8 }}>
-                {edit[cfg.imageField] && (
-                  <Image source={{ uri: edit[cfg.imageField] }} style={{ width: 120, height: 120, borderRadius: radii.md }} />
-                )}
-                <Pressable onPress={pickImage} style={styles.photoBtn} disabled={uploading}>
-                  <MaterialIcons name="add-a-photo" size={18} color={colors.secondary} />
-                  <Text style={[typography.labelSm, { color: colors.secondary }]}>
-                    {uploading ? 'Subiendo…' : 'Subir foto'}
-                  </Text>
-                </Pressable>
-              </View>
+              {!!cfg.imageField && (
+                <View style={{ alignItems: 'center', gap: 8 }}>
+                  {!!coverUrl(edit) && (
+                    <Image source={{ uri: coverUrl(edit) }} style={{ width: 120, height: 120, borderRadius: radii.md }} />
+                  )}
+                  <Pressable onPress={pickImage} style={styles.photoBtn} disabled={uploading}>
+                    <MaterialIcons name="add-a-photo" size={18} color={colors.secondary} />
+                    <Text style={[typography.labelSm, { color: colors.secondary }]}>
+                      {uploading ? 'Subiendo…' : 'Subir foto'}
+                    </Text>
+                  </Pressable>
+                </View>
+              )}
+
+              {cfg.needsRestauranteId && (
+                <View style={{ gap: 8 }}>
+                  <Text style={[typography.labelMd, { color: colors.onSurfaceVariant }]}>Restaurante</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                    {misRestaurantes.map(r => (
+                      <Pressable
+                        key={r.id}
+                        onPress={() => setEdit((p: any) => ({ ...p, restaurante_id: r.id }))}
+                        style={[styles.optionChip, edit.restaurante_id === r.id && styles.optionChipActive]}
+                      >
+                        <Text style={[typography.labelSm, { color: edit.restaurante_id === r.id ? colors.onPrimary : colors.onSurfaceVariant }]}>
+                          {r.nombre}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
 
               <View style={{ gap: 8 }}>
                 <Text style={[typography.labelMd, { color: colors.onSurfaceVariant }]}>Fotos adicionales</Text>
@@ -354,14 +448,30 @@ export default function MyBusiness() {
               {cfg.fields.map(f => (
                 <View key={f.key}>
                   <Text style={[typography.labelMd, { color: colors.onSurfaceVariant, marginBottom: 4 }]}>{f.label}</Text>
-                  <TextInput
-                    value={edit[f.key] != null ? String(edit[f.key]) : ''}
-                    onChangeText={v => setEdit((p: any) => ({ ...p, [f.key]: v }))}
-                    placeholder={f.placeholder}
-                    placeholderTextColor={colors.outline}
-                    multiline={f.multiline}
-                    style={[styles.input, f.multiline && { height: 80, textAlignVertical: 'top' }]}
-                  />
+                  {f.options ? (
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                      {f.options.map(opt => (
+                        <Pressable
+                          key={opt}
+                          onPress={() => setEdit((p: any) => ({ ...p, [f.key]: opt }))}
+                          style={[styles.optionChip, edit[f.key] === opt && styles.optionChipActive]}
+                        >
+                          <Text style={[typography.labelSm, { color: edit[f.key] === opt ? colors.onPrimary : colors.onSurfaceVariant }]}>
+                            {opt}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </ScrollView>
+                  ) : (
+                    <TextInput
+                      value={edit[f.key] != null ? String(edit[f.key]) : ''}
+                      onChangeText={v => setEdit((p: any) => ({ ...p, [f.key]: v }))}
+                      placeholder={f.placeholder}
+                      placeholderTextColor={colors.outline}
+                      multiline={f.multiline}
+                      style={[styles.input, f.multiline && { height: 80, textAlignVertical: 'top' }]}
+                    />
+                  )}
                 </View>
               ))}
 
@@ -386,6 +496,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceContainerLowest, borderWidth: 1, borderColor: colors.outlineVariant,
   },
   chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+  optionChip: {
+    paddingHorizontal: 14, paddingVertical: 8, borderRadius: radii.full,
+    backgroundColor: colors.surfaceContainerLowest, borderWidth: 1, borderColor: colors.outlineVariant,
+  },
+  optionChipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
   newBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
     backgroundColor: colors.primary, borderRadius: radii.full, paddingVertical: 14,

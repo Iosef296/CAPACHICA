@@ -9,6 +9,7 @@ import { Historia } from '@/data/api';
 import { colors, spacing, typography } from '@/theme';
 
 const PHOTO_DURATION_MS = 5000;
+const BROKEN_MEDIA_DURATION_MS = 2500;
 const LONG_PRESS_MS = 220;
 const DOUBLE_TAP_MS = 280;
 
@@ -28,7 +29,11 @@ export function StoryViewer({ group, index, onClose, onNext, onPrev, liked, onTo
   const insets = useSafeInsets();
   const progress = useRef(new Animated.Value(0)).current;
   const [videoDurationMs, setVideoDurationMs] = useState<number | null>(null);
+  const [mediaError, setMediaError] = useState(false);
   const historia = group?.[index] ?? null;
+  // Sin url no hay nada que cargar -- tratalo como error directo, no como
+  // pantalla negra esperando un Image que nunca va a disparar onError.
+  const broken = mediaError || !historia?.media_url;
 
   const pausedValueRef = useRef(0);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -61,15 +66,25 @@ export function StoryViewer({ group, index, onClose, onNext, onPrev, liked, onTo
     if (!historia) return;
     progress.setValue(0);
     setVideoDurationMs(null);
+    setMediaError(!historia.media_url);
     scale.value = 1;
     savedScale.value = 1;
     heartScale.value = 0;
     heartOpacity.value = 0;
 
-    if (historia.tipo === 'foto') {
+    if (historia.tipo === 'foto' && historia.media_url) {
       const anim = startProgressAnim(0, PHOTO_DURATION_MS);
       return () => anim.stop();
     }
+  }, [historia?.id]);
+
+  // Sin media_url no hay nada que cargar ni reproducir (dato corrupto que
+  // se coló antes de que el backend lo validara) -- avanza sola en vez de
+  // quedarse trabada mostrando el aviso de error para siempre.
+  useEffect(() => {
+    if (!historia || historia.media_url) return;
+    const t = setTimeout(() => onNext(), BROKEN_MEDIA_DURATION_MS);
+    return () => clearTimeout(t);
   }, [historia?.id]);
 
   useEffect(() => {
@@ -77,6 +92,8 @@ export function StoryViewer({ group, index, onClose, onNext, onPrev, liked, onTo
     const sub = player.addListener('statusChange', ({ status }) => {
       if (status === 'readyToPlay' && player.duration) {
         setVideoDurationMs(player.duration * 1000);
+      } else if (status === 'error') {
+        setMediaError(true);
       }
     });
     const endSub = player.addListener('playToEnd', () => onNext());
@@ -169,8 +186,20 @@ export function StoryViewer({ group, index, onClose, onNext, onPrev, liked, onTo
       <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#000' }}>
         <GestureDetector gesture={pinchGesture}>
           <ReanimatedAnimated.View style={[StyleSheet.absoluteFillObject, zoomStyle]}>
-            {historia.tipo === 'foto' ? (
-              <Image source={{ uri: historia.media_url }} style={StyleSheet.absoluteFillObject} resizeMode="contain" />
+            {broken ? (
+              <View style={[StyleSheet.absoluteFillObject, styles.brokenMedia]}>
+                <MaterialIcons name="image-not-supported" size={48} color="rgba(255,255,255,0.6)" />
+                <Text style={[typography.bodyMd, { color: 'rgba(255,255,255,0.6)', marginTop: spacing.stackSm }]}>
+                  No se pudo cargar este contenido
+                </Text>
+              </View>
+            ) : historia.tipo === 'foto' ? (
+              <Image
+                source={{ uri: historia.media_url }}
+                style={StyleSheet.absoluteFillObject}
+                resizeMode="contain"
+                onError={() => setMediaError(true)}
+              />
             ) : (
               <VideoView player={player} style={StyleSheet.absoluteFillObject} contentFit="contain" nativeControls={false} />
             )}
@@ -246,6 +275,7 @@ export function StoryViewer({ group, index, onClose, onNext, onPrev, liked, onTo
 
 const styles = StyleSheet.create({
   heart: { position: 'absolute', width: 80, height: 80 },
+  brokenMedia: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.containerPadding },
   top: { position: 'absolute', top: 0, left: 0, right: 0, paddingHorizontal: spacing.containerPadding, gap: spacing.stackSm },
   segments: { flexDirection: 'row', gap: 4 },
   progressTrack: { flex: 1, height: 3, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.3)', overflow: 'hidden' },

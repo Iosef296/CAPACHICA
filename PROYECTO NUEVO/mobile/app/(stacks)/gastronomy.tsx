@@ -5,22 +5,27 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { Chip } from '@/components/Chip';
-import { dishes } from '@/data/mock';
 import { api, API_WS, Restaurante } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
-const TABS_DEFAULT = ['Todo', 'Platos Fuertes', 'Sopas', 'Tradición Viva'];
+const TODO = 'Todo';
 
 export default function Gastronomy() {
   const cfg = useAppConfig();
-  const TABS: string[] = cfg.json('gastronomy.tabs', TABS_DEFAULT);
-  const [tab, setTab] = useState('Todo');
+  const [tab, setTab] = useState(TODO);
   const [restaurantes, setRestaurantes] = useState<Restaurante[]>([]);
+  const [dishes, setDishes] = useState<any[]>([]);
   const [pastHero, setPastHero] = useState(false);
   const insets = useSafeInsets();
-  useLiveRefresh(() => { api.restaurantes().then(setRestaurantes); }, { url: API_WS, channels: 'restaurantes' });
+  useLiveRefresh(() => {
+    api.restaurantes().then(setRestaurantes);
+    api.platos().then(setDishes);
+  }, { url: API_WS, channels: ['restaurantes', 'platos'] });
+  // Pestañas armadas con las categorías reales que traen los platos --
+  // nada de rótulos inventados que no correspondan a ningún dato real.
+  const TABS = [TODO, ...Array.from(new Set(dishes.map(d => d.categoria).filter(Boolean)))];
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
     <ScrollView
@@ -41,18 +46,27 @@ export default function Gastronomy() {
       </ScrollView>
 
       <View style={styles.list}>
-        {dishes.filter(d => tab === 'Todo' || (d as any).tipo === tab).map(d => (
+        {dishes.length === 0 && (
+          <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, textAlign: 'center', paddingVertical: spacing.stackMd, fontStyle: 'italic' }]}>
+            Todavía no hay platos cargados.
+          </Text>
+        )}
+        {dishes.filter(d => tab === TODO || d.categoria === tab).map(d => (
           <View key={d.id} style={styles.card}>
-            <Image source={{ uri: d.img }} style={styles.img} />
+            {!!d.foto && <Image source={{ uri: d.foto }} style={styles.img} />}
             <View style={styles.body}>
-              <Text style={[typography.headlineMd, { color: colors.onSurface }]}>{d.name}</Text>
-              <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, marginTop: 4 }]}>{d.desc}</Text>
-              <View style={styles.tag}>
-                <MaterialIcons name="auto-awesome" size={14} color={colors.sunGold} />
-                <Text style={[typography.labelSm, { color: colors.onPrimaryContainer }]}>
-                  {cfg.text('gastronomy.intiTag', 'Inti: Pruébalo en Asoc. Tikarani')}
-                </Text>
-              </View>
+              <Text style={[typography.headlineMd, { color: colors.onSurface }]}>{d.nombre}</Text>
+              {!!d.descripcion && (
+                <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, marginTop: 4 }]}>{d.descripcion}</Text>
+              )}
+              {!!d.restaurante_nombre && (
+                <View style={styles.tag}>
+                  <MaterialIcons name="storefront" size={14} color={colors.sunGold} />
+                  <Text style={[typography.labelSm, { color: colors.onPrimaryContainer }]}>
+                    {d.restaurante_nombre}{d.precio != null ? ` · S/ ${d.precio}` : ''}
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
         ))}
@@ -64,7 +78,7 @@ export default function Gastronomy() {
           <View style={styles.list}>
             {restaurantes.slice(0, 5).map(r => (
               <View key={r.id} style={[styles.card, { flexDirection: 'row', alignItems: 'center' }]}>
-                {r.imagen && <Image source={{ uri: r.imagen }} style={{ width: 80, height: 80, borderRadius: radii.md, margin: spacing.gutter }} />}
+                {!!r.fotos?.[0] && <Image source={{ uri: r.fotos[0] }} style={{ width: 80, height: 80, borderRadius: radii.md, margin: spacing.gutter }} />}
                 <View style={{ flex: 1, padding: spacing.gutter, gap: 4 }}>
                   <Text style={[typography.headlineMd, { color: colors.onSurface }]} numberOfLines={1}>{r.nombre}</Text>
                   {r.direccion && <Text style={[typography.labelSm, { color: colors.onSurfaceVariant }]} numberOfLines={1}>{r.direccion}</Text>}

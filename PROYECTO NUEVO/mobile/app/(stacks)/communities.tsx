@@ -46,9 +46,9 @@ export default function Communities() {
         )}
 
         <View style={styles.grid}>
-          {filtradas.map((c, i) => (
+          {filtradas.map(c => (
             <Pressable key={c.id} onPress={() => router.push({ pathname: '/(stacks)/community-detail', params: { id: c.id } })}
-              style={[styles.card, i === 0 && styles.featured]}>
+              style={[styles.card, !!(c as any).destacado && styles.featured]}>
               <View>
                 <Image source={{ uri: c.image }} style={styles.cardImg} />
                 {!!(c as any).video && (
@@ -58,7 +58,7 @@ export default function Communities() {
                 )}
               </View>
               <View style={styles.cardBody}>
-                {i === 0 && <Text style={styles.popular}>{cfg.text('communities.badgePopular', 'MÁS POPULAR')}</Text>}
+                {!!(c as any).destacado && <Text style={styles.popular}>{cfg.text('communities.badgePopular', 'MÁS POPULAR')}</Text>}
                 <Text style={[typography.headlineMd, { color: colors.onSurface }]}>{c.name}</Text>
                 <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant }]} numberOfLines={2}>
                   {c.description}
