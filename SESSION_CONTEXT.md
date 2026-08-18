@@ -1,5 +1,174 @@
 # Session Context — Capachica Turismo
 
+## SESIÓN 17 ago 2026 (cont., tarde) — Railway redeploy confirmado, unifica Hospedajes+Familias, fix bug de layout mobile
+
+Continuación de la sesión de arriba, mismo día, vía Claude Code con Chrome
+extension habilitada (permitió operar Railway dashboard directo).
+
+### 1. Railway ya había redeployado — causa raíz: incidente externo
+- Al arrancar la sesión, `admin.astro` en producción seguía sin
+  "Restaurantes"/"Platos" pese a los pushes `e7cdc631`/`140dc01d` del
+  bloque anterior. Con Chrome extension se entró al dashboard de Railway
+  y se confirmó: **2 incidentes activos en Railway/GitHub** (status.railway.com,
+  17 ago ~13:59-19:52 UTC — "GitHub is experiencing elevated error rates"
+  + "Deployments queued longer than usual"). Los deploys de `e7cdc631` y
+  `140dc01d` habían **FAILED** (build ni siquiera arrancaba, solo
+  reintentos de scheduling en 4 builders distintos, sin error de código
+  real) y el último commit (`df2f32e3`, docs) estaba **QUEUED**.
+- No hubo que hacer nada: mientras se investigaba, la cola de Railway se
+  destrabó sola y los 3 servicios (`capachica-backend`, `capachica-frontend`,
+  `capachica-ia`) pasaron a BUILDING → Online con el código correcto.
+  Confirmado visualmente en el admin de producción: sidebar ya con
+  "Restaurantes"/"Platos".
+- **Lección para la próxima vez que "Railway no deployó"**: chequear
+  primero `https://status.railway.com` antes de asumir bug propio — si
+  hay incidente, esperar y como mucho forzar un "Redeploy" manual desde
+  el dashboard del servicio (Deployments → "⋮" en el deploy → Redeploy)
+  una vez que el incidente se resuelva.
+
+### 2. Unificados "Hospedajes" y "Familias" — eran dos recursos redundantes
+Pedido del usuario: "junta hospedajes y familia tanto en la pagina como
+en el app". Investigación previa reveló que existían **dos fuentes de
+datos separadas y desincronizadas** para el mismo concepto (familia
+anfitriona / hospedaje vivencial):
+- `comunidades` (tabla real, ~21 filas reales cargadas por el admin,
+  campos ricos: precio/capacidad/habitaciones/comidas/servicios/
+  actividades/idiomas/whatsapp/fotos/video) — sección "Familias" en
+  admin.astro (`openDestinoModal`).
+- `hospedajes` (tabla JSONB genérica, solo **3 filas de demo/mock**
+  literalmente inventadas — "Posada de Doña Paula", "Eco-Refugio Ccotos",
+  "Hospedaje Samary", las mismas que aparecían hardcodeadas en el
+  fallback del chatbot `mobile/src/data/inti.ts`) — sección "Hospedajes"
+  separada en admin.astro (RECURSOS_SIMPLES genérico).
+
+Decisión: `comunidades` queda como **única fuente**, se elimina
+`hospedajes` por completo (ruta, tabla en init.sql, seed). Cambios
+(commits `c533d843`, `0c9c15d2`, `6a778e82`, todos pusheados a `main`):
+
+**Backend**
+- `backend/rutas/contenido/contenido.rutas.js`, `app.js`: sacado
+  `hospedajesRoutes` / `app.use('/api/hospedajes', ...)`.
+- `backend/db/init.sql`: sacado `CREATE TABLE hospedajes`.
+- `backend/db/seed_contenido.js`: sacado del array `RECURSOS` (script de
+  seed manual, no corre en deploy normal).
+- La tabla `hospedajes` en la Postgres de producción **no se borró**
+  (solo se dejó de usar) — no había forma segura de hacer DROP TABLE
+  desde esta sesión sin acceso a consola Railway; queda huérfana con las
+  3 filas demo, inofensiva.
+
+**Admin web (`admin.astro`)**
+- Sacada sección completa "Hospedajes" (nav button, `sec-hospedajes`,
+  `RECURSOS_SIMPLES.hospedajes`, referencias en `cargarSimple`).
+  "Familias" queda como único lugar para cargar hospedaje vivencial.
+- De paso: borrados `admin-gestion.astro` + `AdminPanel.tsx` — un panel
+  admin **legacy huérfano** (sin ningún link en todo el sitio, no
+  aparecía en ninguna navegación) que también pegaba a `/api/hospedajes`
+  y hubiera quedado roto sin arreglarlo.
+
+**Web pública** (usuario eligió explícitamente "fusionar en una sola" al
+preguntarle sobre las 2 páginas redundantes)
+- `FamiliasGrid.tsx` (usada en `/vivencial`): pasó de leer `/hospedajes`
+  (3 datos demo, precio hardcodeado `S/120` fijo) a leer `/comunidades`
+  (21 familias reales, precio real por familia, chips de servicios,
+  capacidad/habitaciones/comidas, idiomas).
+- `/destinos` (`DestinosGrid.tsx`, misma data `/comunidades` pero con
+  campos viejos sin uso real `tags`/`highlight`/`emoji`/`color`) pasó a
+  ser **redirect 301 a `/vivencial`** — `DestinosGrid.tsx` borrado por no
+  usarse más.
+- Nav/footers actualizados para no tener 2 entradas al mismo contenido:
+  `Navbar.tsx` (sacada entrada "Destinos"), `BottomNav.tsx` y
+  `Layout.astro` (bottom-nav mobile: el tab primario "Destinos" pasó a
+  ser "Vivencial" con icono de pin, se sacó el duplicado del sheet
+  "Más"), `Footer.tsx` y `ArenaFooter.astro` (hrefs `/destinos` →
+  `/vivencial` en los links de pie de página).
+- **Fuera de alcance, detectado pero NO tocado**: `/alojamiento` es una
+  **tercera** página con "19 casas vivenciales" **100% hardcodeadas en
+  el código** (`alojamiento.astro`, array `casas` con nombres/fotos de
+  Cloudinary inventados: Casa Alfonso, Casa Ana María, etc.) — ni admin
+  ni backend la tocan, es contenido fijo en el `.astro`. No es
+  "Hospedajes" ni "Familias" en sentido estricto así que no se tocó,
+  pero es candidata a unificar/limpiar en otra sesión si se quiere que
+  todo el sitio hable de las mismas familias reales.
+
+**Mobile** (`my-business.tsx`, `api.ts`, `booking.tsx`)
+- Tab "Hospedaje" (CRUD simple viejo) sacado del todo de "Mi Negocio".
+- Tab "Destino"/`comunidades` (que tenía solo nombre/tags/highlight,
+  desactualizado, NUNCA se había sincronizado con los campos ricos que
+  el admin web sí tenía) ahora se llama **"Familias"**, es el
+  **primer tab** (antes era el 5to de 7), ícono de casa, y tiene TODOS
+  los campos reales: precio, capacidad, habitaciones, comidas (select),
+  servicios, actividades, idiomas, whatsapp. Subtítulo nuevo bajo el
+  nombre en la lista (`comunidad · S/ precio/noche`) para que no se vea
+  "pelada" con una sola línea.
+- `api.ts`: `negocios.stays()` (usada por `booking.tsx`, tab Reservas) y
+  `TipoNegocio` pasan de `/hospedajes` a `/comunidades`. Canal WebSocket
+  de refresco en vivo de `booking.tsx` también actualizado
+  (`'hospedajes'` → `'comunidades'`).
+- Textos con género corregido: "Nueva familia"/"ninguna familia" en vez
+  de "Nuevo familia"/"ningún familia" (via nuevos campos opcionales
+  `nuevoLabel`/`vacioLabel`/`singular` en `TipoCfg`).
+
+### 3. Bug real de layout encontrado y arreglado (probado en vivo, no solo leído)
+Usuario reportó con capturas que el tab "Familia" en Mi Negocio "se
+achataba feo" comparado con otros tabs. Se instaló Metro (`npx expo
+start --dev-client`) y se conectó al emulador ya corriendo
+(`Capachica_Emulator`) vía deep link
+(`adb shell am start -a android.intent.action.VIEW -d
+"capachica://expo-development-client/?url=http%3A%2F%2F10.0.2.2%3A8081"
+com.capachica.experienceai`, más confiable que el force-stop+tap manual
+de la sesión anterior).
+- **Causa real, reproducida en vivo**: el `ScrollView horizontal` de
+  chips de tipo de negocio, en su **primer render** (antes de cualquier
+  scroll/interacción), quedaba con altura ambigua en Android y estiraba
+  cada chip a **~790px** (casi toda la pantalla) en vez de los ~36px
+  esperados — confirmado con `uiautomator dump` (bounds reales del nodo)
+  y capturas recortadas con PowerShell/System.Drawing. Scrollear una vez
+  forzaba un remeasure y el chip volvía al tamaño correcto — por eso el
+  bug era inconsistente/confuso en las capturas del usuario.
+- **Fix**: alto fijo explícito en el `ScrollView` (`chipsScroll: {height:
+  52}`, pasado como `style`, no `contentContainerStyle`) y en cada chip
+  (`chip: {height: 36, ...}`), para que no dependa de que Android
+  termine de resolver el flex por su cuenta.
+- Verificado visualmente en el emulador tras el fix: chips ya no se
+  inflan en ningún estado de scroll.
+
+### Verificación hecha
+- Build de Astro (`pnpm build`) limpio tras todos los cambios web.
+- `npx tsc --noEmit` en mobile: sin errores nuevos en ningún archivo
+  tocado (los 2 errores preexistentes en `settings.tsx`/`AuthContext.tsx`
+  no son de esta sesión, no se tocaron esos archivos).
+- Probado en vivo en el emulador (Metro + deep link): tab "Familias"
+  primero, lista real de familias con foto/subtítulo, botón "Nueva
+  familia", chips ya no se achatan.
+- Admin de producción confirmado post-redeploy con "Restaurantes"/
+  "Platos" visibles.
+- **NO se generó ningún APK release nuevo** — todo lo de mobile de esta
+  sesión se probó solo vía Metro/dev-client en el emulador, no vía APK
+  instalado. Si se quiere en el teléfono físico o distribuir, falta
+  preguntar versión + correr `gradlew assembleRelease` (regla de
+  siempre).
+
+### Pendiente / posible siguiente paso
+- [ ] `/alojamiento` sigue con 19 "casas" 100% inventadas en el código,
+      sin ninguna conexión a `comunidades` ni a ningún CRUD real — ver
+      nota arriba. Candidata a unificar si se quiere consistencia total.
+- [ ] Tabla `hospedajes` sigue existiendo en la Postgres de producción
+      (huérfana, 3 filas demo, nadie la lee) — se podría hacer `DROP
+      TABLE hospedajes;` a mano desde la consola de Railway si se quiere
+      dejar la base 100% limpia, no es urgente.
+- [ ] No se compiló ningún APK nuevo esta sesión (ver arriba).
+
+### Cómo retomar
+1. Confirmar que Railway sigue sin incidentes (`https://status.railway.com`)
+   antes de asumir que algo no deployó.
+2. Si se sigue en mobile: Metro se puede levantar con `npx expo start
+   --dev-client` desde `C:\APLICACIONES MOVILES\capachica\mobile` y
+   conectar al emulador ya abierto con el deep link de arriba — más
+   rápido y confiable que el force-stop+tap manual.
+3. Commits de esta sesión en `main`: `c533d843` (merge Hospedajes+
+   Familias backend/web/mobile), `0c9c15d2` (subtítulo+ícono+género en
+   tab Familia), `6a778e82` (reorden primero + fix bug de layout chips).
+
 ## SESIÓN 17 ago 2026 — fix pantalla negra Historias, gastronomía real (CRUD restaurantes/platos), fix sesión trabada
 
 ### Contexto de arranque
