@@ -1170,6 +1170,14 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       </div>
     </div>
 
+    <div class="fg">
+      <label>Emprendedor asignado</label>
+      <select id="d-emprendedor">
+        <option value="">— Sin asignar (solo admin puede editar) —</option>
+      </select>
+      <span style="font-size:11px;color:var(--dim)">El emprendedor asignado podrá editar esta familia desde su cuenta (web y app), solo esta.</span>
+    </div>
+
     <div style="display:flex;gap:10px;margin-top:6px">
       <button class="btn-primary" onclick="saveDestinoModal()" style="flex:1">Guardar familia</button>
       <button class="btn-sm" onclick="closeDestinoModal()" style="padding:9px 18px">Cancelar</button>
@@ -1922,6 +1930,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
               <span style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;background:rgba(14,165,233,0.15);color:#0ea5e9;border:1px solid rgba(14,165,233,0.3)">${esc(precioTxt)}</span>
             </div>
             <div style="font-size:12px;color:var(--cyan);margin-bottom:2px">📍 ${esc(d.comunidad)}</div>
+            <div style="font-size:11px;margin-bottom:2px;color:${d.usuario_nombre ? 'var(--green)' : 'var(--dim)'}">${d.usuario_nombre ? `💼 ${esc(d.usuario_nombre)}` : '— sin emprendedor asignado —'}</div>
             ${metaBits ? `<div style="font-size:11px;color:var(--muted);margin-bottom:5px">${esc(metaBits)}</div>` : ''}
             <div style="font-size:12px;color:var(--muted);line-height:1.4;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(d.desc)}</div>
             <div style="display:flex;flex-wrap:wrap;gap:4px">${tagHtml}</div>
@@ -1935,7 +1944,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     }).join('');
   }
 
-  function openDestinoModal(id) {
+  async function openDestinoModal(id) {
     const d = id ? destinosData.find(x => x.id === id) : null;
     $('modalTitle').textContent = d ? 'Editar familia' : 'Nueva familia';
     $('d-id').value           = d ? d.id : '';
@@ -1955,6 +1964,11 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     $('d-whatsapp').value     = d ? (d.whatsapp || '') : '';
     resetDestUpload();
     if (d && d.imagen) setDestPreview(d.imagen);
+    if (!usuariosData.length) await loadUsuarios();
+    const emprendedores = usuariosData.filter(u => u.rol === 'proveedor' || u.rol === 'admin');
+    $('d-emprendedor').innerHTML = '<option value="">— Sin asignar (solo admin puede editar) —</option>' +
+      emprendedores.map(u => `<option value="${u.id}">${esc(u.nombre)} (${esc(u.email)})${u.rol === 'admin' ? ' · admin' : ''}</option>`).join('');
+    $('d-emprendedor').value = d && d.usuario_id ? d.usuario_id : '';
     $('destinoModal').classList.add('open');
   }
 
@@ -2587,6 +2601,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
     };
 
     const id = $('d-id').value;
+    const emprendedorSel = $('d-emprendedor').value;
     try {
       let res;
       const headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN };
@@ -2602,8 +2617,20 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         });
       }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const guardado = await res.json();
+      const savedId = id || guardado.id;
+
+      const previo = id ? (destinosData.find(x => x.id === Number(id))?.usuario_id || '') : '';
+      if (String(emprendedorSel) !== String(previo)) {
+        const rAsig = await fetch(`${API_URL}/api/comunidades/${savedId}/asignar`, {
+          method: 'PUT', headers,
+          body: JSON.stringify({ usuario_id: emprendedorSel || null })
+        });
+        if (!rAsig.ok) throw new Error(`No se pudo asignar el emprendedor (HTTP ${rAsig.status})`);
+      }
+
       closeDestinoModal();
-      showMsg(id ? 'Destino actualizado' : 'Destino creado');
+      showMsg(id ? 'Familia actualizada' : 'Familia creada');
       loadDestinos();
     } catch (e) {
       showMsg('Error al guardar: ' + e.message, 'err');

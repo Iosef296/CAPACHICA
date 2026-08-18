@@ -54,6 +54,33 @@ function crearRutasSQL(tabla, nombreRecurso, canal) {
         return req.usuario.rol === 'admin' || (usuarioIdFila && usuarioIdFila === req.usuario.id);
     }
 
+    // Solo admin: asigna (o desasigna, usuario_id null) el emprendedor dueño
+    // de este item. Separado del PUT normal porque ese ignora usuario_id del
+    // body a propósito (un dueño no puede reasignarse el recurso a otro).
+    router.put('/:id/asignar', autenticacionMiddleware, autorizacionMiddleware(['admin']), async (req, res) => {
+        try {
+            const { rows: existe } = await query(`SELECT id FROM ${tabla} WHERE id = $1`, [req.params.id]);
+            if (!existe.length) return res.status(404).json({ error: `${nombreRecurso} no encontrado` });
+
+            const usuarioId = req.body.usuario_id || null;
+            let usuarioNombre = null;
+            if (usuarioId) {
+                const { rows: u } = await query('SELECT nombre FROM usuarios WHERE id = $1', [usuarioId]);
+                if (!u.length) return res.status(404).json({ error: 'Usuario no encontrado' });
+                usuarioNombre = u[0].nombre;
+            }
+
+            await query(
+                `UPDATE ${tabla} SET usuario_id = $1, usuario_nombre = $2 WHERE id = $3`,
+                [usuarioId, usuarioNombre, req.params.id]
+            );
+            broadcast(canal);
+            res.json({ id: Number(req.params.id), usuario_id: usuarioId, usuario_nombre: usuarioNombre });
+        } catch (err) {
+            res.status(500).json({ error: `Error al asignar ${nombreRecurso.toLowerCase()}` });
+        }
+    });
+
     router.post('/', autenticacionMiddleware, autorizacionMiddleware(['admin', 'proveedor']), async (req, res) => {
         try {
             const id = Date.now();
