@@ -1,9 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import SectionRenderer from '../components/SectionRenderer.astro';
-import cloudinaryData from '../data/cloudinary-urls.json';
 
-const IA_URL = 'http://localhost:5000';
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api';
+const IA_URL = import.meta.env.PUBLIC_IA_URL || 'http://localhost:5000';
+
 let cms: any = null;
 try {
   const r = await fetch(`${IA_URL}/api/contenido/alojamiento`);
@@ -12,169 +13,51 @@ try {
 
 const cmsHero = cms?.secciones?.find((s: any) => s.tipo === 'hero');
 
-function getCldUrls(folder: string): string[] {
-  const entries = (cloudinaryData as any)[folder] || [];
-  return entries.map((e: any) => e.url);
+interface Familia {
+  id: string | number;
+  nombre: string;
+  comunidad: string;
+  desc: string;
+  imagen: string | null;
+  imagenes: string[] | null;
+  video: string | null;
+  precio: number | null;
+  capacidad: number | null;
+  habitaciones: number | null;
+  comidas: string | null;
+  servicios: string[] | null;
+  actividades: string[] | null;
+  whatsapp: string | null;
 }
 
-const casas = [
-  {
-    nombre: "Casa Alfonso",
-    folder: "CASA ALFONSO",
-    lugar: "Llachón",
-    desc: "Amplia casa familiar a orillas del Titicaca con jardín propio y vistas al lago desde el segundo piso. Don Alfonso y su familia ofrecen desayuno con productos frescos de su chacra y paseos en bote al amanecer.",
-    amenities: ["🌅 Vista al lago","🚣 Bote propio","🍳 Desayuno incluido","🌿 Jardín y huerto"],
-    popular: true,
-  },
-  {
-    nombre: "Casa Ana María",
-    folder: "CASA ANA MARIA",
-    lugar: "Capachica",
-    desc: "Hogar cálido y espacioso atendido por doña Ana María, maestra de tejido quechua. Habitaciones ventiladas con colchas tejidas a mano y desayuno andino con quinua, cañihua y leche fresca del campo.",
-    amenities: ["🎨 Taller de tejido","☕ Desayuno andino","🌾 Ambiente rural","🌺 Flores del campo"],
-    popular: false,
-  },
-  {
-    nombre: "Casa Antonia",
-    folder: "CASA ANTONIA",
-    lugar: "Llachón",
-    desc: "Pintoresca casa de piedra con patio central y flores andinas. Doña Antonia prepara trucha del lago a la parrilla y enseña a sus huéspedes el arte de la alfarería local cada tarde.",
-    amenities: ["🐟 Trucha fresca","🏺 Taller de alfarería","🌸 Patio con flores","🌄 Senderos cercanos"],
-    popular: false,
-  },
-  {
-    nombre: "Casa Balbino",
-    folder: "CASA BALBINO",
-    lugar: "Capachica",
-    desc: "Casa vivencial amplia con terraza panorámica y corrales de animales domésticos. Don Balbino lleva a sus huéspedes de pesca artesanal con redes tradicionales al amanecer sobre las aguas azules del Titicaca.",
-    amenities: ["🎣 Pesca artesanal","🏔️ Terraza panorámica","🐄 Animales de granja","🌙 Cielo estrellado"],
-    popular: false,
-  },
-  {
-    nombre: "Casa Calixto",
-    folder: "CASA CALIXTO",
-    lugar: "Capachica",
-    desc: "Pequeña y acogedora, perfecta para viajeros que buscan tranquilidad. Don Calixto ofrece caminatas guiadas por los miradores de la península y convida chicha morada artesanal al atardecer.",
-    amenities: ["🥾 Caminatas guiadas","🍹 Chicha artesanal","🌄 Miradores cercanos","🤫 Ambiente tranquilo"],
-    popular: false,
-  },
-  {
-    nombre: "Casa Eustaquio",
-    folder: "CASA EUSTAQUIO",
-    lugar: "Escallani",
-    desc: "Familia Eustaquio recibe huéspedes con hospitalidad quechua genuina. Habitaciones con vista a los totorales sagrados y noches de música folclórica con zampoñas y quenas alrededor de la fogata.",
-    amenities: ["🎵 Música folclórica","🌿 Totorales sagrados","🔥 Fogata nocturna","🎭 Cultura viva"],
-    popular: false,
-  },
-  {
-    nombre: "Casa Félix",
-    folder: "CASA FELIX",
-    lugar: "Llachón",
-    desc: "Casa con huerto orgánico y vista al islote de los Uros. Don Félix cultiva habas, papas nativas y quinua que forman el desayuno de sus huéspedes. Incluye tour en balsa de totora tradicional.",
-    amenities: ["🌱 Huerto orgánico","🛶 Balsa de totora","🥔 Cocina tradicional","🏝️ Vista a los Uros"],
-    popular: false,
-  },
-  {
-    nombre: "Casa Germán",
-    folder: "CASA GERMAN",
-    lugar: "Bahía Chifrón",
-    desc: "Privilegiada ubicación frente a la bahía de Chifrón con muelle privado. Don Germán es pescador de toda la vida y comparte sus conocimientos del lago en salidas matutinas al amanecer dorado del altiplano.",
-    amenities: ["⛵ Muelle privado","🌅 Amanecer en el lago","🐟 Pesca con lugareño","🏖️ Acceso a bahía"],
-    popular: false,
-  },
-  {
-    nombre: "Casa Gerónimo",
-    folder: "CASA GERONIMO",
-    lugar: "Capachica",
-    desc: "Sencilla y auténtica, la casa de don Gerónimo conserva la arquitectura tradicional de la península con muros de adobe y techo de calamina. Ideal para quienes buscan una experiencia rural genuina y sin pretensiones.",
-    amenities: ["🏚️ Adobe tradicional","🌾 Vida campesina","🌌 Cielo nocturno","🤝 Familia acogedora"],
-    popular: false,
-  },
-  {
-    nombre: "Casa Héctor",
-    folder: "CASA HECTOR",
-    lugar: "Llachón",
-    desc: "Moderna casa vivencial con habitaciones bien equipadas y baño compartido con agua caliente solar. Don Héctor organiza excursiones en cuatrimoto por los senderos de la meseta y cenas comunitarias los fines de semana.",
-    amenities: ["🏍️ Excursiones en moto","☀️ Agua caliente solar","🍽️ Cenas comunitarias","📡 Wifi disponible"],
-    popular: false,
-  },
-  {
-    nombre: "Collpa Wasy — Casa Juana Cahui",
-    folder: "CASA JUANA CAHUI - COLLPA WASY",
-    lugar: "Llachón",
-    desc: "\"Collpa Wasy\" (Casa de Sal en quechua) es el alojamiento más fotografiado de la península. Doña Juana Cahui ofrece habitaciones decoradas con textiles andinos, gastronomía lacustre completa y rituales de agradecimiento a la Pachamama.",
-    amenities: ["🙏 Ritual Pachamama","🧵 Textiles andinos","🌊 Frente al lago","⭐ Muy valorada"],
-    popular: true,
-  },
-  {
-    nombre: "Casa Luciano",
-    folder: "CASA LUCIANO",
-    lugar: "Llachón",
-    desc: "Don Luciano ofrece un rincón íntimo y silencioso en el punto más alto de Llachón, con vista de 180° sobre el lago sagrado. Un solo cuarto disponible para quienes quieran vivir la experiencia en exclusiva total.",
-    amenities: ["👁️ Vista 180° al lago","🔐 Exclusivo 1 habitación","🌬️ Brisa del altiplano","⛰️ Punto más alto"],
-    popular: false,
-  },
-  {
-    nombre: "Casa Magno",
-    folder: "CASA MAGNO",
-    lugar: "Capachica",
-    desc: "Familia Magno tiene una de las casas mejor equipadas de la zona con dormitorios amplios y baño privado. Cena incluida con sopa de quinua, trucha al ajo y mate de muña recién cortada del jardín.",
-    amenities: ["🛁 Baño privado","🍲 Cena incluida","🌿 Mate de muña","🏡 Casa amplia"],
-    popular: false,
-  },
-  {
-    nombre: "Casa Richard",
-    folder: "CASA RICHARD",
-    lugar: "Llachón",
-    desc: "Casa con vista directa a las chullpas funerarias preincas de la colina sagrada. Don Richard comparte relatos orales de la historia Lupaca del lago y organiza visitas arqueológicas al atardecer con su familia.",
-    amenities: ["🏛️ Junto a chullpas","📜 Historia Lupaca","🌇 Visitas arqueológicas","🎙️ Relatos orales"],
-    popular: false,
-  },
-  {
-    nombre: "Casa Roberth",
-    folder: "CASA ROBERTH",
-    lugar: "Capachica",
-    desc: "Joven familia que combina hospitalidad tradicional con comodidades modernas. Roberth habla español e inglés y facilita la comunicación con toda la comunidad. Wifi, desayuno continental y excursiones en bicicleta incluidas.",
-    amenities: ["🚲 Bicicletas incluidas","📶 Wifi","🌍 Guía bilingüe","🥐 Desayuno continental"],
-    popular: false,
-  },
-  {
-    nombre: "Casa Teodora",
-    folder: "CASA TEODORA",
-    lugar: "Escallani",
-    desc: "Doña Teodora es la cocinera más reconocida de Escallani. Su casa huele a hierbas frescas del jardín todo el día. Los huéspedes aprenden a preparar chuño, moraya y el clásico chairo andino en clases de cocina incluidas.",
-    amenities: ["👩‍🍳 Clases de cocina","🌿 Jardín de hierbas","🥘 Recetas ancestrales","🏡 Casa centenaria"],
-    popular: false,
-  },
-  {
-    nombre: "Casa Valentín",
-    folder: "CASA VALENTIN",
-    lugar: "Llachón",
-    desc: "Una de las casas con más habitaciones de la península, ideal para grupos y familias. Don Valentín tiene décadas acogiendo visitantes y conoce cada rincón del lago. Pensión completa con menú cambiante cada día.",
-    amenities: ["👨‍👩‍👧‍👦 Grupos y familias","🍽️ Pensión completa","🗺️ Guía experto","🛶 Paseo en canoa"],
-    popular: false,
-  },
-  {
-    nombre: "Casa Venancio",
-    folder: "CASA VENANCIO",
-    lugar: "Capachica",
-    desc: "Don Venancio es artesano de instrumentos musicales andinos. Sus quenas y sikus decoran las paredes de la casa y cada noche toca para sus huéspedes bajo el cielo estrellado del altiplano a 3800 msnm.",
-    amenities: ["🎶 Música en vivo","🪘 Artesanía musical","⭐ Cielo a 3800 msnm","🌃 Noche andina"],
-    popular: false,
-  },
-  {
-    nombre: "Casa Walther",
-    folder: "CASA WALTHER",
-    lugar: "Llachón",
-    desc: "Don Walther gestiona la única casa con sala de uso común equipada con estufa de leña para las noches frías del altiplano. Organiza noches de cuentos quechuas e invita a los turistas a participar en la siembra comunitaria.",
-    amenities: ["🔥 Estufa de leña","📖 Cuentos quechuas","🌱 Siembra comunitaria","🏡 Sala común"],
-    popular: false,
-  },
-];
+let familias: Familia[] = [];
+try {
+  const r = await fetch(`${API_URL}/comunidades`);
+  if (r.ok) familias = await r.json();
+} catch {}
+
+const casas = familias.map((f) => {
+  const fotos = [f.imagen, ...(f.imagenes || [])].filter(Boolean) as string[];
+  const amenities = [...(f.servicios || []), ...(f.actividades || [])];
+  return {
+    id: f.id,
+    nombre: f.nombre,
+    lugar: f.comunidad,
+    desc: f.desc,
+    fotos,
+    video: f.video || null,
+    amenities,
+    precio: f.precio,
+    capacidad: f.capacidad,
+    habitaciones: f.habitaciones,
+    comidas: f.comidas,
+    whatsapp: f.whatsapp,
+  };
+});
 ---
 <Layout
   title="Alojamiento — Capachica Turismo"
-  description="19 casas vivenciales auténticas en Capachica: familias quechuas con vista al Titicaca, cocina andina y experiencias únicas."
+  description="Familias anfitrionas de Capachica: hospedaje vivencial con vista al Titicaca, cocina andina y experiencias únicas."
 >
   <Fragment slot="hero">
     <span class="section-label">🏡 Hospedaje Auténtico</span>
@@ -182,7 +65,7 @@ const casas = [
       {cmsHero?.titulo || <Fragment>Duerme en <span class="gradient-text">Capachica</span></Fragment>}
     </h1>
     <p style="font-size:1rem;color:var(--text2);line-height:1.78;max-width:520px;margin:0 auto 2rem;">
-      {cmsHero?.subtitulo || '19 familias anfitrionas quechuas te abren sus puertas a orillas del lago Titicaca. Cocina ancestral, tejidos vivos y el cielo estrellado del altiplano a 3800 msnm.'}
+      {cmsHero?.subtitulo || 'Familias anfitrionas quechuas te abren sus puertas a orillas del lago Titicaca. Cocina ancestral, tejidos vivos y el cielo estrellado del altiplano a 3800 msnm.'}
     </p>
   </Fragment>
 
@@ -194,21 +77,33 @@ const casas = [
   <div style="max-width:1280px;margin:0 auto;padding:3rem 1.2rem 5rem;">
 
     <p style="text-align:center;font-size:0.82rem;color:var(--text3);margin-bottom:2.5rem;letter-spacing:0.05em;">
-      {casas.length} alojamientos disponibles en la península de Capachica
+      {casas.length} alojamiento{casas.length === 1 ? '' : 's'} disponible{casas.length === 1 ? '' : 's'} en la península de Capachica
     </p>
 
+    {casas.length === 0 ? (
+      <p style="text-align:center;color:var(--text3);padding:3rem 0;">
+        Todavía no hay familias anfitrionas publicadas. Vuelve pronto.
+      </p>
+    ) : (
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.6rem;">
       {casas.map((c, i) => {
-        const fotos = getCldUrls(c.folder);
-        const cover = fotos[0] || '';
-        const thumbs = fotos.slice(1, 4);
-        const allJson = JSON.stringify(fotos);
+        const cover = c.fotos[0] || '';
+        const thumbs = c.fotos.slice(1, 4);
+        const allJson = JSON.stringify(c.fotos);
+        const metaBits = [
+          c.capacidad ? `${c.capacidad} huéspedes` : null,
+          c.habitaciones ? `${c.habitaciones} hab.` : null,
+          c.comidas || null,
+        ].filter(Boolean);
+        const whatsappHref = c.whatsapp
+          ? `https://wa.me/${c.whatsapp.replace(/[^\d]/g, '')}?text=${encodeURIComponent(`Hola, quiero consultar por alojamiento en ${c.nombre}`)}`
+          : null;
         return (
           <div class="reveal card alo-card" style={`padding:0;overflow:hidden;transition-delay:${i*0.05}s;position:relative;`}
                data-gallery={allJson} data-title={c.nombre}>
-            {c.popular && (
+            {c.video && (
               <div style="position:absolute;top:10px;right:10px;z-index:10;padding:3px 11px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:0.1em;background:linear-gradient(135deg,#c0522a,#d4862a);color:#fff;box-shadow:0 2px 10px rgba(192,82,42,0.45);">
-                ★ DESTACADA
+                ▶ VIDEO
               </div>
             )}
 
@@ -238,9 +133,9 @@ const casas = [
                       loading="lazy"
                       style="width:100%;height:100%;object-fit:cover;display:block;opacity:0.85;"
                     />
-                    {ti === thumbs.length - 1 && fotos.length > 4 && (
+                    {ti === thumbs.length - 1 && c.fotos.length > 4 && (
                       <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;">
-                        +{fotos.length - 4}
+                        +{c.fotos.length - 4}
                       </div>
                     )}
                   </div>
@@ -251,39 +146,67 @@ const casas = [
             <div style="padding:1.2rem 1.3rem 1.3rem;">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem;margin-bottom:0.25rem;">
                 <h3 style="font-family:var(--font-display);font-size:1.05rem;font-weight:700;color:var(--text);line-height:1.3;">{c.nombre}</h3>
-                <span style="font-size:11px;color:#fbbf24;letter-spacing:-0.5px;flex-shrink:0;padding-top:2px;">★★★★★</span>
               </div>
               <div style="font-size:0.72rem;color:var(--accent);margin-bottom:0.65rem;font-weight:600;letter-spacing:0.03em;">
                 📍 {c.lugar} · Capachica, Puno
               </div>
               <p style="font-size:0.83rem;color:var(--text2);line-height:1.65;margin-bottom:0.9rem;">{c.desc}</p>
 
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.3rem;margin-bottom:1.1rem;">
-                {c.amenities.map(a => (
-                  <span style="font-size:10.5px;color:var(--text3);background:rgba(255,255,255,0.04);padding:4px 7px;border-radius:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                    {a}
-                  </span>
-                ))}
-              </div>
+              {metaBits.length > 0 && (
+                <p style="font-size:0.76rem;color:var(--text3);margin-bottom:0.9rem;">
+                  {metaBits.join(' · ')}
+                </p>
+              )}
 
-              <div style="display:flex;gap:0.6rem;padding-top:0.8rem;border-top:1px solid var(--border);">
-                <button
-                  class="alo-gallery-btn"
-                  style="flex:1;padding:8px 0;border-radius:999px;border:1px solid rgba(192,82,42,0.35);background:rgba(192,82,42,0.08);color:#c0522a;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;"
-                >
-                  📷 Ver galería ({fotos.length})
-                </button>
-                <button
-                  style="flex:1;padding:8px 0;border-radius:999px;border:1px solid rgba(212,134,42,0.35);background:rgba(212,134,42,0.08);color:#d4862a;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;"
-                >
-                  Consultar →
-                </button>
+              {c.amenities.length > 0 && (
+                <div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:1.1rem;">
+                  {c.amenities.slice(0, 6).map(a => (
+                    <span style="font-size:10.5px;color:var(--text3);background:rgba(255,255,255,0.04);padding:4px 7px;border-radius:7px;white-space:nowrap;">
+                      {a}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:0.6rem;padding-top:0.8rem;border-top:1px solid var(--border);">
+                <span style="font-size:1rem;font-weight:700;color:var(--accent);">
+                  {c.precio != null ? `S/ ${c.precio}` : 'Consultar precio'}
+                  {c.precio != null && <span style="font-size:11px;font-weight:500;color:var(--text3);"> /noche</span>}
+                </span>
+                <div style="display:flex;gap:0.5rem;">
+                  {c.fotos.length > 0 && (
+                    <button
+                      class="alo-gallery-btn"
+                      style="padding:8px 14px;border-radius:999px;border:1px solid rgba(192,82,42,0.35);background:rgba(192,82,42,0.08);color:#c0522a;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;"
+                    >
+                      📷 {c.fotos.length}
+                    </button>
+                  )}
+                  {whatsappHref ? (
+                    <a
+                      href={whatsappHref}
+                      target="_blank"
+                      rel="noopener"
+                      style="padding:8px 14px;border-radius:999px;border:1px solid rgba(37,211,102,0.35);background:rgba(37,211,102,0.1);color:#25d366;font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;"
+                    >
+                      WhatsApp
+                    </a>
+                  ) : (
+                    <a
+                      href="/vivencial#reservar"
+                      style="padding:8px 14px;border-radius:999px;border:1px solid rgba(212,134,42,0.35);background:rgba(212,134,42,0.08);color:#d4862a;font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;"
+                    >
+                      Consultar →
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         );
       })}
     </div>
+    )}
   </div>
 
   <div style="border-top:1px solid rgba(192,82,42,0.14);padding:4rem 1.5rem;">
