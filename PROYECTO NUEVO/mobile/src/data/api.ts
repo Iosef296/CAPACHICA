@@ -342,6 +342,20 @@ export const negocios = {
   crear: (tipo: TipoNegocio, datos: any) => authFetch('POST', `/${tipo}`, datos),
   editar: (tipo: TipoNegocio, id: string | number, datos: any) => authFetch('PUT', `/${tipo}/${id}`, datos),
   eliminar: (tipo: TipoNegocio, id: string | number) => authFetch('DELETE', `/${tipo}/${id}`),
+  // Sin filtrar por dueño -- solo para el panel admin (asignar emprendedor).
+  listarTodos: async (tipo: TipoNegocio): Promise<any[]> => {
+    if (!API_BASE) return [];
+    try {
+      const res = await fetch(`${API_BASE}/${tipo}`);
+      const data = await res.json().catch(() => []);
+      return Array.isArray(data) ? data : [];
+    } catch {
+      return [];
+    }
+  },
+  // Solo admin (el backend lo exige) -- fija/limpia el dueño de un item.
+  asignar: (tipo: TipoNegocio, id: string | number, usuario_id: string | null) =>
+    authFetch('PUT', `/${tipo}/${id}/asignar`, { usuario_id }),
 };
 
 // Sube una foto (URI local del picker) a Cloudinary via el backend. No
