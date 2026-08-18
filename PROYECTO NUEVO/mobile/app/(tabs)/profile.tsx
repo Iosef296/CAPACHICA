@@ -70,9 +70,6 @@ export default function Profile() {
             <MenuItem icon="admin-panel-settings" label={t('profile.menu.usuarios')} onPress={() => router.push('/(stacks)/manage-users')} />
           )}
           {user?.rol === 'admin' && (
-            <MenuItem icon="home-work" label="Familias · asignar dueño" onPress={() => router.push('/(stacks)/manage-familias')} />
-          )}
-          {user?.rol === 'admin' && (
             <MenuItem icon="edit-note" label="Textos de la app" onPress={() => router.push('/(stacks)/config-etiquetas')} />
           )}
           {esEmprendedor && (

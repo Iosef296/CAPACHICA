@@ -5,7 +5,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { useAuth } from '@/auth/AuthContext';
-import { negocios, subirFoto, subirMediaHistoria, API_WS, TipoNegocio } from '@/data/api';
+import { negocios, subirFoto, subirMediaHistoria, usuariosAdmin, UsuarioAdmin, API_WS, TipoNegocio } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
@@ -127,11 +127,17 @@ const TIPOS: TipoCfg[] = [
   },
 ];
 
+// Tipos sobre el CRUD generico sqlCrud (backend/rutas/utilidades/sqlCrud.rutas.js)
+// -- los unicos que exponen PUT /:id/asignar. 'restaurantes'/'platos' son
+// TypeORM aparte, sin ese endpoint.
+const ASIGNABLE: TipoNegocio[] = ['comunidades', 'artesania', 'festividades', 'maestros', 'guias'];
+
 export default function MyBusiness() {
   const { user, refreshProfile } = useAuth();
   const [tipoIdx, setTipoIdx] = useState(0);
   const [items, setItems] = useState<any[]>([]);
   const [misRestaurantes, setMisRestaurantes] = useState<any[]>([]);
+  const [emprendedores, setEmprendedores] = useState<UsuarioAdmin[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [edit, setEdit] = useState<any>({});
   const [saving, setSaving] = useState(false);
@@ -142,16 +148,25 @@ export default function MyBusiness() {
   const appCfg = useAppConfig();
 
   const canManage = user?.rol === 'admin' || user?.rol === 'proveedor';
+  const esAdmin = user?.rol === 'admin';
+  // Admin ve y asigna dueño de TODOS los items (no solo los propios) --
+  // si no, la pestaña queda vacia para el admin en cuanto no crea el
+  // mismo cada item (que es lo normal: los crea/asigna a otro despues).
+  const puedeAsignar = esAdmin && ASIGNABLE.includes(cfg.key);
 
   function refreshItems() {
     if (!canManage || !user) return;
-    negocios.listarPropios(cfg.key, user.id).then(setItems);
+    const p = esAdmin && ASIGNABLE.includes(cfg.key) ? negocios.listarTodos(cfg.key) : negocios.listarPropios(cfg.key, user.id);
+    p.then(setItems);
     if (cfg.needsRestauranteId) negocios.listarPropios('restaurantes', user.id).then(setMisRestaurantes);
   }
 
   // Recarga al cambiar de pestaña -- useLiveRefresh de abajo solo dispara
   // al enfocar la pantalla o por WS, no en cada tap de TIPOS.
   useEffect(refreshItems, [tipoIdx, user?.id]);
+  useEffect(() => {
+    if (esAdmin) usuariosAdmin.listar().then(setEmprendedores).catch(() => {});
+  }, [esAdmin]);
 
   useLiveRefresh(refreshItems, { url: API_WS, channels: TIPOS.map(t => t.key) });
 
@@ -279,10 +294,20 @@ export default function MyBusiness() {
       return;
     }
     if (!body[cfg.fields[0].key]) { Alert.alert('Falta información', `Completa "${cfg.fields[0].label}".`); return; }
+    const emprendedorSel = puedeAsignar ? (edit.usuario_id ?? null) : undefined;
+    delete body.usuario_id;
+    delete body.usuario_nombre;
     setSaving(true);
     try {
+      let savedId = edit.id;
       if (edit.id) await negocios.editar(cfg.key, edit.id, body);
-      else await negocios.crear(cfg.key, body);
+      else {
+        const creado = await negocios.crear(cfg.key, body);
+        savedId = creado.id;
+      }
+      if (puedeAsignar && emprendedorSel !== undefined) {
+        await negocios.asignar(cfg.key, savedId, emprendedorSel);
+      }
       setModalOpen(false);
       refreshItems();
     } catch (e) {
@@ -354,6 +379,11 @@ export default function MyBusiness() {
                       {sub}
                     </Text>
                   )}
+                  {puedeAsignar && (
+                    <Text style={[typography.labelSm, { color: item.usuario_nombre ? colors.primary : colors.outline, marginTop: 2 }]} numberOfLines={1}>
+                      {item.usuario_nombre ? `💼 ${item.usuario_nombre}` : '— sin emprendedor asignado —'}
+                    </Text>
+                  )}
                 </View>
                 <Pressable onPress={() => openEdit(item)} style={styles.iconBtn}>
                   <MaterialIcons name="edit" size={18} color={colors.primary} />
@@ -409,6 +439,36 @@ export default function MyBusiness() {
                       </Pressable>
                     ))}
                   </ScrollView>
+                </View>
+              )}
+
+              {puedeAsignar && (
+                <View style={{ gap: 8 }}>
+                  <Text style={[typography.labelMd, { color: colors.onSurfaceVariant }]}>Emprendedor asignado</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                    <Pressable
+                      onPress={() => setEdit((p: any) => ({ ...p, usuario_id: null }))}
+                      style={[styles.optionChip, !edit.usuario_id && styles.optionChipActive]}
+                    >
+                      <Text style={[typography.labelSm, { color: !edit.usuario_id ? colors.onPrimary : colors.onSurfaceVariant }]}>
+                        — Sin asignar —
+                      </Text>
+                    </Pressable>
+                    {emprendedores.filter(u => u.rol === 'proveedor' || u.rol === 'admin').map(u => (
+                      <Pressable
+                        key={u.id}
+                        onPress={() => setEdit((p: any) => ({ ...p, usuario_id: u.id }))}
+                        style={[styles.optionChip, edit.usuario_id === u.id && styles.optionChipActive]}
+                      >
+                        <Text style={[typography.labelSm, { color: edit.usuario_id === u.id ? colors.onPrimary : colors.onSurfaceVariant }]}>
+                          {u.nombre}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+                  <Text style={[typography.labelSm, { color: colors.outline }]}>
+                    El emprendedor asignado podrá editar/eliminar solo este item desde su cuenta.
+                  </Text>
                 </View>
               )}
 
