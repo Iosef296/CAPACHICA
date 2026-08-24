@@ -401,11 +401,23 @@ Elegí UNA familia como hospedaje para toda la estadía (la que mejor se ajuste 
 Devolvé SOLO este JSON, sin texto antes ni después:
 {"resumen":"2-3 frases en español con el plan y por qué","hospedaje_id":"<id de la familia elegida>","dias":[{"numero":1,"actividad_ids":["<id>"],"notas":"breve, en español"}],"artesania_ids":["<id>"]}`;
 
-    const result = await chatComplete([{ role: 'user', content: prompt }], { temperature: 0.4, max_tokens: 1400 });
+    const result = await chatComplete(
+      [{ role: 'user', content: prompt }],
+      { temperature: 0.4, max_tokens: 1400 }
+    );
     const raw = result.choices[0].message.content.trim();
     const match = raw.match(/\{[\s\S]*\}/);
-    if (!match) throw new Error('La IA no devolvió un plan válido');
-    const plan = JSON.parse(match[0]);
+    if (!match) {
+      console.error('IA no devolvió JSON, contenido crudo:', raw.slice(0, 500));
+      throw new Error('La IA no devolvió un plan válido');
+    }
+    let plan;
+    try {
+      plan = JSON.parse(match[0]);
+    } catch (e) {
+      console.error('IA devolvió JSON inválido:', raw.slice(0, 500));
+      throw new Error('La IA no devolvió un plan válido');
+    }
 
     const hospedaje = familias.find(f => String(f.id) === String(plan.hospedaje_id));
     if (!hospedaje) throw new Error('La IA eligió un hospedaje que no existe');
