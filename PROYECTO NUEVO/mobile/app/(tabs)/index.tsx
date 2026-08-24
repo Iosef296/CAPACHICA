@@ -13,10 +13,9 @@ import { StoryViewer } from '@/components/StoryViewer';
 import { PhotoCard } from '@/components/Card';
 import { HighlightRow } from '@/components/HighlightRow';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
-import { historias as historiasApi, Historia, API_WS } from '@/data/api';
+import { api, historias as historiasApi, Historia, API_WS } from '@/data/api';
 import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, spacing, typography, useThemeMode } from '@/theme';
-import { recommendations, highlights } from '@/data/mock';
 
 const HERO = 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1600';
 
@@ -31,8 +30,44 @@ export default function Home() {
   const [creatingStory, setCreatingStory] = useState(false);
   const [viewingGroup, setViewingGroup] = useState<Historia[] | null>(null);
   const [viewingIndex, setViewingIndex] = useState(0);
+  const [families, setFamilies] = useState<any[]>([]);
+  const [crafts, setCrafts] = useState<any[]>([]);
+  const [festividadesList, setFestividadesList] = useState<any[]>([]);
   const cfg = useAppConfig();
   useThemeMode(); // se resuscribe para repintar en vivo al cambiar tema
+
+  // "Recomendaciones"/"Destacados" salen de datos reales ya cargados en
+  // otras secciones (Familias/Artesanía/Festividades) -- antes eran items
+  // 100% inventados (fotos y nombres que no existían en ningún lado).
+  useLiveRefresh(() => {
+    api.communities().then(setFamilies);
+    api.crafts().then(setCrafts);
+    api.festividades().then(setFestividadesList);
+  }, { url: API_WS, channels: ['comunidades', 'artesania', 'festividades'] });
+
+  const recommendations = [
+    ...families.filter(f => !!f.image).slice(0, 2).map(f => ({
+      id: `fam-${f.id}`, title: f.name, image: f.image,
+      badge: 'FAMILIA', badgeTone: 'tertiary' as const,
+      onPress: () => router.push({ pathname: '/(stacks)/community-detail', params: { id: f.id } }),
+    })),
+    ...crafts.filter(c => !!c.img).slice(0, 2).map(c => ({
+      id: `craft-${c.id}`, title: c.name, image: c.img,
+      badge: 'ARTESANÍA', badgeTone: 'primary' as const,
+      onPress: () => router.push({ pathname: '/(stacks)/craft-detail', params: { id: c.id } }),
+    })),
+  ];
+
+  const highlights = [
+    ...festividadesList.slice(0, 2).map(f => ({
+      id: `fest-${f.id}`, category: f.tipo, title: f.nombre, subtitle: f.fecha, image: f.imagen,
+      onPress: () => router.push({ pathname: '/(stacks)/festividad-detail', params: { id: f.id } }),
+    })),
+    ...crafts.slice(2, 3).filter(c => !!c.img).map(c => ({
+      id: `craft-h-${c.id}`, category: 'Artesanía', title: c.name, subtitle: `S/ ${c.price}`, image: c.img,
+      onPress: () => router.push({ pathname: '/(stacks)/craft-detail', params: { id: c.id } }),
+    })),
+  ];
 
   function refreshHistorias() {
     // Filtra historias con media_url vacío -- datos corruptos (upload
@@ -188,25 +223,29 @@ export default function Home() {
         </View>
       </Section>
 
-      <Section title={t('home.sectionRecomendaciones')} link={t('home.verTodo')}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.gutter, paddingHorizontal: spacing.containerPadding }}>
-          {recommendations.map(r => (
-            <PhotoCard key={r.id}
-              image={r.image} title={r.title}
-              badge={{ label: r.badge, tone: r.badgeTone }}
-              rating={r.rating}
-            />
-          ))}
-        </ScrollView>
-      </Section>
+      {recommendations.length > 0 && (
+        <Section title={t('home.sectionRecomendaciones')} link={t('home.verTodo')}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.gutter, paddingHorizontal: spacing.containerPadding }}>
+            {recommendations.map(r => (
+              <PhotoCard key={r.id}
+                image={r.image} title={r.title}
+                badge={{ label: r.badge, tone: r.badgeTone }}
+                onPress={r.onPress}
+              />
+            ))}
+          </ScrollView>
+        </Section>
+      )}
 
-      <Section title={t('home.sectionDestacados')}>
-        <View style={{ gap: spacing.gutter, paddingHorizontal: spacing.containerPadding }}>
-          {highlights.map(h => (
-            <HighlightRow key={h.id} image={h.image} category={h.category} title={h.title} subtitle={h.subtitle} />
-          ))}
-        </View>
-      </Section>
+      {highlights.length > 0 && (
+        <Section title={t('home.sectionDestacados')}>
+          <View style={{ gap: spacing.gutter, paddingHorizontal: spacing.containerPadding }}>
+            {highlights.map(h => (
+              <HighlightRow key={h.id} image={h.image} category={h.category} title={h.title} subtitle={h.subtitle} onPress={h.onPress} />
+            ))}
+          </View>
+        </Section>
+      )}
 
       <View style={{ height: spacing.stackLg }} />
     </ScrollView>
