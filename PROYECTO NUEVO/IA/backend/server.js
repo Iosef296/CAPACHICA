@@ -403,7 +403,12 @@ IMPORTANTE: No expliques tu razonamiento paso a paso ni pienses en voz alta. Res
 
     const result = await chatComplete(
       [{ role: 'user', content: prompt }],
-      { temperature: 0.4, max_tokens: 3000 }
+      // reasoning.exclude: el modelo que suele tocar en el free tier
+      // (nvidia/nemotron) es un modelo "razonador" que gasta casi todo
+      // max_tokens pensando en voz alta antes de escribir el JSON --
+      // esto le pide a OpenRouter que no incluya ese pensamiento y vaya
+      // directo a la respuesta final.
+      { temperature: 0.4, max_tokens: 2000, reasoning: { exclude: true } }
     );
     const raw = result.choices[0].message.content.trim();
     const match = raw.match(/\{[\s\S]*\}/);
