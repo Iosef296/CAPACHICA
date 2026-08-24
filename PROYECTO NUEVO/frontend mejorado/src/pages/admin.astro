@@ -1891,7 +1891,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
 
   async function loadDestinos() {
     try {
-      const res = await fetch(`${API_URL}/api/comunidades`);
+      const res = await fetch(`${API_URL}/api/comunidades`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       destinosData = await res.json();
       const n = destinosData.length;
@@ -1931,11 +1931,13 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
             </div>
             <div style="font-size:12px;color:var(--cyan);margin-bottom:2px">📍 ${esc(d.comunidad)}</div>
             <div style="font-size:11px;margin-bottom:2px;color:${d.usuario_nombre ? 'var(--green)' : 'var(--dim)'}">${d.usuario_nombre ? `💼 ${esc(d.usuario_nombre)}` : '— sin emprendedor asignado —'}</div>
+            ${d.aprobado === false ? `<div style="font-size:11px;font-weight:700;margin-bottom:2px;color:var(--amber)">⏳ Pendiente de aprobación</div>` : ''}
             ${metaBits ? `<div style="font-size:11px;color:var(--muted);margin-bottom:5px">${esc(metaBits)}</div>` : ''}
             <div style="font-size:12px;color:var(--muted);line-height:1.4;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(d.desc)}</div>
             <div style="display:flex;flex-wrap:wrap;gap:4px">${tagHtml}</div>
           </div>
           <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+            ${d.aprobado === false ? `<button onclick="aprobarDestino(${d.id})" style="padding:6px 12px;border-radius:7px;border:1px solid rgba(74,222,128,.3);background:transparent;color:var(--green);font-size:12px;cursor:pointer;font-family:inherit">✓ Aprobar</button>` : ''}
             <button onclick="openDestinoModal(${d.id})" style="padding:6px 12px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">✎ Editar</button>
             <button onclick="deleteDestino(${d.id})" style="padding:6px 12px;border-radius:7px;border:1px solid rgba(248,113,113,.22);background:transparent;color:var(--red);font-size:12px;cursor:pointer;font-family:inherit;transition:background .15s" onmouseover="this.style.background='rgba(248,113,113,.1)'" onmouseout="this.style.background='transparent'">✕ Eliminar</button>
           </div>
@@ -2132,7 +2134,7 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       if (cfg.cargarPersonalizado) {
         items = await cfg.cargarPersonalizado();
       } else {
-        const res = await fetch(`${API_URL}/api/${cfg.endpoint}${cfg.listQuery || ''}`);
+        const res = await fetch(`${API_URL}/api/${cfg.endpoint}${cfg.listQuery || ''}`, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         items = cfg.listResponseKey ? (data[cfg.listResponseKey] || []) : (Array.isArray(data) ? data : []);
@@ -2159,14 +2161,17 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
         ? `<img class="dest-thumb" src="${esc(it[cfg.imageField])}" alt="" onerror="this.style.display='none'" />`
         : `<div class="dest-emoji-box">${esc(it.emoji || '📦')}</div>`;
       const sub = cfg.itemSub ? cfg.itemSub(it) : '';
+      const pendiente = APROBABLES.includes(rec) && it.aprobado === false;
       return `
         <div class="dest-item" id="${rec}-${it.id}">
           ${img}
           <div style="flex:1;min-width:0">
             <div style="font-size:15px;font-weight:700;color:var(--text)">${esc(cfg.itemLabel(it))}</div>
             ${sub ? `<div style="font-size:12px;color:var(--cyan)">${esc(String(sub))}</div>` : ''}
+            ${pendiente ? `<div style="font-size:11px;font-weight:700;color:var(--amber)">⏳ Pendiente de aprobación</div>` : ''}
           </div>
           <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+            ${pendiente ? `<button onclick="aprobarSimple('${rec}', '${it.id}')" style="padding:6px 12px;border-radius:7px;border:1px solid rgba(74,222,128,.3);background:transparent;color:var(--green);font-size:12px;cursor:pointer;font-family:inherit">✓ Aprobar</button>` : ''}
             <button onclick="openSimpleModal('${rec}', '${it.id}')" style="padding:6px 12px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit">✎ Editar</button>
             <button onclick="deleteSimple('${rec}', '${it.id}')" style="padding:6px 12px;border-radius:7px;border:1px solid rgba(248,113,113,.22);background:transparent;color:var(--red);font-size:12px;cursor:pointer;font-family:inherit">✕ Eliminar</button>
           </div>
@@ -2285,6 +2290,23 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       showMsg(`${cfg.titulo} eliminado`);
     } catch (e) {
       showMsg('Error al eliminar: ' + e.message, 'err');
+    }
+  };
+
+  // Solo estos 4 corren sobre el CRUD generico sqlCrud (el mismo que
+  // comunidades) y tienen aprobacion -- restaurantes/platos son TypeORM
+  // aparte, sin este flujo.
+  const APROBABLES = ['artesania', 'festividades', 'maestros', 'guias'];
+
+  window.aprobarSimple = async (rec, id) => {
+    const cfg = RECURSOS_SIMPLES[rec];
+    try {
+      const res = await fetch(`${API_URL}/api/${cfg.endpoint}/${id}/aprobar`, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + TOKEN } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      showMsg(`${cfg.titulo} aprobado y publicado`);
+      cargarSimple(rec);
+    } catch (e) {
+      showMsg('Error al aprobar: ' + e.message, 'err');
     }
   };
 
@@ -2650,6 +2672,17 @@ const IA_URL  = import.meta.env.PUBLIC_IA_URL      || "http://localhost:5000";
       showMsg('Destino eliminado');
     } catch (e) {
       showMsg('Error al eliminar: ' + e.message, 'err');
+    }
+  };
+
+  window.aprobarDestino = async (id) => {
+    try {
+      const res = await fetch(`${API_URL}/api/comunidades/${id}/aprobar`, { method: 'PUT', headers: { 'Authorization': 'Bearer ' + TOKEN } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      showMsg('Familia aprobada y publicada');
+      loadDestinos();
+    } catch (e) {
+      showMsg('Error al aprobar: ' + e.message, 'err');
     }
   };
 
