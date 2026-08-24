@@ -401,31 +401,43 @@ Elegí UNA familia como hospedaje para toda la estadía (la que mejor se ajuste 
 IMPORTANTE: No expliques tu razonamiento paso a paso ni pienses en voz alta. Respondé DIRECTAMENTE con el JSON de abajo, sin ningún texto antes ni después:
 {"resumen":"2-3 frases en español con el plan y por qué","hospedaje_id":"<id de la familia elegida>","dias":[{"numero":1,"actividad_ids":["<id>"],"notas":"breve, en español"}],"artesania_ids":["<id>"]}`;
 
-    const result = await chatComplete(
-      [{ role: 'user', content: prompt }],
-      // reasoning.exclude: el modelo que suele tocar en el free tier
-      // (nvidia/nemotron) es un modelo "razonador" que gasta casi todo
-      // max_tokens pensando en voz alta antes de escribir el JSON --
-      // esto le pide a OpenRouter que no incluya ese pensamiento y vaya
-      // directo a la respuesta final.
-      { temperature: 0.4, max_tokens: 2000, reasoning: { exclude: true } }
-    );
-    const raw = result.choices[0].message.content.trim();
-    const match = raw.match(/\{[\s\S]*\}/);
-    if (!match) {
-      console.error('IA no devolvió JSON, contenido crudo:', raw.slice(0, 500));
-      throw new Error('La IA no devolvió un plan válido');
+    // El modelo que suele tocar en el free tier (nvidia/nemotron) es un
+    // modelo "razonador" que a veces escribe su pensamiento completo como
+    // texto plano ANTES del JSON, sin que reasoning.exclude lo filtre --
+    // y con prompts grandes (mas dias/mas datos) ese pensamiento a veces
+    // no le deja lugar al JSON dentro de max_tokens. Dos intentos con
+    // bastante margen de tokens en vez de uno solo: no es 100% determinista
+    // por tratarse de un modelo gratuito, reintentar una vez recupera la
+    // gran mayoria de los casos sin que la espera se vuelva eterna.
+    let plan = null;
+    let lastRaw = '';
+    for (let intento = 0; intento < 2 && !plan; intento++) {
+      const result = await chatComplete(
+        [{ role: 'user', content: prompt }],
+        { temperature: 0.4, max_tokens: 4000, reasoning: { exclude: true } }
+      );
+      const raw = result.choices[0].message.content.trim();
+      lastRaw = raw;
+      const match = raw.match(/\{[\s\S]*\}/);
+      if (!match) continue;
+      try {
+        const parsed = JSON.parse(match[0]);
+        // Tambien cuenta como intento fallido (reintentar) si el id de
+        // hospedaje que devolvio no existe en los datos reales -- mejor
+        // reintentar que mostrarle al usuario un hospedaje inventado.
+        if (familias.some(f => String(f.id) === String(parsed.hospedaje_id))) {
+          plan = parsed;
+        }
+      } catch {
+        // sigue null, reintenta
+      }
     }
-    let plan;
-    try {
-      plan = JSON.parse(match[0]);
-    } catch (e) {
-      console.error('IA devolvió JSON inválido:', raw.slice(0, 500));
+    if (!plan) {
+      console.error('IA no devolvió un plan válido tras reintentar, contenido crudo:', lastRaw.slice(0, 500));
       throw new Error('La IA no devolvió un plan válido');
     }
 
     const hospedaje = familias.find(f => String(f.id) === String(plan.hospedaje_id));
-    if (!hospedaje) throw new Error('La IA eligió un hospedaje que no existe');
 
     const actividadesPorId = new Map(actividades.map(a => [String(a.id), a]));
     const artesaniaPorId = new Map(artesania.map(a => [String(a.id), a]));
