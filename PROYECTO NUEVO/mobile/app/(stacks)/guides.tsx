@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import { ScreenHeader } from '@/components/ScreenHeader';
-import { guides as mockGuides } from '@/data/mock';
 import { api, API_WS } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { useAppConfig } from '@/data/AppConfigContext';
@@ -13,9 +12,20 @@ export default function Guides() {
   const { type } = useLocalSearchParams<{ type?: string }>();
   const isTravel = type === 'travel';
   const cfg = useAppConfig();
-  const [allGuides, setAllGuides] = useState<any[]>(mockGuides);
-  useLiveRefresh(() => { api.guides().then(setAllGuides); }, { url: API_WS, channels: 'guias' });
+  const [allGuides, setAllGuides] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  useLiveRefresh(() => {
+    api.guides().then(data => { setAllGuides(data); setLoading(false); });
+  }, { url: API_WS, channels: 'guias' });
   const guides = allGuides.filter((g: any) => !g.type || g.type === (isTravel ? 'viaje' : 'cultural'));
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
+        <ActivityIndicator color={colors.primary} />
+      </View>
+    );
+  }
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaView edges={['bottom']}>
@@ -32,6 +42,11 @@ export default function Guides() {
         </Text>
 
         <View style={styles.list}>
+          {guides.length === 0 && (
+            <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, textAlign: 'center', paddingVertical: spacing.stackMd, fontStyle: 'italic' }]}>
+              Todavía no hay guías cargadas.
+            </Text>
+          )}
           {guides.map(g => (
             <View key={g.id} style={styles.card}>
               <Image source={{ uri: g.img }} style={styles.img} />

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialIcons } from '@expo/vector-icons';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { GlassPanel } from '@/components/GlassPanel';
-import { crafts as mockCrafts, masters as mockMasters } from '@/data/mock';
 import { api, API_WS } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { useAppConfig } from '@/data/AppConfigContext';
@@ -18,12 +18,24 @@ const PALETTE = [
 
 export default function Crafts() {
   const cfg = useAppConfig();
-  const [crafts, setCrafts] = useState<any[]>(mockCrafts);
-  const [masters, setMasters] = useState<any[]>(mockMasters);
+  const [crafts, setCrafts] = useState<any[]>([]);
+  const [masters, setMasters] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   useLiveRefresh(() => {
-    api.crafts().then(setCrafts);
-    api.masters().then(setMasters);
+    Promise.all([api.crafts(), api.masters()]).then(([c, m]) => {
+      setCrafts(c);
+      setMasters(m);
+      setLoading(false);
+    });
   }, { url: API_WS, channels: ['artesania', 'maestros'] });
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
+        <ActivityIndicator color={colors.primary} />
+      </View>
+    );
+  }
   return (
     <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaView edges={['bottom']}>
@@ -43,29 +55,45 @@ export default function Crafts() {
           </View>
         </GlassPanel>
 
-        <Text style={styles.sectionTitle}>{cfg.text('crafts.sectionMaestros', 'MAESTROS DEL TELAR')}</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hScroll}>
-          {masters.map(m => (
-            <View key={m.id} style={styles.master}>
-              <Image source={{ uri: m.img }} style={styles.masterImg} />
-              <Text style={[typography.bodyLg, { color: colors.onSurface, fontFamily: 'HankenGrotesk_700Bold' }]}>{m.name}</Text>
-              <Text style={[typography.labelSm, { color: colors.secondary }]}>{m.craft.toUpperCase()}</Text>
-            </View>
-          ))}
-        </ScrollView>
+        {masters.length > 0 && (
+          <>
+            <Text style={styles.sectionTitle}>{cfg.text('crafts.sectionMaestros', 'MAESTROS DEL TELAR')}</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hScroll}>
+              {masters.map(m => (
+                <View key={m.id} style={styles.master}>
+                  <Image source={{ uri: m.img }} style={styles.masterImg} />
+                  <Text style={[typography.bodyLg, { color: colors.onSurface, fontFamily: 'HankenGrotesk_700Bold' }]}>{m.name}</Text>
+                  <Text style={[typography.labelSm, { color: colors.secondary }]}>{m.craft.toUpperCase()}</Text>
+                </View>
+              ))}
+            </ScrollView>
+          </>
+        )}
 
         <Text style={styles.sectionTitle}>{cfg.text('crafts.sectionGaleria', 'GALERÍA')}</Text>
-        <View style={styles.grid}>
-          {crafts.map(c => (
-            <View key={c.id} style={styles.craftCard}>
-              <Image source={{ uri: c.img }} style={styles.craftImg} />
-              <View style={{ padding: 12 }}>
-                <Text style={[typography.bodyLg, { color: colors.onSurface, fontFamily: 'HankenGrotesk_700Bold' }]}>{c.name}</Text>
-                <Text style={[typography.headlineMd, { color: colors.primary, marginTop: 2 }]}>S/ {c.price}</Text>
+        {crafts.length === 0 ? (
+          <Text style={[typography.bodyMd, { color: colors.onSurfaceVariant, textAlign: 'center', paddingVertical: spacing.stackMd, fontStyle: 'italic' }]}>
+            Todavía no hay productos de artesanía cargados.
+          </Text>
+        ) : (
+          <View style={styles.grid}>
+            {crafts.map(c => (
+              <View key={c.id} style={styles.craftCard}>
+                {c.img ? (
+                  <Image source={{ uri: c.img }} style={styles.craftImg} />
+                ) : (
+                  <View style={[styles.craftImg, styles.craftImgFallback]}>
+                    <MaterialIcons name="palette" size={28} color={colors.onSurfaceVariant} />
+                  </View>
+                )}
+                <View style={{ padding: 12 }}>
+                  <Text style={[typography.bodyLg, { color: colors.onSurface, fontFamily: 'HankenGrotesk_700Bold' }]}>{c.name}</Text>
+                  <Text style={[typography.headlineMd, { color: colors.primary, marginTop: 2 }]}>S/ {c.price}</Text>
+                </View>
               </View>
-            </View>
-          ))}
-        </View>
+            ))}
+          </View>
+        )}
 
         <Text style={styles.sectionTitle}>{cfg.text('crafts.sectionTintes', 'TINTES DE LA TIERRA')}</Text>
         <View style={[styles.palette, { paddingHorizontal: spacing.containerPadding }]}>
@@ -93,6 +121,7 @@ const styles = StyleSheet.create({
   grid: { paddingHorizontal: spacing.containerPadding, flexDirection: 'row', flexWrap: 'wrap', gap: spacing.gutter },
   craftCard: { width: '47%', backgroundColor: colors.surfaceContainerLowest, borderRadius: radii.lg, overflow: 'hidden', ...shadows.card },
   craftImg: { width: '100%', height: 130 },
+  craftImgFallback: { backgroundColor: colors.surfaceContainerLow, alignItems: 'center', justifyContent: 'center' },
   palette: { flexDirection: 'row', gap: spacing.gutter, marginTop: spacing.stackSm },
   swatch: { width: 50, height: 50, borderRadius: 25 },
 });
