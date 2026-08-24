@@ -398,12 +398,12 @@ ${JSON.stringify(artesaniaResumen)}
 
 Elegí UNA familia como hospedaje para toda la estadía (la que mejor se ajuste a presupuesto/capacidad/intereses). Para cada día elegí 0 a 2 actividades reales de la lista (podés repetir actividades entre días, o dejar algún día libre). Sugerí hasta 2 artesanías reales para comprar SOLO si el presupuesto alcanza después de hospedaje + actividades. NUNCA excedas el presupuesto total salvo que sea literalmente imposible con las opciones dadas (avisalo en el resumen si pasa).
 
-Devolvé SOLO este JSON, sin texto antes ni después:
+IMPORTANTE: No expliques tu razonamiento paso a paso ni pienses en voz alta. Respondé DIRECTAMENTE con el JSON de abajo, sin ningún texto antes ni después:
 {"resumen":"2-3 frases en español con el plan y por qué","hospedaje_id":"<id de la familia elegida>","dias":[{"numero":1,"actividad_ids":["<id>"],"notas":"breve, en español"}],"artesania_ids":["<id>"]}`;
 
     const result = await chatComplete(
       [{ role: 'user', content: prompt }],
-      { temperature: 0.4, max_tokens: 1400 }
+      { temperature: 0.4, max_tokens: 3000 }
     );
     const raw = result.choices[0].message.content.trim();
     const match = raw.match(/\{[\s\S]*\}/);
