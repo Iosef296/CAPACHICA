@@ -320,6 +320,130 @@ app.post('/api/chat/stream', async (req, res) => {
   }
 });
 
+// ── EXPERIENCIA (itinerario real armado con IA) ───────
+// El backend principal (Postgres) tiene los datos reales de familias/
+// artesania/actividades -- este servicio no tiene esas tablas, asi que
+// las trae por su API publica (ya filtra aprobado=true) y le pasa SOLO
+// esos ids/precios reales a la IA. Nunca confiamos en que la IA invente
+// nombres/precios: el costo final se recalcula acá con los precios
+// reales, y cualquier id que la IA devuelva y no exista en los datos
+// reales se descarta en vez de mostrarse.
+const MAIN_API_URL = process.env.MAIN_API_URL || 'https://capachica-backend-production.up.railway.app/api';
+
+async function fetchJSON(url) {
+  try {
+    const r = await fetch(url);
+    if (!r.ok) return null;
+    return await r.json();
+  } catch {
+    return null;
+  }
+}
+
+app.post('/api/experiencia', async (req, res) => {
+  const dias = Number(req.body?.dias);
+  const presupuesto = Number(req.body?.presupuesto);
+  const personas = Number(req.body?.personas) || 1;
+  const intereses = Array.isArray(req.body?.intereses) ? req.body.intereses : [];
+
+  if (!Number.isFinite(dias) || dias < 1 || !Number.isFinite(presupuesto) || presupuesto <= 0) {
+    return res.status(400).json({ error: 'Indica días de estancia y presupuesto válidos.' });
+  }
+
+  try {
+    const [familiasRaw, artesaniaRaw, actividadesRaw] = await Promise.all([
+      fetchJSON(`${MAIN_API_URL}/comunidades`),
+      fetchJSON(`${MAIN_API_URL}/artesania`),
+      fetchJSON(`${MAIN_API_URL}/actividades`),
+    ]);
+    const familias = Array.isArray(familiasRaw) ? familiasRaw : [];
+    const artesania = Array.isArray(artesaniaRaw) ? artesaniaRaw : [];
+    const actividades = Array.isArray(actividadesRaw?.actividades)
+      ? actividadesRaw.actividades
+      : (Array.isArray(actividadesRaw) ? actividadesRaw : []);
+
+    if (!familias.length) {
+      return res.status(503).json({ error: 'Todavía no hay familias anfitrionas cargadas para armar una experiencia.' });
+    }
+
+    const familiasResumen = familias.map(f => ({
+      id: f.id, nombre: f.nombre, comunidad: f.comunidad, precio_por_persona_noche: f.precio ?? null,
+      capacidad: f.capacidad ?? null, servicios: f.servicios || [], actividades: f.actividades || [],
+    }));
+    const actividadesResumen = actividades.map(a => ({
+      id: a.id, nombre: a.nombre, precio_por_persona: a.precio ?? null, duracion: a.duracion, categoria: a.categoria,
+    }));
+    const artesaniaResumen = artesania.map(a => ({
+      id: a.id, nombre: a.nombre, precio_unidad: a.precio_soles ?? null, tecnica: a.tecnica || '',
+    }));
+    const interesesTxt = intereses.length ? intereses.join(', ') : 'sin preferencia particular';
+
+    const prompt = `Sos un planificador experto de turismo vivencial en Capachica, Puno, Perú.
+Un viajero quiere una experiencia de ${dias} día(s), para ${personas} persona(s), con presupuesto TOTAL de S/ ${presupuesto}. Intereses: ${interesesTxt}.
+
+SOLO podés usar estas opciones reales -- no inventes nombres, ids ni precios nuevos, usá exactamente los ids que aparecen:
+
+FAMILIAS ANFITRIONAS (hospedaje, precio por persona/noche):
+${JSON.stringify(familiasResumen)}
+
+ACTIVIDADES DISPONIBLES (precio por persona):
+${JSON.stringify(actividadesResumen)}
+
+ARTESANÍA (recuerdos para comprar, precio por unidad):
+${JSON.stringify(artesaniaResumen)}
+
+Elegí UNA familia como hospedaje para toda la estadía (la que mejor se ajuste a presupuesto/capacidad/intereses). Para cada día elegí 0 a 2 actividades reales de la lista (podés repetir actividades entre días, o dejar algún día libre). Sugerí hasta 2 artesanías reales para comprar SOLO si el presupuesto alcanza después de hospedaje + actividades. NUNCA excedas el presupuesto total salvo que sea literalmente imposible con las opciones dadas (avisalo en el resumen si pasa).
+
+Devolvé SOLO este JSON, sin texto antes ni después:
+{"resumen":"2-3 frases en español con el plan y por qué","hospedaje_id":"<id de la familia elegida>","dias":[{"numero":1,"actividad_ids":["<id>"],"notas":"breve, en español"}],"artesania_ids":["<id>"]}`;
+
+    const result = await chatComplete([{ role: 'user', content: prompt }], { temperature: 0.4, max_tokens: 1400 });
+    const raw = result.choices[0].message.content.trim();
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('La IA no devolvió un plan válido');
+    const plan = JSON.parse(match[0]);
+
+    const hospedaje = familias.find(f => String(f.id) === String(plan.hospedaje_id));
+    if (!hospedaje) throw new Error('La IA eligió un hospedaje que no existe');
+
+    const actividadesPorId = new Map(actividades.map(a => [String(a.id), a]));
+    const artesaniaPorId = new Map(artesania.map(a => [String(a.id), a]));
+
+    const diasResueltos = (Array.isArray(plan.dias) ? plan.dias : []).map(d => ({
+      numero: d.numero,
+      notas: d.notas || '',
+      actividades: (Array.isArray(d.actividad_ids) ? d.actividad_ids : [])
+        .map(id => actividadesPorId.get(String(id)))
+        .filter(Boolean),
+    }));
+    const artesaniaResuelta = (Array.isArray(plan.artesania_ids) ? plan.artesania_ids : [])
+      .map(id => artesaniaPorId.get(String(id)))
+      .filter(Boolean);
+
+    // Costo recalculado acá con precios reales -- no se usa ninguna suma
+    // que haya podido devolver la IA.
+    const costoHospedaje = (hospedaje.precio || 0) * dias * personas;
+    const costoActividades = diasResueltos.reduce(
+      (sum, d) => sum + d.actividades.reduce((s2, a) => s2 + (a.precio || 0) * personas, 0), 0
+    );
+    const costoArtesania = artesaniaResuelta.reduce((sum, a) => sum + (a.precio_soles || 0), 0);
+    const costoTotal = costoHospedaje + costoActividades + costoArtesania;
+
+    res.json({
+      resumen: plan.resumen || '',
+      hospedaje,
+      dias: diasResueltos,
+      artesania: artesaniaResuelta,
+      costo: { hospedaje: costoHospedaje, actividades: costoActividades, artesania: costoArtesania, total: costoTotal },
+      presupuesto,
+      dentro_de_presupuesto: costoTotal <= presupuesto,
+    });
+  } catch (err) {
+    console.error('Error /api/experiencia:', err.message);
+    res.status(500).json({ error: 'No se pudo generar la experiencia. Intenta de nuevo.' });
+  }
+});
+
 // ── RESERVAR ──────────────────────────────────────────
 app.post('/api/reservar', async (req, res) => {
   const { nombre, contacto, fecha_llegada, dias_estancia, personas, hospedaje, idioma, notas } = req.body;
