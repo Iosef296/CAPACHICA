@@ -1,5 +1,142 @@
 # Session Context — Capachica Turismo
 
+## SESIÓN 23-24 ago 2026 — moderación de contenido, splash UPEU, experiencia con IA, arranque de publicación en Play Store
+
+Sesión larga (mobile principalmente). En orden:
+
+### 1. Asignar emprendedor dueño a cada recurso (backend+web+mobile)
+- `PUT /:recurso/:id/asignar` (admin-only) en `sqlCrud.rutas.js` — aplica a
+  comunidades/artesania/festividades/maestros/guias. admin.astro y
+  Mi Negocio (mobile) lo usan; admin ve TODOS los items de esos tipos
+  (`negocios.listarTodos`), no solo los propios.
+- Se crearon 21 cuentas reales (`<slug-nombre>@capachica.pe` /
+  `Capachica2026`, rol proveedor) y se asignó cada una a su familia real
+  en producción vía script en la consola del navegador (admin logueado).
+
+### 2. Moderación: un emprendedor no publica directo
+- POST en `sqlCrud.rutas.js` fuerza `data.aprobado` según rol (admin=true,
+  proveedor=false). `PUT /:id/aprobar` (admin-only) publica. GET público
+  hace soft-auth (token opcional) para que dueño/admin vean pendientes,
+  cualquier otro no. Items viejos sin el campo cuentan como aprobados.
+- admin.astro y Mi Negocio (mobile) muestran badge "⏳ Pendiente" + botón
+  aprobar cuando aplica.
+
+### 3. Contenido real reemplaza demo/inventado
+- Artesanía: 3 productos reales (chullo/chumpi/poncho), sin atribuir a
+  personas ficticias (antes "Mamá Victoria"/"Mateo Huatta" con fotos de
+  desconocidos). Maestros (fotos falsas) borrados sin reemplazo.
+- Guías: 4 guías reescritas con contenido investigado real (historia,
+  mito de Manco Cápac, rutas Puno→Capachica→Llachón, clima).
+- Festividades: borradas 2 de prueba ("actividad random").
+- Gastronomía: 1 restaurante + 6 platos reales investigados (trucha,
+  chairo, thimpo de karachi, chuño con charqui, pesque de quinua,
+  pachamanca) — antes vacía en producción.
+- `/alojamiento` (web) conectado a `/comunidades` real (antes 19 casas
+  100% inventadas).
+
+### 4. Detalle + navegación real (mobile)
+- `craft-detail.tsx`, `festividad-detail.tsx`, `guide-detail.tsx`
+  (nuevos) — antes ninguna de las 3 secciones navegaba a nada al tocar
+  un item. Craft-detail tiene botón "Comprar por WhatsApp".
+- Home: "Recomendaciones"/"Destacados" ya no son mock (fotos de otra
+  cuenta de Google Photos) — arman con familias/artesanía/festividades
+  reales con foto, tocables.
+
+### 5. "Crear mi experiencia con IA" — itinerario real, no chat genérico
+- `POST /api/experiencia` (IA/backend/server.js, nuevo): recibe
+  {dias, presupuesto, personas, intereses}, trae familias/actividades/
+  artesanía reales del backend principal, le pasa SOLO esos ids/precios
+  reales a la IA (nunca puede inventar), resuelve la respuesta contra
+  los datos reales y RECALCULA el costo server-side (nunca confía en la
+  suma de la IA). `experience-builder.tsx` (mobile, nuevo) es la pantalla
+  -- el botón del Home ya no abre killa-chat.
+- Bugs de IA encontrados y arreglados en el camino: `chatComplete` no
+  reintentaba el siguiente modelo en 404 (solo en 429) -- OpenRouter le
+  cortó el free tier a varios modelos ese día. El modelo que sí respondía
+  (nvidia/nemotron) "piensa en voz alta" y a veces se queda sin
+  `max_tokens` antes de llegar al JSON -- subido a 4000 + `reasoning:
+  {exclude:true}` (este último no lo respetó el modelo, pero no molesta
+  dejarlo). Con 1 intento por request (2 causaba 502 de Railway por
+  timeout) queda ~2 de 3 éxitos -- comportamiento esperable de un modelo
+  gratuito, no bug pendiente.
+
+### 6. Splash de arranque UPEU + créditos
+- `AppSplash.tsx` (nuevo): logo + "Universidad Peruana Unión" +
+  "Desarrollado por estudiantes UPEU", fondo azul degradado, mínimo
+  1.6s, se muestra mientras cargan fuentes/auth en `app/_layout.tsx`.
+- **Bug real encontrado**: AppSplash se renderiza ANTES de que
+  `useFonts()` termine -- usar `fontFamily` custom ahí truncaba el texto
+  en Android sin ningún error (confirmado en vivo con marcador de texto
+  de prueba). Fix: sin `fontFamily` en este componente puntual, fuente
+  del sistema.
+- Configuración > Acerca de: versión pasó a `1.0.0` (`app.json`), sección
+  nueva "Desarrollado por" con los 6 nombres del equipo en lista.
+
+### 7. Publicación en Play Store — EN CURSO, no se puede terminar hoy
+El usuario pidió subir esta app como actualización de una app YA
+publicada. Se investigó en Play Console (cuenta `upeusistemacj`,
+logueada por el usuario en Chrome) y aparecieron 2 bloqueantes:
+
+**a) Paquete distinto** — la app publicada es `pe.capachica.turismo`
+(51 usuarios, en producción, package ID: `4975711731080108229` dentro
+del developer account `8510068969879574672`). Este proyecto Expo usa
+`com.capachica.experienceai`. Play Store identifica la app por el
+package -- **hay que cambiar `android.package` en `app.json` a
+`pe.capachica.turismo` antes de poder subir nada como actualización**
+(sigue sin hacerse, es el primer paso al retomar).
+
+**b) Sin keystore de subida original** — el usuario no tiene el
+keystore con el que se firmó la app publicada. Buena noticia: **Play
+App Signing está activo** (Google guarda la clave real de firma, "En
+uso", base instalada 100%) -- solo hace falta una "clave de subida"
+válida, que Google puede resetear.
+- **Ya se generó una keystore nueva** en
+  `C:\APLICACIONES MOVILES\capachica\mobile\android\app\upload-keystore.jks`
+  (alias `upload`, misma contraseña para store y key: guardada en
+  `upload_certificate.pem` del mismo directorio -- **la contraseña es
+  `qOSpQJ7PiAN7yJXprNaBlLtR`, GUARDAR ESTO, si se pierde hay que repetir
+  todo el proceso de reset**). SHA1:
+  `E3:75:88:82:AE:E5:8D:22:75:C8:68:05:05:55:73:E9:36:44:EC:EE` -- SHA256:
+  `B1:F7:CA:F6:5D:12:20:76:8B:7A:46:E1:A7:24:51:72:16:36:30:07:81:4A:D5:F6:0B:63:A3:14:E3:00:47:AD`.
+- **Ya se envió la solicitud de cambio de clave de subida** a Google
+  desde Play Console (Firma de aplicaciones → Solicitar cambio de la
+  clave de subida → motivo "He perdido mi clave de subida" → se subió
+  `upload_certificate.pem`). Estado al cerrar la sesión: **"Hay una
+  solicitud pendiente para cambiar la clave de subida de esta
+  aplicación."** Google tarda históricamente 3-7 días hábiles en
+  aprobar esto -- no depende de nada de este lado, no se puede acelerar.
+
+**Cómo retomar cuando Google apruebe la clave** (revisar Play Console →
+Firma de aplicaciones, o el email de Google a la cuenta `upeusistemacj`):
+1. `PROYECTO NUEVO/mobile/app.json`: cambiar `"package":
+   "com.capachica.experienceai"` a `"package": "pe.capachica.turismo"`
+   dentro de `android`. Probablemente también haya que revisar
+   `scheme`/`bundleIdentifier` de iOS si algún día se publica ahí,
+   pero eso no bloquea Android.
+2. Correr `npx expo prebuild --platform android --clean` en
+   `C:\APLICACIONES MOVILES\capachica\mobile` para regenerar el proyecto
+   nativo con el package nuevo (el actual sigue con
+   `com.capachica.experienceai` compilado).
+3. **Reconfigurar Google Sign-In y Google Maps** para el package+SHA1
+   nuevos -- el Android OAuth Client ID y la Maps API key actuales
+   (`app.json` extra.googleClientIdAndroid / googleClientIdAndroid,
+   `AndroidManifest.xml`) están atados a `com.capachica.experienceai` +
+   SHA1 del keystore de debug. Con el package/firma nuevos, login
+   Google y el mapa van a romper hasta que se registren de nuevo en
+   Google Cloud Console (puede ser un proyecto GCP distinto al que se
+   usó hasta ahora -- confirmar con el usuario cuál).
+4. `cd android && gradlew bundleRelease` (no `assembleRelease` -- Play
+   Store pide `.aab`, no `.apk`) firmado con
+   `android/app/upload-keystore.jks` (agregar `signingConfigs.release`
+   en `android/app/build.gradle` apuntando a esa keystore si
+   `expo prebuild` no lo dejó configurado solo).
+5. Subir el `.aab` en Play Console → Producción → Crear nueva versión,
+   con un `versionCode` mayor al que ya está publicado (revisar cuál es
+   el actual en Play Console antes de buildear).
+6. Confirmar version que se quiere mostrar (ya quedó `1.0.0` en
+   `app.json` y en Configuración > Acerca de del app, hecho en el punto
+   6 de esta sesión) antes de subir.
+
 ## SESIÓN 17 ago 2026 (cont., tarde) — Railway redeploy confirmado, unifica Hospedajes+Familias, fix bug de layout mobile
 
 Continuación de la sesión de arriba, mismo día, vía Claude Code con Chrome
