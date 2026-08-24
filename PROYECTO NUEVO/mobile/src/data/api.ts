@@ -163,6 +163,8 @@ export const api = {
       name: c.nombre ?? c.name,
       price: c.precio_soles ?? c.precio ?? c.price,
       img: c.imagen_url ?? c.imagen ?? c.img,
+      tecnica: c.tecnica, materiales: c.materiales,
+      artesana: c.artesana_nombre, comunidad: c.artesana_comunidad, stock: c.stock,
     }))
   ),
   masters: () => cachedGet<any[]>('/maestros', mock.masters, list =>

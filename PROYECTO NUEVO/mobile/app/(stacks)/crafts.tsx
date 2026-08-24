@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { GlassPanel } from '@/components/GlassPanel';
 import { api, API_WS } from '@/data/api';
@@ -17,6 +18,7 @@ const PALETTE = [
 ];
 
 export default function Crafts() {
+  const router = useRouter();
   const cfg = useAppConfig();
   const [crafts, setCrafts] = useState<any[]>([]);
   const [masters, setMasters] = useState<any[]>([]);
@@ -78,7 +80,7 @@ export default function Crafts() {
         ) : (
           <View style={styles.grid}>
             {crafts.map(c => (
-              <View key={c.id} style={styles.craftCard}>
+              <Pressable key={c.id} style={styles.craftCard} onPress={() => router.push({ pathname: '/(stacks)/craft-detail', params: { id: c.id } })}>
                 {c.img ? (
                   <Image source={{ uri: c.img }} style={styles.craftImg} />
                 ) : (
@@ -90,7 +92,7 @@ export default function Crafts() {
                   <Text style={[typography.bodyLg, { color: colors.onSurface, fontFamily: 'HankenGrotesk_700Bold' }]}>{c.name}</Text>
                   <Text style={[typography.headlineMd, { color: colors.primary, marginTop: 2 }]}>S/ {c.price}</Text>
                 </View>
-              </View>
+              </Pressable>
             ))}
           </View>
         )}

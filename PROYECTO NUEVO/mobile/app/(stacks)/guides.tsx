@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { api, API_WS } from '@/data/api';
 import { useLiveRefresh } from '@/hooks/useLiveRefresh';
@@ -9,6 +9,7 @@ import { useAppConfig } from '@/data/AppConfigContext';
 import { colors, radii, shadows, spacing, typography } from '@/theme';
 
 export default function Guides() {
+  const router = useRouter();
   const { type } = useLocalSearchParams<{ type?: string }>();
   const isTravel = type === 'travel';
   const cfg = useAppConfig();
@@ -48,7 +49,7 @@ export default function Guides() {
             </Text>
           )}
           {guides.map(g => (
-            <View key={g.id} style={styles.card}>
+            <Pressable key={g.id} style={styles.card} onPress={() => router.push({ pathname: '/(stacks)/guide-detail', params: { id: g.id } })}>
               <Image source={{ uri: g.img }} style={styles.img} />
               <View style={styles.body}>
                 <Text style={[typography.headlineMd, { color: colors.onSurface }]}>{g.title}</Text>
@@ -59,7 +60,7 @@ export default function Guides() {
                   {cfg.text('guides.readMoreLabel', 'LEER MÁS →')}
                 </Text>
               </View>
-            </View>
+            </Pressable>
           ))}
         </View>
         <View style={{ height: spacing.stackLg }} />

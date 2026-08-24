@@ -55,16 +55,18 @@ export default function Festividades() {
           <ScreenHeader eyebrow={cfg.text('festividades.eyebrow', 'CULTURA VIVA')} title={cfg.text('festividades.title', 'Festividades')} back />
 
           {featured && (
-            <ImageBackground source={{ uri: featured.imagen }} style={styles.hero} imageStyle={{ borderRadius: radii.xl }}>
-              <LinearGradient colors={['transparent', 'rgba(0,66,104,0.9)']} style={[StyleSheet.absoluteFillObject, { borderRadius: radii.xl }]} />
-              <View style={styles.heroBody}>
-                <Text style={[typography.labelMd, { color: colors.sunGold }]}>{cfg.text('festividades.badgeDestacada', 'DESTACADA')}</Text>
-                <Text style={[typography.headlineLg, { color: '#fff', marginTop: 4 }]}>{featured.nombre}</Text>
-                <Text style={[typography.bodyMd, { color: 'rgba(255,255,255,0.85)' }]}>
-                  📅 {featured.fecha}  ·  📍 {featured.ubicacion}
-                </Text>
-              </View>
-            </ImageBackground>
+            <Pressable onPress={() => router.push({ pathname: '/(stacks)/festividad-detail', params: { id: featured.id } })}>
+              <ImageBackground source={{ uri: featured.imagen }} style={styles.hero} imageStyle={{ borderRadius: radii.xl }}>
+                <LinearGradient colors={['transparent', 'rgba(0,66,104,0.9)']} style={[StyleSheet.absoluteFillObject, { borderRadius: radii.xl }]} />
+                <View style={styles.heroBody}>
+                  <Text style={[typography.labelMd, { color: colors.sunGold }]}>{cfg.text('festividades.badgeDestacada', 'DESTACADA')}</Text>
+                  <Text style={[typography.headlineLg, { color: '#fff', marginTop: 4 }]}>{featured.nombre}</Text>
+                  <Text style={[typography.bodyMd, { color: 'rgba(255,255,255,0.85)' }]}>
+                    📅 {featured.fecha}  ·  📍 {featured.ubicacion}
+                  </Text>
+                </View>
+              </ImageBackground>
+            </Pressable>
           )}
 
           <View style={styles.chipsWrap}>
@@ -77,7 +79,7 @@ export default function Festividades() {
         </View>
       }
       renderItem={({ item }) => (
-        <Pressable style={styles.card}>
+        <Pressable style={styles.card} onPress={() => router.push({ pathname: '/(stacks)/festividad-detail', params: { id: item.id } })}>
           <Image source={{ uri: item.imagen }} style={styles.thumb} />
           <View style={{ flex: 1, gap: 4 }}>
             <Text style={[typography.labelSm, { color: colors.secondary }]}>{item.tipo.toUpperCase()}</Text>
