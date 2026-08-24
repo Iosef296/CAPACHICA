@@ -13,6 +13,7 @@ type Prefs = { notifications: boolean; newsletter: boolean };
 
 const KEY = 'capachica.settings';
 const DEFAULT: Prefs = { notifications: true, newsletter: false };
+const DEVELOPERS = ['Iosef Chata', 'Nikol Ticona', 'Cristofer Quispe', 'Joaquin Sanchez', 'Deissy Quispe', 'Karol Tolentino'];
 const LANGS: { code: LangCode; name: string }[] = [
   { code: 'es', name: 'Español' },
   { code: 'en', name: 'English' },
@@ -64,6 +65,17 @@ export default function SettingsScreen() {
 
         <Group title={t('settings.acercaDe')}>
           <InfoRow icon="info" label={t('settings.version')} value={Constants.expoConfig?.version ?? '?'} />
+          <View style={[styles.row, { borderBottomColor: colors.outlineVariant, alignItems: 'flex-start' }]}>
+            <MaterialIcons name="groups" size={22} color={colors.primary} style={{ marginTop: 2 }} />
+            <View style={{ flex: 1 }}>
+              <Text style={[typography.bodyLg, { color: colors.onSurface, marginBottom: 6 }]}>Desarrollado por</Text>
+              {DEVELOPERS.map(nombre => (
+                <Text key={nombre} style={[typography.labelSm, { color: colors.onSurfaceVariant, marginTop: 3 }]}>
+                  •  {nombre}
+                </Text>
+              ))}
+            </View>
+          </View>
           <InfoRow icon="copyright" label={t('settings.copyright')} />
         </Group>
       </SafeAreaView>

@@ -1,14 +1,14 @@
 import { Stack, useRouter, useSegments } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useFonts, EBGaramond_600SemiBold, EBGaramond_700Bold } from '@expo-google-fonts/eb-garamond';
 import { HankenGrotesk_400Regular, HankenGrotesk_500Medium, HankenGrotesk_700Bold } from '@expo-google-fonts/hanken-grotesk';
-import { ActivityIndicator, View } from 'react-native';
 import { AuthProvider, useAuth } from '@/auth/AuthContext';
 import { AppConfigProvider } from '@/data/AppConfigContext';
 import { colors, useThemeMode, loadSavedThemeMode } from '@/theme';
 import { SystemBars } from 'react-native-edge-to-edge';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { loadSavedLanguage } from '@/i18n';
+import { AppSplash } from '@/components/AppSplash';
 
 function Gate() {
   const { user, guest, loading } = useAuth();
@@ -28,11 +28,7 @@ function Gate() {
   }, [user, guest, loading, segments]);
 
   if (loading) {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
-        <ActivityIndicator color={colors.primary} />
-      </View>
-    );
+    return <AppSplash />;
   }
 
   return <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }} />;
@@ -47,6 +43,10 @@ export default function RootLayout() {
     HankenGrotesk_700Bold,
   });
 
+  // Splash de arranque: se ve un rato minimo fijo aunque fonts/auth carguen
+  // rapido, para que no sea un flash de una fraccion de segundo.
+  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
+
   const themeMode = useThemeMode();
 
   useEffect(() => {
@@ -54,12 +54,13 @@ export default function RootLayout() {
     loadSavedThemeMode();
   }, []);
 
-  if (!loaded) {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
-        <ActivityIndicator color={colors.primary} />
-      </View>
-    );
+  useEffect(() => {
+    const t = setTimeout(() => setMinTimeElapsed(true), 1600);
+    return () => clearTimeout(t);
+  }, []);
+
+  if (!loaded || !minTimeElapsed) {
+    return <AppSplash />;
   }
 
   return (
