@@ -47,8 +47,12 @@ async function chatComplete(messages, opts = {}) {
     } catch (err) {
       lastErr = err;
       const status = err?.status ?? err?.response?.status;
-      if (status !== 429) throw err;
-      console.warn(`OpenRouter 429 en ${model}, probando siguiente modelo...`);
+      // 429 = rate-limit del free tier saturado; 404 = OpenRouter dejó de
+      // ofrecer ese modelo gratis (les pasa seguido a los ":free"). Ambos
+      // casos ameritan probar el siguiente modelo de la cadena en vez de
+      // fallar la request entera.
+      if (status !== 429 && status !== 404) throw err;
+      console.warn(`OpenRouter ${status} en ${model}, probando siguiente modelo...`);
     }
   }
   throw lastErr;
