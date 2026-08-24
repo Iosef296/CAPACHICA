@@ -297,6 +297,7 @@ export default function MyBusiness() {
     const emprendedorSel = puedeAsignar ? (edit.usuario_id ?? null) : undefined;
     delete body.usuario_id;
     delete body.usuario_nombre;
+    const esNuevo = !edit.id;
     setSaving(true);
     try {
       let savedId = edit.id;
@@ -310,10 +311,22 @@ export default function MyBusiness() {
       }
       setModalOpen(false);
       refreshItems();
+      if (esNuevo && !esAdmin && ASIGNABLE.includes(cfg.key)) {
+        Alert.alert('Enviado a revisión', 'Un administrador tiene que aprobarlo antes de que se publique.');
+      }
     } catch (e) {
       Alert.alert('Error al guardar', (e as Error).message);
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function aprobar(item: any) {
+    try {
+      await negocios.aprobar(cfg.key, item.id);
+      refreshItems();
+    } catch (e) {
+      Alert.alert('Error al aprobar', (e as Error).message);
     }
   }
 
@@ -384,7 +397,17 @@ export default function MyBusiness() {
                       {item.usuario_nombre ? `💼 ${item.usuario_nombre}` : '— sin emprendedor asignado —'}
                     </Text>
                   )}
+                  {ASIGNABLE.includes(cfg.key) && item.aprobado === false && (
+                    <Text style={[typography.labelSm, { color: colors.error, marginTop: 2, fontFamily: 'HankenGrotesk_700Bold' }]} numberOfLines={1}>
+                      ⏳ Pendiente de aprobación
+                    </Text>
+                  )}
                 </View>
+                {puedeAsignar && item.aprobado === false && (
+                  <Pressable onPress={() => aprobar(item)} style={styles.iconBtn}>
+                    <MaterialIcons name="check-circle" size={18} color={colors.primary} />
+                  </Pressable>
+                )}
                 <Pressable onPress={() => openEdit(item)} style={styles.iconBtn}>
                   <MaterialIcons name="edit" size={18} color={colors.primary} />
                 </Pressable>

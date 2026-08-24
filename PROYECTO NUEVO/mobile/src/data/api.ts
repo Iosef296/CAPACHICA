@@ -306,6 +306,14 @@ export const usuariosAdmin = {
   }) => authFetch('PUT', `/usuarios/${id}`, datos),
 };
 
+// Header con el token si hay sesion -- sin esto el GET (publico, sin
+// autenticacionMiddleware) no puede reconocer al dueño/admin y el
+// backend le esconde sus propios items pendientes de aprobar.
+async function authHeaderMaybe(): Promise<Record<string, string>> {
+  const token = await SecureStore.getItemAsync('capachica.token').catch(() => null);
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export const negocios = {
   // Trae TODO el recurso (sin transformar/cachear) y filtra por dueño en el cliente.
   // 'restaurantes' es la excepción -- backend TypeORM real con DTOs propios,
@@ -313,8 +321,9 @@ export const negocios = {
   listarPropios: async (tipo: TipoNegocio, usuarioId: string): Promise<any[]> => {
     if (!API_BASE) return [];
     try {
+      const headers = await authHeaderMaybe();
       if (tipo === 'restaurantes') {
-        const res = await fetch(`${API_BASE}/restaurantes?limit=200`);
+        const res = await fetch(`${API_BASE}/restaurantes?limit=200`, { headers });
         const data = await res.json().catch(() => ({}));
         const lista = Array.isArray(data?.data) ? data.data : [];
         return lista.filter((it: any) => String(it.usuario_id) === String(usuarioId));
@@ -325,14 +334,14 @@ export const negocios = {
         const misRestaurantes = await negocios.listarPropios('restaurantes', usuarioId);
         const listas = await Promise.all(misRestaurantes.map(async (r: any) => {
           try {
-            const res = await fetch(`${API_BASE}/platos/restaurante/${r.id}`);
+            const res = await fetch(`${API_BASE}/platos/restaurante/${r.id}`, { headers });
             const data = await res.json().catch(() => []);
             return Array.isArray(data) ? data : [];
           } catch { return []; }
         }));
         return listas.flat();
       }
-      const res = await fetch(`${API_BASE}/${tipo}`);
+      const res = await fetch(`${API_BASE}/${tipo}`, { headers });
       const data = await res.json().catch(() => []);
       return (Array.isArray(data) ? data : []).filter((it: any) => String(it.usuario_id) === String(usuarioId));
     } catch {
@@ -342,11 +351,14 @@ export const negocios = {
   crear: (tipo: TipoNegocio, datos: any) => authFetch('POST', `/${tipo}`, datos),
   editar: (tipo: TipoNegocio, id: string | number, datos: any) => authFetch('PUT', `/${tipo}/${id}`, datos),
   eliminar: (tipo: TipoNegocio, id: string | number) => authFetch('DELETE', `/${tipo}/${id}`),
-  // Sin filtrar por dueño -- solo para el panel admin (asignar emprendedor).
+  // Solo admin -- publica un item pendiente creado por un emprendedor.
+  aprobar: (tipo: TipoNegocio, id: string | number) => authFetch('PUT', `/${tipo}/${id}/aprobar`),
+  // Sin filtrar por dueño -- solo para el panel admin (asignar emprendedor / aprobar).
   listarTodos: async (tipo: TipoNegocio): Promise<any[]> => {
     if (!API_BASE) return [];
     try {
-      const res = await fetch(`${API_BASE}/${tipo}`);
+      const headers = await authHeaderMaybe();
+      const res = await fetch(`${API_BASE}/${tipo}`, { headers });
       const data = await res.json().catch(() => []);
       return Array.isArray(data) ? data : [];
     } catch {
