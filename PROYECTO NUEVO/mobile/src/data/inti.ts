@@ -3,7 +3,7 @@ import Constants from 'expo-constants';
 import { toWsUrl } from './ws';
 
 const extra = (Constants.expoConfig?.extra as any) ?? {};
-const IA_BASE = (extra.iaBaseUrl ?? '').replace(/\/api\/?$/, '');
+export const IA_BASE = (extra.iaBaseUrl ?? '').replace(/\/api\/?$/, '');
 export const IA_WS = toWsUrl(IA_BASE);
 
 // Backend real de Inti IA (Railway). Si falla, cae a knowledge base local.

@@ -181,7 +181,7 @@ export default function Home() {
             <Text style={[typography.bodyMd, { color: 'rgba(255,255,255,0.85)', marginTop: 8, marginBottom: spacing.stackMd }]}>
               {cfg.text('home.heroSubtitle', t('home.heroSubtitle'))}
             </Text>
-            <Button label={cfg.text('home.ctaCrear', t('home.ctaCrear'))} variant="killa" icon="auto-awesome" onPress={() => router.push('/(stacks)/killa-chat')} />
+            <Button label={cfg.text('home.ctaCrear', t('home.ctaCrear'))} variant="killa" icon="auto-awesome" onPress={() => router.push('/(stacks)/experience-builder')} />
           </View>
         </View>
       </ImageBackground>
