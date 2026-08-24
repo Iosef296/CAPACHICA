@@ -137,6 +137,25 @@ Firma de aplicaciones, o el email de Google a la cuenta `upeusistemacj`):
    `app.json` y en Configuración > Acerca de del app, hecho en el punto
    6 de esta sesión) antes de subir.
 
+### 8. APK de prueba para el celular (cierre de sesión)
+`gradlew assembleRelease --no-daemon` (firma con keystore de DEBUG, no
+con `upload-keystore.jks` del punto 7 -- son cosas separadas, no
+mezclar). Generado `Capachica-1.0.0.apk` (57MB) en
+`C:\APLICACIONES MOVILES\capachica\mobile\android\app\build\outputs\apk\release\`.
+No se pudo mandar por el chat (pasa el límite de 30MB) -- el usuario lo
+pasa a mano (USB/Drive/WhatsApp) desde esa ruta. Antes de compilar se
+cerró el emulador (quedaba 4GB libres de RAM con emulador+Metro
+corriendo, insuficiente -- con el emulador cerrado subió a 5.4GB,
+umbral ya confirmado como seguro en sesiones anteriores). Metro sigue
+corriendo en el puerto 8081 si se quiere levantar el emulador de nuevo
+para seguir probando en vivo.
+
+### Cómo retomar (general)
+Si "ya aprobó la clave" -- seguir los 6 pasos del punto 7 de arriba.
+Si no, seguir probando el APK de prueba / pidiendo features nuevas
+normal, sin tocar nada de lo de Play Store hasta que llegue esa
+aprobación.
+
 ## SESIÓN 17 ago 2026 (cont., tarde) — Railway redeploy confirmado, unifica Hospedajes+Familias, fix bug de layout mobile
 
 Continuación de la sesión de arriba, mismo día, vía Claude Code con Chrome
